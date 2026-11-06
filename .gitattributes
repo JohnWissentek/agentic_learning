@@ -1,0 +1,26 @@
+# 脚本在 Windows 上也必须保持 LF 换行，否则 Bash 报 $'\r': command not found
+github_push text eol=lf
+*.sh text eol=lf
+
+# ------------------------------------------------------------------------------
+# 伪代码：上面两条规则的含义（Git 每次读写文件时按这个逻辑处理）
+#
+#   对仓库里的每个文件 f：
+#       如果 f 的名字是 "github_push"，或者 f 以 ".sh" 结尾：
+#           把 f 当作文本文件（text）
+#
+#           提交时（工作区 → 仓库）：
+#               把 f 里所有的 CRLF（\r\n）换成 LF（\n）再存进仓库
+#
+#           检出时（仓库 → 工作区，如 git clone、git pull、git checkout）：
+#               不管在哪个系统上（包括 Windows），也不管 core.autocrlf 怎么设置，
+#               都按 LF（\n）写到磁盘上，不转换成 CRLF
+#       否则：
+#           按 Git 的默认设置处理，本文件不干预
+#
+#   结果：github_push 和 *.sh 在任何设备上都是 LF 换行，Bash 能直接运行。
+#
+# 相关命令：
+#   git check-attr text eol -- github_push     # 查看某个文件实际生效的属性
+#   git add --renormalize . && git status      # 修改本文件后，按新规则重新规范已提交文件的换行
+# ------------------------------------------------------------------------------

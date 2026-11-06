@@ -1,0 +1,10 @@
+[project]
+name = "agentic-learning"
+version = "0.1.0"
+description = "Agentic AI Design Patterns and Engineering Workspace"
+requires-python = ">=3.14"
+dependencies = [
+    "playwright>=1.64.1",
+    "pymupdf4llm>=2.1",
+    "pypdf>=7.0.0",
+]
