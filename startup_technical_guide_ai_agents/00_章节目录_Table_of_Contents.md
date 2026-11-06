@@ -8,6 +8,7 @@
   - 原始 PDF：[startup_technical_guide_ai_agents_final.pdf](./startup_technical_guide_ai_agents_final.pdf)
   - 全文 Markdown 转换版：[startup_technical_guide_ai_agents_full.md](./startup_technical_guide_ai_agents_full.md)
   - 核心概念专题问答与工程深潜：[01_核心概念专题问答_工具调用_编排决策_Runtime与开源RAG.md](./01_核心概念专题问答_工具调用_编排决策_Runtime与开源RAG.md)
+  - 开源高性能 GraphRAG 选型与实战：[02_开源高性能GraphRAG选型与工程实战指南.md](./02_开源高性能GraphRAG选型与工程实战指南.md)
 
 ---
 
