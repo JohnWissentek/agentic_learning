@@ -1,0 +1,326 @@
+{
+  "nodes": [
+    {
+      "id": "group_row1",
+      "type": "group",
+      "x": 0,
+      "y": 0,
+      "width": 1460,
+      "height": 240,
+      "label": "1. LLM Workflow（基于确定性规则触发的大模型工作流 — 全单向流转）",
+      "color": "3"
+    },
+    {
+      "id": "r1_user",
+      "type": "text",
+      "x": 40,
+      "y": 75,
+      "width": 130,
+      "height": 80,
+      "text": "### 👤 User\n用户输入"
+    },
+    {
+      "id": "r1_prompt",
+      "type": "text",
+      "x": 230,
+      "y": 75,
+      "width": 150,
+      "height": 80,
+      "text": "### ⌨️ Prompt\n提示词输入"
+    },
+    {
+      "id": "r1_trigger",
+      "type": "text",
+      "x": 440,
+      "y": 60,
+      "width": 200,
+      "height": 110,
+      "color": "3",
+      "text": "### 📋 Rules based Trigger\n硬编码规则触发器 (1, 2, 3)\n`if-else` 确定性分支"
+    },
+    {
+      "id": "r1_llm",
+      "type": "text",
+      "x": 700,
+      "y": 75,
+      "width": 250,
+      "height": 80,
+      "color": "3",
+      "text": "### 🧠 Large Language Model\n单次无状态推理"
+    },
+    {
+      "id": "r1_tools",
+      "type": "text",
+      "x": 1000,
+      "y": 15,
+      "width": 190,
+      "height": 70,
+      "text": "🛠️ **Tools** (外部工具)"
+    },
+    {
+      "id": "r1_data",
+      "type": "text",
+      "x": 1000,
+      "y": 145,
+      "width": 190,
+      "height": 70,
+      "text": "🗄️ **Data Sources** (数据源)"
+    },
+    {
+      "id": "r1_output",
+      "type": "text",
+      "x": 1270,
+      "y": 75,
+      "width": 150,
+      "height": 80,
+      "text": "### 📤 Output\n输出结果"
+    },
+
+    {
+      "id": "group_row2",
+      "type": "group",
+      "x": 0,
+      "y": 300,
+      "width": 1460,
+      "height": 260,
+      "label": "2. RAG（检索增强生成：用事实数据锚定模型 — 单向检索增强流水线）",
+      "color": "4"
+    },
+    {
+      "id": "r2_user",
+      "type": "text",
+      "x": 40,
+      "y": 395,
+      "width": 130,
+      "height": 80,
+      "text": "### 👤 User\n用户输入"
+    },
+    {
+      "id": "r2_prompt",
+      "type": "text",
+      "x": 230,
+      "y": 395,
+      "width": 150,
+      "height": 80,
+      "text": "### ⌨️ Prompt\n查询问题"
+    },
+    {
+      "id": "r2_ds",
+      "type": "text",
+      "x": 460,
+      "y": 315,
+      "width": 210,
+      "height": 65,
+      "text": "🗄️ **Data Sources** (原始知识库)"
+    },
+    {
+      "id": "r2_retrieval",
+      "type": "text",
+      "x": 460,
+      "y": 405,
+      "width": 330,
+      "height": 110,
+      "color": "4",
+      "text": "### 🔍 Retrieval (检索阶段)\n`Embedding` ➡️ `Vector Db`\n文本向量化与高维相似度检索"
+    },
+    {
+      "id": "r2_augmented",
+      "type": "text",
+      "x": 850,
+      "y": 405,
+      "width": 310,
+      "height": 110,
+      "color": "4",
+      "text": "### 📄 Augmented (增强阶段)\n`Data` (召回片段拼装进上下文)\n供 LLM 生成事实锚定回答"
+    },
+    {
+      "id": "r2_tools",
+      "type": "text",
+      "x": 890,
+      "y": 315,
+      "width": 220,
+      "height": 65,
+      "text": "🛠️ **Tools** (外部工具)"
+    },
+    {
+      "id": "r2_output",
+      "type": "text",
+      "x": 1270,
+      "y": 395,
+      "width": 150,
+      "height": 80,
+      "text": "### 📤 Output\n输出结果"
+    },
+
+    {
+      "id": "group_row3",
+      "type": "group",
+      "x": 0,
+      "y": 620,
+      "width": 1460,
+      "height": 280,
+      "label": "3. AI Agent（单体智能体：首次出现双向闭环 ⟷ 具备规划、记忆与多轮推理）",
+      "color": "5"
+    },
+    {
+      "id": "r3_user",
+      "type": "text",
+      "x": 40,
+      "y": 720,
+      "width": 130,
+      "height": 80,
+      "text": "### 👤 User\n用户目标"
+    },
+    {
+      "id": "r3_prompt",
+      "type": "text",
+      "x": 230,
+      "y": 720,
+      "width": 150,
+      "height": 80,
+      "text": "### ⌨️ Prompt\n任务指令"
+    },
+    {
+      "id": "r3_left",
+      "type": "text",
+      "x": 460,
+      "y": 665,
+      "width": 210,
+      "height": 190,
+      "text": "- 💬 **Chat** (多轮对话)\n- 🗄️ **Database** (数据库)\n- 🗂️ **Planning** (任务规划)"
+    },
+    {
+      "id": "r3_core",
+      "type": "text",
+      "x": 730,
+      "y": 700,
+      "width": 200,
+      "height": 120,
+      "color": "5",
+      "text": "### 🤖 AI Agent Core\nLLM + Runtime Loop\n(双向动态编排中枢)"
+    },
+    {
+      "id": "r3_right",
+      "type": "text",
+      "x": 990,
+      "y": 665,
+      "width": 210,
+      "height": 190,
+      "text": "- 💾 **Memory** (长短期记忆)\n- 🛠️ **Tools** (工具执行)\n- 💡 **Reasoning** (动态推理)"
+    },
+    {
+      "id": "r3_output",
+      "type": "text",
+      "x": 1270,
+      "y": 720,
+      "width": 150,
+      "height": 80,
+      "text": "### 📤 Output\n输出结果"
+    },
+
+    {
+      "id": "group_row4",
+      "type": "group",
+      "x": 0,
+      "y": 960,
+      "width": 1460,
+      "height": 300,
+      "label": "4. Agentic AI（多智能体协同系统 + Human in the Loop 人工审批门禁）",
+      "color": "6"
+    },
+    {
+      "id": "r4_user",
+      "type": "text",
+      "x": 40,
+      "y": 1070,
+      "width": 130,
+      "height": 80,
+      "text": "### 👤 User\n复杂业务目标"
+    },
+    {
+      "id": "r4_prompt",
+      "type": "text",
+      "x": 230,
+      "y": 1070,
+      "width": 150,
+      "height": 80,
+      "text": "### ⌨️ Prompt\n目标输入"
+    },
+    {
+      "id": "r4_a1_caps",
+      "type": "text",
+      "x": 440,
+      "y": 1015,
+      "width": 180,
+      "height": 190,
+      "text": "- 💾 **Memory**\n- 💡 **Reasoning**\n- 💬 **Chat**"
+    },
+    {
+      "id": "r4_agent1",
+      "type": "text",
+      "x": 650,
+      "y": 1050,
+      "width": 160,
+      "height": 120,
+      "color": "6",
+      "text": "### 🤖 Agent 1\n规划与交互智能体"
+    },
+    {
+      "id": "r4_agent2",
+      "type": "text",
+      "x": 860,
+      "y": 1050,
+      "width": 160,
+      "height": 120,
+      "color": "6",
+      "text": "### 🤖 Agent 2\n执行与合规智能体"
+    },
+    {
+      "id": "r4_a2_caps",
+      "type": "text",
+      "x": 1050,
+      "y": 1015,
+      "width": 190,
+      "height": 190,
+      "text": "- 🛠️ **Tools**\n- 🗄️ **Database**\n- 🧑‍⚖️ **Human in the Loop**\n  *(人工审批门禁)*"
+    },
+    {
+      "id": "r4_output",
+      "type": "text",
+      "x": 1270,
+      "y": 1070,
+      "width": 150,
+      "height": 80,
+      "text": "### 📤 Output\n最终交付"
+    }
+  ],
+  "edges": [
+    {"id": "e1_1", "fromNode": "r1_user", "fromSide": "right", "toNode": "r1_prompt", "toSide": "left"},
+    {"id": "e1_2", "fromNode": "r1_prompt", "fromSide": "right", "toNode": "r1_trigger", "toSide": "left"},
+    {"id": "e1_3", "fromNode": "r1_trigger", "fromSide": "right", "toNode": "r1_llm", "toSide": "left"},
+    {"id": "e1_4", "fromNode": "r1_llm", "fromSide": "top", "toNode": "r1_tools", "toSide": "left"},
+    {"id": "e1_5", "fromNode": "r1_llm", "fromSide": "bottom", "toNode": "r1_data", "toSide": "left"},
+    {"id": "e1_6", "fromNode": "r1_llm", "fromSide": "right", "toNode": "r1_output", "toSide": "left"},
+
+    {"id": "e2_1", "fromNode": "r2_user", "fromSide": "right", "toNode": "r2_prompt", "toSide": "left"},
+    {"id": "e2_2", "fromNode": "r2_prompt", "fromSide": "right", "toNode": "r2_retrieval", "toSide": "left"},
+    {"id": "e2_3", "fromNode": "r2_ds", "fromSide": "bottom", "toNode": "r2_retrieval", "toSide": "top"},
+    {"id": "e2_4", "fromNode": "r2_retrieval", "fromSide": "right", "toNode": "r2_augmented", "toSide": "left"},
+    {"id": "e2_5", "fromNode": "r2_augmented", "fromSide": "top", "toNode": "r2_tools", "toSide": "bottom"},
+    {"id": "e2_6", "fromNode": "r2_augmented", "fromSide": "right", "toNode": "r2_output", "toSide": "left"},
+
+    {"id": "e3_1", "fromNode": "r3_user", "fromSide": "right", "toNode": "r3_prompt", "toSide": "left"},
+    {"id": "e3_2", "fromNode": "r3_prompt", "fromSide": "right", "toNode": "r3_left", "toSide": "left"},
+    {"id": "e3_3", "fromNode": "r3_left", "fromSide": "right", "toNode": "r3_core", "toSide": "left", "fromEnd": "arrow", "toEnd": "arrow", "label": "⟷"},
+    {"id": "e3_4", "fromNode": "r3_core", "fromSide": "right", "toNode": "r3_right", "toSide": "left", "fromEnd": "arrow", "toEnd": "arrow", "label": "⟷"},
+    {"id": "e3_5", "fromNode": "r3_right", "fromSide": "right", "toNode": "r3_output", "toSide": "left"},
+
+    {"id": "e4_1", "fromNode": "r4_user", "fromSide": "right", "toNode": "r4_prompt", "toSide": "left"},
+    {"id": "e4_2", "fromNode": "r4_prompt", "fromSide": "right", "toNode": "r4_a1_caps", "toSide": "left"},
+    {"id": "e4_3", "fromNode": "r4_a1_caps", "fromSide": "right", "toNode": "r4_agent1", "toSide": "left", "fromEnd": "arrow", "toEnd": "arrow"},
+    {"id": "e4_4", "fromNode": "r4_agent1", "fromSide": "right", "toNode": "r4_agent2", "toSide": "left", "fromEnd": "arrow", "toEnd": "arrow", "label": "A2A ⟷"},
+    {"id": "e4_5", "fromNode": "r4_agent2", "fromSide": "right", "toNode": "r4_a2_caps", "toSide": "left", "fromEnd": "arrow", "toEnd": "arrow"},
+    {"id": "e4_6", "fromNode": "r4_a2_caps", "fromSide": "right", "toNode": "r4_output", "toSide": "left"}
+  ]
+}
+
