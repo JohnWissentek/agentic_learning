@@ -12,6 +12,7 @@
   - Chapter 1 高亮解析与任务拆解机制对比（设计时预定义 vs 运行时 LLM 拆解）：[03_Chapter1_Prompt_Chaining_高亮解析与任务拆解机制对比.md](./03_Chapter1_Prompt_Chaining_高亮解析与任务拆解机制对比.md)
   - Chapter 2 高亮解析与路由机制实战指南（四种路由对比、三级漏斗与动态通道扩展）：[04_Chapter2_Routing_高亮解析_四种路由机制与动态通道扩展指南.md](./04_Chapter2_Routing_高亮解析_四种路由机制与动态通道扩展指南.md)
   - Chapter 3 高亮解析与并行化实战指南（适用与禁区场景、五大重点与 LangChain/LangGraph 三种实现）：[05_Chapter3_Parallelization_高亮解析_适用与禁区场景及LangGraph实现指南.md](./05_Chapter3_Parallelization_高亮解析_适用与禁区场景及LangGraph实现指南.md)
+  - Chapter 4 高亮解析与反思模式落地方案（生成与评估模型配对博弈、谁来修改与 LangGraph 实战模板）：[06_Chapter4_Reflection_高亮解析_生成与评估模型博弈及工程落地方案.md](./06_Chapter4_Reflection_高亮解析_生成与评估模型博弈及工程落地方案.md)
 
 ---
 
