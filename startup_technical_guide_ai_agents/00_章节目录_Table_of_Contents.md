@@ -9,6 +9,10 @@
   - 全文 Markdown 转换版：[startup_technical_guide_ai_agents_full.md](./startup_technical_guide_ai_agents_full.md)
   - 核心概念专题问答与工程深潜：[01_核心概念专题问答_工具调用_编排决策_Runtime与开源RAG.md](./01_核心概念专题问答_工具调用_编排决策_Runtime与开源RAG.md)
   - 开源高性能 GraphRAG 选型与实战：[02_开源高性能GraphRAG选型与工程实战指南.md](./02_开源高性能GraphRAG选型与工程实战指南.md)
+  - Embedding 模型对比与 RAG 全链路执行机制拆解：[03_Embedding模型对比与RAG全链路执行机制拆解.md](./03_Embedding模型对比与RAG全链路执行机制拆解.md)
+  - Section 1 高亮重点提取与智能体编排破壁指南：[04_Section1_高亮重点提取与智能体编排破壁指南.md](./04_Section1_高亮重点提取与智能体编排破壁指南.md)
+  - LangGraph 编排控制参数与上下文精准装配指南：[05_LangGraph编排控制参数与上下文精准装配指南.md](./05_LangGraph编排控制参数与上下文精准装配指南.md)
+  - 脱离 Google 云：四层记忆架构开源平替与 ADK/A2A 取舍指南：[06_脱离Google云_四层记忆架构开源平替与ADK取舍指南.md](./06_脱离Google云_四层记忆架构开源平替与ADK取舍指南.md)
 
 ---
 
