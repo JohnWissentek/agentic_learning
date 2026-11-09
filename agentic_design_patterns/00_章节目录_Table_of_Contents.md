@@ -5,7 +5,7 @@
 - **总页数**：482 页（涵盖 4 大部分、21 个核心智能体设计模式章节、7 个技术附录、术语表及索引，每章均附有基于 **LangChain / LangGraph / CrewAI / Google ADK** 的可运行代码）
 - **同目录文件**：
   - 原始 PDF：[Agentic_Design_Patterns.pdf](./Agentic_Design_Patterns.pdf)
-  - 全书架构精要与完整技术摘要（含 21 章、7 附录、底层架构生命周期与速查总表）：[摘要.md](./摘要.md)
+  - 全书架构精要与技术摘要（模块化速读分册文件夹，含 `README.md` 与 9 篇短文）：[全书摘要分册/README.md](./全书摘要分册/README.md)
   - 全文 Markdown 转换版（约 90 万字符，按页精准标注 `## [PDF Page X]`）：[Agentic_Design_Patterns_full.md](./Agentic_Design_Patterns_full.md)
   - AI 范式演进全景图（Mermaid + 架构精解）：[01_AI范式演进全景图_LLM_Workflow_RAG_Agent_AgenticAI.md](./01_AI范式演进全景图_LLM_Workflow_RAG_Agent_AgenticAI.md)
   - AI 范式演进全景图（JSON Canvas 白板文件）：[01_AI范式演进全景图_LLM_Workflow_RAG_Agent_AgenticAI.canvas](./01_AI范式演进全景图_LLM_Workflow_RAG_Agent_AgenticAI.canvas)
