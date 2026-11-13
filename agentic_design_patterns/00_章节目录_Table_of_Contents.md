@@ -14,6 +14,7 @@
   - Chapter 2 高亮解析与路由机制实战指南（四种路由对比、三级漏斗与动态通道扩展）：[04_Chapter2_Routing_高亮解析_四种路由机制与动态通道扩展指南.md](./04_Chapter2_Routing_高亮解析_四种路由机制与动态通道扩展指南.md)
   - Chapter 3 高亮解析与并行化实战指南（适用与禁区场景、五大重点与 LangChain/LangGraph 三种实现）：[05_Chapter3_Parallelization_高亮解析_适用与禁区场景及LangGraph实现指南.md](./05_Chapter3_Parallelization_高亮解析_适用与禁区场景及LangGraph实现指南.md)
   - Chapter 4 高亮解析与反思模式落地方案（生成与评估模型配对博弈、谁来修改与 LangGraph 实战模板）：[06_Chapter4_Reflection_高亮解析_生成与评估模型博弈及工程落地方案.md](./06_Chapter4_Reflection_高亮解析_生成与评估模型博弈及工程落地方案.md)
+  - 跨模式综合实战参考（工业 B2B 市场调研与 BD 销售拓展 Agentic Workflow，以 V&F IMR-MS 与 CCUS 为例）：[../reference_agentic_workflow/02_工业B2B市场调研与BD销售拓展_Agentic_Workflow_开源生态与架构参考_以VF_IMR_MS与CCUS为例.md](../reference_agentic_workflow/02_工业B2B市场调研与BD销售拓展_Agentic_Workflow_开源生态与架构参考_以VF_IMR_MS与CCUS为例.md)
 
 ---
 
