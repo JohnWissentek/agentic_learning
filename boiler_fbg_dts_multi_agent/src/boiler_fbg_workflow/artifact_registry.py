@@ -219,8 +219,18 @@ class ArtifactRegistry:
         return content
     
     def get_quarantined(self) -> list[Artifact]:
-        """Get all quarantined artifacts."""
-        return [a for a in self._artifacts.values() if a.trust_level == "QUARANTINED"]
+        """Get all quarantined artifacts.
+        
+        Returns artifacts that:
+        - Have quarantine_reason set, OR
+        - Have RULE_TRIGGERED trust level, OR
+        - Have PARSE_FAILED trust level
+        """
+        quarantine_levels = {"RULE_TRIGGERED", "PARSE_FAILED", "SCHEMA_FAILED"}
+        return [
+            a for a in self._artifacts.values() 
+            if a.quarantine_reason or a.trust_level in quarantine_levels
+        ]
     
     def get_input_artifact_ids(self, role: str) -> list[str]:
         """Get artifact IDs that should be inputs for a role.

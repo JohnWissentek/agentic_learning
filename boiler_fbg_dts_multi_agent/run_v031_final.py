@@ -366,11 +366,14 @@ QA trust_level: {qa_full['trust_level']}
 
 请修订输出，避免触发语义规则。不可虚构价格/公司/证言。未知值标UNKNOWN。"""
 
+        # Use original role's schema for revision
         revise_trace, revision_artifact, _ = run_stage_with_full_context(
             provider, llm_registry, artifact_registry,
-            f"{target.source_role}_REVISE", f"{target.source_role}修订",
+            target.source_role, f"{target.source_role}修订",
             v031_context, revise_task, max_tokens=400,
         )
+        # Update stage name to indicate revision
+        revision_artifact.stage = f"{target.source_role.lower()}_revise"
         
         # Track derivation
         revision_artifact.derived_from = target.artifact_id
@@ -397,10 +400,13 @@ QA trust_level: {qa_full['trust_level']}
 2. unresolved: 仍未解决的问题
 3. status: IMPROVED/NO_CHANGE/WORSE"""
 
+        # Use QA schema for QA_REVIEW
         qa_review_trace, qa_review_artifact, _ = run_stage_with_full_context(
             provider, llm_registry, artifact_registry,
-            "QA_REVIEW", "QA再审", v031_context, qa_review_task, max_tokens=300,
+            "QA", "QA再审", v031_context, qa_review_task, max_tokens=300,
         )
+        # Update stage name to indicate review
+        qa_review_artifact.stage = "qa_review"
         print(f"  [QA_REVIEW] {qa_review_artifact.trust_level}")
     else:
         print("  无隔离artifact，跳过返工")
