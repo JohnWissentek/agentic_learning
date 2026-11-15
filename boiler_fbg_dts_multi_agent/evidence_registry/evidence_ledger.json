@@ -1,0 +1,130 @@
+[
+  {
+    "evidence_id": "E01",
+    "claim": "书籍第一版由Springer出版，作者Antonio Gullí；Google为作者任职关系，不是已证实的Google机构发布",
+    "source": "https://link.springer.com/book/10.1007/978-3-032-01402-3",
+    "locator": "Bibliographic information; About the author",
+    "confidence": "A",
+    "limitation": "不能宣传Google认证"
+  },
+  {
+    "evidence_id": "E02",
+    "claim": "Ch7明确顺序、并行、层级、专家团队、Critic-Reviewer结构",
+    "source": "research/sources/Agentic_Design_Patterns_full.md",
+    "locator": "PDF Page113–119",
+    "confidence": "A",
+    "limitation": "框架版本/API另验证"
+  },
+  {
+    "evidence_id": "E03",
+    "claim": "2025–2027煤电升级政策要求深调峰、安全可靠和智能化",
+    "source": "research/sources/NEA_coal_upgrade_2025_2027.pdf",
+    "locator": "p1–3,p5及附件",
+    "confidence": "A",
+    "limitation": "不是光纤系统强制采购要求"
+  },
+  {
+    "evidence_id": "E04",
+    "claim": "国家能源集团2026自述已实现飞秒/双栅高温壁温监测示范",
+    "source": "https://epaper.ceic.com/pad/content/202607/10/content_22800.html",
+    "locator": "2026-07-10报道后半部",
+    "confidence": "B",
+    "limitation": "无原始试验数据；不可外推本产品"
+  },
+  {
+    "evidence_id": "E05",
+    "claim": "si255 EV有1460–1620nm、8CH、10Hz、LC/APC和API",
+    "source": "research/sources/Luna_si255.pdf",
+    "locator": "p2 REV4",
+    "confidence": "A",
+    "limitation": "当前供货/SDK授权/组合宽峰精度HOLD"
+  },
+  {
+    "evidence_id": "E06",
+    "claim": "HBK FS22SI提供1500–1600nm、1S/s、FC/APC与公开SCPI",
+    "source": "research/sources/HBK_FS22SI_B04203.pdf",
+    "locator": "p3–4",
+    "confidence": "A",
+    "limitation": "重复性/分辨率不等绝对准确度"
+  },
+  {
+    "evidence_id": "E07",
+    "claim": "HBK远程端口3500命令、3365连续数据",
+    "source": "research/sources/HBK_FS22SI_A04249.pdf",
+    "locator": "PDF43,PDF54",
+    "confidence": "A",
+    "limitation": "真实固件帧/终止符须实测"
+  },
+  {
+    "evidence_id": "E08",
+    "claim": "T890为低摩擦Inconel625管多点探头；原厂页称最多40点和25m",
+    "source": "https://technicasa.com/t890-high-temp-fbg-sensing-probe/",
+    "locator": "Description; Key Features",
+    "confidence": "B",
+    "limitation": "原厂PDF/连续寿命/全温光谱/应变/串联匹配HOLD"
+  },
+  {
+    "evidence_id": "E09",
+    "claim": "engionic原厂册称TypeII≤1000℃并可提供封装校准服务",
+    "source": "research/sources/engionic_FemtoGratings.pdf",
+    "locator": "p4–5",
+    "confidence": "B",
+    "limitation": "不是已确定型号探头多年精度保证"
+  },
+  {
+    "evidence_id": "E10",
+    "claim": "高温FBG长期波长漂移不能仅凭耐温声明排除",
+    "source": "https://www.mdpi.com/1424-8220/21/4/1454",
+    "locator": "§4–7作者实测900–1000℃",
+    "confidence": "A",
+    "limitation": "不从高温文献数值线性外推600℃寿命"
+  },
+  {
+    "evidence_id": "E11",
+    "claim": "8点/串在100nm解调波段下不满足本例16.5nm槽预算",
+    "source": "engineering/02_系统设计及接口基线.md",
+    "locator": "§5",
+    "confidence": "C",
+    "limitation": "全部系数是假设，待原厂/实测"
+  },
+  {
+    "evidence_id": "E12",
+    "claim": "现场接触不确定度示例U≈5.73℃大于拟±5℃目标",
+    "source": "engineering/02_系统设计及接口基线.md",
+    "locator": "§7",
+    "confidence": "C",
+    "limitation": "需改进/重定目标，当前不能验收"
+  },
+  {
+    "evidence_id": "E13",
+    "claim": "全部BOM价格仅为预算情景，没有核实原厂售价",
+    "source": "tables/BOM_两档预算.csv",
+    "locator": "price_evidence全列",
+    "confidence": "D",
+    "limitation": "禁止据此采购或宣称成本竞争力已证实"
+  },
+  {
+    "evidence_id": "E14",
+    "claim": "第一版无自动闭环；所有采购/现场行为需另行授权",
+    "source": "00_阅读指南与结论.md",
+    "locator": "用户约束及工程安全边界",
+    "confidence": "REQUIREMENT",
+    "limitation": "不以智能体多数票替代授权"
+  },
+  {
+    "evidence_id": "E15",
+    "claim": "试点对象尚不存在，首选画像是调峰直流煤粉炉局部背火侧管屏",
+    "source": "research/01_书籍市场路线及团队架构.md",
+    "locator": "§3",
+    "confidence": "DESIGN_CHOICE",
+    "limitation": "目标300–660MW不是市场统计结论"
+  },
+  {
+    "evidence_id": "E16",
+    "claim": "电力监控系统安全防护须现场确定落区与接入",
+    "source": "research/sources/Power_Cybersecurity_Order27.pdf",
+    "locator": "现行27号令原文",
+    "confidence": "A",
+    "limitation": "只读TCP不等物理单向隔离"
+  }
+]

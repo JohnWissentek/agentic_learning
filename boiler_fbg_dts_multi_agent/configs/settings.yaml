@@ -1,0 +1,35 @@
+# Boiler FBG Multi-Agent Workflow Settings
+
+# Run mode: simulation | offline-replay | live
+mode: simulation
+
+# Human-in-the-Loop gates
+hitl_enabled: true
+
+# Paths
+output_dir: ./outputs
+evidence_db_path: ./evidence_registry/evidence.db
+synthetic_data_dir: ./synthetic_data
+
+# Stage gate thresholds
+max_critical_issues: 0
+max_major_issues: 3
+require_hitl_on_hold: true
+
+# Concurrency for parallel node execution
+concurrency: 4
+
+# Retry settings for resilience
+max_retries: 3
+retry_backoff_base: 2.0
+retry_max_delay: 60.0
+
+# Cost tracking
+enable_cost_tracking: true
+cost_budget_cny: 10000.0
+
+# LLM settings (for live mode)
+llm_provider: openai
+llm_model: gpt-4o
+llm_temperature: 0.1
+llm_max_tokens: 4096

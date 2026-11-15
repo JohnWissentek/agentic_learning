@@ -1,0 +1,11 @@
+﻿interface_id,from,to,evidence_status,verified_fact,unverified_condition,test,release_status
+ICD01,si255 EV,T890,PARTIAL,LC/APC仪器；传感原厂页单模高温阵列,T890实际纤型/峰宽/反射/全温谱/应变/插损与FC/APC书面确认,冷热错位全谱+光衰+温标,HOLD
+ICD02,si255 LC/APC,FC/APC冷端,PARTIAL,si255原厂PDF p2列oa2001连接套件,长度/纤型/损耗/温区及供货,端面+插损+反射,HOLD
+ICD03,HBK FS22SI,T885单点,PARTIAL,1500–1600nm FC/APC可订；T885单模独立探头,T885同波段窄峰/校准/连续温度,每通道1点独立热试验,HOLD
+ICD04,HBK FS22SI,IPC网络,DOCUMENTED_NOT_TESTED,TCP3500命令/3365连续流；公开SCPI；NTP,SKU固件/指令终止符/端序/时戳/错误处理,抓取真实帧并断连/粘包/重启测试,HOLD
+ICD05,Luna si255,IPC软件,PARTIAL,Ethernet API Python/C++等,SDK获取/许可/OS/端口/时戳/丢包,离线安装+原厂示例+协议抓帧,HOLD
+ICD06,24V支路,si255/UNO,PARTIAL,9–36V与10–36V存在24V交集,电源浪涌/接地/保险/UPS/插头,最大负载+断电/恢复,HOLD
+ICD07,T890内部纤维,管壁夹具,UNVERIFIED,原厂称低摩擦Inconel管,热接触/受压影响/轴向隔离/腐蚀/膨胀,模拟管屏+OEM审查,HOLD
+ICD08,DCS数据源,网关/AI,UNVERIFIED,第一版只读是设计要求不是已获接口,现场协议/授权/网安分区/标签/时钟,批准的影子读取与权限审计,HOLD
+ICD09,我方数据平台,OPC UA/Modbus目的端,PLANNED_NOT_IMPLEMENTED,可作为软件开发目标,未实现/未认证/未获现场许可,协议一致性与安全隔离验收,HOLD
+ICD10,FBGS X0X-EP,T890 8点宽温串,NOT_APPROVED,1510–1590仅80nm,示例8点132nm槽预算不能容纳,改为少点/串且重新验证,REJECT_CURRENT_CONFIG

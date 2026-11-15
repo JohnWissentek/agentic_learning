@@ -1,0 +1,31 @@
+{
+  "classification": "DETERMINISTIC_ENGINEERING_CALCULATION_NOT_AGENT_OR_HARDWARE_RESULT",
+  "assumptions": {
+    "Tmin_C": 25,
+    "Tmax_C": 700,
+    "max_ST_nm_per_C": 0.018,
+    "lambda_tolerance_nm_each_side": 1,
+    "residual_strain_microstrain_each_side": 100,
+    "strain_coefficient_nm_per_microstrain": 0.0012,
+    "aging_nm_each_side": 0.15,
+    "FWHM_nm": 0.8,
+    "slot_nm": 16.5,
+    "guard_nm": 1,
+    "band_edge_nm_each_side": 4
+  },
+  "thermal_shift_nm": 12.149999999999999,
+  "full_envelope_nm": 15.49,
+  "eight_slot_width_nm": 132.0,
+  "band160_usable_nm": 152,
+  "band100_usable_nm": 92,
+  "last_peak_worst_high_nm": 1599.3200000000002,
+  "first_peak_worst_low_nm": 1468.33,
+  "one_way_loss_dB": 6.640000000000001,
+  "return_loss_at20percent_dB": 20.26970004336019,
+  "loss_plus_6dB_margin_dB": 26.26970004336019,
+  "lab_U_k2_C": 2.794637722496424,
+  "field_U_k2_C": 5.728001396647874,
+  "raw_64x10x96bytes_GB_per_day": 5.308416,
+  "power_load_W": 160,
+  "ups_usable_Wh_30min_at80pct": 100.0
+}
