@@ -21,18 +21,18 @@
       "problemMatcher": []
     },
     {
-      "label": "PSO: 3. Run Flagship Opportunity Workflow",
+      "label": "PSO: 3. Run Flagship V3 Commercial + AI Co-Design Discovery Workflow",
       "type": "shell",
-      "command": "/Users/john/.local/bin/uv run pso-research run --sector all --profile flagship --output-dir outputs/power_semiconductor_online_testing_2026_2036",
+      "command": "/Users/john/.local/bin/uv run pso-research run --sector all --profile flagship --output-dir outputs/v3_commercial_ai_grounded_2026_2036",
       "options": {
         "cwd": "${workspaceFolder}/power_semiconductor_opportunities"
       },
       "problemMatcher": []
     },
     {
-      "label": "PSO: 4. Run Stage-Gate Evaluator",
+      "label": "PSO: 4. Run Stage-Gate Evaluator (V3)",
       "type": "shell",
-      "command": "/Users/john/.local/bin/uv run pso-research evaluate outputs/power_semiconductor_online_testing_2026_2036",
+      "command": "/Users/john/.local/bin/uv run pso-research evaluate outputs/v3_commercial_ai_grounded_2026_2036",
       "options": {
         "cwd": "${workspaceFolder}/power_semiconductor_opportunities"
       },

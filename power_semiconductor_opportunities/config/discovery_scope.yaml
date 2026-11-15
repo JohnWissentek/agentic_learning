@@ -1,0 +1,134 @@
+# ==============================================================================
+# V3.0 从零动态发现范围定义 (Commercial White-Space & AI-Native Discovery Scope)
+# 本文件刻意不预设任何二级赛道、产品标题或种子机会投资参数；仅定义：
+# 1. 两大宏观行业边界与价值使命；
+# 2. Stage 0 广谱扫描查询词（同步覆盖产线痛点、海内外商业设备供应格局与 AI 原生仪器范式）；
+# 3. 三级商业化产品空白分级体系 & AI 时代软硬件协同研发工程范式；
+# 4. Stage 2 行业物理经济边界护栏（仅防量级离谱越界，不对具体仪器预设单值）。
+# ==============================================================================
+version: "3.0"
+
+sector_mandates:
+  power_energy:
+    display_name: "电力能源全产业链制造、装备与新型电力系统"
+    scope_description: >
+      涵盖动力与储能电池/固态/钠电/液流制造、光伏/新型电池与绿氢制储输、特高压/智能电网/配网自动化与低碳绝缘、
+      清洁高效火电调峰与CCUS，以及与新能源算力融合的新型供配电与热管理（如AI智算中心800V直流母线/液冷换热在线安全与能耗测试、
+      高温超导/电力电子装备产线测试）。
+  semiconductor:
+    display_name: "半导体芯片制造（前道晶圆制造、功率化合物及先进封装测试）"
+    scope_description: >
+      涵盖晶圆厂Fab超净工艺介质(AMC/UPW/电子特气/湿化学品)、前道光刻/刻蚀/薄膜/CMP在线纳米量检测与缺陷监控、
+      第三代/超宽禁带功率半导体(SiC/GaN/氧化镓)衬底外延与晶圆级动态可靠性测试、2.5D/3D Chiplet/HBM/Cu-Cu混合键合与玻璃基板量检测，
+      以及硅光共封装光学(CPO)晶圆级光耦合与热-电-光协同测试等新兴制造环节。
+
+# Stage 0 广谱侦察查询矩阵：同时扫描真实痛点、海内外商业在售厂商/产品空白及 AI 原生仪器演进
+macro_recon_queries:
+  power_energy:
+    cn_queries:
+      - query: "2025 2026 中国 储能 固态电池 特高压 产线 在线检测 设备 厂商 型号 中标 国产替代"
+        scope: "webpage"
+      - query: "2025 2026 绿氢 钙钛矿 AI算力中心 800V直流 液冷 测试仪器 供应商 商业化 空白"
+        scope: "webpage"
+      - query: "电力装备 光伏 锂电 AI计算成像 无损检测 在线光谱 超声 工业应用 综述"
+        scope: "scholar"
+      - query: "十五五 双碳 能源装备 智能制造 在线监测 环保合规 SF6替代 CCUS 仪器厂家"
+        scope: "webpage"
+    global_queries:
+      - query: "2025 2026 energy battery hydrogen grid inline metrology inspection commercial vendor market system model"
+        endpoint: "search"
+      - query: "AI data center HVDC liquid cooling solid-state battery inline test equipment suppliers white space 2026"
+        endpoint: "search"
+      - query: "physics-informed AI computational sensing inline non-destructive testing battery electrolyzer review 2025 2026"
+        endpoint: "scholar"
+      - query: "ABB Siemens Omicron Chroma Keysight Hioki inline power energy test equipment new launch 2025 2026"
+        endpoint: "search"
+  semiconductor:
+    cn_queries:
+      - query: "2025 2026 中国 半导体 前道量检测 先进封装 混合键合 碳化硅 设备 厂商 型号 中标 国产化率"
+        scope: "webpage"
+      - query: "2025 2026 硅光 CPO 玻璃基板 HBM 在线量测 设备 供应商 商业空白 AI算法 突破"
+        scope: "webpage"
+      - query: "半导体芯片制造 AI计算光学量测 逆散射 超声 X射线 晶圆级测试 论文"
+        scope: "scholar"
+      - query: "中国 集成电路制造 量测 检测 仪器仪表 商业化 厂商 痛点 招标 2026"
+        scope: "webpage"
+    global_queries:
+      - query: "SEMI IRDS metrology inspection roadmap commercial vendors KLA Onto Camtek Lasertec 2025 2026"
+        endpoint: "search"
+      - query: "silicon photonics CPO wafer level test SiC KGD hybrid bonding commercial equipment suppliers 2026"
+        endpoint: "search"
+      - query: "AI computational metrology machine learning inline wafer defect inspection review 2025 2026"
+        endpoint: "scholar"
+      - query: "KLA Applied Materials Bruker Horiba Inficon inline metrology product launch semiconductor 2025 2026"
+        endpoint: "search"
+
+# V3.0 核心新增：商业化产品空白分级体系
+commercial_whitespace_taxonomy:
+  global_and_cn_commercialized:
+    label: "海内外均有在售设备（存量替代/AI升维切入）"
+    definition: >
+      中国与海外均已有明确商业化量产整机厂商在售。新进入者不能停留在通用参数仿制，
+      必须依靠 AI 计算传感软硬协同将 BOM/采购成本压低 30%-50%、或以毫秒级闭环/细分高难工段实现 TCO 升维替代。
+  overseas_only_cn_blank:
+    label: "海外已有成熟在售、中国商业化整机空白（卡脖子国产首发替代）"
+    definition: >
+      海外巨头（如 KLA、Onto、Camtek、Inficon、Bruker、Horiba、Omicron、Keysight 等）已有成熟商业型号在售，
+      但中国产线量产级在线整机仍属空白或仅停留在实验室/极少数早期样机验证，存在明确断供风险与高毛利国产替代窗口。
+  global_and_cn_true_blank:
+    label: "海内外均无成熟在线在售产品（全球首发新物种空白）"
+    definition: >
+      因新一代工艺跃迁（如全固态压实界面、800VDC液冷微弧、TGV/混合键合三维亚表面、CPO热-电-光协同），
+      目前海内外尚无成熟标准化产线在线在售整机，仍依赖离线破坏性抽检或人工目检，需依托 AI 计算传感实现全球首发定义。
+
+# V3.0 核心新增：AI 时代软硬件协同产品开发四大范式
+ai_native_engineering_paradigms:
+  computational_sensing_and_inverse_solver:
+    title: "计算传感：AI 算力换硬件物理极限"
+    description: >
+      以 PINNs 物理信息神经网络、神经逆散射求解器、AI 弱信号超分辨与多模态融合，在软件/算法侧补偿传感器物理信噪比与景深限制；
+      从而使用成熟可获得的国产中端光电器件/探头达到海外顶尖仪器灵敏度，绕开受限高端元器件并压缩硬件 BOM 成本 30%-60%。
+  synthetic_defect_and_few_shot_cold_start:
+    title: "合成缺陷工厂与少样本冷启动"
+    description: >
+      基于物理仿真渲染器与扩散模型生成稀缺晶圆/电池/高压失效合成数据，叠加跨工段微调迁移学习，
+      破解“新建产线没有足够不良品照片/波形导致传统 CV 与规则算法无法上线、标定耗时长达数月”的商业落地死结。
+  ai_accelerated_multiphysics_eda_rd:
+    title: "AI 驱动多物理场仿真与软硬编码周期倍速压缩"
+    description: >
+      利用 AI 多物理场代理模型加速光学/声学/高压热流体探头结构设计，并用 AI Agent 辅助完成 FPGA RTL 逻辑、
+      高速 ADC 驱动、SECS/GEM 与 IEC 61850 工业协议栈及工艺上位机软件开发，将传统仪器 30-48 个月研发周期压缩至 10-18 个月。
+  edge_ai_airgapped_closed_loop:
+    title: "断网安全域 Edge-AI 边缘实时闭环与模型变现"
+    description: >
+      适配晶圆厂 Fab 与电网变电站断网合规要求，采用机台侧 FPGA + 工业 NPU 实现 <5-20ms 确定性推理、
+      Golden-Tool 跨机台漂移自校准与 R2R/APC 联动控制，形成“标准硬件平台 + 工艺缺陷模型库订阅/升级”的高毛利持续商业模式。
+
+# Stage 2 物理经济合理性边界护栏（仅对 LLM 提取区间做量级防失真钳位，不预填具体产品数字）
+sector_roi_guardrails:
+  power_energy:
+    capex_cny_min: 150000.0
+    capex_cny_max: 25000000.0
+    annual_output_value_cny_min: 20000000.0
+    annual_output_value_cny_max: 2000000000.0
+    yield_gain_pct_min: 0.05
+    yield_gain_pct_max: 4.0
+    opex_ratio_min: 0.03
+    opex_ratio_max: 0.20
+    market_tam_china_cny_100m_min: 1.0
+    market_tam_china_cny_100m_max: 150.0
+    market_tam_global_usd_m_min: 20.0
+    market_tam_global_usd_m_max: 5000.0
+  semiconductor:
+    capex_cny_min: 300000.0
+    capex_cny_max: 60000000.0
+    annual_output_value_cny_min: 50000000.0
+    annual_output_value_cny_max: 5000000000.0
+    yield_gain_pct_min: 0.05
+    yield_gain_pct_max: 5.0
+    opex_ratio_min: 0.03
+    opex_ratio_max: 0.20
+    market_tam_china_cny_100m_min: 2.0
+    market_tam_china_cny_100m_max: 200.0
+    market_tam_global_usd_m_min: 30.0
+    market_tam_global_usd_m_max: 8000.0

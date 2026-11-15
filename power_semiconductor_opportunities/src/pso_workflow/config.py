@@ -169,10 +169,21 @@ class WorkflowSettings:
     max_reflection_loops: int = 2
     concurrency: int = 6
     data_dir: Path = field(default_factory=lambda: Path("data"))
-    default_output_dir: Path = field(default_factory=lambda: Path("outputs/power_semiconductor_online_testing_2026_2036"))
+    vault_db_name: str = "evidence_vault_v3.db"
+    default_output_dir: Path = field(default_factory=lambda: Path("outputs/v3_commercial_ai_grounded_2026_2036"))
 
     contract: dict[str, Any] = field(default_factory=dict)
     taxonomy: dict[str, Any] = field(default_factory=dict)
+    discovery_scope: dict[str, Any] = field(default_factory=dict)
+
+    def resolve_vault_path(self, vault_db: str | None = None) -> Path:
+        raw = (vault_db or self.vault_db_name or "evidence_vault_v3.db").strip()
+        p = Path(raw)
+        if p.is_absolute():
+            return p
+        if p.parts and p.parts[0] == self.data_dir.name:
+            return self.root_dir / p
+        return self.data_dir / p
 
     @classmethod
     def load(cls, root: Path | None = None) -> "WorkflowSettings":
@@ -198,6 +209,7 @@ class WorkflowSettings:
 
         contract_path = root_dir / "config" / "research_contract.yaml"
         taxonomy_path = root_dir / "config" / "domain_taxonomy.yaml"
+        scope_path = root_dir / "config" / "discovery_scope.yaml"
         contract = (
             yaml.safe_load(contract_path.read_text(encoding="utf-8"))
             if contract_path.exists()
@@ -208,11 +220,17 @@ class WorkflowSettings:
             if taxonomy_path.exists()
             else {}
         )
+        discovery_scope = (
+            yaml.safe_load(scope_path.read_text(encoding="utf-8"))
+            if scope_path.exists()
+            else {}
+        )
 
         data_dir = Path(pick("PSO_DATA_DIR", "data"))
         if not data_dir.is_absolute():
             data_dir = root_dir / data_dir
-        out_dir = Path(pick("PSO_DEFAULT_OUTPUT_DIR", "outputs/power_semiconductor_online_testing_2026_2036"))
+        vault_db_name = pick("PSO_VAULT_DB", "evidence_vault_v3.db")
+        out_dir = Path(pick("PSO_DEFAULT_OUTPUT_DIR", "outputs/v3_commercial_ai_grounded_2026_2036"))
         if not out_dir.is_absolute():
             out_dir = root_dir / out_dir
 
@@ -241,9 +259,11 @@ class WorkflowSettings:
             max_reflection_loops=int(pick("PSO_MAX_REFLECTION_LOOPS", "2")),
             concurrency=int(pick("PSO_CONCURRENCY", "6")),
             data_dir=data_dir,
+            vault_db_name=vault_db_name,
             default_output_dir=out_dir,
             contract=contract or {},
             taxonomy=taxonomy or {},
+            discovery_scope=discovery_scope or {},
         )
 
 

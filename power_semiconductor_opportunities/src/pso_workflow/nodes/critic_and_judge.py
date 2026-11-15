@@ -16,7 +16,7 @@ from pso_workflow.schemas import CritiqueVerdict, JudgeRubricScores, WorkflowSta
 def _extract_citation_ids(texts: list[str]) -> set[str]:
     found: set[str] = set()
     for t in texts:
-        found.update(re.findall(r"EV-(?:CN|GL)-\d{3}", t))
+        found.update(re.findall(r"EV-(?:CN|GL)-\d{3,4}", t))
     return found
 
 
@@ -33,8 +33,10 @@ def deterministic_contract_checks(
     min_cn_ratio = float(gates.get("min_china_evidence_ratio", 0.45))
     min_tracks = int(gates.get("min_tracks_covered", 8))
 
-    # Adjust threshold dynamically when running filtered single-sector jobs
-    tracks_covered = len(vault_stats.get("by_track", {}))
+    # Count research tracks excluding Stage 0 RECON bucket when computing coverage
+    by_track = vault_stats.get("by_track", {}) or {}
+    research_tracks = {k for k in by_track if k != "RECON"}
+    tracks_covered = len(research_tracks) if research_tracks else len(by_track)
     effective_min_ev = min_ev if tracks_covered >= 6 else max(16, min_ev // 2)
 
     main_texts = [
@@ -47,6 +49,15 @@ def deterministic_contract_checks(
         for t in main_texts[:3]
     )
     has_dual_horizon = all(("3-5" in t or "3–5" in t) and ("5-10" in t or "5–10" in t) for t in main_texts[:3])
+    joined_main = "\n".join(main_texts)
+    has_commercial_whitespace = (
+        ("在售" in joined_main or "厂商" in joined_main)
+        and ("空白" in joined_main)
+    )
+    has_ai_paradigm = (
+        ("AI" in joined_main)
+        and any(k in joined_main for k in ("计算传感", "软硬", "合成数据", "边缘", "FPGA", "PINN"))
+    )
 
     checks = {
         "total_evidences_pass": vault_stats.get("total", 0) >= effective_min_ev,
@@ -57,9 +68,49 @@ def deterministic_contract_checks(
         "roi_calc_tags_count": roi_tags,
         "china_first_global_second_present": has_cn_and_global,
         "dual_horizon_present": has_dual_horizon,
+        "commercial_whitespace_grounded": has_commercial_whitespace,
+        "ai_native_paradigm_present": has_ai_paradigm,
         "all_5_volumes_non_empty": len(main_texts) == 5 and all(len(t) > 500 for t in main_texts),
     }
     return checks
+
+
+def _build_dynamic_fallback_gap_queries(state: WorkflowState) -> list[dict[str, str]]:
+    track_plans = state.get("research_plan", {}).get("track_plans", [])
+    if not track_plans:
+        return [
+            {
+                "track_id": "DP1",
+                "geo_scope": "CN",
+                "query": "中国 新型电力系统 储能 在线检测 仪器 痛点 招标",
+            },
+            {
+                "track_id": "DS1",
+                "geo_scope": "CN",
+                "query": "中国 半导体 晶圆制造 在线量测 国产替代 良率",
+            },
+        ]
+    picked: list[dict[str, str]] = []
+    for sec in ("power_energy", "semiconductor"):
+        for tp in track_plans:
+            if tp.get("sector") == sec:
+                tid = str(tp.get("track_id", "DP1"))
+                name = str(tp.get("name", ""))
+                picked.append(
+                    {
+                        "track_id": tid,
+                        "geo_scope": "CN",
+                        "query": f"中国 {name} 在线检测 产线良率 ROI 招标 2025 2026",
+                    }
+                )
+                break
+    return picked or [
+        {
+            "track_id": str(track_plans[0].get("track_id", "DP1")),
+            "geo_scope": "CN",
+            "query": f"中国 {track_plans[0].get('name', '工业制造')} 在线检测 测试仪器 招标",
+        }
+    ]
 
 
 async def node_heterogeneous_critic(
@@ -69,6 +120,9 @@ async def node_heterogeneous_critic(
     drafts = state.get("draft_reports") or {}
     vault_stats = deps.vault.stats()
     evaluated = state.get("evaluated_opportunities", [])
+    plan = state.get("research_plan", {})
+    raw_count = int(state.get("raw_candidates_count", 0))
+    eliminated = state.get("eliminated_candidates", [])
     loop_count = int(state.get("loop_count", 0))
     max_loops = int(state.get("max_loops", deps.settings.max_reflection_loops))
 
@@ -79,6 +133,10 @@ async def node_heterogeneous_critic(
         contract=deps.settings.contract,
     )
 
+    tracks_summary = ", ".join(
+        f"{t.get('track_id')}:{t.get('name')}"
+        for t in plan.get("track_plans", [])
+    )
     draft_previews = "\n\n".join(
         f"=== {k} ({len(v)} chars) ===\n{v[:2200]}\n...[tail]...\n{v[-800:]}"
         for k, v in sorted(drafts.items())
@@ -87,11 +145,13 @@ async def node_heterogeneous_critic(
 
     user_prompt = (
         f"Current Reflection Loop: {loop_count} / {max_loops}\n"
+        f"Stage 0 Dynamically Discovered Tracks: {tracks_summary}\n"
+        f"Stage 2 Funnel: raw={raw_count}, shortlist={len(evaluated)}, eliminated={len(eliminated)}\n"
         f"EvidenceVault Stats: {json.dumps(vault_stats, ensure_ascii=False)}\n"
         f"Deterministic Checks: {json.dumps(det_checks, ensure_ascii=False)}\n\n"
         f"Draft Report Excerpts:\n{draft_previews}\n\n"
         f"Audit rigorously against the Formalized Contract (China-first -> Global-second, 3-5y vs 5-10y, "
-        f"physics precision, [EV-...] citations, [ROI-CALC] fidelity). "
+        f"physics precision, [EV-...] citations, 3-scenario [ROI-CALC] fidelity, and full coverage of all dynamically discovered tracks). "
         f'Return `CritiqueVerdict` JSON with `decision` in ["pass", "needs_more_evidence", "needs_rewrite"].'
     )
 
@@ -110,19 +170,7 @@ async def node_heterogeneous_critic(
             update={
                 "decision": "needs_more_evidence",
                 "summary": f"证据总量({vault_stats.get('total')})低于合同要求，自动触发定向补搜。",
-                "gap_queries": verdict.gap_queries
-                or [
-                    {
-                        "track_id": "P3",
-                        "geo_scope": "CN",
-                        "query": "特高压 SF6替代气体 C4F7N 在线监测 国家电网 招标",
-                    },
-                    {
-                        "track_id": "S3",
-                        "geo_scope": "CN",
-                        "query": "8英寸 碳化硅 外延 缺陷检测 晶圆级 动态测试 KGD",
-                    },
-                ],
+                "gap_queries": verdict.gap_queries or _build_dynamic_fallback_gap_queries(state),
             }
         )
 
@@ -227,15 +275,46 @@ async def node_stage_gate_judge_and_compiler(
         target.write_text(content, encoding="utf-8")
         written_files.append(str(target))
 
+    plan = state.get("research_plan", {}) or {}
+    eliminated = state.get("eliminated_candidates", []) or []
+    raw_count = int(state.get("raw_candidates_count", 0)) or (len(evaluated) + len(eliminated))
     cost_summary = deps.ledger.summary()
     pass_threshold = float(deps.settings.contract.get("quality_gates", {}).get("stage_gate_pass_score", 85))
+    ws_breakdown: dict[str, int] = {
+        "global_and_cn_commercialized": 0,
+        "overseas_only_cn_blank": 0,
+        "global_and_cn_true_blank": 0,
+    }
+    for e in evaluated:
+        cs = str((e.get("seed") or {}).get("commercial_status", "overseas_only_cn_blank"))
+        ws_breakdown[cs] = ws_breakdown.get(cs, 0) + 1
     scorecard = {
         "run_id": state.get("run_id", ""),
         "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+        "workflow_version": "V3.0_COMMERCIAL_WHITESPACE_AND_AI_CO_DESIGN",
         "profile": state.get("profile", "flagship"),
         "sector_filter": state.get("sector_filter", "all"),
         "stage_gate_passed": exact_sum >= pass_threshold and det_checks["all_5_volumes_non_empty"],
         "pass_threshold": pass_threshold,
+        "discovered_tracks": [
+            {
+                "track_id": t.get("track_id"),
+                "sector": t.get("sector"),
+                "name": t.get("name"),
+                "is_emerging_or_cross_cutting": t.get("is_emerging_or_cross_cutting", False),
+                "emergence_rationale": t.get("emergence_rationale", ""),
+                "recon_evidence_ids": t.get("recon_evidence_ids", []),
+            }
+            for t in plan.get("track_plans", [])
+        ],
+        "commercial_whitespace_breakdown": ws_breakdown,
+        "discovery_funnel_summary": {
+            "recon_evidence_count": len(state.get("recon_evidence_ids", [])),
+            "raw_candidates_count": raw_count,
+            "shortlist_count": len(evaluated),
+            "eliminated_count": len(eliminated),
+            "eliminated_candidates": eliminated,
+        },
         "judge_rubric": rubric.model_dump(),
         "deterministic_contract_checks": det_checks,
         "evidence_vault_stats": vault_stats,

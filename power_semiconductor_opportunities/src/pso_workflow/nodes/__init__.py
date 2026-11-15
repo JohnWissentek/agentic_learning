@@ -7,8 +7,12 @@ from .critic_and_judge import (
     route_after_critic,
 )
 from .deps import RuntimeDeps
-from .planner import node_hitl_approval_gate, node_input_guardrail_and_planner
-from .researcher import node_corrective_rag_refill, node_track_researcher
+from .planner import node_hitl_approval_gate, node_input_guardrail_and_planner, run_macro_recon
+from .researcher import (
+    node_corrective_rag_refill,
+    node_deterministic_funnel_screener,
+    node_track_researcher,
+)
 from .storm_and_rank import (
     node_palms_roi_and_elo_ranker,
     node_storm_persona_interrogator,
@@ -19,6 +23,7 @@ __all__ = [
     "RuntimeDeps",
     "deterministic_contract_checks",
     "node_corrective_rag_refill",
+    "node_deterministic_funnel_screener",
     "node_grounded_report_synthesizer",
     "node_heterogeneous_critic",
     "node_hitl_approval_gate",
@@ -29,4 +34,5 @@ __all__ = [
     "node_track_researcher",
     "render_evidence_index",
     "route_after_critic",
+    "run_macro_recon",
 ]

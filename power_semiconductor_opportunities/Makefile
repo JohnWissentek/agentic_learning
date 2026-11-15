@@ -1,16 +1,18 @@
-.PHONY: help sync verify test collect run-fast run-flagship eval
+.PHONY: help sync verify test collect run-fast run-flagship eval eval-v2 eval-v1
 
 UV := /Users/john/.local/bin/uv
 
 help:
-	@echo "PSO Opportunity Discovery Agentic Workflow Targets:"
+	@echo "PSO Opportunity Discovery Agentic Workflow Targets (V3.0 Commercial White-Space & AI Co-Design):"
 	@echo "  make sync         - 创建/同步 Python 3.12 独立虚拟环境"
 	@echo "  make verify       - 验证 .env.ai_search (Metaso/Serper) 与 .env.llm (DashScope) 连通性"
-	@echo "  make test         - 运行 pytest 契约、ROI数学与图轨迹三层自动化测试"
-	@echo "  make collect      - 仅运行双引擎采集写入 data/evidence_vault.db"
-	@echo "  make run-fast     - 快速全流程演练 (outputs/fast_smoke)"
-	@echo "  make run-flagship - 运行旗舰全流程深度研究 (outputs/power_semiconductor_online_testing_2026_2036)"
-	@echo "  make eval         - 对 outputs/power_semiconductor_online_testing_2026_2036 运行独立 Stage-Gate 门禁打分"
+	@echo "  make test         - 运行 pytest 契约、区间ROI/商业空白加权、漏斗筛选与图轨迹自动化测试"
+	@echo "  make collect      - [V1 Archive] 仅运行预设词表双引擎采集"
+	@echo "  make run-fast     - V3.0 快速动态发现与商业/AI协同全流程演练 (outputs/fast_smoke)"
+	@echo "  make run-flagship - 运行 V3.0 旗舰全流程 (outputs/v3_commercial_ai_grounded_2026_2036)"
+	@echo "  make eval         - 对 V3.0 outputs/v3_commercial_ai_grounded_2026_2036 运行 Stage-Gate 门禁打分"
+	@echo "  make eval-v2      - 对 V2.0 历史归档 outputs/v2_dynamic_discovery_2026_2036 运行门禁打分"
+	@echo "  make eval-v1      - 对 V1.0 历史归档 outputs/power_semiconductor_online_testing_2026_2036 运行门禁打分"
 
 sync:
 	$(UV) sync --python 3.12 --extra dev
@@ -28,7 +30,13 @@ run-fast:
 	$(UV) run pso-research run --sector all --profile fast --output-dir outputs/fast_smoke
 
 run-flagship:
-	$(UV) run pso-research run --sector all --profile flagship --output-dir outputs/power_semiconductor_online_testing_2026_2036
+	$(UV) run pso-research run --sector all --profile flagship --output-dir outputs/v3_commercial_ai_grounded_2026_2036
 
 eval:
+	$(UV) run pso-research evaluate outputs/v3_commercial_ai_grounded_2026_2036
+
+eval-v2:
+	$(UV) run pso-research evaluate outputs/v2_dynamic_discovery_2026_2036
+
+eval-v1:
 	$(UV) run pso-research evaluate outputs/power_semiconductor_online_testing_2026_2036

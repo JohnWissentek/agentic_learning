@@ -1,0 +1,430 @@
+{
+  "contract_id": "PSO-CONTRACT-2026-V3",
+  "sector_filter": "all",
+  "profile": "flagship",
+  "macro_recon_summary": "2025-2026年全球工业与硬科技制造正经历由人工智能算力爆发与能源绿色转型双重驱动的底层制造范式重构。在半导体制造领域，随着先进制程挺进亚2nm埃米时代（Angstrom-scale Era）以及算力互连向3D Chiplet、HBM及硅光共封装（CPO）全面跃迁，传统离线、破坏性或基于微凸点的物理量测已遭遇深亚波长衍射极限与埋层不可视物理墙。与此同时，地缘政治管制迫使中国半导体产业自主可控全面提速，2025年设备国产化率突破22%，在前道计算光学散射、X射线三维成像与微观缺陷多模态AI检测等领域形成了强烈的国产替代商业空白。在电力能源领域，AI数据中心单机柜功率密度从15kW跃升至50kW-100kW+，推动配电网由传统交流向800V高压直流（HVDC）及浸没式液冷热流协同全面切换；而全固态电池干法电极与600MPa等静压成型工艺、特高压环保绝缘气体（SF6替代）以及绿氢制储运与CCUS全流程计量，正在重塑能源装备的在线质量控制要求。现代工业量检测已从被动‘工后筛选’转变为贯穿全工艺链的‘在序物理引导AI计算量测（In-situ Physics-Informed AI Computational Metrology）’，构成了大国高端制造良率与能效爬坡的核心战略底座。",
+  "step_back_thesis": "【第一性原理工业量检测物理演进论（Step-Back First-Principles Industrial Metrology Thesis）】：工业制造的本质是物质、能量与信息在纳观至宏观尺度上的确定性约束与重构，而量检测则是度量系统熵减过程并提供负反馈闭环的唯一定量触手。当半导体关键尺寸缩小至原子级（如GAA晶体管纳米片与亚微米Cu-Cu键合）且电力设备功率与压力达到物理临界点（如800VDC母线强电场电离、600MPa等静压固态接触界面）时，经典单一物理场直接探测遭遇三大物理墙：①『衍射与分辨率极限』——可见光与常规红外波长远大于深亚纳米特征尺寸，常规宽场成像无法分辨空间三维掩埋形貌；②『侵入性与破坏性悖论』——传统FIB-SEM切片或电极拆解直接破坏被测器件，无法满足昂贵晶圆与动力电池100%在线全检及原位应力/电化学演化观测需求；③『多物理场非线性耦合与病态逆问题』——微裂纹、界面脱粘、流体空化与局部放电等缺陷呈现声-光-热-电复杂多物理场非线性交织。因此，工业量测必须从‘直接投影几何测量’彻底转向『物理引导机器学习与正向波动方程联立的计算重构（Computational Inverse Scattering & Physics-Informed Sensing）』。通过将麦克斯韦方程组（Maxwell's Electrodynamics）、波动声学（Acoustic Wave Equation）、连续介质弹性接触力学与辐射传输方程嵌入AI神经算子，利用间接可测的频域衍射谱、太赫兹时域反射、超声声阻抗阶跃与微弱吸收指纹，数学化高精度反演不可见空间物理场与微观缺陷，实现从‘事后缺陷阻断’到‘在序自适应良率闭环控制’的范式跃迁。",
+  "track_plans": [
+    {
+      "track_id": "DP1",
+      "sector": "power_energy",
+      "name": "AI智算中心800V直流母线配电与浸没式液冷热流在线安全检测 (AI Data Center 800VDC Busbar Power Delivery & Immersion Liquid Cooling Thermal-Fluid Inline Metrology)",
+      "step_back_physics_principle": "基于麦克斯韦电磁场方程与汤森放电/帕邢定律(Paschen's Law)分析800VDC母线下空气与浸没工质的临界击穿电场强度；耦合纳维-斯托克斯(Navier-Stokes)方程与热传导对流微分方程，解析两相/单相流体在密闭腔体内流阻、空化微气泡形成与局部热点(Hotspot)声空化发射频谱特征，通过声学-光学-电磁多物理场逆散射算法重构微观瞬态绝缘劣化与温升热流场。",
+      "cn_queries": [
+        {
+          "query": "AI智算中心800V高压直流供电母线微弧放电与绝缘老化在线监测标准"
+        },
+        {
+          "query": "浸没式相变液冷机柜冷却液流阻热阻与PUE动态能耗测试方法"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "AI data center 800VDC busbar inline arc fault detection and insulation breakdown standards"
+        },
+        {
+          "query": "Immersion liquid cooling CDU heat transfer efficiency and flow anomaly acoustic emission metrology"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "AI大模型集群爆发引爆高密机柜供电与热耗危机，机柜功耗达50kW-100kW+，传统AC配电与风冷失效，催生800V高压直流（HVDC）母线架构与单相/相变浸没式液冷技术。高压直流微弧放电与流固耦合相变传热构成全新安全与能效测试空白。引用EV-CN-001、EV-CN-003、EV-CN-004、EV-CN-005、EV-GLOBAL-006、EV-GLOBAL-007。",
+      "recon_evidence_ids": [
+        "EV-CN-001",
+        "EV-CN-003",
+        "EV-CN-004",
+        "EV-CN-005",
+        "EV-GLOBAL-006",
+        "EV-GLOBAL-007"
+      ],
+      "manufacturing_stages": [
+        "AI机柜800V母线排铜铝复合排组装与绝缘介质层热压固化 (Busbar Lamination & Insulation Curing)",
+        "浸没式液冷CDU(冷却液分配单元)与流道密封总成氦检与耐压测试 (CDU & Cold Plate Flow Loop Sealing & Pressure Testing)",
+        "高密算力服务器整机冷板流道微通道焊接无损探伤 (Microchannel Cold Plate Diffusion Bonding NDT)",
+        "算力机柜上电带载800VDC动态暂态响应与绝缘电弧在线监测 (Full-Rack 800VDC Dynamic Load & Arc Fault Metrology)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "800V直流母线绝缘监测装置 国产替代 中标 远景 施耐德"
+        },
+        {
+          "query": "数据中心浸没式液冷系统 在线流量与热阻测试仪器 厂家 型号"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Schneider Electric Vertiv 800VDC power delivery inline monitoring system model"
+        },
+        {
+          "query": "Fluke Keysight high voltage DC busbar insulation and liquid cooling thermal tester"
+        }
+      ]
+    },
+    {
+      "track_id": "DP2",
+      "sector": "power_energy",
+      "name": "全固态与下一代动力电池干法电极纤维化与超高压成型无损量测 (All-Solid-State Battery Dry Electrode Fibrillization & High-Pressure Interface Inline Metrology)",
+      "step_back_physics_principle": "从连续介质力学弹性接触理论(Hertzian Contact Theory)与声弹效应(Acoustoelastic Effect)出发，超高压等静压下固态电解质与活性材料界面的法向与切向声阻抗随微孔隙致密化发生非线性跃迁；结合太赫兹(THz)光电导时域反射与高频超声导波相控阵(PAUT)波动方程，建立微纳裂纹与孔隙率对超声衰减/太赫兹相移的第一性原理散射反演映射。",
+      "cn_queries": [
+        {
+          "query": "固态电池干法电极成膜厚度一致性与PTFE纤维化分散度在线检测标准"
+        },
+        {
+          "query": "全固态电芯600MPa等静压后固固界面微裂纹与接触阻抗无损检测技术"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Solid-state battery dry electrode calendering film thickness and fibrillization inline metrology"
+        },
+        {
+          "query": "All-solid-state pouch cell isostatic pressing interface void and microcrack ultrasonic inspection"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "固态电池产业全面转向干法电极纤维化成膜、无隔膜高精度叠片以及300-600MPa温等静压（WIP）固-固界面致密化成型。界面微裂纹、脱粘空洞以及±1μm级厚度均一性成为决定枝晶抑制与内阻的核心瓶颈，传统X射线与常规超声无法满足高压原位在线量测需求。引用EV-CN-006、EV-CN-007、EV-CN-008、EV-CN-009、EV-CN-010、EV-GLOBAL-001、EV-GLOBAL-013。",
+      "recon_evidence_ids": [
+        "EV-CN-006",
+        "EV-CN-007",
+        "EV-CN-008",
+        "EV-CN-009",
+        "EV-CN-010",
+        "EV-GLOBAL-001",
+        "EV-GLOBAL-013"
+      ],
+      "manufacturing_stages": [
+        "干法电极PTFE粘结剂高剪切纤维化混料与微观网络分散度检测 (Dry Electrode PTFE Fibrillization Quality Metrology)",
+        "连续干法辊压电极膜厚度均匀性(±1μm)与致密度在线测厚 (Continuous Dry Calendering Film Thickness & Density Gauging)",
+        "全固态电芯无隔膜高速叠片对齐度与极耳间距机器视觉在线检测 (Separator-Free Stacking Alignment High-Speed Optical Inspection)",
+        "600MPa温等静压(WIP)致密化成型后固-固界面微裂纹原位超声/高压化成测试 (Post-Isostatic Pressing Interface Delamination Ultrasonic NDT)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "固态电池干法辊压机 在线测厚与缺陷检测设备 中标 先导智能 纳科诺尔"
+        },
+        {
+          "query": "固态电池等静压成型与高压化成分容检测设备 厂家 型号 利元亨 杭可科技"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Hana Technology Dainippon Screen solid-state battery inline inspection equipment model"
+        },
+        {
+          "query": "Thermo Fisher Bruker dry electrode inline thickness gauge and acoustic microcrack detector"
+        }
+      ]
+    },
+    {
+      "track_id": "DP3",
+      "sector": "power_energy",
+      "name": "新型电力系统特高压与环保绝缘气体(SF6替代)微水分解产物在线光谱量测 (Eco-Friendly Insulating Gas & UHV Power Equipment Partial Discharge Online Metrology)",
+      "step_back_physics_principle": "依据比尔-朗伯定律(Beer-Lambert Law)分子特征振转跃迁红外吸收截面，微量水分与含氟分解产物在特定中红外波段具有特征吸收指纹谱；结合高压电场诱导局部放电产生的特高频(UHF, 300MHz-3GHz)电磁波辐射麦克斯韦方程与声表面波(SAW)相速调制原理，实现多组分气体ppm级选择性在线解耦反演。",
+      "cn_queries": [
+        {
+          "query": "特高压环保绝缘气体C4F7N混合气体微水及电弧分解产物在线红外光谱监测规程"
+        },
+        {
+          "query": "气体绝缘全封闭组合电器GIS特高频局部放电在线监测系统校验标准"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Eco-friendly insulating gas C4F7N decomposition products and trace moisture inline infrared spectroscopy"
+        },
+        {
+          "query": "Gas-insulated switchgear GIS partial discharge UHF online monitoring and sensor calibration standards"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "电网迈向低碳与十五五环保合规驱动特高压与智能配电GIS设备由高GWP六氟化硫（SF6）向C4F7N/C5F10O环保气体切换，强电场电弧诱发的微量水分与分解产物直接威胁电网运行安全，催生高精度光谱与微机电传感换轨需求。引用EV-CN-011、EV-CN-012、EV-CN-013、EV-CN-014。",
+      "recon_evidence_ids": [
+        "EV-CN-011",
+        "EV-CN-012",
+        "EV-CN-013",
+        "EV-CN-014"
+      ],
+      "manufacturing_stages": [
+        "特高压GIS/GIL母线筒体气密性氦质谱检漏与环焊缝探伤 (GIS Busbar Enclosure Helium Mass Spectrometry Leak Metrology)",
+        "高压环保气体绝缘断路器灭弧室充气后微水纯度与组分配比在线校准 (Eco-Friendly Gas Mixture Ratio & Trace Moisture Calibration)",
+        "工厂出厂高压绝缘耐压试验与局部放电UHF传感器阵列联合校准 (High-Voltage Factory Withstand & Partial Discharge Sensor Array Testing)",
+        "变电站运行现场环保绝缘状态多组分红外与声表面波终端在线集成监测 (Substation Online Multigas NDIR-SAW Transducer Commissioning)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "SF6及环保替代气体在线监测装置 国产中标 常州鼎诺 汇能智电"
+        },
+        {
+          "query": "特高压GIS局部放电特高频在线监测装置 生产厂家 招标 型号"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "ABB Siemens Energy gas insulated switchgear SF6 alternative online monitoring sensor model"
+        },
+        {
+          "query": "WIKA MR Reinhausen eco-friendly insulating gas decomposition gas analyzer"
+        }
+      ]
+    },
+    {
+      "track_id": "DP4",
+      "sector": "power_energy",
+      "name": "绿氢电解槽多相流界面超声测试与CCUS碳捕集全链条高精度气体计量 (Green Hydrogen Electrolyzer Multiphase Acoustic & CCUS Full-Chain Gas Inline Metrology)",
+      "step_back_physics_principle": "依据多相流声学波动理论与Wood混合流体状态方程，两相流等效体积声阻抗与气体体积分数(Gas Volume Fraction)之间存在强烈非线性依赖，利用物理引导机器学习(PIML)超声反射波飞行时间(ToF)与衰减反演膜电极界面气泡动力学；CCUS环节基于非色散红外(NDIR)与可调谐二极管激光吸收光谱(TDLAS)分子吸收线强积分，消除伴生气体交叉干扰实现高精度吸收反演。",
+      "cn_queries": [
+        {
+          "query": "绿电水制氢兆瓦级电解槽极板流道与膜电极气泡析出在线无损检测规程"
+        },
+        {
+          "query": "CCUS工业碳捕集全流程烟气二氧化碳在线监测系统环保合规计量标准"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Water electrolysis stack inline acoustic sensing for gas volume fraction and bubble dynamics"
+        },
+        {
+          "query": "CCUS flue gas CO2 continuous emission monitoring system CEMS accuracy standards"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "绿氢电解槽向兆瓦级规模化与CCUS工业全流程脱碳示范落地，高压强腐蚀工况下的气液多相流微流动阻力、催化膜电极界面气泡析出率以及超临界/高湿度CO2纯度检测构成工业计量核心瓶颈。引用EV-CN-002、EV-CN-015、EV-GLOBAL-003、EV-GLOBAL-012。",
+      "recon_evidence_ids": [
+        "EV-CN-002",
+        "EV-CN-015",
+        "EV-GLOBAL-003",
+        "EV-GLOBAL-012"
+      ],
+      "manufacturing_stages": [
+        "兆瓦级电解槽双极板流道冲压/微蚀刻深度形貌白光干涉在线扫描 (Electrolyzer Bipolar Plate Flow Channel Surface Profiling)",
+        "PEM/碱液电解槽膜电极催化层涂布载量X射线荧光(XRF)在线测厚 (Membrane Electrode Assembly Catalyst Loading Inline XRF Metrology)",
+        "电解槽堆叠装配后液压锁紧应力分布与气液流道超声流动无损探伤 (Electrolyzer Stack Clamping Pressure & Flow Acoustic NDT)",
+        "CCUS工业碳捕集塔出口烟气脱碳效率与超临界CO2高压管道在线纯度标定 (CCUS Absorber Outlet Gas Flue Monitoring & Supercritical CO2 Purity Metrology)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "电解水制氢电解槽 在线气液检测与膜电极无损检测设备 厂商 型号"
+        },
+        {
+          "query": "CCUS二氧化碳在线分析仪 烟气捕集高精度分析仪 中标 华云仪器"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Horiba Emerson Rosemount flue gas carbon capture CO2 continuous emission analyzer model"
+        },
+        {
+          "query": "Olympus Evident industrial ultrasonic flaw detector for hydrogen electrolyzer cell stack"
+        }
+      ]
+    },
+    {
+      "track_id": "DS1",
+      "sector": "semiconductor",
+      "name": "3D Chiplet与HBM高密度铜-铜混合键合亚微米对准与界面无损量检测 (3D Chiplet & HBM Cu-Cu Hybrid Bonding Sub-Micron Overlay & Interface Inline Metrology)",
+      "step_back_physics_principle": "基于波动光学近红外/短波红外(NIR/SWIR)相干干涉原理与摩尔条纹(Moiré Interferometry)位移相位解调算法，穿透硅衬底探测掩埋对准标记实现深亚波长重叠对准(Overlay)解算；基于界面声学反射波动方程与超高频千兆赫兹(GHz)超声换能器聚焦声阻抗阶跃特性，结合瞬态热反射(TTR)热阻扩散方程，逆向重构金属键合层纳米级未熔合气隙与微空洞。",
+      "cn_queries": [
+        {
+          "query": "3D Chiplet先进封装混合键合铜焊盘CMP平坦化与纳米碟形凹陷在线量测标准"
+        },
+        {
+          "query": "晶圆级Cu-Cu混合键合界面对准误差与纳米空洞红外光学无损检测规程"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Wafer-to-wafer Cu-Cu hybrid bonding overlay alignment accuracy NIR inspection standards"
+        },
+        {
+          "query": "High-density interconnect hybrid bonding interface nanovoid acoustic microscopy metrology"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "AI算力芯片倒逼HBM及3D Chiplet互连间距缩减至亚微米级，传统微凸点倒装焊全面让位于无凸点铜-铜直接接触混合键合（Cu-Cu Hybrid Bonding）。要求对准精度优于50nm且键合界面纳米级微孔洞阻断电阻，构成先进封装量测的核心战略断裂点。引用EV-CN-023、EV-GLOBAL-035、EV-GLOBAL-038。",
+      "recon_evidence_ids": [
+        "EV-CN-023",
+        "EV-GLOBAL-035",
+        "EV-GLOBAL-038"
+      ],
+      "manufacturing_stages": [
+        "化学机械抛光(CMP)后超平整介质层与凹陷Cu焊盘双大马士革表面纳米形貌AFM量测 (Post-CMP Cu Pad Dishing & Dielectric Erosion Metrology)",
+        "等离子体表面活化与亲水官能团接触角光学在线高速检测 (Plasma Surface Activation Hydrophilicity Contact Angle Inspection)",
+        "晶圆级/芯片到晶圆对准键合亚微米高精度红外重叠误差检测 (W2W/D2W Post-Bonding Infrared Transmission Alignment Overlay Inspection)",
+        "热退火铜固相扩散键合后界面微空洞高频声学扫描显微(SAM)与热阻无损探伤 (Post-Anneal Cu-Cu Interface Nanovoid Scanning Acoustic Metrology)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "先进封装混合键合 红外对准量测与界面缺陷检测设备 中标 芯源微 精测电子"
+        },
+        {
+          "query": "3D Chiplet晶圆级无损键合检测设备 厂商 型号 拓荆科技 迈为股份"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Besi EV Group Süss MicroTec hybrid bonding alignment and interface inspection tool model"
+        },
+        {
+          "query": "Onto Innovation Camtek advanced packaging hybrid bonding defect metrology system"
+        }
+      ]
+    },
+    {
+      "track_id": "DS2",
+      "sector": "semiconductor",
+      "name": "埃米级前道晶圆三维环绕栅极(GAA)相干衍射X射线与计算散射光谱量测 (Angstrom-Scale Front-End GAA 3D Computational Optical Scatterometry & Coherent X-Ray Metrology)",
+      "step_back_physics_principle": "基于电磁场严格耦合波分析(RCWA)与麦克斯韦方程组频域有限差分(FDTD)逆散射积分方程，高深宽比纳米结构产生高阶消逝波与偏振态各向异性畸变；结合相干X射线叠层成像(Ptychography)的相位恢复迭代算法，利用硬X射线短波长高穿透与深亚纳米空间相干衍射图样，实现完全无损的三维空间电子密度分布与原子级几何轮廓重建。",
+      "cn_queries": [
+        {
+          "query": "亚2nm前道纳米片GAA架构三维形貌与内部隔离层计算光学散射量测规程"
+        },
+        {
+          "query": "前道晶圆纳米结构相干衍射X射线断层扫描PXCT无损在线检测标准"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Sub-2nm GAA nanosheet inner spacer 3D profile computational optical scatterometry OCD"
+        },
+        {
+          "query": "Ptychographic X-ray computed tomography PXCT inline wafer inspection resolution standards"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "亚2nm与埃米制程晶体管全面转向环绕栅极纳米片（GAA/NanoSheet）及CFET架构，超高深宽比内部隐藏垂直沟道与Inner Spacer几何盲区导致传统OCD出现多参数退化强耦合，推动相干衍射X射线断层扫描（PXCT）与AI计算散射新范式破茧而出。引用EV-CN-023、EV-CN-036、EV-CN-038、EV-GLOBAL-025、EV-GLOBAL-038。",
+      "recon_evidence_ids": [
+        "EV-CN-023",
+        "EV-CN-036",
+        "EV-CN-038",
+        "EV-GLOBAL-025",
+        "EV-GLOBAL-038"
+      ],
+      "manufacturing_stages": [
+        "Si/SiGe交替多层外延超晶格超薄异质结厚度与粗糙度X射线反射(XRR)量测 (Si/SiGe Superlattice Epitaxial Layer Thickness XRR Metrology)",
+        "极紫外(EUV)光刻与超高深宽比纳米片刻蚀三维侧壁垂直度形貌量测 (EUV Lithography & GAA NanoSheet Etch 3D Profile Metrology)",
+        "选择性去除SiGe内侧壁与Inner Spacer微腔几何三维无损逆散射重构 (Inner Spacer Cavity Etching & Recess OCD/X-Ray Scatterometry)",
+        "前道金属栅极替换(RMG)高介电常数金属栅(HKMG)原子层沉积薄膜厚度监控 (Gate-All-Around HKMG Atomic Layer Deposition In-Situ Metrology)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "前道三维光学关键尺寸量测设备 OCD椭偏仪 中标 中科飞测 精测电子"
+        },
+        {
+          "query": "半导体薄膜厚度与X射线前道量测设备 国产替代 厂商 型号 拓荆科技"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "KLA SpectraShape Nova Metrology computational optical scatterometry system model"
+        },
+        {
+          "query": "Applied Materials Bruker JVX inline X-ray metrology and diffraction tool model"
+        }
+      ]
+    },
+    {
+      "track_id": "DS3",
+      "sector": "semiconductor",
+      "name": "晶圆级多模态前道缺陷检测与AI物理自适应良率闭环控制 (Wafer-Level Multimodal Front-End Inline Defect Inspection & AI Physics Adaptive Process Control)",
+      "step_back_physics_principle": "依据瑞利-甘斯散射理论(Rayleigh-Gans Scattering)与微小粒子弹性光散射波印廷矢量分布，深亚波长纳米缺陷的散射光强与缺陷特征尺寸六次方(d^6)成正比，导致光学背景散斑噪声淹没信号；利用统计物理贝叶斯推断与空间泊松随机场卷积神经网络，从多角度明暗场偏振态探测器阵列中解耦微弱缺陷微扰信号，实现亚波长致命缺陷超分辨精准定位与良率飘移预测。",
+      "cn_queries": [
+        {
+          "query": "半导体前道晶圆明暗场光学缺陷检测与多模态AI自动缺陷分类ADC标准"
+        },
+        {
+          "query": "先进制程晶圆制造电子束电压衬度检测与良率漂移自适应闭环控制规范"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Inline wafer broadband darkfield defect inspection signal-to-noise ratio AI enhancement"
+        },
+        {
+          "query": "Semiconductor yield learning adaptive wafer sort and machine learning defect review standards"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "先进制程工序超千道，缺陷尺寸进入亚10nm杀手缺陷区间，明暗场光学散射信噪比逼近理论极限，电子束复检速度慢，驱动多模态光学-电子束协同与AI物理引导自适应良率闭环控制的刚性落地。引用EV-CN-023、EV-GLOBAL-021、EV-GLOBAL-023、EV-GLOBAL-027、EV-GLOBAL-030。",
+      "recon_evidence_ids": [
+        "EV-CN-023",
+        "EV-GLOBAL-021",
+        "EV-GLOBAL-023",
+        "EV-GLOBAL-027",
+        "EV-GLOBAL-030"
+      ],
+      "manufacturing_stages": [
+        "大口径激光宽场暗场散射全晶圆裸片高速宏观与微观微粒缺陷初筛 (Broadband Laser Dark-Field Wafer Defect High-Speed Scanning)",
+        "极紫外(EUV)曝光显影后光刻胶纳米桥接与断线临界尺寸缺陷明场复检 (Post-EUV Lithography Bridging & Line Collapse Bright-Field Inspection)",
+        "多束电子束(Multi-Beam e-Beam)阵列亚5nm电学电压衬度(VC)漏电缺陷高通量定点定位 (Multi-Beam Electron Beam Voltage Contrast Inspection)",
+        "全厂晶圆级缺陷聚类分析与AI自适应测试动态良率闭环反馈 (Fab-Wide AI Defect Classification ADC & Dynamic Yield Learning Feedback)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "半导体前道无图形与有图形晶圆缺陷检测设备 中标 中科飞测 赛腾股份"
+        },
+        {
+          "query": "晶圆级缺陷电子束复检与良率分析系统 国产替代 厂商 型号 东方晶源"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "KLA 29xx 39xx broadband plasma defect inspection system model"
+        },
+        {
+          "query": "Applied Materials PROVision multi-beam e-beam inspection tool model"
+        }
+      ]
+    },
+    {
+      "track_id": "DS4",
+      "sector": "semiconductor",
+      "name": "第三代碳化硅功率衬底外延缺陷与硅光CPO晶圆级光电协同测试 (Third-Gen SiC Substrate Epitaxy Defect & Silicon Photonics CPO Wafer-Level Metrology)",
+      "step_back_physics_principle": "依据半导体固态能带理论与光致发光(Photoluminescence, PL)跃迁动力学，SiC衬底中的基面位错(BPD)、堆垛层错与螺位错具有特定的非辐射复合中心能级与带隙荧光发射光谱；硅光器件基于导波光学本征模展开与耦合模理论(Coupled Mode Theory)，利用倏逝波场光栅耦合纳米压电主动对准算法，解析光波导偏振依赖损耗(PDL)与热-电-光载流子色散相移特性。",
+      "cn_queries": [
+        {
+          "query": "8英寸SiC碳化硅外延片基面位错BPD与微管缺陷紫外光致发光在线检测标准"
+        },
+        {
+          "query": "硅光共封装光学CPO晶圆级光栅耦合损耗与电光热协同高通量测试规程"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Silicon carbide SiC epitaxy basal plane dislocation UV-PL inline screening standards"
+        },
+        {
+          "query": "Silicon photonics CPO wafer-level electro-optical probing and optical coupling metrology"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "新能源车800V平台拉动8英寸碳化硅（SiC）衬底外延扩产，基面位错（BPD）及微管直接引发器件早期击穿；与此同时，AI超算万卡集群互连引爆硅光CPO晶圆级光耦合测试与已知合格管芯（KGD）电-光-热协同在线筛选空白。引用EV-CN-023、EV-GLOBAL-035、EV-GLOBAL-038。",
+      "recon_evidence_ids": [
+        "EV-CN-023",
+        "EV-GLOBAL-035",
+        "EV-GLOBAL-038"
+      ],
+      "manufacturing_stages": [
+        "8英寸碳化硅单晶衬底多线切割后亚表面晶格损伤拉曼光谱在线无损检测 (8-Inch SiC Wafer Subsurface Lattice Damage Raman Metrology)",
+        "SiC化学气相沉积外延层基面位错(BPD)全晶圆深紫外光致发光(UV-PL)成像 (Full-Wafer UV Photoluminescence Epitaxial Defect Metrology)",
+        "硅光晶圆表面纳米光栅耦合器与微环调制器晶圆级高速光探针台自动对准测试 (Silicon Photonics Wafer-Level Optical Prober & Grating Coupler Alignment)",
+        "CPO光电合封模组多通道激光耦合插入损耗与高速电光热协同动态寿命测试 (CPO Module Multi-Channel Optical Insertion Loss & Electro-Optic-Thermal Testing)"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "碳化硅外延缺陷检测仪 光致发光PL设备 中标 国产厂商 长川科技 迈为股份"
+        },
+        {
+          "query": "硅光晶圆级光电探针台 高精度光学耦合测试系统 厂家 型号 华峰测控"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Lasertec SICA88 SiC wafer defect inspection review tool model"
+        },
+        {
+          "query": "Keysight FormFactor silicon photonics wafer-level optical probe system model"
+        }
+      ]
+    }
+  ]
+}

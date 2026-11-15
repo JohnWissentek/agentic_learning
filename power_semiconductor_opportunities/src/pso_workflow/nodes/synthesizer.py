@@ -1,4 +1,4 @@
-"""Node 5: Grounded Multi-Volume Report Synthesizer (Ch 1, Ch 3 Strict Merger, Ch 14)."""
+"""Stage 5: Grounded Multi-Volume Report Synthesizer (V2.0 Dynamic Tracks & 3-Scenario Funnel)."""
 
 from __future__ import annotations
 
@@ -11,29 +11,73 @@ from pso_workflow.prompts import SYNTHESIZER_SYSTEM
 from pso_workflow.schemas import EvidenceRecord, WorkflowState
 
 
-def _format_roi_table(evaluated_opps: list[dict[str, Any]], sector: str | None = None) -> str:
+COMMERCIAL_STATUS_LABELS: dict[str, str] = {
+    "global_and_cn_commercialized": "海内外均已商业在售（AI升维/降本替代）",
+    "overseas_only_cn_blank": "海外成熟在售 / 国内整机空白（卡脖子首发替代）",
+    "global_and_cn_true_blank": "海内外均无成熟在线整机（全球首发新物种空白）",
+}
+
+
+def format_commercial_whitespace_and_ai_table(
+    evaluated_opps: list[dict[str, Any]], sector: str | None = None
+) -> str:
+    """Format V3 commercial vendor supply, product white-space tiers, and AI HW/SW co-design specs."""
+    header = (
+        "| 排名 | ID | 机会名称 | 商业空白分级 | 海外在售厂商与代表型号 | 国内厂商与交付状态 | 空白切入楔子 | AI 计算传感与软硬协同架构 | AI 研发周期对比 | 证据溯源 |\n"
+        "| :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |"
+    )
+    rows: list[str] = []
+    for item in evaluated_opps:
+        seed = item["seed"]
+        if sector and seed.get("sector") != sector:
+            continue
+        status_key = str(seed.get("commercial_status", "overseas_only_cn_blank"))
+        status_label = COMMERCIAL_STATUS_LABELS.get(status_key, status_key)
+        gl_v = str(seed.get("global_vendors_and_products", "-") or "-").replace("|", "\\|").replace("\n", " ")
+        cn_v = str(seed.get("china_vendors_and_products", "-") or "-").replace("|", "\\|").replace("\n", " ")
+        wedge = str(seed.get("white_space_and_entry_wedge", "-") or "-").replace("|", "\\|").replace("\n", " ")
+        ai_cs = str(seed.get("ai_computational_sensing_and_co_design", "-") or "-").replace("|", "\\|").replace("\n", " ")
+        rd_cmp = str(seed.get("estimated_rd_months_ai_vs_legacy", "-") or "-").replace("|", "\\|").replace("\n", " ")
+        evs = ", ".join(f"[{e}]" for e in seed.get("evidence_ids", [])[:4])
+        rows.append(
+            f"| #{item.get('composite_rank', 0)} | `{seed['opp_id']}` | {seed['title']} | {status_label} | "
+            f"{gl_v} | {cn_v} | {wedge} | {ai_cs} | {rd_cmp} | {evs} |"
+        )
+    return header + "\n" + "\n".join(rows)
+
+
+def format_roi_table(evaluated_opps: list[dict[str, Any]], sector: str | None = None) -> str:
+    """Format ranked opportunities into a deterministic `[ROI-CALC]` 3-scenario Markdown table."""
     rows = []
     for item in evaluated_opps:
         seed = item["seed"]
         if sector and seed["sector"] != sector:
             continue
         roi = item["roi"]
+        rr = item.get("roi_range") or {}
+        opt_pb = rr.get("optimistic", {}).get("payback_months", roi["payback_months"])
+        cons_pb = rr.get("conservative", {}).get("payback_months", roi["payback_months"])
+        status_key = str(seed.get("commercial_status", "overseas_only_cn_blank"))
+        status_short = (
+            "全球双空白" if status_key == "global_and_cn_true_blank"
+            else ("国内空白替代" if status_key == "overseas_only_cn_blank" else "海内外均在售")
+        )
         rows.append(
-            f"| #{item['composite_rank']} | `{seed['opp_id']}` | {seed['track_id']} | {seed['horizon']} | "
+            f"| #{item['composite_rank']} | `{seed['opp_id']}` | {seed['track_id']} | {seed['horizon']} | {status_short} | "
             f"{seed['title']} | ¥{roi['capex_cny']/10000:.1f}万 | ¥{roi['net_annual_cashflow_cny']/10000:.1f}万/年 | "
-            f"**{roi['payback_months']}月** | {roi['irr_5yr_pct']}% | ¥{roi['npv_5yr_cny']/10000:.1f}万 | "
+            f"**{opt_pb} / {roi['payback_months']} / {cons_pb}月** | {roi['irr_5yr_pct']}% | ¥{roi['npv_5yr_cny']/10000:.1f}万 | "
             f"{roi['payback_tier']} | {item['weighted_pillar_score']} / Elo {item['elo_rating']} | "
             f"{', '.join(f'[{e}]' for e in seed.get('evidence_ids', [])[:4])} |"
         )
     header = (
-        "| 综合排名 | ID | 赛道 | 周期 | 机会名称 | 单套CAPEX | 年净现金流 | "
-        "回收期[ROI-CALC] | 5年IRR[ROI-CALC] | 5年NPV[ROI-CALC] | ROI分级 | 综合分/Elo | 证据溯源 |\n"
-        "| :---: | :---: | :---: | :---: | :--- | ---: | ---: | ---: | ---: | ---: | :--- | :---: | :--- |"
+        "| 综合排名 | ID | 赛道 | 周期 | 商业空白级 | 机会名称 | 基准CAPEX | 基准年净现金流 | "
+        "乐观/基准/保守回收期[ROI-CALC] | 基准5年IRR[ROI-CALC] | 基准5年NPV[ROI-CALC] | ROI分级 | 综合分/Elo | 证据溯源 |\n"
+        "| :---: | :---: | :---: | :---: | :---: | :--- | ---: | ---: | ---: | ---: | ---: | :--- | :---: | :--- |"
     )
     return header + "\n" + "\n".join(rows)
 
 
-def _format_dossiers(dossiers: list[dict[str, Any]], sector: str | None = None) -> str:
+def format_dossiers(dossiers: list[dict[str, Any]], sector: str | None = None) -> str:
     blocks: list[str] = []
     for d in dossiers:
         if sector and d.get("sector") != sector:
@@ -44,14 +88,21 @@ def _format_dossiers(dossiers: list[dict[str, Any]], sector: str | None = None) 
             for p in d.get("pain_points", [])
         )
         opps = "\n".join(
-            f"  - `{o['opp_id']}` ({o['horizon']}): {o['title']} | 机理: {o['physics_principle']} | "
-            f"中国切入: {o['china_positioning']} | 全球拓展: {o['global_expansion_path']} | "
+            f"  - `{o['opp_id']}` ({o['horizon']}, status={o.get('commercial_status', 'overseas_only_cn_blank')}): "
+            f"{o['title']} | 机理: {o['physics_principle']} | "
+            f"海外在售: {o.get('global_vendors_and_products', '-')} | 国内现状: {o.get('china_vendors_and_products', '-')} | "
+            f"空白切入: {o.get('white_space_and_entry_wedge', '-')} | "
+            f"AI计算传感: {o.get('ai_computational_sensing_and_co_design', '-')} | "
+            f"AI研发与边缘: {o.get('ai_rd_acceleration_and_edge_deployment', '-')} ({o.get('estimated_rd_months_ai_vs_legacy', '')}) | "
+            f"BOM与GTM形态: {o.get('hardware_bom_localization_and_gtm_form', '-')} | "
             f"四大支柱: 良率[{o['quality_yield_mechanism']}], 降本[{o['cost_tco_mechanism']}], "
-            f"环保[{o['green_ehs_mechanism']}], 升级[{o['industrial_upgrade_mechanism']}] | 证据: {o.get('evidence_ids', [])}"
+            f"环保[{o['green_ehs_mechanism']}], 升级[{o['industrial_upgrade_mechanism']}] | "
+            f"参数依据: {(o.get('roi_range_inputs') or {}).get('parameter_basis', 'n/a')} | 证据: {o.get('evidence_ids', [])}"
             for o in d.get("opportunities", [])
         )
         blocks.append(
             f"### 赛道 {d['track_id']}: {d['track_name']}\n"
+            f"- 商业供给与空白全景: {d.get('commercial_landscape_summary', '')}\n"
             f"- 中国市场动态: {d['china_market_dynamics']}\n"
             f"- 全球市场动态: {d['global_market_dynamics']}\n"
             f"- 3-5年展望: {d['horizon_3_5y_outlook']}\n"
@@ -62,7 +113,7 @@ def _format_dossiers(dossiers: list[dict[str, Any]], sector: str | None = None) 
     return "\n\n".join(blocks)
 
 
-def _format_storm_digest(evaluated_opps: list[dict[str, Any]], sector: str | None = None) -> str:
+def format_storm_digest(evaluated_opps: list[dict[str, Any]], sector: str | None = None) -> str:
     lines: list[str] = []
     for item in evaluated_opps:
         seed = item["seed"]
@@ -82,7 +133,9 @@ def _format_storm_digest(evaluated_opps: list[dict[str, Any]], sector: str | Non
     return "\n".join(lines)
 
 
-def _format_vault_snippets(records: list[EvidenceRecord], tracks: set[str] | None = None, limit: int = 36) -> str:
+def format_vault_snippets(
+    records: list[EvidenceRecord], tracks: set[str] | None = None, limit: int = 36
+) -> str:
     filtered = [r for r in records if tracks is None or r.track_id in tracks]
     cn = [r for r in filtered if r.geo_scope == "CN"][: limit // 2 + 4]
     gl = [r for r in filtered if r.geo_scope == "GLOBAL"][: limit // 2 + 4]
@@ -93,14 +146,61 @@ def _format_vault_snippets(records: list[EvidenceRecord], tracks: set[str] | Non
     return "\n".join(out)
 
 
-def render_evidence_index(records: list[EvidenceRecord]) -> str:
+def format_discovery_and_funnel_summary(
+    *,
+    plan: dict[str, Any],
+    raw_count: int,
+    shortlist_count: int,
+    eliminated: list[dict[str, Any]],
+) -> str:
+    """Format Stage 0 dynamically emerged tracks and Stage 2 PALMs funnel elimination log."""
+    tracks = plan.get("track_plans", [])
+    track_lines = []
+    for tp in tracks:
+        tag = "新兴/跨界涌现" if tp.get("is_emerging_or_cross_cutting") else "主流演化"
+        evs = ", ".join(f"[{e}]" for e in tp.get("recon_evidence_ids", [])[:4])
+        track_lines.append(
+            f"- `{tp.get('track_id')}` ({tp.get('sector')} | {tag}): **{tp.get('name')}** — "
+            f"{tp.get('emergence_rationale', '')} 侦察证据: {evs}"
+        )
+
+    elim_header = (
+        "| 淘汰候选 ID | 赛道 | 机会名称 | 周期 | 商业空白级 | 基准回收期 | 保守回收期 | 综合评分 | 淘汰/落选原因 |\n"
+        "| :---: | :---: | :--- | :---: | :---: | ---: | ---: | ---: | :--- |"
+    )
+    elim_rows = [
+        f"| `{e.get('opp_id')}` | {e.get('track_id')} | {e.get('title')} | {e.get('horizon')} | "
+        f"{e.get('commercial_status', 'overseas_only_cn_blank')} | "
+        f"{e.get('baseline_payback_months')}月 | {e.get('conservative_payback_months')}月 | "
+        f"{e.get('weighted_pillar_score')} | {e.get('elimination_reason')} |"
+        for e in eliminated
+    ]
+    elim_table = (
+        elim_header + "\n" + "\n".join(elim_rows)
+        if elim_rows
+        else "(本次初筛候选池规模未超出决选上限，且全部通过保守回收期硬门禁，无被淘汰项。)"
+    )
+
+    return (
+        f"### Stage 0 广谱侦察动态涌现赛道清单（共 {len(tracks)} 条）\n"
+        f"侦察结论摘要: {plan.get('macro_recon_summary', '')}\n"
+        + "\n".join(track_lines)
+        + f"\n\n### Stage 2 确定性漏斗初筛审计（原始挖掘 {raw_count} 项 -> 入围决选 {shortlist_count} 项，淘汰 {len(eliminated)} 项）\n"
+        + elim_table
+    )
+
+
+def render_evidence_index(
+    records: list[EvidenceRecord],
+    db_label: str = "data/evidence_vault_v2.db",
+) -> str:
     """Deterministically compile Volume 05 from SQLite EvidenceVault (zero hallucination)."""
     cn_recs = [r for r in records if r.geo_scope == "CN"]
     gl_recs = [r for r in records if r.geo_scope == "GLOBAL"]
     lines = [
         "# 05. 核验证据库与权威引用总索引 (Verified EvidenceVault Citations Index)",
         "",
-        f"> 本索引由 SQLite 持久化证据记忆库 (`data/evidence_vault.db`) 自动确定性导出，共收录 **{len(records)}** 条去重溯源证据："
+        f"> 本索引由 SQLite 持久化证据记忆库 (`{db_label}`) 自动确定性导出，共收录 **{len(records)}** 条去重溯源证据（含 Stage 0 `RECON` 侦察与各动态赛道深挖证据）："
         f"中国市场证据 **{len(cn_recs)}** 条（优先通过秘塔 Metaso / 中文权威渠道检索），全球市场证据 **{len(gl_recs)}** 条（通过 Serper Google / Scholar / Patents 检索）。",
         "",
         "## 一、 中国市场证据清单（CN — 秘塔 Metaso / 国内权威信源）",
@@ -134,6 +234,196 @@ def render_evidence_index(records: list[EvidenceRecord]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def build_volume_specs(
+    *,
+    plan: dict[str, Any],
+    dossiers: list[dict[str, Any]],
+    evaluated: list[dict[str, Any]],
+    elo_matches: list[dict[str, Any]],
+    all_records: list[EvidenceRecord],
+    raw_candidates_count: int,
+    eliminated_candidates: list[dict[str, Any]],
+    critique_note: str = "",
+) -> list[tuple[str, str, str]]:
+    """Build exact grounded V3 prompts for Volumes 00-04 cleanly shared by LangGraph & CLI."""
+    roi_all_table = format_roi_table(evaluated)
+    roi_power_table = format_roi_table(evaluated, sector="power_energy")
+    roi_semi_table = format_roi_table(evaluated, sector="semiconductor")
+
+    comm_all_table = format_commercial_whitespace_and_ai_table(evaluated)
+    comm_power_table = format_commercial_whitespace_and_ai_table(evaluated, sector="power_energy")
+    comm_semi_table = format_commercial_whitespace_and_ai_table(evaluated, sector="semiconductor")
+
+    power_dossiers = format_dossiers(dossiers, sector="power_energy")
+    semi_dossiers = format_dossiers(dossiers, sector="semiconductor")
+
+    storm_all = format_storm_digest(evaluated)
+    storm_power = format_storm_digest(evaluated, sector="power_energy")
+    storm_semi = format_storm_digest(evaluated, sector="semiconductor")
+
+    power_tids = {d["track_id"] for d in dossiers if d.get("sector") == "power_energy"} | {"RECON"}
+    semi_tids = {d["track_id"] for d in dossiers if d.get("sector") == "semiconductor"} | {"RECON"}
+
+    vault_power = format_vault_snippets(all_records, tracks=power_tids, limit=34)
+    vault_semi = format_vault_snippets(all_records, tracks=semi_tids, limit=34)
+    vault_all = format_vault_snippets(all_records, tracks=None, limit=42)
+
+    power_track_labels = ", ".join(
+        f"{d['track_id']}({d['track_name']})" for d in dossiers if d.get("sector") == "power_energy"
+    ) or "电力能源动态赛道"
+    semi_track_labels = ", ".join(
+        f"{d['track_id']}({d['track_name']})" for d in dossiers if d.get("sector") == "semiconductor"
+    ) or "半导体制造动态赛道"
+
+    discovery_funnel_md = format_discovery_and_funnel_summary(
+        plan=plan,
+        raw_count=raw_candidates_count or len(evaluated) + len(eliminated_candidates),
+        shortlist_count=len(evaluated),
+        eliminated=eliminated_candidates,
+    )
+
+    elo_summary = "\n".join(
+        f"- Round {m['round_idx']}: `{m['opp_a_id']}` vs `{m['opp_b_id']}` -> Winner `{m['winner_id']}` | {m['rationale']}"
+        for m in elo_matches[:24]
+    )
+
+    return [
+        (
+            "00_EXECUTIVE_SUMMARY_AND_TOP_OPPORTUNITIES.md",
+            "Volume 00: V3 总览、海内外在售厂商与产品空白全景、AI软硬协同范式与 Top 16 榜单",
+            f"""Write **Volume 00: 电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年商业空白与AI原生开发战略总报告 (V3.0)**.
+Step-Back Thesis: {plan.get('step_back_thesis', '')}
+{discovery_funnel_md}
+
+Commercial Vendor Supply, Product White-Space & AI Co-Design Master Matrix:
+{comm_all_table}
+
+Deterministic [ROI-CALC] Master Ranking Table (Top Shortlist):
+{roi_all_table}
+
+STORM Buying-Committee Highlights:
+{storm_all}
+
+Selected Grounded Evidence:
+{vault_all}
+{critique_note}
+
+Mandatory Structure:
+1. 执行摘要与核心判断（先中国后全球的结构性拐点；用商业供给与AI工程实证破除纸面空谈）
+2. **海内外现有在售设备摸底 vs. 三级产品空白全景矩阵**（完整展示 16 项机会中哪些属“海内外均有在售”、哪些属“海外成熟/中国商业空白”、哪些属“全球真正空白”）
+3. **AI 时代软硬件协同开发范式重构对在线检测仪器的实质改变**（计算传感“AI算力换硬件极限”降BOM、合成缺陷破解少样本冷启动、AI辅助多物理场/FPGA/上位机开发将研发周期从30月压至14月、断网边缘推理与模型订阅模式）
+4. Stage 0 从零动态发现赛道与电力×半导体跨界能力复用（含跨界新兴赛道与共性平台复用）
+5. Top 16 综合排位总表与 3-5年 vs 5-10年双时间窗对比（完整复现上面 Python 计算的三档回收期与 `[ROI-CALC]` 数据）暨淘汰候选审计
+6. 仪器企业与投资方落地切入优先级决策建议（先选哪类空白、用何种 MVP 形态切入、如何防范红海降价战）。""",
+        ),
+        (
+            "01_POWER_ENERGY_ONLINE_TESTING_OPPORTUNITIES.md",
+            "Volume 01: 电力能源行业动态赛道商业格局、产品空白与AI软硬方案深度研报",
+            f"""Write **Volume 01: 电力能源行业动态发现赛道（{power_track_labels}）3-5年及5-10年在线测试仪器商业落地与技术研报 (V3.0)**.
+Power Commercial White-Space & AI Co-Design Matrix:
+{comm_power_table}
+
+Power Deterministic [ROI-CALC] Table:
+{roi_power_table}
+
+Power Track Dossiers:
+{power_dossiers}
+
+STORM Buyer Interrogation:
+{storm_power}
+
+Power Evidence Snippets:
+{vault_power}
+{critique_note}
+
+Mandatory Structure (cover EVERY dynamically discovered Power track above in full practical depth):
+- 第一节：中国市场产业痛点、在售设备招标格局与国产替代缺口（引用 `[EV-CN-...]`）
+- 第二节：全球市场（欧美日中等地区标杆厂商如 Omicron/ABB/Keysight/Hioki 等在售型号及空白界定）（引用 `[EV-GL-...]`）
+- 第三节：3-5年高ROI机会 vs 5-10年全球空白新物种（针对每项机会写清：商业空白级别 + 竞品切入楔子 + AI 计算传感/FPGA边缘协同硬件形态 + 良率/降本/环保/三档ROI `[ROI-CALC]` 量化支撑）
+- 第四节：电厂/电池厂/智算中心买方四角色阻力、零样本冷启动破局与 Spec-in 方案。""",
+        ),
+        (
+            "02_SEMICONDUCTOR_ONLINE_TESTING_OPPORTUNITIES.md",
+            "Volume 02: 半导体芯片制造动态赛道商业格局、产品空白与AI软硬方案深度研报",
+            f"""Write **Volume 02: 半导体芯片制造行业动态发现赛道（{semi_track_labels}）3-5年及5-10年在线量检测设备商业落地与技术研报 (V3.0)**.
+Semiconductor Commercial White-Space & AI Co-Design Matrix:
+{comm_semi_table}
+
+Semiconductor Deterministic [ROI-CALC] Table:
+{roi_semi_table}
+
+Semiconductor Track Dossiers:
+{semi_dossiers}
+
+STORM Buyer Interrogation:
+{storm_semi}
+
+Semiconductor Evidence Snippets:
+{vault_semi}
+{critique_note}
+
+Mandatory Structure (cover EVERY dynamically discovered Semiconductor track above in full practical depth):
+- 第一节：中国晶圆厂/功率产线/封测厂良率痛点、海外龙头垄断型号与国产商业化缺口（引用 `[EV-CN-...]`）
+- 第二节：全球 KLA/Onto/Camtek/Lasertec/Bruker/Horiba/Inficon 等在售产品矩阵 vs 真正的全球在线量测空白（引用 `[EV-GL-...]`）
+- 第三节：3-5年国产首发替代 vs 5-10年全球空白新物种（针对每项机会写清：物理限界 + AI 逆散射/超分辨补偿国产中端器件 + 断网 FPGA+NPU EFEM 集成 + 四大支柱与三档 `[ROI-CALC]`）
+- 第四节：晶圆厂工艺总工、Golden-Tool 对齐与 CFO 门禁壁垒破解方案。""",
+        ),
+        (
+            "03_ROI_FINANCIAL_MODEL_AND_ELO_RANKING.md",
+            "Volume 03: 三情景产线ROI、仪器商业经济性与Elo排位报告",
+            f"""Write **Volume 03: 制造端三情景 `[ROI-CALC]` 量化模型、不同商业空白毛利与AI研发经济性暨 Elo 排位报告 (V3.0)**.
+{discovery_funnel_md}
+
+Commercial White-Space & R&D Cycle Comparison:
+{comm_all_table}
+
+Master Deterministic [ROI-CALC] Table (Optimistic / Baseline / Conservative):
+{roi_all_table}
+
+Pairwise Elo Tournament Match Log:
+{elo_summary}
+
+STORM CFO & Procurement Gatekeeper Findings:
+{storm_all}
+{critique_note}
+
+Mandatory Structure:
+1. 生产制造端三情景区间 ROI 建模方法论（参数区间提取 + 保守压力情景 + 10% WACC 公式）
+2. 完整入围机会的 `[ROI-CALC]` 乐观/基准/保守三档财务指标汇总与敏感性分析（明确 Tier-A/B/C）
+3. **仪器研制商视角商业经济性对照（海内外均在售红海 vs 国内空白国产首发 vs 全球空白新物种的毛利、BOM 国产化降幅与 AI 把 30 个月研发压至 14 个月的回本优势）**
+4. Stage 2 漏斗淘汰审计（含商业空白级别对比）与 AI Co-Scientist Elo 锦标赛排位暨一页纸算账模板。""",
+        ),
+        (
+            "04_PRODUCT_TECH_AND_UPGRADE_STRATEGY_PLAYBOOK.md",
+            "Volume 04: AI 时代在线测试仪器软硬件协同研发与商业化落地执行手册 (Playbook)",
+            f"""Write **Volume 04: AI 时代在线测试仪器软硬件协同研发、工程落脚点与三级 GTM 商业化执行手册 (V3.0 Playbook)**.
+Commercial White-Space & AI Co-Design Matrix:
+{comm_all_table}
+
+Master Ranking & Physics Context:
+{roi_all_table}
+
+Dossiers Summary:
+{power_dossiers[:3600]}
+{semi_dossiers[:3600]}
+
+STORM Engineering Tweaks:
+{storm_all}
+{critique_note}
+
+Mandatory Structure (FOCUS ON PRACTICAL BUILDABILITY IN THE AI ERA):
+1. **计算传感核心方法论：“AI 算力换硬件物理极限”工程架构**（按光谱/质谱/光学/超声/高频电学平台拆解如何用 PINNs/逆散射/超分辨与国产成熟核心部件绕开海外禁运件并压降 BOM 30%-60%）
+2. **AI 时代仪器研发生命周期新范式（30–48个月 → 10–18个月）**（AI 多物理场代理仿真 + 物理数字孪生合成缺陷工厂解决冷启动 + AI 辅助 FPGA RTL/高速采集驱动/SECS-GEM/IEC61850 上位机生成）
+3. **Fab 与电网断网安全域 Edge-AI 工程落地五道坎**（FPGA+NPU 毫秒级确定性推理、Golden-Tool 自校准防漂移、原位防爆/超净旁路免停线设计、误报率 SLA 兜底与合规）
+4. **可落地的产品形态与“商业化三级抓手”（Wedge Strategy）**：
+   - 外挂式 AI 传感吊舱 / 旁路测试模块（Retrofit Pod，低风险快速进厂收费）
+   - 独立在线国产替代整机（对准 `overseas_only_cn_blank` 抢占集采/扩产订单）
+   - 全球首发 AI 原位 OEM 模组（嵌入工艺机台腔体 + 工艺模型库年度订阅与国际合规认证出海）
+5. 未来 12–18 个月 MVP 研制里程碑与资源配置清单。""",
+        ),
+    ]
+
+
 async def node_grounded_report_synthesizer(
     state: WorkflowState, deps: RuntimeDeps
 ) -> dict[str, Any]:
@@ -145,6 +435,8 @@ async def node_grounded_report_synthesizer(
     plan = state.get("research_plan", {})
     critique = state.get("latest_critique") or {}
     loop_count = int(state.get("loop_count", 0))
+    raw_count = int(state.get("raw_candidates_count", 0))
+    eliminated = state.get("eliminated_candidates", [])
 
     all_records = deps.vault.list_all()
     max_tok = 7500 if profile == "flagship" else 4200
@@ -161,125 +453,16 @@ async def node_grounded_report_synthesizer(
             f"Summary: {critique.get('summary', '')}\n{issues_txt}\n"
         )
 
-    roi_all_table = _format_roi_table(evaluated)
-    roi_power_table = _format_roi_table(evaluated, sector="power_energy")
-    roi_semi_table = _format_roi_table(evaluated, sector="semiconductor")
-
-    power_dossiers = _format_dossiers(dossiers, sector="power_energy")
-    semi_dossiers = _format_dossiers(dossiers, sector="semiconductor")
-
-    storm_all = _format_storm_digest(evaluated)
-    storm_power = _format_storm_digest(evaluated, sector="power_energy")
-    storm_semi = _format_storm_digest(evaluated, sector="semiconductor")
-
-    vault_power = _format_vault_snippets(all_records, tracks={"P1", "P2", "P3", "P4"}, limit=32)
-    vault_semi = _format_vault_snippets(all_records, tracks={"S1", "S2", "S3", "S4"}, limit=32)
-    vault_all = _format_vault_snippets(all_records, tracks=None, limit=40)
-
-    elo_summary = "\n".join(
-        f"- Round {m['round_idx']}: `{m['opp_a_id']}` vs `{m['opp_b_id']}` -> Winner `{m['winner_id']}` | {m['rationale']}"
-        for m in elo_matches[:20]
+    volumes_spec = build_volume_specs(
+        plan=plan,
+        dossiers=dossiers,
+        evaluated=evaluated,
+        elo_matches=elo_matches,
+        all_records=all_records,
+        raw_candidates_count=raw_count,
+        eliminated_candidates=eliminated,
+        critique_note=critique_note,
     )
-
-    volumes_spec = [
-        (
-            "00_EXECUTIVE_SUMMARY_AND_TOP_OPPORTUNITIES.md",
-            "Volume 00: 总览、顶层战略判断与 Top 16 机会全景榜单",
-            f"""Write **Volume 00: 电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年战略机会总报告**.
-Step-Back Thesis: {plan.get('step_back_thesis', '')}
-Deterministic [ROI-CALC] Master Ranking Table:
-{roi_all_table}
-STORM Buying-Committee Highlights:
-{storm_all}
-Selected Grounded Evidence:
-{vault_all}
-{critique_note}
-
-Mandatory Structure:
-1. 执行摘要与核心判断（中国优先→全球跟进的双轨结构性拐点）
-2. 电力能源 × 半导体交叉协同主线（重点剖析 SiC/GaN 宽禁带器件、电网高频高压装备、新能源与算力芯片的共性在线测试底层能力复用）
-3. 3-5年（2027-2031 产线痛点高ROI放量） vs 5-10年（2031-2036 代际工艺跃迁新物种）双时间窗全景对比表
-4. Top 机会综合排位总表（完整复现上面 Python 计算的 `[ROI-CALC]` 数据，禁止篡改任何数字）
-5. 对工业仪器研发企业与系统集成商的三大决策建议（先切哪个产线、如何用 ROI 算账打动 CFO/总工、如何借国产替代出海）。""",
-        ),
-        (
-            "01_POWER_ENERGY_ONLINE_TESTING_OPPORTUNITIES.md",
-            "Volume 01: 电力能源行业（P1-P4）在线测试仪器深度机会分析",
-            f"""Write **Volume 01: 电力能源行业（储能/固态电池、新型光伏/绿氢、特高压/环保气体/海缆、灵活调峰与CCUS）3-5年及5-10年在线测试仪器仪表深度研报**.
-Power Deterministic [ROI-CALC] Table:
-{roi_power_table}
-Power Track Dossiers:
-{power_dossiers}
-STORM Buyer Interrogation:
-{storm_power}
-Power Evidence Snippets:
-{vault_power}
-{critique_note}
-
-Mandatory Structure (for EACH of P1, P2, P3, P4):
-- 第一节：中国市场产业痛点、十五五/双碳/国网南网驱动与本土在线检测刚需（引用 `[EV-CN-...]`）
-- 第二节：全球市场（欧美F-gas法规、绿氢补贴、海外储能与CCUS）对标与出海窗口（引用 `[EV-GL-...]`）
-- 第三节：3-5年高ROI机会 vs 5-10年下一代技术新机会（含测量物理机理、产品形态、安装取样/光学接口、产线良率/降本/环保/ROI[ROI-CALC]量化支撑）
-- 第四节：产线买方四角色阻力与 Spec-in 破局点。""",
-        ),
-        (
-            "02_SEMICONDUCTOR_ONLINE_TESTING_OPPORTUNITIES.md",
-            "Volume 02: 半导体芯片制造行业（S1-S4）在线测试仪器深度机会分析",
-            f"""Write **Volume 02: 半导体芯片制造行业（Fab AMC与湿化/特气、前道纳米光学/X射线量测、SiC/GaN宽禁带功率半导体、2.5D/3D Chiplet/HBM混合键合）3-5年及5-10年在线量检测与测试深度研报**.
-Semiconductor Deterministic [ROI-CALC] Table:
-{roi_semi_table}
-Semiconductor Track Dossiers:
-{semi_dossiers}
-STORM Buyer Interrogation:
-{storm_semi}
-Semiconductor Evidence Snippets:
-{vault_semi}
-{critique_note}
-
-Mandatory Structure (for EACH of S1, S2, S3, S4):
-- 第一节：中国晶圆厂/功率产线/封测厂痛点、良率爬坡瓶颈与国产化率缺口（引用 `[EV-CN-...]`）
-- 第二节：全球先进节点（GAA/CFET、HBM4、Cu-Cu混合键合、8英寸SiC）技术代际演进与国际标杆（引用 `[EV-GL-...]`）
-- 第三节：3-5年确定性国产替代与良率放量机会 vs 5-10年原子级/非接触无损原位新物种（含物理测量限界突破、EFEM/原位腔体集成、良率/成本/EHS/ROI[ROI-CALC]定量指标）
-- 第四节：晶圆厂工艺与CFO门禁壁垒破解方案。""",
-        ),
-        (
-            "03_ROI_FINANCIAL_MODEL_AND_ELO_RANKING.md",
-            "Volume 03: PALMs 制造端 ROI 财务建模、TCO 算账与 Elo 锦标赛排位",
-            f"""Write **Volume 03: 制造环节投资回报率 (ROI) 量化模型、TCO 算账与 AI Co-Scientist Elo 锦标赛排位报告**.
-Master Deterministic [ROI-CALC] Table:
-{roi_all_table}
-Pairwise Elo Tournament Match Log:
-{elo_summary}
-STORM CFO & Procurement Gatekeeper Findings:
-{storm_all}
-{critique_note}
-
-Mandatory Structure:
-1. 生产制造端 ROI 建模方法论（为什么产线买单靠的是 `良率增益 + 避免整批报废/非计划停线 + 耗材/环保减负 - OPEX`，附计算公式与 10% WACC 基准）
-2. 完整 16+ 项机会的 `[ROI-CALC]` 财务指标汇总与敏感性分析（区分 Tier-A <=12个月、Tier-B 12-24个月、Tier-C 24-42个月）
-3. AI Co-Scientist 两两对抗 Elo 锦标赛排序解析（为什么某些高价值“产业升级项”在 Elo 评分中排位靠前或靠后）
-4. 给客户 CFO 与总工的“一页纸算账模板”（分别以动力电池/火电厂、晶圆厂/SiC封测线为例）。""",
-        ),
-        (
-            "04_PRODUCT_TECH_AND_UPGRADE_STRATEGY_PLAYBOOK.md",
-            "Volume 04: 仪器技术路线图、产品工程化与产业升级 BD 路线图",
-            f"""Write **Volume 04: 在线测试仪器技术研发、产品形态演进与助力产业升级执行手册 (Playbook)**.
-Master Ranking & Physics Context:
-{roi_all_table}
-Dossiers Summary:
-{power_dossiers[:3500]}
-{semi_dossiers[:3500]}
-STORM Engineering Tweaks:
-{storm_all}
-{critique_note}
-
-Mandatory Structure:
-1. 共性核心技术平台复用矩阵（如何用同一套“软电离质谱(IMR-MS)/激光光谱(TDLAS/CRDS)/太赫兹与超声无损成像/高压动态电学测试”底层平台横跨电力能源与半导体双赛道，降本增效）
-2. 从“离线实验室仪器”升级为“产线在线/机台原位仪器”的五大工程化坎（采样预处理防堵塞/防腐蚀、SECS/GEM 与 PLC 工业总线闭环、防爆/洁净室兼容、自动标定免漂移、AI实时缺陷重构）
-3. 分阶段市场进入策略（先中国本土标杆示范线 Spec-in -> 再随大客户与认证标准出海欧美/东南亚/中东）
-4. 未来 3-5 年与 5-10 年研发立项与并购/生态合作里程碑清单。""",
-        ),
-    ]
 
     async def _gen_volume(filename: str, role_label: str, prompt: str) -> tuple[str, str]:
         async with deps.semaphore:
@@ -293,7 +476,6 @@ Mandatory Structure:
             )
         return filename, md.strip() + "\n"
 
-    # Skip re-synthesizing unaffected volumes if critic specified narrow sections on rewrite
     existing = dict(state.get("draft_reports") or {})
     target_specs = volumes_spec
     if loop_count > 0 and critique.get("decision") == "needs_rewrite" and existing:
@@ -310,7 +492,10 @@ Mandatory Structure:
         *[_gen_volume(fn, lbl, pr) for fn, lbl, pr in target_specs]
     )
     updated_drafts = dict(generated_pairs)
-    updated_drafts["05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"] = render_evidence_index(all_records)
+    db_name = deps.settings.vault_db_name or "evidence_vault_v3.db"
+    updated_drafts["05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"] = render_evidence_index(
+        all_records, db_label=f"data/{db_name}"
+    )
 
     return {
         "draft_reports": updated_drafts,

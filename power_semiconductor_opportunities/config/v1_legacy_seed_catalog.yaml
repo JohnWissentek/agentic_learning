@@ -1,0 +1,437 @@
+# ==============================================================================
+# 电力能源与半导体芯片制造在线测试仪器仪表 8 赛道领域本体与双引擎查询矩阵
+# ==============================================================================
+tracks:
+  - id: "P1"
+    sector: "power_energy"
+    name: "储能与动力电池/全固态电池制造产线在线检测"
+    english_name: "Battery, ESS & All-Solid-State Battery Inline Manufacturing Testing"
+    manufacturing_stages:
+      - "极片涂布与辊压（面密度/厚度/水分/缺陷）"
+      - "电芯激光焊接与密封（焊缝熔深、极耳虚焊）"
+      - "注液浸润与化成老化（微漏检测、电解液HF/VOC逃逸、产气监测）"
+      - "固态电池干法电极与硫化物/氧化物固-固界面接触在线无损评估"
+    cn_queries:
+      - query: "动力电池 储能电芯 涂布 面密度 X射线 太赫兹 在线检测 良率 成本"
+        scope: "webpage"
+      - query: "电池 激光焊接 OCT 熔深 在线监测 锂电池 化成 氦检 替代 质谱 漏液"
+        scope: "webpage"
+      - query: "全固态电池 硫化物 干法电极 产线 在线无损检测 超声 阻抗"
+        scope: "scholar"
+    global_queries:
+      - query: "lithium battery gigafactory inline OCT laser welding terahertz coating metrology ROI yield"
+        endpoint: "search"
+      - query: "solid-state battery manufacturing inline ultrasonic inspection gas leak mass spectrometry"
+        endpoint: "scholar"
+    seed_opportunities:
+      - opp_id: "OPP-P1-3Y-01"
+        title: "无氦化高频在线质谱/VOC微漏检测系统（替代传统真空氦检与产线电解液泄漏筛查）"
+        horizon: "3-5y"
+        china_priority_score: 94
+        global_priority_score: 88
+        physics_principle: "基于离子分子反应软电离质谱(IMR-MS)或激光吸收光谱直接捕捉EC/DMC电解液溶剂特征分子与HF痕量分解气，省去高价氦气消耗与抽真空节拍等待"
+        roi_baseline:
+          capex_cny: 1150000
+          annual_opex_cny: 95000
+          annual_output_value_cny: 320000000
+          yield_gain_pct: 0.35
+          annual_scrap_saving_cny: 520000
+          annual_downtime_saving_cny: 280000
+          annual_consumable_ehs_saving_cny: 680000
+          market_tam_china_cny_100m: 28.0
+          market_tam_global_usd_m: 850.0
+      - opp_id: "OPP-P1-5Y-02"
+        title: "太赫兹时域光谱与空气耦合超声融合的干法电极/全固态电解质界面在线无损成像仪"
+        horizon: "5-10y"
+        china_priority_score: 90
+        global_priority_score: 92
+        physics_principle: "利用0.1-3 THz非电离电磁波穿透多层叠片与聚合物/陶瓷复合物，同步反演面密度/孔隙率；结合非接触空气耦合超声检测固-固界面微脱粘与局部空洞"
+        roi_baseline:
+          capex_cny: 1850000
+          annual_opex_cny: 140000
+          annual_output_value_cny: 260000000
+          yield_gain_pct: 0.65
+          annual_scrap_saving_cny: 420000
+          annual_downtime_saving_cny: 210000
+          annual_consumable_ehs_saving_cny: 180000
+          market_tam_china_cny_100m: 22.0
+          market_tam_global_usd_m: 720.0
+
+  - id: "P2"
+    sector: "power_energy"
+    name: "新型光伏(TOPCon/HJT/钙钛矿)与绿氢电解槽制造在线量检测"
+    english_name: "Next-Gen PV (Perovskite/Tandem) & Green Hydrogen Electrolyzer Inline Metrology"
+    manufacturing_stages:
+      - "钙钛矿与叠层电池大面积狭缝涂布、晶化与激光刻蚀 P1/P2/P3 在线高光谱/PL成像"
+      - "无银化铜电镀栅线在线3D共聚焦形貌与线宽线高量测"
+      - "PEM/AEM 质子交换膜及催化剂涂覆膜(CCM)铂铱载量在线XRF与针孔缺陷检测"
+      - "碱性/PEM电解槽出厂测试台与运行端痕量氢中氧/氧中氢及碱雾在线激光/质谱监测"
+    cn_queries:
+      - query: "钙钛矿 叠层电池 涂布 荧光PL 高光谱 在线检测 激光划线 良率"
+        scope: "webpage"
+      - query: "绿氢 电解槽 PEM 膜电极 CCM XRF 铂载量 氧中氢 在线激光分析仪"
+        scope: "webpage"
+      - query: "perovskite solar cell inline photoluminescence electroluminescence metrology roll to roll"
+        scope: "scholar"
+    global_queries:
+      - query: "green hydrogen PEM electrolyzer inline CCM catalyst loading XRF optical pinhole inspection"
+        endpoint: "search"
+      - query: "electrolyzer H2 in O2 safety online TDLAS laser analyzer European regulation"
+        endpoint: "search"
+    seed_opportunities:
+      - opp_id: "OPP-P2-3Y-01"
+        title: "绿氢电解槽膜电极(CCM)贵金属载量高速在线微区XRF+微针孔缺陷协同检测仪"
+        horizon: "3-5y"
+        china_priority_score: 91
+        global_priority_score: 89
+        physics_principle: "卷对卷涂布产线在线高通量能量色散微区X射线荧光(micro-XRF)实时闭环控制Pt/Ir涂布均匀性（省去10-15%贵金属过量冗余），叠加透射光学微针孔实时拦截"
+        roi_baseline:
+          capex_cny: 1350000
+          annual_opex_cny: 110000
+          annual_output_value_cny: 180000000
+          yield_gain_pct: 0.55
+          annual_scrap_saving_cny: 460000
+          annual_downtime_saving_cny: 190000
+          annual_consumable_ehs_saving_cny: 920000
+          market_tam_china_cny_100m: 14.5
+          market_tam_global_usd_m: 540.0
+      - opp_id: "OPP-P2-5Y-02"
+        title: "GW级钙钛矿/晶硅叠层产线纳秒激光PL+高光谱薄膜结晶态在线闭环检测系统"
+        horizon: "5-10y"
+        china_priority_score: 93
+        global_priority_score: 87
+        physics_principle: "通过时间分辨光致发光(TRPL)与短波红外高光谱成像在涂布与退火后秒级测绘载流子寿命、膜厚及PbI2残留结晶相，联动涂布头/退火温区自动微调"
+        roi_baseline:
+          capex_cny: 1600000
+          annual_opex_cny: 130000
+          annual_output_value_cny: 240000000
+          yield_gain_pct: 0.70
+          annual_scrap_saving_cny: 540000
+          annual_downtime_saving_cny: 220000
+          annual_consumable_ehs_saving_cny: 150000
+          market_tam_china_cny_100m: 31.0
+          market_tam_global_usd_m: 780.0
+
+  - id: "P3"
+    sector: "power_energy"
+    name: "特高压电网装备制造、环保绝缘气体与海缆在线诊断测试"
+    english_name: "UHV Grid Equipment Factory Testing, SF6-Free Gas & HVDC Subsea Cable Inline Inspection"
+    manufacturing_stages:
+      - "特高压变压器/换流变/GIS工厂自动化局放与无耗材光声光谱/TDLAS油色谱在线标定"
+      - "环保型SF6替代气体（C4F7N/C5F10O/干燥空气）充气产线及开关设备痕量分解产物在线质谱/激光分析"
+      - "±525kV及以上高压直流海缆XLPE绝缘挤出偏心、微孔与杂质太赫兹/X射线在线扫描"
+    cn_queries:
+      - query: "特高压 变压器 光声光谱 油色谱 在线监测 局放 出厂试验 国网"
+        scope: "webpage"
+      - query: "SF6 替代气体 C4F7N 全氟异丁腈 环保型GIS 痕量分解产物 在线监测 国家电网"
+        scope: "webpage"
+      - query: "高压直流 海缆 XLPE 绝缘 在线检测 太赫兹 X射线 偏心"
+        scope: "scholar"
+    global_queries:
+      - query: "EU F-gas regulation SF6 alternative C4F7N decomposition gas analyzer switchgear online"
+        endpoint: "search"
+      - query: "HVDC subsea cable XLPE extrusion inline X-ray terahertz eccentricity defect inspection"
+        endpoint: "search"
+    seed_opportunities:
+      - opp_id: "OPP-P3-3Y-01"
+        title: "SF6环保替代气体(C4F7N/混合气)产线纯度及痕量分解物在线红外-质谱分析仪"
+        horizon: "3-5y"
+        china_priority_score: 92
+        global_priority_score: 95
+        physics_principle: "面向欧盟2026+ F-gas法规禁令与国网/南网环保GIS大规模换装，利用无载气光声光谱(PAS)或量子级联激光(QCL-TDLAS)+软电离质谱，在线 ppb 级监控混气比例偏差、水分及氟化分解毒气(HF/CF3CN/COF2)"
+        roi_baseline:
+          capex_cny: 880000
+          annual_opex_cny: 55000
+          annual_output_value_cny: 160000000
+          yield_gain_pct: 0.30
+          annual_scrap_saving_cny: 290000
+          annual_downtime_saving_cny: 360000
+          annual_consumable_ehs_saving_cny: 450000
+          market_tam_china_cny_100m: 19.5
+          market_tam_global_usd_m: 690.0
+      - opp_id: "OPP-P3-5Y-02"
+        title: "特高压海缆XLPE交联挤出全周向太赫兹+多角度X射线微杂质/偏心在线检测站"
+        horizon: "5-10y"
+        china_priority_score: 89
+        global_priority_score: 91
+        physics_principle: "在超高压海缆连续硫化管道前实现亚毫米级绝缘偏心度、微气泡(>30μm)及焦烧颗粒在线全检，彻底消灭数百公里整盘报废风险"
+        roi_baseline:
+          capex_cny: 2400000
+          annual_opex_cny: 160000
+          annual_output_value_cny: 420000000
+          yield_gain_pct: 0.45
+          annual_scrap_saving_cny: 1100000
+          annual_downtime_saving_cny: 480000
+          annual_consumable_ehs_saving_cny: 120000
+          market_tam_china_cny_100m: 16.0
+          market_tam_global_usd_m: 610.0
+
+  - id: "P4"
+    sector: "power_energy"
+    name: "火电深度灵活调峰、重型燃机与电力CCUS碳捕集在线过程分析仪"
+    english_name: "Flexible Power Combustion Optimization, Gas Turbine & Power CCUS Inline Analyzers"
+    manufacturing_stages:
+      - "煤电/垃圾发电锅炉20%超低负荷深度调峰炉膛二维声波测温与在线激光燃气分析闭环优化"
+      - "掺氢燃气轮机防回火/NOx排放与透平叶片高温在线红外热辐射测温"
+      - "电厂燃烧后胺洗CCUS尾气ppb级亚硝胺、逃逸胺及CO2管道腐蚀杂质(H2S/H2O/O2/SOx)在线软电离质谱"
+    cn_queries:
+      - query: "煤电 灵活调峰 锅炉 声波测温 TDLAS 燃烧优化 节能降耗 投资回收期"
+        scope: "webpage"
+      - query: "火电 CCUS 碳捕集 胺洗 亚硝胺 超临界CO2管道 杂质腐蚀 在线质谱 FTIR"
+        scope: "webpage"
+      - query: "hydrogen blending gas turbine combustor flashback optical sensor NOx inline monitoring"
+        scope: "scholar"
+    global_queries:
+      - query: "power plant CCUS amine scrubbing nitrosamine CO2 impurity ISO 27913 online analyzer IMR-MS"
+        endpoint: "search"
+      - query: "boiler acoustic pyrometry TDLAS combustion optimization ROI coal biomass power"
+        endpoint: "search"
+    seed_opportunities:
+      - opp_id: "OPP-P4-3Y-01"
+        title: "煤电/垃圾焚烧灵活调峰锅炉声波二维测温+原位TDLAS多组分燃烧闭环优化系统"
+        horizon: "3-5y"
+        china_priority_score: 95
+        global_priority_score: 84
+        physics_principle: "通过多通道声波飞行时间层析重建炉膛二维温度场（免受飞灰辐射干扰），耦合原位可调谐半导体激光吸收光谱(TDLAS)秒级测量CO/O2/NH3逃逸，直接闭环优化配风与SNCR精准喷氨"
+        roi_baseline:
+          capex_cny: 980000
+          annual_opex_cny: 65000
+          annual_output_value_cny: 280000000
+          yield_gain_pct: 0.20
+          annual_scrap_saving_cny: 180000
+          annual_downtime_saving_cny: 320000
+          annual_consumable_ehs_saving_cny: 1050000
+          market_tam_china_cny_100m: 34.0
+          market_tam_global_usd_m: 620.0
+      - opp_id: "OPP-P4-5Y-02"
+        title: "电力CCUS与掺氢燃机多流路软电离质谱(IMR-MS)痕量杂质及腐蚀预警分析站"
+        horizon: "5-10y"
+        china_priority_score: 85
+        global_priority_score: 94
+        physics_principle: "采用10-14 eV汞/氪/氙离子-分子反应软电离质谱，抗高湿和高CO2基质干扰，单台毫秒级同时测ppb级致癌亚硝胺、挥发性胺、H2S/SOx/O2及HCl"
+        roi_baseline:
+          capex_cny: 1950000
+          annual_opex_cny: 150000
+          annual_output_value_cny: 200000000
+          yield_gain_pct: 0.25
+          annual_scrap_saving_cny: 350000
+          annual_downtime_saving_cny: 720000
+          annual_consumable_ehs_saving_cny: 420000
+          market_tam_china_cny_100m: 12.5
+          market_tam_global_usd_m: 580.0
+
+  - id: "S1"
+    sector: "semiconductor"
+    name: "晶圆厂前道AMC分子污染、电子特气与超纯湿化学品ppt/ppb级在线分析"
+    english_name: "Fab AMC, Electronic Specialty Gas & Ultrapure Wet Chemical ppt/ppb Online Analyzers"
+    manufacturing_stages:
+      - "光刻机内部/FOUP微环境/洁净室新风系统 ppt-ppb 级酸碱/有机/难熔金属 AMC 在线监测"
+      - "Etch/CVD/ALD 反应腔体原位工艺气体质谱(Process RGA/IMR-MS)与光学发射光谱(OES)终点及微漏诊断"
+      - "UPW超纯水与SPM/SC1/HF/电子级IPA循环药液中ppt级金属离子与有机TOC/纳米颗粒在线监控"
+    cn_queries:
+      - query: "晶圆厂 AMC 气态分子污染物 在线质谱 PTR-MS IMS 光刻机 国产替代"
+        scope: "webpage"
+      - query: "半导体 湿电子化学品 超纯水 ppt 金属离子 在线ICP-MS 颗粒监测 良率"
+        scope: "webpage"
+      - query: "semiconductor fab AMC airborne molecular contamination online PTR-MS CRDS IMS EUV lithography"
+        scope: "scholar"
+    global_queries:
+      - query: "semiconductor fab online ICP-MS UPW wet chemical trace metal monitoring yield ROI"
+        endpoint: "search"
+      - query: "plasma etch chamber inline OES process RGA endpoint detection virtual metrology"
+        endpoint: "scholar"
+    seed_opportunities:
+      - opp_id: "OPP-S1-3Y-01"
+        title: "12英寸晶圆厂多流路切换ppt级AMC分子污染在线软电离质谱/CRDS监控系统"
+        horizon: "3-5y"
+        china_priority_score: 96
+        global_priority_score: 94
+        physics_principle: "结合化学电离/PTR/IMR软电离飞行时间质谱与光腔衰荡光谱(CRDS)，在10-30秒切换巡检40+采样点（FOUP/光刻机/化学过滤塔前后），实时捕捉NH3/SO2/硅氧烷/有机胺ppt级突增，防止光刻镜头雾化(Haze)与金属腐蚀"
+        roi_baseline:
+          capex_cny: 2200000
+          annual_opex_cny: 180000
+          annual_output_value_cny: 1200000000
+          yield_gain_pct: 0.22
+          annual_scrap_saving_cny: 650000
+          annual_downtime_saving_cny: 1400000
+          annual_consumable_ehs_saving_cny: 380000
+          market_tam_china_cny_100m: 38.0
+          market_tam_global_usd_m: 1150.0
+      - opp_id: "OPP-S1-5Y-02"
+        title: "先进制程循环湿法清洗(SC1/HF/SPM)单机台原位金属杂质与药液组分在线光学-质谱联用仪"
+        horizon: "5-10y"
+        china_priority_score: 91
+        global_priority_score: 93
+        physics_principle: "用在线拉曼/中红外衰减全反射光谱实时测H2O2/HF/NH4OH浓度配比（减少换液频次30%），配合微流控在线ICP-MS/激光诱导击穿实时监测ppt级Fe/Cu/Ni金属反弹"
+        roi_baseline:
+          capex_cny: 2600000
+          annual_opex_cny: 220000
+          annual_output_value_cny: 1000000000
+          yield_gain_pct: 0.25
+          annual_scrap_saving_cny: 580000
+          annual_downtime_saving_cny: 820000
+          annual_consumable_ehs_saving_cny: 1150000
+          market_tam_china_cny_100m: 29.0
+          market_tam_global_usd_m: 980.0
+
+  - id: "S2"
+    sector: "semiconductor"
+    name: "晶圆前道先进工艺光学/声学/X射线纳米在线量测与缺陷检测"
+    english_name: "Front-End Wafer Nanoscale Optical/Acoustic/X-Ray Inline Metrology & Inspection"
+    manufacturing_stages:
+      - "28nm-14nm-7nm及以下套刻误差(Overlay)、关键尺寸(OCD)与薄膜厚度机台内集成量测(Integrated Metrology)"
+      - "3D NAND 超深孔刻蚀与GAA全环绕栅极沟道结构无损CD-SAXS/高能XRF在线量测"
+      - "晶圆边缘与背面晶圆隐形缺陷、CMP后微划痕/蝶形凹陷皮秒超声及暗场光学检测"
+    cn_queries:
+      - query: "半导体 前道 量测设备 穆勒矩阵 椭圆偏振 OCD 晶圆 薄膜厚度 国产替代 良率"
+        scope: "webpage"
+      - query: "晶圆 集成量测 Integrated Metrology CMP 皮秒超声 缺陷检测 国产化率"
+        scope: "webpage"
+      - query: "Mueller matrix spectroscopic ellipsometry GAA nanosheet CD-SAXS inline metrology"
+        scope: "scholar"
+    global_queries:
+      - query: "semiconductor inline metrology integrated metrology CMP picosecond ultrasonics GAA 3D NAND"
+        endpoint: "search"
+      - query: "CD-SAXS X-ray metrology high aspect ratio 3D NAND GAA inline fab deployment"
+        endpoint: "scholar"
+    seed_opportunities:
+      - opp_id: "OPP-S2-3Y-01"
+        title: "机台内嵌式(Integrated)宽光谱穆勒矩阵椭偏+皮秒超声膜厚/OCD在线闭环量测模块"
+        horizon: "3-5y"
+        china_priority_score: 97
+        global_priority_score: 91
+        physics_principle: "直接集成于CMP/CVD/刻蚀设备EFEM传片前端，用深紫外-近红外穆勒矩阵光谱椭偏反演三维线宽/侧壁角，叠加皮秒激光声波无损测量不透明Cu/Co/W金属互联厚度，实现每片晶圆R2R实时反馈"
+        roi_baseline:
+          capex_cny: 3100000
+          annual_opex_cny: 210000
+          annual_output_value_cny: 1800000000
+          yield_gain_pct: 0.28
+          annual_scrap_saving_cny: 950000
+          annual_downtime_saving_cny: 1200000
+          annual_consumable_ehs_saving_cny: 260000
+          market_tam_china_cny_100m: 62.0
+          market_tam_global_usd_m: 2400.0
+      - opp_id: "OPP-S2-5Y-02"
+        title: "面向3D NAND超深孔与GAA/CFET的紧凑型高亮度液态金属靶X射线CD-SAXS/XRF在线量测系统"
+        horizon: "5-10y"
+        china_priority_score: 88
+        global_priority_score: 96
+        physics_principle: "利用高亮度液态金属射流微焦斑X射线源突破光学衍射极限与不透明多层遮挡，在量测站内无损重建200层+高深宽比通孔倾斜度、底径及GAA纳米片内硅锗刻蚀残留"
+        roi_baseline:
+          capex_cny: 5500000
+          annual_opex_cny: 380000
+          annual_output_value_cny: 2200000000
+          yield_gain_pct: 0.32
+          annual_scrap_saving_cny: 1300000
+          annual_downtime_saving_cny: 1650000
+          annual_consumable_ehs_saving_cny: 180000
+          market_tam_china_cny_100m: 45.0
+          market_tam_global_usd_m: 1850.0
+
+  - id: "S3"
+    sector: "semiconductor"
+    name: "SiC/GaN宽禁带功率半导体衬底、外延与晶圆级动态KGD在线测试（电力×半导体核心交叉）"
+    english_name: "SiC/GaN Power Semiconductor Wafer, Epitaxy & Dynamic KGD Inline Testing"
+    manufacturing_stages:
+      - "8英寸SiC晶锭/衬底微管、TSD/TED/BPD位错与残余应力高速光学PL/拉曼全片在线扫描"
+      - "SiC/GaN外延层厚度与掺杂浓度在线FTIR/非接触电晕电荷(Corona-Kelvin)CV测试"
+      - "新能源汽车主驱/特高压柔性直流/光储逆变器用SiC MOSFET晶圆级动态雪崩、短路、体二极管退化与HTRB/HTGB在线KGD全检分选"
+    cn_queries:
+      - query: "8英寸 碳化硅 SiC 衬底 外延 缺陷检测 光致发光 PL 拉曼 在线量测 良率"
+        scope: "webpage"
+      - query: "碳化硅 SiC MOSFET 晶圆级 动态测试 KGD 高压 栅氧可靠性 在线分选 设备"
+        scope: "webpage"
+      - query: "SiC wafer basal plane dislocation photoluminescence inline inspection epitaxy FTIR"
+        scope: "scholar"
+    global_queries:
+      - query: "SiC wafer level burn-in dynamic KGD test gate oxide screening 200mm inline metrology"
+        endpoint: "search"
+      - query: "8-inch SiC GaN epitaxy non-contact corona charge CV doping thickness inline tool"
+        endpoint: "search"
+    seed_opportunities:
+      - opp_id: "OPP-S3-3Y-01"
+        title: "8英寸SiC外延片UV-PL缺陷映射+非接触FTIR/电晕电荷掺杂厚度一体化在线量测仪"
+        horizon: "3-5y"
+        china_priority_score: 98
+        global_priority_score: 94
+        physics_principle: "单台产线量测台集成多波长深紫外光致发光(实时定位BPD/堆垛层错与杀手级缺陷)、微区拉曼应力测绘及非接触FTIR外延厚度测量，彻底替代破坏性汞探针CV并提升切片/外延返工闭环效率"
+        roi_baseline:
+          capex_cny: 2800000
+          annual_opex_cny: 180000
+          annual_output_value_cny: 550000000
+          yield_gain_pct: 0.95
+          annual_scrap_saving_cny: 1450000
+          annual_downtime_saving_cny: 620000
+          annual_consumable_ehs_saving_cny: 280000
+          market_tam_china_cny_100m: 36.0
+          market_tam_global_usd_m: 980.0
+      - opp_id: "OPP-S3-3Y-02"
+        title: "高压碳化硅功率芯片晶圆级动态开关/栅氧早期失效(KGD)高通量在线测试分选平台"
+        horizon: "3-5y"
+        china_priority_score: 96
+        global_priority_score: 95
+        physics_principle: "在封装前对8英寸SiC晶圆实施高di/dt-dv/dt双脉冲动态开关、雪崩耐量及高温高栅压(HTGB)应力筛选，避免把单颗价值50-100元的不良裸片封入价值上千元的汽车电驱多芯片并联模块"
+        roi_baseline:
+          capex_cny: 3400000
+          annual_opex_cny: 240000
+          annual_output_value_cny: 680000000
+          yield_gain_pct: 0.75
+          annual_scrap_saving_cny: 2150000
+          annual_downtime_saving_cny: 540000
+          annual_consumable_ehs_saving_cny: 140000
+          market_tam_china_cny_100m: 42.0
+          market_tam_global_usd_m: 1250.0
+
+  - id: "S4"
+    sector: "semiconductor"
+    name: "2.5D/3D Chiplet、HBM高带宽内存与混合键合先进封装在线无损检测"
+    english_name: "2.5D/3D Chiplet, HBM & Hybrid Bonding Advanced Packaging Inline NDT Inspection"
+    manufacturing_stages:
+      - "HBM/CoWoS 微凸点(Micro-bump <=10μm)、TSV硅通孔及RDL重布线在线3D高速X射线断层扫描"
+      - "Cu-Cu 无凸点混合键合(Hybrid Bonding)界面纳米级空洞非接触激光超声/高频C-SAM在线检测"
+      - "大尺寸面板级封装(FOPLP)/玻璃基板翘曲度(Warpage)、共面度及玻璃通孔(TGV)在线干涉量测"
+    cn_queries:
+      - query: "先进封装 Chiplet HBM 混合键合 空洞检测 超声 X射线 CT 在线检测 良率"
+        scope: "webpage"
+      - query: "CoWoS TSV 微凸点 翘曲度 玻璃基板 TGV 在线量测 国产设备"
+        scope: "webpage"
+      - query: "Cu-Cu hybrid bonding void inspection laser ultrasonic acoustic microscopy inline"
+        scope: "scholar"
+    global_queries:
+      - query: "HBM hybrid bonding CoWoS inline 3D X-ray CT laser ultrasonic void metrology yield"
+        endpoint: "search"
+      - query: "glass core substrate TGV warpage inline optical interferometry inspection tool"
+        endpoint: "search"
+    seed_opportunities:
+      - opp_id: "OPP-S4-3Y-01"
+        title: "亚10微米TSV/微凸点高速在线3D X射线层析成像(AXI/CT)与AI缺陷判别站"
+        horizon: "3-5y"
+        china_priority_score: 94
+        global_priority_score: 96
+        physics_principle: "采用微焦斑透射靶X射线结合限定角平面层析重构(Laminography)及GPU端到端三维去噪算法，在产线节拍内全检HBM堆叠焊接桥连、冷焊与空洞率，防止整颗AI加速卡因单颗HBM封装报废"
+        roi_baseline:
+          capex_cny: 3600000
+          annual_opex_cny: 260000
+          annual_output_value_cny: 1500000000
+          yield_gain_pct: 0.35
+          annual_scrap_saving_cny: 2400000
+          annual_downtime_saving_cny: 850000
+          annual_consumable_ehs_saving_cny: 160000
+          market_tam_china_cny_100m: 39.0
+          market_tam_global_usd_m: 1480.0
+      - opp_id: "OPP-S4-5Y-02"
+        title: "免耦合水非接触激光超声+红外光热混合键合(Hybrid Bonding)纳米空洞及玻璃TGV在线检测仪"
+        horizon: "5-10y"
+        china_priority_score: 89
+        global_priority_score: 97
+        physics_principle: "传统水浸C-SAM会污染裸露Cu-Cu键合表面；采用脉冲激光激发表面/界面声波(LUS)配合外差激光干涉非接触接收，在干态洁净腔室内探测纳米级键合空洞与玻璃基板TGV微裂纹"
+        roi_baseline:
+          capex_cny: 4200000
+          annual_opex_cny: 290000
+          annual_output_value_cny: 1900000000
+          yield_gain_pct: 0.42
+          annual_scrap_saving_cny: 2950000
+          annual_downtime_saving_cny: 980000
+          annual_consumable_ehs_saving_cny: 220000
+          market_tam_china_cny_100m: 28.5
+          market_tam_global_usd_m: 1620.0

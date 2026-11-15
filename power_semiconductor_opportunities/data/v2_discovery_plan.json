@@ -1,0 +1,312 @@
+{
+  "contract_id": "PSO-CONTRACT-2026-V2",
+  "sector_filter": "all",
+  "profile": "flagship",
+  "macro_recon_summary": "【宏观侦察综合综述 (Macro Reconnaissance Synthesis)】\n基于2025-2026年全球与中国工业前沿证据库（EvidenceVault）的情报聚类，电力能源（power_energy）与半导体芯片制造（semiconductor）两大硬科技赛道正经历底层物理范式与工程边界的深刻重构，催生出前所未有的工业量检测（Industrial Metrology & Inspection）技术革命：\n\n1. 电力能源领域（power_energy）：\n驱动力由传统的“宏观离线安全抽检”全面转向“算力-能源协同高密热电安全、固态界面物理与全生命周期双碳计量”。一方面，AI智算大模型爆发导致全球智算中心能耗预计于2026年突破1,050 TWh，机柜功率密度攀升倒逼配电系统向800V高压直流（HVDC）微电网与直接液冷换热全面迁移，热-电耦合安全与微通道泄漏检测成为跨界刚需（[EV-CN-001], [EV-GLOBAL-001], [EV-GLOBAL-003], [EV-GLOBAL-005]）；另一方面，新型电力系统全面迈入314Ah+大容量储能电芯时代（中国电建16GWh大规模集采招标）与GWh级全固态电池、GW级钙钛矿叠层产线落地关键节点，固-固界面接触应力与光伏结晶相变缺陷成为制约良率核心卡点（[EV-CN-002], [EV-CN-006], [EV-CN-009]）；同时，中国绿氢产能占据全球74%及特高压环保绝缘气体替代SF6、火电调峰CCUS规模化，直接拉动高精度气体红外吸收光谱与声学相控阵在线监控需求（[EV-CN-011], [EV-CN-014], [EV-GLOBAL-007]）。\n\n2. 半导体芯片制造领域（semiconductor）：\n摩尔定律微缩受阻与算力互连带宽瓶颈共同推动半导体量检测迈向“跨尺度三维多物理场表征与光电协同”。中国大陆前道与先进封装量检测设备市场迎来高速扩张（2026年达数十亿美元，复合增速超17%，[EV-CN-036]）。在先进制程向GAA/3D NAND迈进的同时，无凸点Cu-Cu混合键合（Hybrid Bonding）与面板级/玻璃基板先进封装对纳米级凹陷（Dishing）与全场热翘曲（Warpage）提出了极高精度的白光干涉与超声成像要求（[EV-CN-026], [EV-GLOBAL-025], [EV-GLOBAL-026]）；CPO（共封装光学）与硅光芯片的崛起，颠覆了传统纯电学测试体系，创造了晶圆级高精度光纤亚微米对准与光-电-热原位协同测试的新蓝海（[EV-GLOBAL-039]）；而在AI高压电源与新能源汽车拉动下，8英寸SiC/GaN功率半导体外延晶格缺陷与晶圆级超高压动态KGD（Known Good Die）测试装备成为高端良率管控的核心命门（[EV-GLOBAL-002], [EV-GLOBAL-039]）。",
+  "step_back_thesis": "【第一性原理退步物理假说 (Step-Back First-Principles Physics Thesis)】\n工业量检测的本质并非外在几何尺寸的被动比对，而是在原子与微米介观尺度上，通过可控能量探针（光子、电子、声波、电磁波与热流）与物质界面的非平衡态能量及载流子输运过程发生相互作用，并对所激发的散射波场、相位延迟、辐射复合并发射能谱进行高信噪比反演。\n\n其物理极限与测量瓶颈由三大第一性原理支配：\n1. 波动力学分辨率与衍射极限（Wave Diffraction & Coherence Limits）：光学衍射极限遵循阿贝极限（$d \\ge \\frac{\\lambda}{2 \\cdot \\text{NA}}$），在深亚微米及三维埋层结构中，常规明场成像失效，必须退步至波动相位反演——利用低相干干涉的纵向相干长度测量纳米级高度差，利用严格耦合波分析（RCWA）麦克斯韦电磁场空间谐波解析深纳米光栅关键尺寸（OCD），利用声阻抗失配系数（$R = \\frac{Z_2 - Z_1}{Z_2 + Z_1}$）实现埋层纳米空洞的声场高对比度反射；\n2. 非平衡载流子复合与量子受激发射（Non-Equilibrium Carrier Transport & Recombination）：在半导体与光伏活性层中，晶格缺陷（如位错、悬挂键、微管）本质上是禁带中的非辐射复合中心。外场激发的荧光强度与准费米能级分裂量直接相关（$I \\propto \\exp(\\frac{E_F^n - E_F^p}{kT})$），通过全晶圆微区微秒级荧光寿命（PL）与受激辐射谱成像，能够无损直接探测出肉眼不可见的深能级晶格缺陷态；\n3. 动态热-电多场耦合耗散动力学（Coupled Electro-Thermal-Fluidic Dissipation Dynamics）：高密电能传输与微流道冷却遵循麦克斯韦电磁发热定律（$Q = I^2 R_c$）与纳维-斯托克斯对流传热方程。接触界面的微观粗糙度收缩阻抗及交变热应力下的微孔气蚀，直接决定了宏观绝缘与换热失效。通过瞬态热阻谱（$Z_{th}$）与谐振微扰计量，能够在线预警灾难性击穿。\n\n因此，工业量检测的战略重心正在从“离线静态形貌表征”根本性演进为“在线三维埋层多物理场输运断层扫描”。",
+  "track_plans": [
+    {
+      "track_id": "DP1",
+      "sector": "power_energy",
+      "name": "AI智算中心高密供电与液冷热管理产线及现场测试 (AI Data Center High-Density Power & Liquid Cooling Thermal Management Testing)",
+      "step_back_physics_principle": "焦耳热发热定律与纳维-斯托克斯流固耦合换热传热学：大电流直流偏置下的界面接触电阻呈现微观粗糙峰收缩效应（霍姆接触收缩理论），接触点瞬态温升与短路耐受由热阻抗网络动力学决定；同时，微流道内的两相流空化腐蚀遵循不可压缩牛顿流体动力学与质量扩散守恒方程，微裂纹微泄漏会引发介质电离与击穿风险。",
+      "cn_queries": [
+        {
+          "query": "AI智算中心 800V高压直流母线 瞬态温升 接触电阻 在线检测"
+        },
+        {
+          "query": "数据中心液冷冷板 微通道微泄漏 氦检 流阻在线测试 装备"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "AI data center 800V HVDC busbar transient thermal resistance inline testing"
+        },
+        {
+          "query": "liquid cooling cold plate microfluidic channel leakage flow impedance metrology"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "随着大模型训练集群单机柜功耗突破100kW，AI智算中心正全面倒逼配电系统向800V高压直流（HVDC）微电网与直接液冷换热演进（[EV-CN-001], [EV-CN-004], [EV-GLOBAL-001], [EV-GLOBAL-003], [EV-GLOBAL-005]）。大电流高压母线在交变冲击负荷下的微欧级瞬态接触阻抗突变、微通道换热冷板在复杂两相流循环中的微裂纹腐蚀与介质微泄漏（[EV-GLOBAL-034]），成为直接威胁集群算力连续性的关键物理卡点，亟需制造产线与现场高精度在线计量装备。",
+      "recon_evidence_ids": [
+        "EV-CN-001",
+        "EV-CN-004",
+        "EV-GLOBAL-001",
+        "EV-GLOBAL-002",
+        "EV-GLOBAL-003",
+        "EV-GLOBAL-005",
+        "EV-GLOBAL-034"
+      ],
+      "manufacturing_stages": [
+        "液冷冷板微通道超精密成型与微缝焊接密封性测试",
+        "800V高压直流母线排精密折弯与超低接触电阻压接测试",
+        "冷量分配单元(CDU)多通道流阻动态平衡与微泄漏在线氦检",
+        "整机柜算力-供电-散热动态耦合交收测试与绝缘耐压计量"
+      ]
+    },
+    {
+      "track_id": "DP2",
+      "sector": "power_energy",
+      "name": "新一代大容量储能电芯与全固态电池产线在线量测与界面质控 (Next-Gen High-Capacity Grid Storage Cells & Solid-State Battery Inline Metrology)",
+      "step_back_physics_principle": "声阻抗连续性方程与电化学固相离子扩散双电层动力学：超声纵波与横波在固态电解质-电极活性物质界面的传播反射系数取决于声阻抗差（$Z = \\rho \\cdot v$），界面微气孔与剥离缺陷诱发特征相位突变；极片面密度计量则依赖低能光子光电效应与康普顿散射质量衰减定律（朗伯-比尔吸收定律 $I = I_0 e^{-\\mu_m \\rho x}$）。",
+      "cn_queries": [
+        {
+          "query": "大容量储能电芯 固态电池 固固界面接触阻抗 超声在线无损检测"
+        },
+        {
+          "query": "锂电极片厚度涂布面密度 阵列式太赫兹 X射线面密度测量仪"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "solid-state battery solid-electrolyte interface impedance inline acoustic ultrasonic metrology"
+        },
+        {
+          "query": "grid-scale 314Ah battery cell slurry coating thickness X-ray gauge inspection"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "电网级储能集中采购全面迈入314Ah+大电芯及高压直挂/级联架构（单次集采达16GWh，[EV-CN-006]至[EV-CN-010]），同时全球首条GWh级固态电池产线正式投产（[EV-CN-009]）。超大单体电芯与全固态电池量产面临固-固界面物理应力接触不良、极片超厚涂布面密度微米级离散等严峻良率挑战，传统离线破坏性分析无法支撑连续化生产，必须建立产线级在线声阻抗与射线层析质控（[EV-CN-016]）。",
+      "recon_evidence_ids": [
+        "EV-CN-006",
+        "EV-CN-007",
+        "EV-CN-008",
+        "EV-CN-009",
+        "EV-CN-010",
+        "EV-GLOBAL-004",
+        "EV-GLOBAL-006"
+      ],
+      "manufacturing_stages": [
+        "固态电解质膜/极片超高精度狭缝式涂布面密度在线闭环量测",
+        "电极与固态电解质多层复合极片超高压致密辊压厚度与平整度监控",
+        "固-固界面叠片热压成型后声阻抗非接触超声成像缺陷检测",
+        "化成分容后大单体电芯宽频阻抗谱(EIS)与电化学一致性全检"
+      ]
+    },
+    {
+      "track_id": "DP3",
+      "sector": "power_energy",
+      "name": "钙钛矿/叠层高效光伏与百兆瓦级绿氢电解槽制造过程检测 (Perovskite/Tandem Photovoltaics & Multi-Megawatt Green Hydrogen Electrolyzer Manufacturing Metrology)",
+      "step_back_physics_principle": "非平衡态光生载流子辐射复合动力学与电催化界面多相传质多孔介质渗流理论：钙钛矿光致发光（PL）与电致发光（EL）强度遵从准费米能级分裂物理模型，界面缺陷态诱发Shockley-Read-Hall非辐射复合损耗；绿氢电解槽氢气渗透则遵循菲克第一扩散定律与克努森扩散传质模型，微孔缺陷导致氢氧交叉混合与法拉第效率暴跌。",
+      "cn_queries": [
+        {
+          "query": "钙钛矿光伏电池 GW级大面积涂布 光致发光PL在线成像缺陷检测"
+        },
+        {
+          "query": "兆瓦级电解槽双极板 膜电极微孔缺陷 氢气微泄漏在线质谱色谱检测"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "perovskite tandem solar cell inline photoluminescence imaging crystallization defect metrology"
+        },
+        {
+          "query": "water electrolysis MEA bipolar plate hydrogen crossover leakage inline detection"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "2025-2026年钙钛矿叠层电池实现多条GW级产线投产，产业化推进迅速（[EV-CN-001], [EV-CN-002], [EV-CN-003], [EV-CN-005]），大面积结晶相变缺陷导致组件效率快速衰减；与此同时，中国占据全球运营绿氢产能的74%并向百兆瓦/万标方级工业余热与离网制氢推进（[EV-CN-005], [EV-GLOBAL-007]），大型碱性与PEM电解槽双极板纳米涂层针孔、膜电极（MEA）氢气交叉渗透成为危及产线安全与电化学良率的核心痛点。",
+      "recon_evidence_ids": [
+        "EV-CN-001",
+        "EV-CN-002",
+        "EV-CN-003",
+        "EV-CN-005",
+        "EV-GLOBAL-006",
+        "EV-GLOBAL-007"
+      ],
+      "manufacturing_stages": [
+        "钙钛矿湿法溶液狭缝涂布结晶干燥全幅面光学膜厚与相变在线检测",
+        "钙钛矿-叠层激光P1-P4划线线宽、深宽比与刻蚀残留共聚焦显微复查",
+        "电解槽双极板物理气相沉积(PVD)耐腐蚀涂层纳米孔隙率在线无损探伤",
+        "兆瓦级电解槽膜电极组装后氢气交叉渗透与多通道保压气密性全检"
+      ]
+    },
+    {
+      "track_id": "DP4",
+      "sector": "power_energy",
+      "name": "新型电力系统特高压装备低碳绝缘介质与CCUS碳捕集过程在线质控计量 (UHV Eco-Friendly Insulating Gas & CCUS Process Metrology for Modern Power Systems)",
+      "step_back_physics_principle": "分子振动转动能级跃迁吸收光谱学（朗伯-比尔吸收定律 $I(\\nu) = I_0(\\nu) e^{-\\sigma(\\nu) N L}$）与弹性波衍射聚焦理论：环保氟碳气体及其放电分解产物具有特征红外吸收指纹谱，可利用可调谐半导体激光吸收光谱（TDLAS）实现ppb-ppm级超灵敏定量；金属厚壁结构焊缝缺陷检测则基于超声相控阵换能器阵列的时延波束合成与波动弹性散射干涉原理。",
+      "cn_queries": [
+        {
+          "query": "特高压环保气体 C4F7N混合绝缘介质 微水微氧在线红外激光光谱检测仪"
+        },
+        {
+          "query": "CCUS碳捕集吸收塔 二氧化碳逃逸率 调峰火电 在线非分散红外NDIR监测"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "eco-friendly insulating gas C4F7N CO2 mixture ratio inline infrared spectrometer"
+        },
+        {
+          "query": "CCUS post-combustion carbon capture inline NDIR gas analyzer flue gas"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "全球环保法规对高温室潜能SF6气体的严控（[EV-CN-011], [EV-CN-012], [EV-CN-015]）推动电网在12kV-1100kV特高压装备中全面应用C4F7N等低碳替代气体，要求ppm级混合比精度与放电分解产物在线色谱/激光光谱监测；同时火电深度调峰与CCUS产业在2026年从示范走向规模化落地（[EV-CN-014], [EV-GLOBAL-021], [EV-GLOBAL-023]），高湿强腐蚀烟气环境下的二氧化碳捕集率与胺液逃逸率监测成为双碳核算的刚性计量指标。此赛道为传统电力装备与减碳工程升级，不属于新兴突变跨界赛道。",
+      "recon_evidence_ids": [
+        "EV-CN-011",
+        "EV-CN-012",
+        "EV-CN-014",
+        "EV-CN-015",
+        "EV-CN-016",
+        "EV-GLOBAL-009",
+        "EV-GLOBAL-021",
+        "EV-GLOBAL-023"
+      ],
+      "manufacturing_stages": [
+        "特高压GIS壳体超大厚壁压力容器自动化超声相控阵焊缝无损探伤",
+        "环保绝缘混合气体自动化高精度充注与气体组分在线红外色谱监测",
+        "特高压断路器与气体绝缘组合电器出厂特高频(UHF)局部放电综合测试",
+        "CCUS烟气预处理脱硫脱硝及二氧化碳吸收解析塔在线组分连续质控"
+      ]
+    },
+    {
+      "track_id": "DS1",
+      "sector": "semiconductor",
+      "name": "2.5D/3D Chiplet超高密度混合键合与高翘曲大尺寸基板三维形貌量检测 (2.5D/3D Chiplet Ultra-High Density Hybrid Bonding & Large-Area Substrate 3D Metrology)",
+      "step_back_physics_principle": "光学低相干干涉相位测量学与连续介质热弹性力学（双金属热应力失配理论）：白光干涉（WLI）利用宽带复色光的有限相干长度，通过调相干涉条纹调制度包络峰值精确定位纳米表面高度；而超大尺寸多层异质结构基板翘曲受制于热膨胀系数（CTE）失配引发的非对称剪切应力与弯曲力矩平衡方程。",
+      "cn_queries": [
+        {
+          "query": "Cu-Cu混合键合 晶圆级铜凹陷纳米量测 白光干涉仪 缺陷在线检测"
+        },
+        {
+          "query": "先进封装 玻璃基板 面板级封装 热翘曲全场光学投影在线测量"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "wafer-to-wafer hybrid bonding Cu dishing nanometer white light interferometry"
+        },
+        {
+          "query": "panel level packaging glass substrate thermal warpage inline shadow moire metrology"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "在后摩尔时代（More-than-Moore），HBM4与超大芯片Chiplet先进封装全面拥抱无凸点Cu-Cu直接混合键合（[EV-CN-026], [EV-GLOBAL-025], [EV-GLOBAL-026]），互连节距逼近亚微米级。CMP后纳米级铜碟形凹陷（Dishing）或介质腐蚀（Erosion）哪怕超出几个纳米公差便会导致空洞或电气短路（[EV-GLOBAL-026]）；与此同时，大尺寸面板级封装与新型玻璃基板（Glass Substrate）在回流焊热循环中极易发生剧烈非线性热翘曲（[EV-GLOBAL-025]），对三维白光相干干涉与阴影叠栅（Shadow Moiré）在线全场三维量测提出极端挑战。",
+      "recon_evidence_ids": [
+        "EV-CN-026",
+        "EV-GLOBAL-025",
+        "EV-GLOBAL-026",
+        "EV-GLOBAL-029",
+        "EV-GLOBAL-039"
+      ],
+      "manufacturing_stages": [
+        "混合键合前介质与金属超精密CMP纳米级碟形凹陷与平整度量测",
+        "晶圆对准红外透射光学显微测量与亚微米预键合对准误差量测",
+        "晶圆键合热退火后纳米级空洞与界面结合强度扫描声学显微(C-SAM)检测",
+        "大尺寸玻璃封装基板在多温区热应力下的全场动态热翘曲与形变量测"
+      ]
+    },
+    {
+      "track_id": "DS2",
+      "sector": "semiconductor",
+      "name": "硅光共封装光学(CPO)晶圆级光电协同测试与微纳光栅极高精度耦合计量 (Silicon Photonics CPO Wafer-Level Electro-Optical Co-Testing & Nano-Coupler Metrology)",
+      "step_back_physics_principle": "电磁波导模式耦合理论（重叠积分理论）与半导体电光等离子体色散效应：光纤基模与片上光栅耦合器的电磁场模式匹配度决定了透射损耗（$\\eta = \\frac{|\\int E_{fiber} E_{grating}^* dA|^2}{\\int |E_{fiber}|^2 dA \\int |E_{grating}|^2 dA}$），对微位移表现出极高的空间灵敏度；微环调制器谐振波长对载流子注入浓度及热光效应引起的有效折射率微扰（$\\Delta n_{eff}$）呈现高度非线性响应。",
+      "cn_queries": [
+        {
+          "query": "硅光晶圆级光电测试 自动光纤对准 光斑质量 插入损耗 探针台"
+        },
+        {
+          "query": "CPO共封装光学 微环调制器 动态眼图 晶圆级原位在线测试系统"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "silicon photonics wafer-level electro-optical probing automatic alignment metrology"
+        },
+        {
+          "query": "CPO co-packaged optics micro-ring modulator optical insertion loss inline testing"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "面向千卡/万卡AI算力集群的超大互连带宽瓶颈，传统可插拔光模块正被硅光共封装光学（CPO, Co-Packaged Optics）技术体系颠覆（[EV-GLOBAL-039], [EV-GLOBAL-002]）。硅光芯片制造中，微米/亚微米光波导与无源/有源器件（微环调制器、光电探测器）的晶圆级高通量光电协同测试长期处于工业荒漠，光纤阵列对准容差小于0.5微米，且光-电-热三场耦合极为剧烈，亟需开发亚微米自适应光路耦合与宽带高频皮秒级光电一体化晶圆探针台。",
+      "recon_evidence_ids": [
+        "EV-GLOBAL-039",
+        "EV-GLOBAL-002",
+        "EV-CN-026",
+        "EV-GLOBAL-044"
+      ],
+      "manufacturing_stages": [
+        "硅光晶圆无源器件(阵列波导光栅/耦合光栅)宽光谱透射损耗在线快速扫描",
+        "高速马赫-曾德尔与微环光电调制器晶圆级高频S参数电光响应测试",
+        "激光器芯片与硅光晶圆微转印/倒装焊亚微米光斑对准与耦合效率测试",
+        "CPO光电合封模组高低温循环热漂移抑制与光纤阵列长期可靠性评估"
+      ]
+    },
+    {
+      "track_id": "DS3",
+      "sector": "semiconductor",
+      "name": "前道先进制程在线纳米光学与电子束量检测及关键尺寸缺陷监控 (Front-End Advanced Node Inline Nano-Optical & E-Beam Metrology / Defect Inspection)",
+      "step_back_physics_principle": "麦克斯韦方程组在三维周期纳米结构中的严格耦合波分析（RCWA）与高能聚焦电子束电荷散射收集机理：入射偏振光在纳米结构上的斯托克斯偏振参数变化敏感反演三维结构形貌与侧壁倾角；而高深宽比深孔结构中电子激发二次电子（SE）受孔壁表面电荷偏折阻挡，需施加电场吸吸引导以达到检测极限深度。",
+      "cn_queries": [
+        {
+          "query": "晶圆前道量检测 光学关键尺寸OCD 椭偏散射测量仪 先进制程良率"
+        },
+        {
+          "query": "集成电路 电子束缺陷复查SEM 高深宽比深孔底部缺陷检测 晶圆制造"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "advanced node wafer inline optical critical dimension scatterometry OCD metrology"
+        },
+        {
+          "query": "high aspect ratio contact hole defect review e-beam inspection SEM semiconductor"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "前道晶圆制造先进制程走向GAA环绕栅极与3D NAND超高堆叠，工艺步骤突破千道，关键尺寸公差进入亚纳米级（[EV-CN-026], [EV-CN-033], [EV-CN-036], [EV-GLOBAL-044]）。中国大陆前道量检测设备市场正高速增长（CAGR达17.33%），先进制程交付验证加速（[EV-CN-026], [EV-CN-036]）。此领域为半导体制造最具技术壁垒与市场规模的基石赛道，高深宽比孔道底部缺陷、套刻对准误差监控直接决定全厂良率，属于经典演进型核心赛道而非突发性跨界赛道。",
+      "recon_evidence_ids": [
+        "EV-CN-026",
+        "EV-CN-033",
+        "EV-CN-036",
+        "EV-GLOBAL-026",
+        "EV-GLOBAL-044",
+        "EV-GLOBAL-047"
+      ],
+      "manufacturing_stages": [
+        "光刻后套刻误差(Overlay)与亚纳米关键尺寸(CD-SEM)在线计量",
+        "先进制程薄膜沉积后多角度宽光谱椭圆偏振散射(OCD)膜厚与折射率测量",
+        "高深宽比(HAR)刻蚀后接触孔底部残留物宽波段深紫外(DUV)明暗场光学扫描",
+        "多电子束缺陷复查系统(M-EBI)全晶圆纳秒级定位分类与良率管理(YMS)"
+      ]
+    },
+    {
+      "track_id": "DS4",
+      "sector": "semiconductor",
+      "name": "第三代/超宽禁带半导体(SiC/GaN)外延晶格缺陷与晶圆级高压高温动态可靠性测试 (Wide-Bandgap SiC/GaN Wafer Epitaxial Defect Metrology & Dynamic KGD Reliability Testing)",
+      "step_back_physics_principle": "宽禁带能带缺陷态紫外激发辐射复合跃迁机理与强电场冲击下碰撞雪崩电离理论：紫外光激发价带电子至导带后，基面位错诱发局域晶格畸变产生深能级缺陷，形成特征波长荧光猝灭或红移谱带；而在千伏动态测试中，强电场注入诱发碰撞雪崩电离与空间电荷陷阱捕获效应，导致动态导通电阻漂移与绝缘栅穿透击穿。",
+      "cn_queries": [
+        {
+          "query": "碳化硅SiC外延片 基面位错BPD 全晶圆光致发光PL在线检测系统"
+        },
+        {
+          "query": "第三代半导体 晶圆级高压动态测试 动态导通电阻 探针台 KGD筛选"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "silicon carbide SiC epitaxial wafer basal plane dislocation UV photoluminescence inspection"
+        },
+        {
+          "query": "wide bandgap wafer-level dynamic HTGB high-voltage probe station KGD testing"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "受AI服务器高压电源架构（[EV-GLOBAL-002]）与新能源汽车800V高压驱动，SiC/GaN宽禁带半导体加速扩产并向8英寸晶圆切换。然而宽禁带外延层基面位错（BPD）、堆垛层错（SF）与微管缺陷会在长期高温高压电场应力下引起双极型退化，导致器件早期击穿；且下游要求100%已知好芯片（KGD, Known Good Die），传统常温直流静态电测无法筛选出动态短路耐受（SCWT）与动态导通电阻劣化器件，推动全晶圆紫外光致发光成像与晶圆级千伏高压动态探针测试成为产线必选（[EV-GLOBAL-039]）。",
+      "recon_evidence_ids": [
+        "EV-CN-026",
+        "EV-CN-033",
+        "EV-GLOBAL-002",
+        "EV-GLOBAL-039"
+      ],
+      "manufacturing_stages": [
+        "8英寸SiC单晶衬底全表面微划痕与晶向偏角X射线高分辨率衍射(HRXRD)检测",
+        "外延层生长后基面位错与三角形缺陷超高分辨率全晶圆紫外光致发光(PL)检测",
+        "器件栅氧化层与微沟槽加工质量椭偏及激光共聚焦表面显微全检",
+        "晶圆级高压探针台(>3000V/100A)动态高温栅极偏压(HTGB)与动态导通电阻KGD筛选"
+      ]
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import json
 import operator
 from typing import Annotated, Any, Literal, TypedDict
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 def _coerce_sector(v: Any) -> str:
@@ -20,6 +20,53 @@ def _coerce_sector(v: Any) -> str:
 
 def _clamp(v: Any, lo: float, hi: float) -> float:
     return max(lo, min(float(v), hi))
+
+
+def _coerce_commercial_status(v: Any) -> str:
+    low = str(v or "").strip().lower()
+    if any(
+        k in low
+        for k in (
+            "true_blank",
+            "global_and_cn_true_blank",
+            "全球空白",
+            "海内外均属产品空白",
+            "海内外空白",
+            "全球均无",
+            "均无量产",
+            "均未商业",
+            "均无",
+            "尚无成熟",
+            "global blank",
+            "true blank",
+        )
+    ):
+        return "global_and_cn_true_blank"
+    if any(k in low for k in ("global_and_cn_commercialized", "commercialized", "均有", "红海", "均已在售", "海内外在售")):
+        return "global_and_cn_commercialized"
+    return "overseas_only_cn_blank"
+
+
+def _coerce_query_list(v: Any) -> list[dict[str, str]]:
+    if v is None:
+        return []
+    if isinstance(v, str):
+        try:
+            v = json.loads(v)
+        except Exception:
+            return [{"query": v}] if v.strip() else []
+    if not isinstance(v, list):
+        return []
+    out: list[dict[str, str]] = []
+    for item in v:
+        if isinstance(item, str) and item.strip():
+            out.append({"query": item.strip()})
+        elif isinstance(item, dict):
+            d = {str(k): str(val) for k, val in item.items()}
+            if "query" not in d and "关键词" in d:
+                d["query"] = d["关键词"]
+            out.append(d)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -81,25 +128,7 @@ class TrackQueryPlan(BaseModel):
     @field_validator("cn_queries", "global_queries", mode="before")
     @classmethod
     def _val_queries(cls, v: Any) -> list[dict[str, str]]:
-        if v is None:
-            return []
-        if isinstance(v, str):
-            try:
-                v = json.loads(v)
-            except Exception:
-                return [{"query": v}] if v.strip() else []
-        if not isinstance(v, list):
-            return []
-        out: list[dict[str, str]] = []
-        for item in v:
-            if isinstance(item, str) and item.strip():
-                out.append({"query": item.strip()})
-            elif isinstance(item, dict):
-                d = {str(k): str(val) for k, val in item.items()}
-                if "query" not in d and "关键词" in d:
-                    d["query"] = d["关键词"]
-                out.append(d)
-        return out
+        return _coerce_query_list(v)
 
 
 class ResearchPlan(BaseModel):
@@ -110,6 +139,33 @@ class ResearchPlan(BaseModel):
     profile: Literal["flagship", "fast"]
     step_back_thesis: str
     track_plans: list[TrackQueryPlan]
+
+
+class DiscoveredTrack(TrackQueryPlan):
+    """V2.0/V3.0 dynamically discovered orthogonal or cross-cutting track from Stage 0 Recon."""
+
+    is_emerging_or_cross_cutting: bool = False
+    emergence_rationale: str = ""
+    recon_evidence_ids: list[str] = Field(default_factory=list)
+    manufacturing_stages: list[str] = Field(default_factory=list)
+    cn_vendor_queries: list[dict[str, str]] = Field(default_factory=list)
+    global_vendor_queries: list[dict[str, str]] = Field(default_factory=list)
+
+    @field_validator("cn_vendor_queries", "global_vendor_queries", mode="before")
+    @classmethod
+    def _val_vendor_queries(cls, v: Any) -> list[dict[str, str]]:
+        return _coerce_query_list(v)
+
+
+class DiscoveryPlan(BaseModel):
+    """V3.0 dynamic track discovery output clustered from Stage 0 macro recon evidence."""
+
+    contract_id: str = "PSO-CONTRACT-2026-V3"
+    sector_filter: str = "all"
+    profile: Literal["flagship", "fast"] = "flagship"
+    macro_recon_summary: str = ""
+    step_back_thesis: str
+    track_plans: list[DiscoveredTrack]
 
 
 class PainPointItem(BaseModel):
@@ -203,6 +259,89 @@ class ROIMetrics(BaseModel):
     global_som_5_10y_usd_m: float
 
 
+class ROIRangeInputs(BaseModel):
+    """Evidence-anchored low/base/high economic parameter bounds extracted for V2.0 dynamic candidates."""
+
+    capex_cny_low: float = Field(gt=0)
+    capex_cny_base: float = Field(gt=0)
+    capex_cny_high: float = Field(gt=0)
+    yield_gain_pct_low: float = Field(ge=0, le=20.0)
+    yield_gain_pct_base: float = Field(ge=0, le=20.0)
+    yield_gain_pct_high: float = Field(ge=0, le=20.0)
+    annual_output_value_cny: float = Field(gt=0)
+    annual_opex_cny: float = Field(ge=0)
+    annual_scrap_saving_cny: float = Field(ge=0)
+    annual_downtime_saving_cny: float = Field(ge=0)
+    annual_consumable_ehs_saving_cny: float = Field(ge=0)
+    market_tam_china_cny_100m: float = Field(gt=0)
+    market_tam_global_usd_m: float = Field(gt=0)
+    parameter_basis: str = ""
+    wacc: float = Field(default=0.10, gt=0, lt=0.5)
+
+    @field_validator("wacc", mode="before")
+    @classmethod
+    def _val_range_wacc(cls, v: Any) -> float:
+        val = float(v)
+        if val >= 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.03, 0.35)
+
+    @model_validator(mode="after")
+    def _normalize_triads(self) -> "ROIRangeInputs":
+        c_lo, c_mid, c_hi = sorted(
+            (max(1.0, self.capex_cny_low), max(1.0, self.capex_cny_base), max(1.0, self.capex_cny_high))
+        )
+        y_lo, y_mid, y_hi = sorted(
+            (
+                _clamp(self.yield_gain_pct_low, 0.0, 20.0),
+                _clamp(self.yield_gain_pct_base, 0.0, 20.0),
+                _clamp(self.yield_gain_pct_high, 0.0, 20.0),
+            )
+        )
+        self.capex_cny_low, self.capex_cny_base, self.capex_cny_high = c_lo, c_mid, c_hi
+        self.yield_gain_pct_low, self.yield_gain_pct_base, self.yield_gain_pct_high = y_lo, y_mid, y_hi
+        return self
+
+    def to_baseline_inputs(self) -> ROIInputs:
+        return ROIInputs(
+            capex_cny=self.capex_cny_base,
+            annual_opex_cny=self.annual_opex_cny,
+            annual_output_value_cny=self.annual_output_value_cny,
+            yield_gain_pct=self.yield_gain_pct_base,
+            annual_scrap_saving_cny=self.annual_scrap_saving_cny,
+            annual_downtime_saving_cny=self.annual_downtime_saving_cny,
+            annual_consumable_ehs_saving_cny=self.annual_consumable_ehs_saving_cny,
+            market_tam_china_cny_100m=self.market_tam_china_cny_100m,
+            market_tam_global_usd_m=self.market_tam_global_usd_m,
+            wacc=self.wacc,
+        )
+
+
+class RangeROIMetrics(BaseModel):
+    """Three-scenario deterministic PALMs sensitivity envelope."""
+
+    conservative: ROIMetrics
+    baseline: ROIMetrics
+    optimistic: ROIMetrics
+    parameter_basis: str = ""
+
+
+class EliminatedCandidate(BaseModel):
+    """Candidate filtered out during Stage 2 deterministic PALMs funnel screening."""
+
+    opp_id: str
+    track_id: str
+    sector: Literal["power_energy", "semiconductor"]
+    title: str
+    horizon: Literal["3-5y", "5-10y"]
+    commercial_status: str = "overseas_only_cn_blank"
+    baseline_payback_months: float
+    conservative_payback_months: float
+    weighted_pillar_score: float
+    evidence_count: int
+    elimination_reason: str
+
+
 class TechOpportunitySeed(BaseModel):
     """Candidate online instrumentation technology, product, or application."""
 
@@ -222,8 +361,35 @@ class TechOpportunitySeed(BaseModel):
     industrial_upgrade_mechanism: str
     china_positioning: str
     global_expansion_path: str
+    commercial_status: Literal[
+        "global_and_cn_commercialized",
+        "overseas_only_cn_blank",
+        "global_and_cn_true_blank",
+    ] = "overseas_only_cn_blank"
+    global_vendors_and_products: str = ""
+    china_vendors_and_products: str = ""
+    white_space_and_entry_wedge: str = ""
+    ai_computational_sensing_and_co_design: str = ""
+    ai_rd_acceleration_and_edge_deployment: str = ""
+    estimated_rd_months_ai_vs_legacy: str = "14个月 (AI原生协同) vs 30个月 (传统串行研发)"
+    hardware_bom_localization_and_gtm_form: str = ""
     evidence_ids: list[str] = Field(default_factory=list)
-    roi_inputs: ROIInputs
+    roi_inputs: ROIInputs | None = None
+    roi_range_inputs: ROIRangeInputs | None = None
+    discovery_origin: str = "dynamic_evidence_emergence"
+
+    @field_validator("commercial_status", mode="before")
+    @classmethod
+    def _val_commercial_status(cls, v: Any) -> str:
+        return _coerce_commercial_status(v)
+
+    @model_validator(mode="after")
+    def _ensure_roi_inputs(self) -> "TechOpportunitySeed":
+        if self.roi_inputs is None and self.roi_range_inputs is not None:
+            self.roi_inputs = self.roi_range_inputs.to_baseline_inputs()
+        elif self.roi_inputs is None:
+            raise ValueError("Either `roi_inputs` or `roi_range_inputs` must be provided")
+        return self
 
     @field_validator("sector", mode="before")
     @classmethod
@@ -248,6 +414,7 @@ class TrackDossier(BaseModel):
     track_id: str
     sector: Literal["power_energy", "semiconductor"]
     track_name: str
+    commercial_landscape_summary: str = ""
     china_market_dynamics: str
     global_market_dynamics: str
     horizon_3_5y_outlook: str
@@ -257,6 +424,27 @@ class TrackDossier(BaseModel):
     evidence_count_cn: int = 0
     evidence_count_global: int = 0
     top_evidence_ids: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _propagate_track_meta(cls, data: Any) -> Any:
+        """Stamp parent track_id and sector onto nested opportunities when omitted by LLM schemas."""
+        if isinstance(data, dict) and isinstance(data.get("opportunities"), list):
+            tid = data.get("track_id")
+            sec = data.get("sector")
+            patched_opps = []
+            for opp in data["opportunities"]:
+                if isinstance(opp, dict):
+                    opp_copy = dict(opp)
+                    if tid and not opp_copy.get("track_id"):
+                        opp_copy["track_id"] = tid
+                    if sec and not opp_copy.get("sector"):
+                        opp_copy["sector"] = sec
+                    patched_opps.append(opp_copy)
+                else:
+                    patched_opps.append(opp)
+            return {**data, "opportunities": patched_opps}
+        return data
 
     @field_validator("sector", mode="before")
     @classmethod
@@ -321,6 +509,7 @@ class EvaluatedOpportunity(BaseModel):
 
     seed: TechOpportunitySeed
     roi: ROIMetrics
+    roi_range: RangeROIMetrics | None = None
     storm_memo: OpportunityStormMemo | None = None
     weighted_pillar_score: float = 0.0
     elo_rating: float = 1500.0
@@ -352,6 +541,8 @@ class CritiqueIssue(BaseModel):
     issue_type: Literal[
         "missing_evidence",
         "physics_precision",
+        "commercial_landscape_gap",
+        "ai_co_design_depth",
         "china_global_balance",
         "horizon_clarity",
         "roi_consistency",
@@ -377,6 +568,8 @@ class CritiqueIssue(BaseModel):
         valid = {
             "missing_evidence",
             "physics_precision",
+            "commercial_landscape_gap",
+            "ai_co_design_depth",
             "china_global_balance",
             "horizon_clarity",
             "roi_consistency",
@@ -384,6 +577,10 @@ class CritiqueIssue(BaseModel):
         }
         if s in valid:
             return s
+        if "commercial" in s or "vendor" in s or "blank" in s:
+            return "commercial_landscape_gap"
+        if "ai" in s or "co_design" in s:
+            return "ai_co_design_depth"
         return "missing_evidence" if "evidence" in s else "prose_quality"
 
 
@@ -478,13 +675,16 @@ class WorkflowState(TypedDict, total=False):
     loop_count: int
     recent_query_hashes: Annotated[list[str], operator.add]
 
-    # Stage 1: Plan
+    # Stage 0 & 1: Dynamic Recon Plan
+    recon_evidence_ids: list[str]
     research_plan: dict[str, Any]
     hitl_approved: bool
 
-    # Stage 2: Parallel Fan-out Track Dossiers (accumulated safely via operator.add)
+    # Stage 1 & 2: Parallel Fan-out Track Dossiers & Funnel Screening
     track_dossiers: Annotated[list[dict[str, Any]], operator.add]
     evidence_stats: dict[str, Any]
+    raw_candidates_count: int
+    eliminated_candidates: list[dict[str, Any]]
 
     # Stage 3: STORM & PALMs / Elo Ranking
     storm_memos: dict[str, Any]

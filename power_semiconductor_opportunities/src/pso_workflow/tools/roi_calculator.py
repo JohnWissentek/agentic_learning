@@ -6,7 +6,26 @@ All numbers tagged `[ROI-CALC]` in final reports originate strictly from here.
 
 from __future__ import annotations
 
-from pso_workflow.schemas import ROIInputs, ROIMetrics
+from typing import Any
+
+from pso_workflow.schemas import (
+    EliminatedCandidate,
+    EvaluatedOpportunity,
+    RangeROIMetrics,
+    ROIInputs,
+    ROIMetrics,
+    ROIRangeInputs,
+    TechOpportunitySeed,
+)
+
+
+def _clamp_val(value: float, lo: float | None, hi: float | None) -> float:
+    out = float(value)
+    if lo is not None:
+        out = max(float(lo), out)
+    if hi is not None:
+        out = min(float(hi), out)
+    return out
 
 
 def _npv(rate: float, cashflows: list[float]) -> float:
@@ -94,6 +113,8 @@ def compute_weighted_pillar_score(
     global_priority: float,
     horizon: str,
     evidence_count: int,
+    commercial_status: str | None = None,
+    has_ai_co_design: bool = False,
 ) -> float:
     """Score an opportunity on [0, 100] aligned with the 4 contract value pillars.
 
@@ -102,6 +123,9 @@ def compute_weighted_pillar_score(
     - 25% Quality / Yield Impact
     - 20% Industrial Upgrade & China-First Localization Leverage
     - 20% Cost/TCO & Green/EHS Evidence Grounding
+
+    In V3.0, optional `commercial_status` & `has_ai_co_design` apply bounded white-space
+    and AI-moat prioritization adjustments without perturbing unit callers that omit them.
     """
     # Payback component (<=6m -> 100, 12m -> 90, 24m -> 72, 36m -> 55, >=48m -> 35)
     pb = roi.payback_months
@@ -134,4 +158,261 @@ def compute_weighted_pillar_score(
         + 0.20 * upgrade_score
         + 0.20 * ev_bonus
     )
+
+    if commercial_status == "overseas_only_cn_blank":
+        total += 2.0
+    elif commercial_status == "global_and_cn_true_blank":
+        total += 2.4 if has_ai_co_design else 1.6
+    elif commercial_status == "global_and_cn_commercialized":
+        total -= 0.3 if has_ai_co_design else 1.2
+
     return round(min(99.5, max(40.0, total)), 2)
+
+
+def clamp_roi_range_inputs(
+    rng: ROIRangeInputs,
+    sector: str,
+    guardrails: dict[str, Any] | None = None,
+) -> ROIRangeInputs:
+    """Clamp LLM-extracted economic intervals against physical sector guardrails."""
+    guard = (guardrails or {}).get(sector, {}) or {}
+    if not guard:
+        return rng
+
+    cap_lo_b, cap_hi_b = guard.get("capex_cny_min"), guard.get("capex_cny_max")
+    out_lo_b, out_hi_b = guard.get("annual_output_value_cny_min"), guard.get("annual_output_value_cny_max")
+    yld_lo_b, yld_hi_b = guard.get("yield_gain_pct_min"), guard.get("yield_gain_pct_max")
+    opex_r_lo, opex_r_hi = guard.get("opex_ratio_min"), guard.get("opex_ratio_max")
+    cn_lo_b, cn_hi_b = guard.get("market_tam_china_cny_100m_min"), guard.get("market_tam_china_cny_100m_max")
+    gl_lo_b, gl_hi_b = guard.get("market_tam_global_usd_m_min"), guard.get("market_tam_global_usd_m_max")
+
+    c_lo = _clamp_val(rng.capex_cny_low, cap_lo_b, cap_hi_b)
+    c_mid = _clamp_val(rng.capex_cny_base, cap_lo_b, cap_hi_b)
+    c_hi = _clamp_val(rng.capex_cny_high, cap_lo_b, cap_hi_b)
+    c_lo, c_mid, c_hi = sorted((c_lo, c_mid, c_hi))
+
+    y_lo = _clamp_val(rng.yield_gain_pct_low, yld_lo_b, yld_hi_b)
+    y_mid = _clamp_val(rng.yield_gain_pct_base, yld_lo_b, yld_hi_b)
+    y_hi = _clamp_val(rng.yield_gain_pct_high, yld_lo_b, yld_hi_b)
+    y_lo, y_mid, y_hi = sorted((y_lo, y_mid, y_hi))
+
+    opex_min = c_mid * float(opex_r_lo) if opex_r_lo is not None else 0.0
+    opex_max = c_mid * float(opex_r_hi) if opex_r_hi is not None else rng.annual_opex_cny
+
+    return ROIRangeInputs(
+        capex_cny_low=c_lo,
+        capex_cny_base=c_mid,
+        capex_cny_high=c_hi,
+        yield_gain_pct_low=y_lo,
+        yield_gain_pct_base=y_mid,
+        yield_gain_pct_high=y_hi,
+        annual_output_value_cny=_clamp_val(rng.annual_output_value_cny, out_lo_b, out_hi_b),
+        annual_opex_cny=_clamp_val(rng.annual_opex_cny, opex_min, opex_max),
+        annual_scrap_saving_cny=max(0.0, rng.annual_scrap_saving_cny),
+        annual_downtime_saving_cny=max(0.0, rng.annual_downtime_saving_cny),
+        annual_consumable_ehs_saving_cny=max(0.0, rng.annual_consumable_ehs_saving_cny),
+        market_tam_china_cny_100m=_clamp_val(rng.market_tam_china_cny_100m, cn_lo_b, cn_hi_b),
+        market_tam_global_usd_m=_clamp_val(rng.market_tam_global_usd_m, gl_lo_b, gl_hi_b),
+        parameter_basis=rng.parameter_basis,
+        wacc=rng.wacc,
+    )
+
+
+def derive_range_inputs_from_seed(
+    seed: TechOpportunitySeed,
+    guardrails: dict[str, Any] | None = None,
+) -> ROIRangeInputs:
+    """Resolve and clamp ROIRangeInputs whether candidate supplied range or baseline only."""
+    if seed.roi_range_inputs is not None:
+        rng = seed.roi_range_inputs
+    else:
+        assert seed.roi_inputs is not None
+        base = seed.roi_inputs
+        rng = ROIRangeInputs(
+            capex_cny_low=round(base.capex_cny * 0.80, 2),
+            capex_cny_base=base.capex_cny,
+            capex_cny_high=round(base.capex_cny * 1.25, 2),
+            yield_gain_pct_low=round(base.yield_gain_pct * 0.75, 4),
+            yield_gain_pct_base=base.yield_gain_pct,
+            yield_gain_pct_high=round(base.yield_gain_pct * 1.25, 4),
+            annual_output_value_cny=base.annual_output_value_cny,
+            annual_opex_cny=base.annual_opex_cny,
+            annual_scrap_saving_cny=base.annual_scrap_saving_cny,
+            annual_downtime_saving_cny=base.annual_downtime_saving_cny,
+            annual_consumable_ehs_saving_cny=base.annual_consumable_ehs_saving_cny,
+            market_tam_china_cny_100m=base.market_tam_china_cny_100m,
+            market_tam_global_usd_m=base.market_tam_global_usd_m,
+            parameter_basis="derived ±25% from baseline parameters",
+            wacc=base.wacc,
+        )
+    return clamp_roi_range_inputs(rng, seed.sector, guardrails)
+
+
+def compute_range_roi_metrics(rng: ROIRangeInputs) -> RangeROIMetrics:
+    """Compute conservative / baseline / optimistic ROI envelopes deterministically."""
+    conservative_inputs = ROIInputs(
+        capex_cny=rng.capex_cny_high,
+        annual_opex_cny=round(rng.annual_opex_cny * 1.10, 2),
+        annual_output_value_cny=rng.annual_output_value_cny,
+        yield_gain_pct=rng.yield_gain_pct_low,
+        annual_scrap_saving_cny=round(rng.annual_scrap_saving_cny * 0.80, 2),
+        annual_downtime_saving_cny=round(rng.annual_downtime_saving_cny * 0.80, 2),
+        annual_consumable_ehs_saving_cny=round(rng.annual_consumable_ehs_saving_cny * 0.80, 2),
+        market_tam_china_cny_100m=rng.market_tam_china_cny_100m,
+        market_tam_global_usd_m=rng.market_tam_global_usd_m,
+        wacc=rng.wacc,
+    )
+    optimistic_inputs = ROIInputs(
+        capex_cny=rng.capex_cny_low,
+        annual_opex_cny=round(rng.annual_opex_cny * 0.95, 2),
+        annual_output_value_cny=rng.annual_output_value_cny,
+        yield_gain_pct=rng.yield_gain_pct_high,
+        annual_scrap_saving_cny=round(rng.annual_scrap_saving_cny * 1.15, 2),
+        annual_downtime_saving_cny=round(rng.annual_downtime_saving_cny * 1.15, 2),
+        annual_consumable_ehs_saving_cny=round(rng.annual_consumable_ehs_saving_cny * 1.15, 2),
+        market_tam_china_cny_100m=rng.market_tam_china_cny_100m,
+        market_tam_global_usd_m=rng.market_tam_global_usd_m,
+        wacc=rng.wacc,
+    )
+    return RangeROIMetrics(
+        conservative=compute_roi_metrics(conservative_inputs),
+        baseline=compute_roi_metrics(rng.to_baseline_inputs()),
+        optimistic=compute_roi_metrics(optimistic_inputs),
+        parameter_basis=rng.parameter_basis,
+    )
+
+
+def _to_eliminated(ev: EvaluatedOpportunity, reason: str) -> EliminatedCandidate:
+    return EliminatedCandidate(
+        opp_id=ev.seed.opp_id,
+        track_id=ev.seed.track_id,
+        sector=ev.seed.sector,
+        title=ev.seed.title,
+        horizon=ev.seed.horizon,
+        commercial_status=ev.seed.commercial_status,
+        baseline_payback_months=ev.roi.payback_months,
+        conservative_payback_months=(
+            ev.roi_range.conservative.payback_months if ev.roi_range else ev.roi.payback_months
+        ),
+        weighted_pillar_score=ev.weighted_pillar_score,
+        evidence_count=len(ev.seed.evidence_ids),
+        elimination_reason=reason,
+    )
+
+
+def screen_candidate_pool(
+    candidates: list[TechOpportunitySeed],
+    *,
+    sector_filter: str = "all",
+    guardrails: dict[str, Any] | None = None,
+    target_total: int = 16,
+    max_conservative_payback_months: float = 42.0,
+) -> tuple[list[EvaluatedOpportunity], list[EliminatedCandidate]]:
+    """Deterministic Stage 2 PALMs funnel: clamp -> compute 3 scenarios -> hard gates -> balanced shortlist."""
+    deduped: dict[str, TechOpportunitySeed] = {}
+    for cand in candidates:
+        existing = deduped.get(cand.opp_id)
+        if existing is None or len(cand.evidence_ids) > len(existing.evidence_ids):
+            deduped[cand.opp_id] = cand
+
+    evaluated_all: list[EvaluatedOpportunity] = []
+    for cand in deduped.values():
+        clamped_rng = derive_range_inputs_from_seed(cand, guardrails=guardrails)
+        clean_seed = cand.model_copy(
+            update={
+                "roi_range_inputs": clamped_rng,
+                "roi_inputs": clamped_rng.to_baseline_inputs(),
+            }
+        )
+        roi_range = compute_range_roi_metrics(clamped_rng)
+        roi = roi_range.baseline
+        w_score = compute_weighted_pillar_score(
+            roi=roi,
+            china_priority=clean_seed.china_priority_score,
+            global_priority=clean_seed.global_priority_score,
+            horizon=clean_seed.horizon,
+            evidence_count=len(clean_seed.evidence_ids),
+            commercial_status=clean_seed.commercial_status,
+            has_ai_co_design=bool(clean_seed.ai_computational_sensing_and_co_design.strip()),
+        )
+        evaluated_all.append(
+            EvaluatedOpportunity(
+                seed=clean_seed,
+                roi=roi,
+                roi_range=roi_range,
+                weighted_pillar_score=w_score,
+            )
+        )
+
+    survivors: list[EvaluatedOpportunity] = []
+    eliminated: list[EliminatedCandidate] = []
+    for ev in evaluated_all:
+        cons_pb = ev.roi_range.conservative.payback_months if ev.roi_range else ev.roi.payback_months
+        reasons: list[str] = []
+        if len(ev.seed.evidence_ids) == 0:
+            reasons.append("缺少经证据库核验的原始引用 ID (evidence_ids=0)")
+        if ev.roi.net_annual_cashflow_cny <= 0:
+            reasons.append(f"基准情景年净现金流为负 ({ev.roi.net_annual_cashflow_cny:,.0f} CNY)")
+        if cons_pb > max_conservative_payback_months:
+            reasons.append(
+                f"保守情景回收期 {cons_pb:.1f} 个月超过漏斗上限 {max_conservative_payback_months:.1f} 个月"
+            )
+        if reasons:
+            eliminated.append(_to_eliminated(ev, "；".join(reasons)))
+        else:
+            survivors.append(ev)
+
+    if not survivors and evaluated_all:
+        # Safety net: only if every single candidate failed hard gates, promote top cited ones
+        fallback_sorted = sorted(
+            evaluated_all,
+            key=lambda e: (len(e.seed.evidence_ids) > 0, e.weighted_pillar_score),
+            reverse=True,
+        )
+        kept = fallback_sorted[: min(target_total, len(fallback_sorted))]
+        kept_ids = {k.seed.opp_id for k in kept}
+        survivors = kept
+        eliminated = [el for el in eliminated if el.opp_id not in kept_ids]
+
+    def _rank_key(ev: EvaluatedOpportunity) -> tuple[float, float, int]:
+        return (ev.weighted_pillar_score, -ev.roi.payback_months, len(ev.seed.evidence_ids))
+
+    survivors.sort(key=_rank_key, reverse=True)
+
+    if sector_filter == "all" and len(survivors) > target_total:
+        half = target_total // 2
+        power_pool = [e for e in survivors if e.seed.sector == "power_energy"]
+        semi_pool = [e for e in survivors if e.seed.sector == "semiconductor"]
+        selected = power_pool[:half] + semi_pool[: (target_total - half)]
+        selected_ids = {e.seed.opp_id for e in selected}
+        if len(selected) < target_total:
+            leftovers = [e for e in survivors if e.seed.opp_id not in selected_ids]
+            for extra in leftovers[: target_total - len(selected)]:
+                selected.append(extra)
+                selected_ids.add(extra.seed.opp_id)
+        for ev in survivors:
+            if ev.seed.opp_id not in selected_ids:
+                sector_cn = "电力能源" if ev.seed.sector == "power_energy" else "半导体制造"
+                eliminated.append(
+                    _to_eliminated(
+                        ev,
+                        f"Stage 2 赛道平衡名额竞争淘汰：{sector_cn}组加权得分 {ev.weighted_pillar_score:.1f} 未进入前 {half} 名决选池",
+                    )
+                )
+    elif len(survivors) > target_total:
+        selected = survivors[:target_total]
+        for ev in survivors[target_total:]:
+            eliminated.append(
+                _to_eliminated(
+                    ev,
+                    f"Stage 2 综合得分竞争淘汰：加权得分 {ev.weighted_pillar_score:.1f} 未进入前 {target_total} 名决选池",
+                )
+            )
+    else:
+        selected = list(survivors)
+
+    selected.sort(key=_rank_key, reverse=True)
+    for idx, ev in enumerate(selected, start=1):
+        ev.composite_rank = idx
+
+    return selected, eliminated

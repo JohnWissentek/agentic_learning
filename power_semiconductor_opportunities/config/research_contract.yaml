@@ -1,8 +1,18 @@
 # ==============================================================================
 # Formalized Contractor Specification (对齐《Agentic Design Patterns》Ch 11 + Ch 19)
 # ==============================================================================
-contract_id: "PSO-CONTRACT-2026-V1"
-title: "电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年技术、产品与应用潜在机会研究契约"
+contract_id: "PSO-CONTRACT-2026-V3"
+title: "电力能源与半导体芯片制造在线测试仪器仪表——海内外商业供给摸底、产品空白分级与 AI 原生软硬件协同落地研究契约 (V3.0)"
+
+# V2.0 动态漏斗编排参数（先发散侦察长出赛道与候选池，再确定性收敛决选）
+discovery_funnel:
+  target_dynamic_tracks: 8
+  tracks_per_sector_flagship: 4
+  candidates_per_track_min: 3
+  min_raw_candidates_flagship: 20
+  finalist_shortlist_flagship: 16
+  finalist_shortlist_fast: 8
+  max_conservative_payback_months: 42.0
 
 # 地理优先级与阶段推进准则（严格先中国、后世界，不混写、不失焦）
 geographic_mandate:

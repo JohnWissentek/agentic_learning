@@ -22,6 +22,7 @@ from pso_workflow.config import CostLedger, DashScopeLLMGateway, WorkflowSetting
 from pso_workflow.nodes import (
     RuntimeDeps,
     node_corrective_rag_refill,
+    node_deterministic_funnel_screener,
     node_grounded_report_synthesizer,
     node_heterogeneous_critic,
     node_hitl_approval_gate,
@@ -64,6 +65,9 @@ def build_workflow_graph(
     async def _researcher(state: dict[str, Any]) -> dict[str, Any]:
         return await node_track_researcher(state, deps)
 
+    async def _screener(state: WorkflowState) -> dict[str, Any]:
+        return await node_deterministic_funnel_screener(state, deps)
+
     async def _storm(state: WorkflowState) -> dict[str, Any]:
         return await node_storm_persona_interrogator(state, deps)
 
@@ -86,6 +90,7 @@ def build_workflow_graph(
     builder.add_node("input_guardrail_and_planner", _planner)
     builder.add_node("hitl_approval_gate", _hitl)
     builder.add_node("track_researcher", _researcher)
+    builder.add_node("deterministic_funnel_screener", _screener)
     builder.add_node("storm_persona_interrogator", _storm)
     builder.add_node("palms_roi_and_elo_ranker", _ranker)
     builder.add_node("grounded_report_synthesizer", _synth)
@@ -96,7 +101,8 @@ def build_workflow_graph(
     builder.add_edge(START, "input_guardrail_and_planner")
     builder.add_edge("input_guardrail_and_planner", "hitl_approval_gate")
     builder.add_conditional_edges("hitl_approval_gate", _fan_out_tracks, ["track_researcher"])
-    builder.add_edge("track_researcher", "storm_persona_interrogator")
+    builder.add_edge("track_researcher", "deterministic_funnel_screener")
+    builder.add_edge("deterministic_funnel_screener", "storm_persona_interrogator")
     builder.add_edge("storm_persona_interrogator", "palms_roi_and_elo_ranker")
     builder.add_edge("palms_roi_and_elo_ranker", "grounded_report_synthesizer")
     builder.add_edge("grounded_report_synthesizer", "heterogeneous_critic")
@@ -122,7 +128,7 @@ def create_default_deps(
     cfg = settings or WorkflowSettings.load()
     cfg.data_dir.mkdir(parents=True, exist_ok=True)
     ledger = CostLedger()
-    vault = EvidenceVault(cfg.data_dir / "evidence_vault.db")
+    vault = EvidenceVault(cfg.resolve_vault_path())
     search_router = DualEngineSearchRouter(cfg, ledger)
     llm = DashScopeLLMGateway(cfg, ledger)
     return RuntimeDeps(
