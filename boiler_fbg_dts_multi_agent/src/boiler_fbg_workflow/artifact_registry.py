@@ -34,9 +34,12 @@ class Artifact:
     raw_hash: str
     parsed_hash: str
     
-    # Trust level
-    trust_level: str  # VERIFIED, UNVERIFIED, QUARANTINED
+    # Trust level (renamed from VERIFIED)
+    trust_level: str  # FORMAT_VALID_RULES_NOT_TRIGGERED, RULE_TRIGGERED, etc.
     quarantine_reason: str = ""
+    
+    # Revision tracking (Fix #3)
+    derived_from: str = ""  # Original artifact_id if this is a revision
     
     def to_summary(self, max_len: int = 200) -> dict[str, Any]:
         """Create concise summary for downstream consumption."""
@@ -51,6 +54,27 @@ class Artifact:
             "semantic_anomalies_count": len(self.semantic_anomalies),
             "raw_preview": self.raw_response[:max_len] + "..." if len(self.raw_response) > max_len else self.raw_response,
             "raw_hash": self.raw_hash,
+        }
+    
+    def to_full_handoff(self) -> dict[str, Any]:
+        """Full content for downstream handoff - NO TRUNCATION.
+        
+        Fix #1: Pass complete raw/parsed/validation/anomalies.
+        """
+        return {
+            "artifact_id": self.artifact_id,
+            "source_role": self.source_role,
+            "stage": self.stage,
+            "raw_response": self.raw_response,  # FULL - no truncation
+            "parsed_output": self.parsed_output,  # FULL
+            "parse_success": self.parse_success,
+            "schema_valid": self.schema_valid,
+            "validation_issues": self.validation_issues,  # ALL issues
+            "semantic_anomalies": self.semantic_anomalies,  # ALL with pattern/context
+            "trust_level": self.trust_level,
+            "quarantine_reason": self.quarantine_reason,
+            "raw_hash": self.raw_hash,
+            "parsed_hash": self.parsed_hash,
         }
     
     def to_dict(self) -> dict[str, Any]:
@@ -70,6 +94,7 @@ class Artifact:
             "parsed_hash": self.parsed_hash,
             "trust_level": self.trust_level,
             "quarantine_reason": self.quarantine_reason,
+            "derived_from": self.derived_from,
         }
 
 
@@ -150,29 +175,48 @@ class ArtifactRegistry:
         """Get all artifacts."""
         return list(self._artifacts.values())
     
-    def get_summaries_for_qa(self, roles: list[str]) -> str:
-        """Get summaries of upstream artifacts for QA review.
+    def get_full_handoffs_for_qa(self, roles: list[str]) -> tuple[str, int]:
+        """Get FULL content of upstream artifacts for QA review.
         
-        RUN-03 Fix: QA must see actual upstream outputs.
+        Fix #1: No truncation. Pass complete raw/parsed/validation/anomalies.
+        Returns (content, total_chars)
         """
-        summaries = []
+        handoffs = []
+        total_chars = 0
         
         for role in roles:
             artifacts = self.get_by_role(role)
             for art in artifacts:
-                summary = art.to_summary(max_len=300)
-                summaries.append(f"""
-### {role} ({art.artifact_id})
-- 解析成功: {art.parse_success}
-- Schema有效: {art.schema_valid}
-- 信任级别: {art.trust_level}
-- 语义异常: {len(art.semantic_anomalies)}个
-- 验证问题: {', '.join(art.validation_issues[:3]) if art.validation_issues else '无'}
-- 原文摘要: {summary['raw_preview']}
-- 原文hash: {art.raw_hash}
-""")
+                full = art.to_full_handoff()
+                
+                # Format full content
+                anomaly_details = ""
+                for a in full["semantic_anomalies"]:
+                    anomaly_details += f"\n    - {a.get('id')}: {a.get('pattern')} | {a.get('conflict')}"
+                
+                content = f"""
+### {role} ({full['artifact_id']})
+- raw_hash: {full['raw_hash']}
+- parse_success: {full['parse_success']}
+- schema_valid: {full['schema_valid']}
+- trust_level: {full['trust_level']}
+- validation_issues: {full['validation_issues']}
+- semantic_anomalies ({len(full['semantic_anomalies'])}个):{anomaly_details if anomaly_details else ' 无'}
+- 完整原文:
+```
+{full['raw_response']}
+```
+- parsed_output: {json.dumps(full['parsed_output'], ensure_ascii=False) if full['parsed_output'] else 'null'}
+"""
+                handoffs.append(content)
+                total_chars += len(content)
         
-        return "\n".join(summaries)
+        return "\n".join(handoffs), total_chars
+    
+    def get_summaries_for_qa(self, roles: list[str]) -> str:
+        """DEPRECATED: Use get_full_handoffs_for_qa instead."""
+        content, _ = self.get_full_handoffs_for_qa(roles)
+        return content
     
     def get_quarantined(self) -> list[Artifact]:
         """Get all quarantined artifacts."""
@@ -223,6 +267,80 @@ class ArtifactRegistry:
                 received[artifact_id] = False
         
         return received
+    
+    def validate_reference(self, artifact_id: str) -> tuple[bool, str]:
+        """Validate artifact reference exists in registry.
+        
+        Fix #2: All artifact_id references must resolve.
+        Returns (is_valid, error_message)
+        """
+        if artifact_id in self._artifacts:
+            return True, ""
+        return False, f"REFERENCE_INVALID: {artifact_id} not in registry"
+    
+    def validate_all_references(self, artifact_ids: list[str]) -> dict[str, tuple[bool, str]]:
+        """Validate multiple artifact references."""
+        return {aid: self.validate_reference(aid) for aid in artifact_ids}
+    
+    def register_revision(
+        self,
+        original_artifact_id: str,
+        source_role: str,
+        stage: str,
+        raw_response: str,
+        parsed_output: Optional[dict[str, Any]],
+        parse_success: bool,
+        schema_valid: bool,
+        validation_issues: list[str],
+        semantic_anomalies: list[dict[str, Any]],
+    ) -> tuple[Optional[Artifact], str]:
+        """Register a revision artifact with derived_from tracking.
+        
+        Fix #3: Track revision lineage.
+        Returns (artifact, error_message)
+        """
+        # Validate original exists
+        valid, err = self.validate_reference(original_artifact_id)
+        if not valid:
+            return None, err
+        
+        artifact_id = self._generate_id(f"{source_role}_REVISE")
+        
+        trust_level = "FORMAT_VALID_RULES_NOT_TRIGGERED"
+        quarantine_reason = ""
+        
+        if not parse_success:
+            trust_level = "PARSE_FAILED"
+            quarantine_reason = "JSON解析失败"
+        elif not schema_valid:
+            trust_level = "SCHEMA_FAILED"
+            quarantine_reason = "Schema验证失败"
+        elif len(semantic_anomalies) > 0:
+            trust_level = "RULE_TRIGGERED"
+            quarantine_reason = f"检测到{len(semantic_anomalies)}个规则命中"
+        
+        artifact = Artifact(
+            artifact_id=artifact_id,
+            source_role=source_role,
+            stage=stage,
+            created_at=datetime.now(timezone.utc).isoformat(),
+            raw_response=raw_response,
+            parsed_output=parsed_output,
+            parse_success=parse_success,
+            schema_valid=schema_valid,
+            validation_issues=validation_issues,
+            semantic_anomalies=semantic_anomalies,
+            raw_hash=self._hash(raw_response),
+            parsed_hash=self._hash(json.dumps(parsed_output, sort_keys=True)) if parsed_output else "",
+            trust_level=trust_level,
+            quarantine_reason=quarantine_reason,
+        )
+        
+        # Track derivation
+        artifact.derived_from = original_artifact_id
+        
+        self._artifacts[artifact_id] = artifact
+        return artifact, ""
     
     def export(self) -> dict[str, Any]:
         """Export all artifacts."""

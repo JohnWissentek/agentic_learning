@@ -24,6 +24,105 @@ from rich.panel import Panel
 console = Console()
 
 
+def run_live_workflow(args: argparse.Namespace) -> int:
+    """Run live workflow with real LLM inference."""
+    from boiler_fbg_workflow.llm_provider import LLMProviderFactory, ProviderType
+    from boiler_fbg_workflow.live_agents import run_live_workflow_demo, LIVE_OUTPUT_DISCLAIMER
+    
+    console.print(Panel.fit(
+        "[bold magenta]燃煤锅炉水冷壁光纤测温产品研发 - 真实LLM推理演示[/bold magenta]\n"
+        "基于《Agentic Design Patterns》(Antonio Gulli) 设计模式\n"
+        "[yellow]⚠️ 研发工作流演示，小模型产物未经工程验证[/yellow]",
+        title="Boiler FBG Live Workflow Demo",
+    ))
+    
+    provider_type = ProviderType(args.provider)
+    console.print(f"\nProvider: [bold]{provider_type.value}[/bold]")
+    console.print(f"输出目录: {args.output_dir}")
+    
+    # Create provider
+    try:
+        provider = LLMProviderFactory.create(provider_type)
+        console.print(f"模型: [bold]{provider.model_id}[/bold]")
+        console.print(f"版本: {provider.model_revision}")
+        console.print(f"许可: {provider.model_license}")
+    except Exception as e:
+        console.print(f"[red]创建provider失败: {e}[/red]")
+        return 1
+    
+    console.print("\n[bold green]开始真实LLM推理工作流...[/bold green]\n")
+    
+    try:
+        # Run live workflow
+        results = run_live_workflow_demo(provider, args.output_dir)
+        
+        console.print("\n[bold green]✓ 工作流执行完成[/bold green]\n")
+        
+        # Show summary
+        table = Table(title="LLM调用统计")
+        table.add_column("指标", style="cyan")
+        table.add_column("值", style="green")
+        
+        summary = results["call_summary"]
+        table.add_row("总调用数", str(summary["total_calls"]))
+        table.add_row("成功调用", str(summary["successful_calls"]))
+        table.add_row("失败调用", str(summary["failed_calls"]))
+        table.add_row("总输入tokens", str(summary.get("total_prompt_tokens", 0)))
+        table.add_row("总输出tokens", str(summary.get("total_response_tokens", 0)))
+        table.add_row("总延迟(ms)", str(summary.get("total_latency_ms", 0)))
+        table.add_row("平均延迟(ms)", str(summary.get("avg_latency_ms", 0)))
+        
+        console.print(table)
+        
+        console.print(f"\nQA门禁状态: [bold red]{results['final_gate_status']}[/bold red]")
+        console.print(f"门禁确定性: {results['gate_is_deterministic']}")
+        
+        console.print(f"\n生成的文件:")
+        console.print(f"  - {results['trace_path']}")
+        console.print(f"  - {results['calls_path']}")
+        
+        console.print(f"\n[yellow]{LIVE_OUTPUT_DISCLAIMER}[/yellow]")
+        
+        return 0
+        
+    except Exception as e:
+        console.print(f"[red]工作流执行失败: {e}[/red]")
+        import traceback
+        traceback.print_exc()
+        return 1
+
+
+def run_v031_workflow(args: argparse.Namespace) -> int:
+    """Run v0.3.1 final workflow with all structural fixes."""
+    import subprocess
+    import sys
+    
+    console.print(Panel.fit(
+        "[bold magenta]燃煤锅炉水冷壁光纤测温 - v0.3.1最终工作流[/bold magenta]\n"
+        "修复: 无截断/引用验证/真实返工闭环/信任级别重命名\n"
+        "[yellow]⚠️ 研发工作流演示，小模型产物标FORMAT_VALID_RULES_NOT_TRIGGERED[/yellow]",
+        title="Boiler FBG v0.3.1 Final",
+    ))
+    
+    runner_path = Path(__file__).parent.parent.parent / "run_v031_final.py"
+    
+    cmd = [
+        sys.executable,
+        str(runner_path),
+        f"--model-size={args.model_size}",
+        f"--output-dir={args.output_dir}",
+    ]
+    
+    console.print(f"\n运行: {' '.join(cmd)}\n")
+    
+    try:
+        result = subprocess.run(cmd, check=True)
+        return result.returncode
+    except subprocess.CalledProcessError as e:
+        console.print(f"[red]执行失败: {e}[/red]")
+        return 1
+
+
 def run_workflow(args: argparse.Namespace) -> int:
     """Run the multi-agent R&D workflow."""
     from boiler_fbg_workflow.config import CostLedger, RuntimeDeps, WorkflowSettings
@@ -300,6 +399,34 @@ def main() -> int:
         help="输出文件路径",
     )
     
+    # Run live workflow with real LLM inference
+    live_parser = subparsers.add_parser("run-live", help="运行真实LLM推理工作流")
+    live_parser.add_argument(
+        "--provider",
+        choices=["local", "deterministic"],
+        default="local",
+        help="LLM provider (默认: local - Qwen2.5-0.5B-Instruct)",
+    )
+    live_parser.add_argument(
+        "--output-dir",
+        default="./outputs/live_run",
+        help="输出目录 (默认: ./outputs/live_run)",
+    )
+    
+    # Run v0.3.1 final workflow (with all fixes)
+    v031_parser = subparsers.add_parser("run-v031", help="运行v0.3.1最终工作流（含全部修复）")
+    v031_parser.add_argument(
+        "--model-size",
+        choices=["0.5B", "1.5B", "3B"],
+        default="1.5B",
+        help="模型规模 (默认: 1.5B)",
+    )
+    v031_parser.add_argument(
+        "--output-dir",
+        default="./outputs/v031_final",
+        help="输出目录 (默认: ./outputs/v031_final)",
+    )
+    
     args = parser.parse_args()
     
     if args.command == "run":
@@ -308,6 +435,10 @@ def main() -> int:
         return test_temperature_app(args)
     elif args.command == "export-evidence":
         return export_evidence(args)
+    elif args.command == "run-live":
+        return run_live_workflow(args)
+    elif args.command == "run-v031":
+        return run_v031_workflow(args)
     else:
         parser.print_help()
         return 0
