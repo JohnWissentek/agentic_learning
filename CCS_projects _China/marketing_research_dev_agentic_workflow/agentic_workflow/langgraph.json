@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "vf_ccus_market_research": "./src/vf_ccus_workflow/graph.py:build_langgraph_app"
+  },
+  "env": ".env"
+}

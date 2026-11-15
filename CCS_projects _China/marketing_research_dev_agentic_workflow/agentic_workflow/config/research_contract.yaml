@@ -1,0 +1,72 @@
+contract_id: "VF-CCUS-CHINA-2026-V1"
+version: "1.0"
+language: "zh-CN"
+title: "中国CCS/CCUS市场V&F IMR-MS质谱解决方案商业机会、竞争格局与GTM营销战略全景研究"
+
+target_company:
+  name: "V&F Analyse- und Messtechnik GmbH (奥地利)"
+  core_products:
+    - "CO2Sense / AirSense / ProcessSense (IMR-MS 软电离质谱仪核心主机, ~1s响应, 21/29种关键杂质)"
+    - "PremierGuard CCUS QAS (奥地利原装一体化CCS分析站: IMR-MS + GC(N2/H2/Ar/CO) + NDIR + FID + P2O5 + Hg AFS + Laser粒子)"
+    - "VF-QAS-CN (规划双轨本土化防爆分析小屋: 进口V&F IMR-MS核心 + 中国PAC/分析小屋集成商防爆/采样/辅机合规化)"
+  hq_reference_benchmark:
+    annual_turnover_eur_m: 12.0
+    headcount: 30
+    food_beverage_ccu_installations: 90
+    qas_orders_cumulative: 27
+    lighthouse_projects:
+      - "Northern Lights Phase 2 (Equinor/Shell/TotalEnergies, Norway)"
+      - "Brevik Cement CCS (Heidelberg Materials / SLB Capturi, 400 ktpa, Norway)"
+      - "Stockholm Exergi BECCS (900 ktpa, 3 QAS units, Sweden)"
+      - "Denmark Asnæs (ASV) & Avedøre (AVV) Bio-CCS (Ørsted / Aker)"
+      - "Hafslund Celsio Oslo WtE CCS & Technology Centre Mongstad (TCM)"
+      - "ENEOS Japan DAC & China-built LCO2 carriers (Xiamen)"
+
+strategic_mandates:
+  answer_core_questions:
+    - "1. 是否有真实市场机会？严格区分真实高痛点高ROI刚需（强腐蚀交叉反应监控/船舶港口验收/绿醇合成防毒/胺洗逃逸科研）与伪需求/无支付意愿场景（常规食品级饮料离线抽检）。"
+    - "2. 中国市场规模有多大？由Python [MKT-CALC] 确定性输出2026–2030（十五五）与2031–2036（十六五）低/中/高三情景 TAM/SAM/SOM（台套数与人民币亿元/百万元）。"
+    - "3. 竞争对手与潜在替代有哪些？基于EvidenceVault对比海外Process MS、Thermo MAX-iR/MAX-Bev FTIR、ABB/Siemens/Emerson/Servomex/E+H光学/GC组合、以及中国本土质谱与分析小屋厂商，严禁编造型号。"
+    - "4. 如何实现中国商业成功？明确Track A/B/C双轨交付定价、设计院(SEI/HQC/CPECC/天辰)Spec-in切入、PAC本土分析小屋OEM合作、30-60-90天与12-24个月灯塔路线图。"
+  horizon_policy:
+    near_term: "2026-2030 (十五五: 大型CCS集群示范、沿海船舶外输枢纽、煤制绿醇/化工CCUS、百万吨级EOR与燃煤碳捕集)"
+    mid_long_term: "2031-2036 (十六五: 跨省CO2管网互联互通、ISO/国家CO2纯度强标落地、CCER/碳税惩罚刚性化、国产化组装规模扩张)"
+
+discovery_funnel:
+  macro_sectors: 4
+  target_emergent_tracks_min: 4
+  target_emergent_tracks_max: 6
+  raw_wedges_flagship_target: 18
+  raw_wedges_fast_target: 10
+  finalist_shortlist_flagship: 10
+  finalist_shortlist_fast: 6
+  max_conservative_payback_months: 42.0
+
+quality_gates:
+  min_evidences_total: 55
+  min_cn_evidences: 25
+  min_global_evidences: 15
+  min_siggi_evidences: 12
+  min_cited_evidences_per_wedge: 2
+  max_reflection_loops: 2
+  stage_gate_pass_score: 85.0
+  hitl_enabled_default: false
+
+audit_rules:
+  forbid_fabricated_competitor_models: true
+  forbid_llm_financial_or_market_math: true
+  preserve_negative_and_eliminated_wedges: true
+  citation_format: "[EV-SIGGI-XXX] / [EV-CN-XXX] / [EV-GL-XXX]"
+  calc_tags:
+    - "[MKT-CALC]"
+    - "[ROI-CALC]"
+
+required_deliverables:
+  - "00_EXECUTIVE_DECISION_MEMO_AND_VERDICT.md"
+  - "01_CHINA_CCUS_MARKET_SIZING_AND_PAIN_POINTS.md"
+  - "02_COMPETITIVE_LANDSCAPE_AND_BATTLECARDS.md"
+  - "03_COMMERCIAL_GTM_PRICING_AND_PARTNERSHIP_PLAN.md"
+  - "04_ACTION_ROADMAP_30_60_90_AND_12_24M.md"
+  - "05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"
+  - "06_EVALUATION_SCORECARD_AND_COST_TELEMETRY.json"
+  - "07_WORKFLOW_EXECUTION_TOPOLOGY.svg"

@@ -1,0 +1,23 @@
+# Environments & secrets (NEVER commit)
+.env
+.env.*
+!env.*.example
+
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# Runtime SQLite & intermediate stage artifacts
+data/*.db
+data/*.db-*
+data/*.json
+*.sqlite
+*.sqlite3
+
+# macOS
+.DS_Store

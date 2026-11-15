@@ -1,0 +1,80 @@
+scope_id: "VF-CCUS-CHINA-SCOPE-V1"
+principle: "Sectors and delivery tracks are defined strategically; emergent market tracks, named Chinese projects, and vendor battlecards MUST be populated dynamically from Stage 0a Siggi MCP Corpus + Stage 0b Live Recon + Stage 1 Search."
+
+delivery_tracks:
+  TRACK_A_IMPORTED_CORE:
+    name: "Track A: 奥地利原装进口核心主机 (CO2Sense / AirSense)"
+    landed_asp_cny_wan_band: [140.0, 220.0]
+    default_asp_cny_wan: 180.0
+    ideal_buyers: "国家级实验室、高校中试平台、膜/吸附/胺液专利商、半导体/科研院所实验室、轻量化撬装研发验证"
+    advantage: "交付周期相对短、无复杂多辅机合规集成阻力、1s全谱动态监测胺雾/热解产物/微量硫氮反应中间体"
+  TRACK_B_LOCALIZED_QAS:
+    name: "Track B: 双轨本土化防爆分析小屋 (VF-QAS-CN)"
+    landed_asp_cny_wan_band: [320.0, 550.0]
+    default_asp_cny_wan: 420.0
+    architecture: "奥地利原装CO2Sense核心主机 + 中国头部PAC/分析小屋集成商（国标GB/T 3836防爆正压小屋、电伴热采样、恒流切换阀、国产/通用型GC[N2/H2/Ar/CO]+P2O5/TDLAS水+FID总烃+AFS汞+激光粉尘）"
+    ideal_buyers: "三桶油(中石化/中石油/中海油)、国家能源/华能/华电/大唐百万吨级CCUS、跨省高压超临界CO2管道、大型绿醇/绿色航煤合成项目、LCO2港口中转枢纽"
+    advantage: "相较原装奥地利QAS降本35%-45%，满足国标防爆/CCC/CPA计量与本土设计院工程验收规范，保留V&F不可替代的亚ppm H2S/NOx/SOx/NH3/Amines秒级核心能力"
+  TRACK_C_AUSTRIA_PREMIERGUARD:
+    name: "Track C: 奥地利原装PremierGuard CCUS QAS一体化分析站"
+    landed_asp_cny_wan_band: [580.0, 950.0]
+    default_asp_cny_wan: 720.0
+    ideal_buyers: "外资合资沿海CCUS枢纽（如大亚湾Shell/ExxonMobil/CNOOC/TotalEnergies架构）、中国船厂承建的国际LCO2运输船(对标Northern Lights标准)、对全套欧洲FAT整站背书有硬性要求的国际EPC总包项目"
+    advantage: "直接复制Northern Lights Ph2 / Stockholm Exergi / Brevik已验证整站与Grafana UI交钥匙模板，零工程踩坑风险"
+
+macro_sectors:
+  S1_pipeline_ship_eor:
+    label: "大型超临界CO2管道、油田EOR枢纽与沿海/LCO2船运封存枢纽"
+    strategic_physics: "Shell/IFE 2024机理：高压CO2中10 ppm O2 + 2.5 ppm NOx + 5 ppm H2S + 10 ppm SOx + 50 ppm H2O触发自由基链式反应生成H2SO4/HNO3与元素硫析出，碳钢点蚀>25–1000 mm/yr，必须秒级在线多组分质谱守门。"
+  S2_green_methanol_ccu_chem:
+    label: "绿氢+CO2制绿色甲醇、e-SAF与高值化工催化合成"
+    strategic_physics: "Cu/ZnO/Al2O3等甲醇催化剂对ppm级H2S、COS、CS2、NH3、Amines、Cl与汞极度敏感；传统GC 5–15分钟滞后无法拦截瞬态穿透中毒，IMR-MS实现~1s级催化剂保护联锁。"
+  S3_capture_rd_industry:
+    label: "煤电/水泥/钢铁/垃圾焚烧/铝业胺法捕集与设计院中试验证平台"
+    strategic_physics: "烟气复杂含NOx/SO2/O2/H2O/胺雾降解产物与重金属；捕集工艺优化、溶剂降解监控与排放逃逸追踪需要1s快速多点切换质谱。"
+  S4_food_beverage_dryice:
+    label: "中国食品饮料级与干冰级CO2市场（负向对照/红海甄别赛道）"
+    strategic_physics: "虽然Siggi数据显示中国食品级CO2规模约1.5–2.5 Mt/yr且V&F全球>90套ISBT/EIGA业绩，但中国客户历史采购价格敏感且仅依赖离线抽检（无强强制安全/法务追溯压力），需在Stage 2漏斗中实事求是检验其商业可行性或淘汰定位。"
+
+china_market_sizing_guardrails:
+  notes: "Deterministically computed in Python [MKT-CALC] from verified pipeline capacity & analyzer station density; NEVER hardcode output totals."
+  asp_by_track_cny_wan:
+    TRACK_A_IMPORTED_CORE: 180.0
+    TRACK_B_LOCALIZED_QAS: 420.0
+    TRACK_C_AUSTRIA_PREMIERGUARD: 720.0
+  scenario_multipliers:
+    conservative: 0.70
+    baseline: 1.00
+    optimistic: 1.35
+
+wedge_roi_guardrails:
+  S1_pipeline_ship_eor:
+    capex_cny_band: [3200000, 9000000]
+    default_capex_cny: 4200000
+    gross_benefit_cny_band: [1600000, 5200000]
+    annual_opex_cny_band: [180000, 420000]
+    default_opex_cny: 260000
+  S2_green_methanol_ccu_chem:
+    capex_cny_band: [1800000, 5200000]
+    default_capex_cny: 3600000
+    gross_benefit_cny_band: [1400000, 4200000]
+    annual_opex_cny_band: [150000, 350000]
+    default_opex_cny: 220000
+  S3_capture_rd_industry:
+    capex_cny_band: [1450000, 4800000]
+    default_capex_cny: 1850000
+    gross_benefit_cny_band: [700000, 2600000]
+    annual_opex_cny_band: [120000, 280000]
+    default_opex_cny: 180000
+  S4_food_beverage_dryice:
+    capex_cny_band: [1450000, 3500000]
+    default_capex_cny: 2200000
+    gross_benefit_cny_band: [350000, 950000]
+    annual_opex_cny_band: [140000, 260000]
+    default_opex_cny: 200000
+
+storm_buyer_personas:
+  - "三大油/央企CCUS工程公司工艺与压缩防腐总工"
+  - "设计院(SEI/HQC/CPECC/天辰)分析仪表室主任与EPC包采经理"
+  - "煤化工/水泥/绿醇项目业主EHS、碳核查与财务ROI决策人"
+  - "大型CCUS分析小屋集成商与运维总包负责人"
