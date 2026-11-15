@@ -1,0 +1,69 @@
+# ==============================================================================
+# Formalized Contractor Specification (对齐《Agentic Design Patterns》Ch 11 + Ch 19)
+# ==============================================================================
+contract_id: "PSO-CONTRACT-2026-V1"
+title: "电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年技术、产品与应用潜在机会研究契约"
+
+# 地理优先级与阶段推进准则（严格先中国、后世界，不混写、不失焦）
+geographic_mandate:
+  primary_focus:
+    code: "CN"
+    name: "中国市场（优先深挖）"
+    focus_drivers:
+      - "十五五规划（2026-2030）与双碳硬约束下的新型电力系统、特高压、储能安全与清洁火电灵活调峰"
+      - "中国半导体产业链国产替代（28nm/14nm及以下先进逻辑、3D NAND、HBM/Chiplet先进封装、SiC/GaN 8英寸产线良率爬坡）"
+      - "产线痛点、总拥有成本(TCO)压降、投资回收期(Payback < 18-24个月)与制造装备自主可控"
+  secondary_focus:
+    code: "GLOBAL"
+    name: "全球市场（跟进拓展与出海对照）"
+    focus_drivers:
+      - "欧美日韩台先进节点（GAA 2nm/1.4nm、CoWoS/混合键合、HBM4）在线纳米量测与AMC控制"
+      - "欧美电网脱碳（SF6禁令/F-gas法规）、绿氢规模化电解槽安全监测与欧洲/北美工业CCUS合规"
+      - "中国仪器与系统集成商出海路径（东南亚/中东光伏储能电站、欧洲电网与汽车功率半导体产线）"
+
+# 双时间跨度准则
+time_horizons:
+  near_term:
+    label: "3-5年（2027-2031）"
+    theme: "产线痛点刚需、高ROI快速放量、国产替代与标准强制驱动"
+    target_payback_months_max: 24
+  long_term:
+    label: "5-10年（2031-2036）"
+    theme: "下一代工艺变革（全固态电池、钙钛矿叠层、GAA/CFET、玻璃基板/混合键合、8-12英寸SiC）催生的原生在线检测新物种与产业升级"
+    target_payback_months_max: 42
+
+# 四大核心价值支柱（每一项推荐机会必须给出量化或机制级支撑）
+value_pillars:
+  - id: "quality_yield"
+    name: "提高产品质量与产线良率"
+    weight: 0.25
+  - id: "cost_tco"
+    name: "降低制造成本与全生命周期TCO"
+    weight: 0.20
+  - id: "green_ehs"
+    name: "促进环保合规、降耗减排与EHS本质安全"
+    weight: 0.20
+  - id: "roi_upgrade"
+    name: "生产制造高投资回报率(ROI)与产业升级赋能"
+    weight: 0.35
+
+# SMART 质量门禁与审查红线
+quality_gates:
+  min_total_evidences: 48
+  min_china_evidence_ratio: 0.45
+  min_tracks_covered: 8
+  min_opportunities_per_sector: 8
+  require_deterministic_roi: true
+  require_explicit_citations: true
+  max_reflection_loops: 2
+  stage_gate_pass_score: 85
+
+# 强制交付物契约清单
+deliverables:
+  - "00_EXECUTIVE_SUMMARY_AND_TOP_OPPORTUNITIES.md"
+  - "01_POWER_ENERGY_ONLINE_TESTING_OPPORTUNITIES.md"
+  - "02_SEMICONDUCTOR_ONLINE_TESTING_OPPORTUNITIES.md"
+  - "03_ROI_FINANCIAL_MODEL_AND_ELO_RANKING.md"
+  - "04_PRODUCT_TECH_AND_UPGRADE_STRATEGY_PLAYBOOK.md"
+  - "05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"
+  - "06_EVALUATION_SCORECARD_AND_COST_TELEMETRY.json"

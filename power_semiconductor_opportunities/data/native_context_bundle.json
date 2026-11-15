@@ -1,0 +1,2742 @@
+{
+  "contract": {
+    "contract_id": "PSO-CONTRACT-2026-V1",
+    "title": "电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年技术、产品与应用潜在机会研究契约",
+    "geographic_mandate": {
+      "primary_focus": {
+        "code": "CN",
+        "name": "中国市场（优先深挖）",
+        "focus_drivers": [
+          "十五五规划（2026-2030）与双碳硬约束下的新型电力系统、特高压、储能安全与清洁火电灵活调峰",
+          "中国半导体产业链国产替代（28nm/14nm及以下先进逻辑、3D NAND、HBM/Chiplet先进封装、SiC/GaN 8英寸产线良率爬坡）",
+          "产线痛点、总拥有成本(TCO)压降、投资回收期(Payback < 18-24个月)与制造装备自主可控"
+        ]
+      },
+      "secondary_focus": {
+        "code": "GLOBAL",
+        "name": "全球市场（跟进拓展与出海对照）",
+        "focus_drivers": [
+          "欧美日韩台先进节点（GAA 2nm/1.4nm、CoWoS/混合键合、HBM4）在线纳米量测与AMC控制",
+          "欧美电网脱碳（SF6禁令/F-gas法规）、绿氢规模化电解槽安全监测与欧洲/北美工业CCUS合规",
+          "中国仪器与系统集成商出海路径（东南亚/中东光伏储能电站、欧洲电网与汽车功率半导体产线）"
+        ]
+      }
+    },
+    "time_horizons": {
+      "near_term": {
+        "label": "3-5年（2027-2031）",
+        "theme": "产线痛点刚需、高ROI快速放量、国产替代与标准强制驱动",
+        "target_payback_months_max": 24
+      },
+      "long_term": {
+        "label": "5-10年（2031-2036）",
+        "theme": "下一代工艺变革（全固态电池、钙钛矿叠层、GAA/CFET、玻璃基板/混合键合、8-12英寸SiC）催生的原生在线检测新物种与产业升级",
+        "target_payback_months_max": 42
+      }
+    },
+    "value_pillars": [
+      {
+        "id": "quality_yield",
+        "name": "提高产品质量与产线良率",
+        "weight": 0.25
+      },
+      {
+        "id": "cost_tco",
+        "name": "降低制造成本与全生命周期TCO",
+        "weight": 0.2
+      },
+      {
+        "id": "green_ehs",
+        "name": "促进环保合规、降耗减排与EHS本质安全",
+        "weight": 0.2
+      },
+      {
+        "id": "roi_upgrade",
+        "name": "生产制造高投资回报率(ROI)与产业升级赋能",
+        "weight": 0.35
+      }
+    ],
+    "quality_gates": {
+      "min_total_evidences": 48,
+      "min_china_evidence_ratio": 0.45,
+      "min_tracks_covered": 8,
+      "min_opportunities_per_sector": 8,
+      "require_deterministic_roi": true,
+      "require_explicit_citations": true,
+      "max_reflection_loops": 2,
+      "stage_gate_pass_score": 85
+    },
+    "deliverables": [
+      "00_EXECUTIVE_SUMMARY_AND_TOP_OPPORTUNITIES.md",
+      "01_POWER_ENERGY_ONLINE_TESTING_OPPORTUNITIES.md",
+      "02_SEMICONDUCTOR_ONLINE_TESTING_OPPORTUNITIES.md",
+      "03_ROI_FINANCIAL_MODEL_AND_ELO_RANKING.md",
+      "04_PRODUCT_TECH_AND_UPGRADE_STRATEGY_PLAYBOOK.md",
+      "05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md",
+      "06_EVALUATION_SCORECARD_AND_COST_TELEMETRY.json"
+    ]
+  },
+  "vault_stats": {
+    "total": 225,
+    "cn_count": 142,
+    "global_count": 83,
+    "cn_ratio": 0.6311,
+    "with_fulltext_count": 24,
+    "by_track": {
+      "P1": {
+        "CN": 18,
+        "GLOBAL": 16
+      },
+      "P2": {
+        "CN": 18,
+        "GLOBAL": 7
+      },
+      "P3": {
+        "CN": 18,
+        "GLOBAL": 12
+      },
+      "P4": {
+        "CN": 18,
+        "GLOBAL": 12
+      },
+      "S1": {
+        "CN": 17,
+        "GLOBAL": 13
+      },
+      "S2": {
+        "CN": 18,
+        "GLOBAL": 12
+      },
+      "S3": {
+        "CN": 17,
+        "GLOBAL": 6
+      },
+      "S4": {
+        "CN": 18,
+        "GLOBAL": 5
+      }
+    }
+  },
+  "sector_filter": "all",
+  "tracks": [
+    {
+      "id": "P1",
+      "sector": "power_energy",
+      "name": "储能与动力电池/全固态电池制造产线在线检测",
+      "manufacturing_stages": [
+        "极片涂布与辊压（面密度/厚度/水分/缺陷）",
+        "电芯激光焊接与密封（焊缝熔深、极耳虚焊）",
+        "注液浸润与化成老化（微漏检测、电解液HF/VOC逃逸、产气监测）",
+        "固态电池干法电极与硫化物/氧化物固-固界面接触在线无损评估"
+      ],
+      "evidence_count_cn": 18,
+      "evidence_count_global": 16,
+      "valid_ev_ids": [
+        "EV-GLOBAL-007",
+        "EV-GLOBAL-009",
+        "EV-GLOBAL-011",
+        "EV-CN-007",
+        "EV-CN-008",
+        "EV-CN-009",
+        "EV-CN-010",
+        "EV-CN-011",
+        "EV-CN-012",
+        "EV-CN-019",
+        "EV-CN-020",
+        "EV-CN-021",
+        "EV-CN-022",
+        "EV-CN-023",
+        "EV-CN-024",
+        "EV-CN-025",
+        "EV-CN-026",
+        "EV-CN-027",
+        "EV-CN-028",
+        "EV-CN-029",
+        "EV-CN-030",
+        "EV-GLOBAL-001",
+        "EV-GLOBAL-002",
+        "EV-GLOBAL-003",
+        "EV-GLOBAL-004",
+        "EV-GLOBAL-005",
+        "EV-GLOBAL-006",
+        "EV-GLOBAL-008",
+        "EV-GLOBAL-010",
+        "EV-GLOBAL-012",
+        "EV-GLOBAL-013",
+        "EV-GLOBAL-014",
+        "EV-GLOBAL-015",
+        "EV-GLOBAL-016"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-007",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年03月08日",
+          "title": "激光焊接OCT在线检测系统受到动力电池制造业青睐",
+          "url": "https://www.daiban365.com/jghj/1980.html",
+          "excerpt": "实验根据结果得出，熔深拟合曲线与熔深金相图片比较，测量平均精度可达几十微米量级，满足如储能电池、手机等精密制造业规范要求。 OCT进入工业制造环境，成功应用于激光焊接熔深实时检测，是一种大胆的探索和深入生产一线实践的结果，更是多交叉学科综合研究的集成，其涉及到光学、金相学、材料力学、电子学、自动控制、计算机学、编程算法、图像识别处理、信息处理技术、数理分析方法等。"
+        },
+        {
+          "ev_id": "EV-CN-008",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年12月12日",
+          "title": "OCT技术在动力电池焊接在线质控中的应用研究",
+          "url": "https://auto.jgvogel.cn/c1612456.shtml",
+          "excerpt": "传统离线、有损检测方法存在效率低、滞后性强等局限，难以适配动力电池规模化生产的全流程质控需求。 OCT技术凭借微米级分辨率、非接触实时成像特性，可精准检测熔池动态与焊后熔深，通过近红外光干涉原理实现熔深参数在线测量与缺陷实时检测，为动力电池焊接质量闭环控制提供关键技术支撑。 本文以铝合金激光搭接焊为对象，重点探究OCT对熔深的检测准确度及典型焊接缺陷的识别能力，为提升动力电池焊接在线质控水平提供试验依据与理论参考。"
+        },
+        {
+          "ev_id": "EV-CN-009",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年10月11日",
+          "title": "激光焊接OCT在线检测系统",
+          "url": "https://www.laserfair.com/news/202310/11/84699.html",
+          "excerpt": "! [](http://www.laserfair.com/file/upload/202310/11/1725357048106.jpg) 图2 激光焊接OCT在线检测系统组成示意图（该图片由广东省焊接工程技术研究中心提供） OCT扫描光束以高速率扫描工件表面，一次扫描周期直接覆盖焊缝表面、熔池和焊后焊缝。 设备可适配固定式焊接头和振镜焊接设备。 对于电池行业的应用，电池转接片的焊接有铝和铜异种材料，可测量焊接处的熔深。 如电池极耳焊接，可实时检测整条焊缝熔深，超出熔深范围即判定该焊缝为不合格。 又如汇流排焊接，可实时检测整条焊缝熔深，识别虚焊、过烧等缺陷。 激光焊接OCT在线检测系统应用的意义"
+        },
+        {
+          "ev_id": "EV-CN-010",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年10月11日",
+          "title": "激光焊接OCT在线检测系统的功能与应用",
+          "url": "http://www.laserfair.com/news/202310/11/84699.html",
+          "excerpt": "传统熔深检测方法具有随机性。 通常采用切金相方法检验，但不管横切竖切，只能看到一个界面，无法代表熔深总体情况。 非直接测量方法无法得到熔深直接数据。 通过焊接过程的信号监测，例如多波段光辐射强度、光学图像和声波等间接测量信号，都无法得到熔深值，且测量效果容易受焊接过程工艺参数、设备稳定性影响。 市场需求对安全性提出更高要求。 我国迄今已成为全球最大的工业激光市场。 据统计，影响购买新能源汽车的因素，除了续航里程和驾驶感觉外，安全因素占57%，包括电池本身发生故障和由外部碰撞引起的电池故障。"
+        },
+        {
+          "ev_id": "EV-CN-011",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年04月01日",
+          "title": "筑牢动力电池安全防线：激光焊接零缺陷工艺与NewOCT熔深实时监测系统",
+          "url": "https://www.newlas.com/blog/2025/04/24/%E7%AD%91%E7%89%A2%E5%8A%A8%E5%8A%9B%E7%94%B5%E6%B1%A0%E5%AE%89%E5%85%A8%E9%98%B2%E7%BA%BF%EF%BC%9A%E6%BF%80%E5%85%89%E7%84%8A%E6%8E%A5%E9%9B%B6%E7%BC%BA%E9%99%B7%E5%B7%A5%E8%89%BA%E4%B8%8Enewoct",
+          "excerpt": "五、创新解决方案：NewOCT激光焊接熔深实时监测系统 - 熔深在线检测：集成OCTMetrix模块实现焊接过程熔深实时监控； - 即插即用设计：模块化架构兼容主流焊接头（振镜/摆动头/定焦头）； - 污染预警功能：可选配镜片污染检测模块，预防功率损耗导致的焊接异常； - 高稳定性保障：采用耐高温光学材料，支持8kW级满功率连续作业； - 多场景适配：兼容单模/多模/环形光斑激光器，覆盖国内外主流品牌； - 工业互联能力：支持Modbus TCP/PN/EIP等通讯协议，无缝对接MES系统。"
+        },
+        {
+          "ev_id": "EV-CN-012",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年03月01日",
+          "title": "激光焊接全过程控制技术在动力电池中的应用",
+          "url": "http://mp.ofweek.com/libattery/a656714303537",
+          "excerpt": "3、激光焊接熔深检测模块（OCT） 赵曙明表示，这是国内第一家全自主开发的，可以实时在线检测焊接熔深的模块：基于光学相干断层扫描（OCT）和振镜扫描位置同步技术，样品内不同深度位置的背散射光和参考臂反射镜反射的光产生干涉信号，通过结合振镜在横向上进行扫描，可以实现样品的2D和3D成像。 该模块250kHz的最大速度扫描成像、检测精度高达微米级，可应用于电池壳体密封钉焊接、电池壳体满焊、极柱焊接等场景，最大检测深度10mm，适配1000-1300mm/s 高速焊接。 在焊后环节，杰普特推出了焊接质量检测技术。 该技术包括AI深度学习表面检测系统和2D/3D视觉检测算法，能够准确区分复杂应用场景中的焊缝缺陷并进行分类，应用于动力电池和3C消费电子产品，误判率小于0.5%，漏判率小于0.001%。"
+        },
+        {
+          "ev_id": "EV-CN-019",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2011-09-01",
+          "title": "A lithium superionic conductor.",
+          "url": "https://doi.org/10.1038/nmat3066",
+          "excerpt": ""
+        },
+        {
+          "ev_id": "EV-CN-020",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2020-06-30",
+          "title": "Interfaces and Interphases in All-Solid-State Batteries with Inorganic Solid Electrolytes.",
+          "url": "https://doi.org/10.1021/acs.chemrev.0c00101",
+          "excerpt": "All-solid-state batteries (ASSBs) have attracted enormous attention as one of the critical future technologies for safe and high energy batteries. With the emergence of several highly conductive solid electrolytes in recent years, the bottleneck is no longer Li-ion diffusion within the electrolyte. Instead, many ASSBs are limited by their low Coulombic efficiency, poor power pe"
+        },
+        {
+          "ev_id": "EV-CN-021",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2016-03-21",
+          "title": "High-power all-solid-state batteries using sulfide superionic conductors",
+          "url": "https://doi.org/10.1038/nenergy.2016.30",
+          "excerpt": ""
+        },
+        {
+          "ev_id": "EV-CN-022",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "Novel dry-film technique developed for sulfide all-solid-state batteries",
+          "url": "https://www.semanticscholar.org/search?q=Novel+dry-film+technique+developed+for+sulfide+all-solid-state+batteries&sort=relevance",
+          "excerpt": ""
+        },
+        {
+          "ev_id": "EV-CN-023",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "1996-11-15",
+          "title": "中国机械工程学会第七次全国代表大会暨成立60周年庆祝活动在京举行",
+          "url": "https://s.wanfangdata.com.cn/paper?q=%E4%B8%AD%E5%9B%BD%E6%9C%BA%E6%A2%B0%E5%B7%A5%E7%A8%8B%E5%AD%A6%E4%BC%9A%E7%AC%AC%E4%B8%83%E6%AC%A1%E5%85%A8%E5%9B%BD%E4%BB%A3%E8%A1%A8%E5%A4%A7%E4%BC%9A%E6%9A%A8%E6%88%90%E7%AB%8B60%E5%91%A8%E5%B9%B4%E5%BA%86%E7%A5%9D%E6%B4%BB%E5%8A%A8%E5%9C%A8%E4%BA%AC%E4%B8%BE%E8%A1%8C",
+          "excerpt": "中国机械工程学会第七次全国代表大会暨成立60周年庆祝活动于1996年9月17～19日在北京人民大会堂举行.党中央及国家领导人江泽民、李鹏、李瑞环、邹家华、李岚清、宋健、倪志福、朱光亚、张劲夫、周光召、林宗棠、何光远、沈鸿、包叙定等对大会作了题词.会议通过了陆燕荪理事长的工作报告及程瑞全秘书长的关于修改会章的报告,并选举产生了第七届新的理事会,原机械部部长何光远同志被选举为第七届理事会理事长,程瑞全同志继续担任秘书长(兼副理事长).大会还选举产生了138名理事,37名常务理事及9名副理事长.无损检测学会姚锦钟主任当选为机械工程学会副理事长,刘时风同志当选为常务理事."
+        },
+        {
+          "ev_id": "EV-CN-024",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2021-06-09",
+          "title": "Flexible Sulfide Electrolyte Thin Membrane with Ultrahigh Ionic Conductivity for All-Solid-State Lithium Batteries.",
+          "url": "https://doi.org/10.1021/acs.nanolett.1c01344",
+          "excerpt": "All-solid-state lithium batteries (ASSLBs) employing Li-metal anode, sulfide solid electrolyte (SE) can deliver high energy density with high safety. The thick SE separator and its low ionic conductivity are two major challenges. Herein, a 30 μm sulfide SE membrane with ultrahigh room temperature conductivity of 8.4 mS cm-1 is realized by mechanized manufacturing technologies u"
+        },
+        {
+          "ev_id": "EV-GLOBAL-007",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2022",
+          "title": "Evaluating interfacial stability in solid-state pouch cells via ultrasonic imaging",
+          "url": "https://pubs.acs.org/doi/abs/10.1021/acsenergylett.1c02363",
+          "excerpt": "Title: Just a moment...  URL Source: https://pubs.acs.org/doi/abs/10.1021/acsenergylett.1c02363  Warning: This page maybe requiring CAPTCHA, please make sure you are authorized to access this page.  Markdown Content: ![Image 1: Icon for pubs.acs.org](https://pubs.acs.org/favicon.ico)  ## pubs.acs.org  ## Performing security verification  This website uses a security service to protect against malicious bots. This page is displayed while the website verifies you are not a bot."
+        },
+        {
+          "ev_id": "EV-GLOBAL-009",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2025",
+          "title": "Non-destructive estimation of internal state for lithium-ion batteries by ultrasonic phased array scanning and imaging technologies",
+          "url": "https://www.sciencedirect.com/science/article/pii/S2352152X25008680",
+          "excerpt": "There was a problem providing the content you requested Please [contact our support team](https://service.elsevier.com/app/answers/detail/a_id/10117/supporthub/sciencedirect/kw/IP+blocked/) for more information and provide the details below. - Reference number:a5ab229a59da2b6a - IP Address:129.211.223.124 - CPE00001 Please"
+        },
+        {
+          "ev_id": "EV-GLOBAL-011",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2021",
+          "title": "Recent advances in acoustic diagnostics for electrochemical power systems",
+          "url": "https://iopscience.iop.org/article/10.1088/2515-7655/abfb4a/meta",
+          "excerpt": "Abstract Over the last decade, acoustic methods, including acoustic emission (AE) and ultrasonic testing (UT), have been increasingly deployed for process diagnostics and health monitoring of electrochemical power devices, including batteries, fuel cells, and water electrolysers. These techniques are non-invasive, highly sensitive, and low-cost, providing a high level of spatial and temporal resolution and practicality. Their application in electrochemical devices is based on identifying changes in acoustic signals emitted from or propagated through materials as a result of physical, structura"
+        },
+        {
+          "ev_id": "EV-GLOBAL-001",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Feb 2, 2026",
+          "title": "Tesla achieves scaled production of dry electrode batteries.",
+          "url": "https://www.moomoo.com/news/post/64933468/major-breakthrough-in-lithium-batteries-musk-tesla-achieves-scaled-production",
+          "excerpt": "This technology eliminates the use of traditional toxic solvents and costly drying processes, significantly reducing manufacturing costs and energy consumption"
+        },
+        {
+          "ev_id": "EV-GLOBAL-002",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "8 months ago",
+          "title": "Tesla's Dry Electrode Process Revolutionizes Battery ...",
+          "url": "https://www.linkedin.com/posts/rigaku-battery-technologies_teslas-dry-electrode-manufacturing-breakthrough-activity-7435483839365541889-ipSC",
+          "excerpt": "Lithium Titanate (LTO) for Battery Anode. Tesla increasing the output of 4680 cells at Grünheide in preparation for an annual capacity of 18 GWh, making it one ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-003",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "",
+          "title": "Kristian Jensen's Post",
+          "url": "https://www.linkedin.com/posts/kjensenprofile_elevated-materials-awarded-50-million-from-activity-7507955588757168128-PLsJ",
+          "excerpt": "Elevated Materials said it had recorded its highest output of ultra-thin lithium-metal films to boost energy density, cycle life, and charge rates of batteries."
+        },
+        {
+          "ev_id": "EV-GLOBAL-004",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Nov 28, 2025",
+          "title": "Scientists make incredible breakthrough that could ...",
+          "url": "https://tech.yahoo.com/transportation/articles/scientists-incredible-breakthrough-could-revolutionize-170000370.html",
+          "excerpt": "Battery experts in South Korea have developed a lithium lifesaver that can also extend battery longevity for electric vehicles, smartphones, and other tech."
+        },
+        {
+          "ev_id": "EV-GLOBAL-005",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Feb 2, 2026",
+          "title": "Tesla achieves scaled production of dry electrode batteries.",
+          "url": "https://news.futunn.com/en/post/68274738/major-breakthrough-in-lithium-batteries-musk-tesla-achieves-scaled-production",
+          "excerpt": "Major breakthrough in lithium batteries! This technology eliminates the use of traditional toxic solvents and costly drying processes, significantly reducing ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-006",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2 months ago",
+          "title": "New Chip Factory From America Is Shocking Everyone",
+          "url": "https://www.youtube.com/watch?v=e7jLQw15MGI&vl=en",
+          "excerpt": "TeraFab in Texas, a chip factory over 100 million square feet that could cost up to $100 billion and aims to produce roughly a terawatt of AI compute a year,"
+        },
+        {
+          "ev_id": "EV-GLOBAL-008",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2021",
+          "title": "Recent progress on advanced imaging techniques for lithium‐ion batteries",
+          "url": "https://advanced.onlinelibrary.wiley.com/doi/abs/10.1002/aenm.202000806",
+          "excerpt": "… phenomena in all-solid-state batteries, and concluded that … [25] introduced a method to integrate mass spectrometry with … For instance, the positrons and leakage magnetic flux can be …"
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-P1-3Y-01",
+          "track_id": "P1",
+          "sector": "power_energy",
+          "title": "无氦化高频在线质谱/VOC微漏检测系统（替代传统真空氦检与产线电解液泄漏筛查）",
+          "horizon": "3-5y",
+          "china_priority_score": 94.0,
+          "global_priority_score": 88.0,
+          "physics_principle": "基于离子分子反应软电离质谱(IMR-MS)或激光吸收光谱直接捕捉EC/DMC电解液溶剂特征分子与HF痕量分解气，省去高价氦气消耗与抽真空节拍等待",
+          "roi_baseline": {
+            "capex_cny": 1150000,
+            "annual_opex_cny": 95000,
+            "annual_output_value_cny": 320000000,
+            "yield_gain_pct": 0.35,
+            "annual_scrap_saving_cny": 520000,
+            "annual_downtime_saving_cny": 280000,
+            "annual_consumable_ehs_saving_cny": 680000,
+            "market_tam_china_cny_100m": 28.0,
+            "market_tam_global_usd_m": 850.0
+          },
+          "roi_metrics": {
+            "capex_cny": 1150000.0,
+            "annual_opex_cny": 95000.0,
+            "yield_gain_saving_cny": 1120000.0,
+            "annual_gross_benefit_cny": 2600000.0,
+            "net_annual_cashflow_cny": 2505000.0,
+            "payback_months": 5.5,
+            "roi_3yr_pct": 553.5,
+            "npv_5yr_cny": 8345920.86,
+            "irr_5yr_pct": 217.1,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 11.76,
+            "china_som_3_5y_cny_100m": 1.88,
+            "global_sam_usd_m": 323.0,
+            "global_som_5_10y_usd_m": 38.76
+          },
+          "weighted_pillar_score": 88.36
+        },
+        {
+          "opp_id": "OPP-P1-5Y-02",
+          "track_id": "P1",
+          "sector": "power_energy",
+          "title": "太赫兹时域光谱与空气耦合超声融合的干法电极/全固态电解质界面在线无损成像仪",
+          "horizon": "5-10y",
+          "china_priority_score": 90.0,
+          "global_priority_score": 92.0,
+          "physics_principle": "利用0.1-3 THz非电离电磁波穿透多层叠片与聚合物/陶瓷复合物，同步反演面密度/孔隙率；结合非接触空气耦合超声检测固-固界面微脱粘与局部空洞",
+          "roi_baseline": {
+            "capex_cny": 1850000,
+            "annual_opex_cny": 140000,
+            "annual_output_value_cny": 260000000,
+            "yield_gain_pct": 0.65,
+            "annual_scrap_saving_cny": 420000,
+            "annual_downtime_saving_cny": 210000,
+            "annual_consumable_ehs_saving_cny": 180000,
+            "market_tam_china_cny_100m": 22.0,
+            "market_tam_global_usd_m": 720.0
+          },
+          "roi_metrics": {
+            "capex_cny": 1850000.0,
+            "annual_opex_cny": 140000.0,
+            "yield_gain_saving_cny": 1690000.0,
+            "annual_gross_benefit_cny": 2500000.0,
+            "net_annual_cashflow_cny": 2360000.0,
+            "payback_months": 9.4,
+            "roi_3yr_pct": 282.7,
+            "npv_5yr_cny": 7096256.78,
+            "irr_5yr_pct": 125.4,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 9.24,
+            "china_som_3_5y_cny_100m": 1.48,
+            "global_sam_usd_m": 273.6,
+            "global_som_5_10y_usd_m": 32.83
+          },
+          "weighted_pillar_score": 86.8
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "sector": "power_energy",
+      "name": "新型光伏(TOPCon/HJT/钙钛矿)与绿氢电解槽制造在线量检测",
+      "manufacturing_stages": [
+        "钙钛矿与叠层电池大面积狭缝涂布、晶化与激光刻蚀 P1/P2/P3 在线高光谱/PL成像",
+        "无银化铜电镀栅线在线3D共聚焦形貌与线宽线高量测",
+        "PEM/AEM 质子交换膜及催化剂涂覆膜(CCM)铂铱载量在线XRF与针孔缺陷检测",
+        "碱性/PEM电解槽出厂测试台与运行端痕量氢中氧/氧中氢及碱雾在线激光/质谱监测"
+      ],
+      "evidence_count_cn": 18,
+      "evidence_count_global": 7,
+      "valid_ev_ids": [
+        "EV-CN-035",
+        "EV-GLOBAL-017",
+        "EV-GLOBAL-021",
+        "EV-GLOBAL-022",
+        "EV-CN-001",
+        "EV-CN-003",
+        "EV-CN-004",
+        "EV-CN-005",
+        "EV-CN-013",
+        "EV-CN-014",
+        "EV-CN-015",
+        "EV-CN-016",
+        "EV-CN-017",
+        "EV-CN-018",
+        "EV-CN-031",
+        "EV-CN-032",
+        "EV-CN-033",
+        "EV-CN-034",
+        "EV-CN-036",
+        "EV-GLOBAL-018",
+        "EV-GLOBAL-019",
+        "EV-GLOBAL-020",
+        "EV-GLOBAL-023",
+        "EV-CN-002",
+        "EV-CN-006"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-035",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2026-07-27",
+          "title": "Hyperspectral imaging for inline quality monitoring of roll-to-roll slot-die coated organic photovoltaic active layers",
+          "url": "https://arxiv.org/abs/2607.24278",
+          "excerpt": "Physics > Optics [Submitted on 27 Jul 2026] Title:Hyperspectral imaging for inline quality monitoring of roll-to-roll slot-die coated organic photovoltaic active layers [View PDF](https://arxiv.org/pdf/2607.24278) [HTML (experimental)](https://arxiv.org/html/2607.24278v1) > Abstract:Lab-scale organic solar cells have shown high efficiency and strong potential for large-scale production. Among the fabrication techniques for upscaling production, roll-to-roll slot-die coating offers a cost-effective route toward scalable manufacturing. However, reliable in-line metrology is needed for real-time "
+        },
+        {
+          "ev_id": "EV-CN-001",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年06月06日",
+          "title": "钙钛矿叠层电池知识整理汇总",
+          "url": "https://www.elecfans.com/d/7980695.html",
+          "excerpt": "PL高精度成像：采用线扫激光，成像精度＜75um/pix（成像精度可定制） 支持 16bit 颜色灰度：同时清晰呈现高亮区域（如无缺陷区）与低亮区域（如缺陷暗斑） 高速在线PL检测缺陷：检测速度≤2s，漏检率；误判率 AI缺陷识别分类训练：实现全自动缺陷识别与工艺反馈 美能大平台钙钛矿电池PL测试仪采用无接触式测试方式，可实时监测钙钛矿电池各工艺段中的薄膜质量异常，精准定位单结及叠层电池中的缺陷分布。"
+        },
+        {
+          "ev_id": "EV-CN-003",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年10月28日",
+          "title": "钙钛矿激光划线机",
+          "url": "https://www.akribis-sys.cn/renewable-energy/73.html",
+          "excerpt": "钙钛矿激光划线机 钙钛矿激光划设备是专门用于制造钙钛矿太阳能电池（PSC） 和钙钛矿叠层电池（如硅基钙钛矿叠层） 的关键工艺设备，主要是利用高精度、特定波长和能量的激光束，在钙钛矿薄膜电池的叠层结构（通常包括透明导电氧化物层、电子传输层、钙钛矿吸光层、空穴传输层、金属电极层等）上进行精密的划线（刻蚀），以形成特定的图案和隔离区域，以此来将大面积沉积的连续薄膜分割成多个串联连接的子电池，并隔离电池边缘，形成子电池串联、实现电学隔离以及定义电池结构-精确控制每个子电池的宽度和串联连接点，钙钛矿电池向更高效率、更大组件尺寸发展，要求划线线宽更窄、间距更小、位置精度和层间对准精度要求极高，率先掌握和应用高性能直驱平台技术的设备商将在精度、速度、良率保障上获得显著优势。 应用与解决方案 可选相关产品 ! [public-contact-img.png](htt"
+        },
+        {
+          "ev_id": "EV-CN-004",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年06月09日",
+          "title": "钙钛矿P1激光划线测试仪",
+          "url": "https://millennialsolar.cn/news/384.html",
+          "excerpt": "Horiba稳瞬态荧光光谱仪 钙钛矿P1激光划线测试仪 钙钛矿在线PL测试仪 钙钛矿在线方阻测试仪 钙钛矿在线膜厚测试仪 钙钛矿工艺检测工作站 手持式IV测试仪 便携式EL测试仪 手持热成像测试仪 户外组件多通道测试系统 光伏逆变器电能质量测试仪 无人机EL检测仪 大平台方阻+椭偏测试仪 大面积钙钛矿影像显微二合一监测站 IV测试仪 IVEL分选机 钙钛矿太阳能电池PSCs效率提升的关键：高透光的SnO₂电子传输层ETL"
+        },
+        {
+          "ev_id": "EV-CN-005",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年01月05日",
+          "title": "钙钛矿叠层涂布系统",
+          "url": "https://news.solarbe.com/tag/%E9%92%99%E9%92%9B%E7%9F%BF%E5%8F%A0%E5%B1%82%E6%B6%82%E5%B8%83%E7%B3%BB%E7%BB%9F",
+          "excerpt": "，像爱旭n型ABC电池，创新研发的全无银涂布金属化技术，成本低、可靠性更高;而TOPCon电池由于金属电极结构设计的固有限制，暂未开发出无银金属化方法，只能沿用丝网印刷银浆金属化。 随着电池产能扩张、白银 钙钛矿电池，晶硅/钙钛矿叠层电池、全钙钛矿叠层电池、柔性薄膜/钙钛矿叠层电池等叠层技术，包括纳米级3D打印钙钛矿电池等是钙钛矿应用发展的多元方向。 晶硅叠层组件是钙钛矿商用的第一步和突破口。 钙钛矿与晶硅"
+        },
+        {
+          "ev_id": "EV-CN-013",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年06月14日",
+          "title": "(CCM）质子交换膜PEM膜电极技术",
+          "url": "https://www.bilibili.com/read/cv26303344",
+          "excerpt": "本技术基于质子交换膜（PEM）电解槽，用于绿色制氢。电解槽工作压力为30bar，温度60°C，电流密度为3A/cm²，功率范围从500kW（100Nm³/h）到1MW（200Nm³/h）。该技术利用可再生能源电力和去离子水，在现场生产高纯度的绿色氢气，产品可扩展。电解槽采用定制化PEM膜电极和电解槽设计，具备高定制化能力，满足不同客户需求。"
+        },
+        {
+          "ev_id": "EV-CN-014",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年06月14日",
+          "title": "CCM直涂膜电极 兆瓦级PEM电解槽核心模块",
+          "url": "https://www.bilibili.com/read/mobile?id=26058939",
+          "excerpt": "(CCM）兆瓦级PEM膜电极电堆 (CCM）质子交换膜PEM膜电极技术 PEM制氢电解槽，绿色制氢设备 质子交换膜PEM电解槽，电解水制氢 PEM模块化电解槽，绿色氢气发生器 氢气发生器，PEM电解槽 电解水制氢设备，PEM电解槽 水电解制氢设备，PEM电解槽 绿色氢气发生器，PEM电解槽 质子交换膜（PEM）水电解制氢 氢气电解槽PEM制氢设备 水电解制氢设备，PEM电解槽"
+        },
+        {
+          "ev_id": "EV-CN-015",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年06月14日",
+          "title": "PEM电解槽膜电极-阴阳极催化剂层复合催化剂",
+          "url": "https://www.bilibili.com/read/cv25188853",
+          "excerpt": "质子交换膜（PEM）电解槽通过可再生电力和水制氢，产生绿色氢气，副产品为氧气，无污染。该技术可将绿色电力转化为可储存的绿色氢气，适用于工业、交通和能源转换等领域，助力脱碳。PEM电解槽膜电极是核心组件，具有高效率、长寿命和适应多种应用场景的特点。其催化剂层采用复合催化剂，如IrRuOx和PtCo，提升性能与稳定性。PEM电解槽模块化设计，便于灵活部署，满足不同规模的制氢需求。该技术是实现可再生能源制氢的关键，推动绿色能源发展。"
+        },
+        {
+          "ev_id": "EV-CN-016",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年09月24日",
+          "title": "PEM 電解槽：透過材料創新推動綠色氫能發展",
+          "url": "https://www.malvernpanalytical.com/tw/learn/knowledge-center/insights/pem-electrolyzers-advancing-green-hydrogen-through-materials-innovation",
+          "excerpt": "我們緊湊型的 Aeris 桌上型 X 射線繞射儀可處理常規的晶粒大小與相分析，而我們的 模組化 Empyrean 平台則加入 X 射線散射與原位能力，可在催化劑受熱、循環或處於其他真實操作條件時追蹤其結構變化。 X 射線螢光（XRF） 若說 XRD 揭示的是結構，那麼 X 射線螢光則分析元素組成。 XRF 可驗證催化劑的組成與貴金屬負載量：例如確認銥或鉑的負載量是否符合規格，或檢查 Pt 合金催化劑中的金屬比例。"
+        },
+        {
+          "ev_id": "EV-CN-017",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年10月25日",
+          "title": "碳中和|绿氢技术路线和经济性比较",
+          "url": "https://finance.sina.cn/2023-10-25/detail-imzsisih7065351.d.html",
+          "excerpt": "所述装置包括阳极、阴极和通常由铂或铱构成的电极组合物(MEA)。 在阳极中，水被分解为氧、电子和质子。 在阴极，由阳极生成氧、电子和质子，通过膜的循环，最后变成氢气。 PEM电解槽的工作原理如图2所示。 PEM电解槽常用于制造小规模的氢，它的最大产氢容量为30Nm3/h，功率为174kW。 结果表明，PEM电解槽的氢气产量基本涵盖了总配额的全部产量。"
+        },
+        {
+          "ev_id": "EV-CN-018",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年05月25日",
+          "title": "PEM电解的要点",
+          "url": "http://bodecheng.com/shownews.asp?id=3499",
+          "excerpt": "PEM电解槽技术的工作原理与燃料电池类似，通过水分子在阳极和阴极的反应生成氢气和氧气。阳极发生析氧反应（OER），阴极发生析氢反应（HER）。PEM电解槽由双极板、多孔传输层和膜电极组件（MEA）组成，MEA包含贵金属催化剂。膜电极组件中的Nafion®膜具有高质子传导性，但需保持水合状态。为提高质子传导性，可采用纳米填料或优化膜厚度。OER是PEM电解的主要限制因素，需高效催化剂，如IrO₂和RuO₂。二元金属氧化物如Ir-Ru合金可作为替代催化剂，降低贵金属依赖。合成方法包括热分解、胶体法、磁控溅射等。电化学表征技术如循环伏安法、线性扫描伏安法用于评估催化剂性能。CCM（催化剂涂层膜）是水电解核心，涉及制备、结构分析和电化学性能评估。影响性能的关键因素包括催化剂效率、膜导电性、界面优化等。未来需优化催化剂、改进制造工艺、提升耐久性，推动PEM电解"
+        },
+        {
+          "ev_id": "EV-CN-031",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024-03-12",
+          "title": "The first demonstration of entirely roll-to-roll fabricated perovskite solar cell modules under ambient room conditions",
+          "url": "https://doi.org/10.1038/s41467-024-46016-1",
+          "excerpt": "Time-resolved photoluminescence measurements were performed using a time-correlated single-photon counting (TCSPC) luminescence spectrometer (Edinburgh Instruments Ltd., FLSP920) comprising a pulsed diode laser excitation source (466 nm, 100 kHz, -100 ps FWHM, -0.2 nJ cm $ ^{-2} $  pulse $ ^{-1} $ ) and a Hamamatsu R928P photomultiplier tube detector, giving an overall instrume"
+        },
+        {
+          "ev_id": "EV-GLOBAL-017",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "Nov 27, 2025",
+          "title": "Spatial Atomic Layer Deposition of IrOx Using (EtCp)Ir(CHD ...",
+          "url": "https://pubs.acs.org/jpccck/article/129/49/21859/3741679/Spatial-Atomic-Layer-Deposition-of-IrOx-Using-EtCp",
+          "excerpt": "Title: Just a moment...  URL Source: https://pubs.acs.org/jpccck/article/129/49/21859/3741679/Spatial-Atomic-Layer-Deposition-of-IrOx-Using-EtCp  Warning: This page maybe requiring CAPTCHA, please make sure you are authorized to access this page.  Markdown Content: ![Image 1: Icon for pubs.acs.org](https://pubs.acs.org/favicon.ico)  ## pubs.acs.org  ## Performing security verification  This website uses a security service to protect against malicious bots. This page is displayed while the website verifies you are not a bot."
+        },
+        {
+          "ev_id": "EV-GLOBAL-021",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "",
+          "title": "Review of analytical methods for ISO 14687:2025 Grade F ...",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0378382026001979",
+          "excerpt": "ScienceDirect  Are you a robot? Please confirm you are a human by completing the captcha challenge below. - Reference number: a5ab22a18b1d33b0 - IP Address: 1.15.135.191 t;t++)a=Math.floor(Math.random()*o),6>t&&l[t]a||2a||20&&(t=!1)),{corsType:e,corsCookiesEnabled:t}}(),getCORSInstance:function(){return\"none\"===this.corsMetadata.corsType?null:new b[this.corsMetadata.corsType]},fireCORS:function(t,a){function n(e){var a;try{if((a=JSON.parse(e))!==Object(a))return void r.handleCORSError(t,null,\"Response is not JSON\")}catch(e){return void r.handleCORSError(t,e,\"Error parsing response as JSON\")}tr"
+        },
+        {
+          "ev_id": "EV-GLOBAL-022",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "",
+          "title": "Primary Trace Humidity Standards and SI-Traceable ...",
+          "url": "https://www.preprints.org/manuscript/202604.2096",
+          "excerpt": "by V Fernicola · 2026 · Cited by 2 — Tuneable diode laser absorption spectroscopy (TDLAS) provides highly. To guarantee safe operation, the evolved H₂ and O₂ gases must be adequately diluted."
+        },
+        {
+          "ev_id": "EV-GLOBAL-018",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Nov 20, 2025",
+          "title": "AP2E's ProCEAS analyzer boosts hydrogen purity for EU's ...",
+          "url": "https://www.linkedin.com/posts/davidspectrumanalytics_development-and-evaluation-of-a-novel-analyser-activity-7397246088019292160-KM03",
+          "excerpt": "DURAG #AP2E #ProCEAS® ANALYZER SURGES AHEAD AS LEADING TECHNOLOGY FOR #H2PURITY IN SUPPORT OF EU's CLIMATE LAW. \"For all species, µLOD was calculated and ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-019",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Sep 22, 2026",
+          "title": "Continuous Gas Analyzer: Extractive or In-Situ?",
+          "url": "https://fluidhandlingpro.com/news/extractive-or-in-situ-how-to-choose-the-right-continuous-gas-analyzer",
+          "excerpt": "Extractive or in-situ, NDIR, paramagnetic or laser: how to choose a continuous gas analyzer for emissions, combustion control and safety, with a checklist."
+        },
+        {
+          "ev_id": "EV-GLOBAL-020",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 29, 2026",
+          "title": "Hydrogen (H₂) Analyzers — Process and Safety | GESHINE",
+          "url": "https://geshine.com/gas-analyzers/hydrogen-analyzers",
+          "excerpt": "Hydrogen analyzers for two distinct jobs: TCD %vol process purity in syngas and generator cooling, plus catalytic bead %LEL safety leak detection."
+        },
+        {
+          "ev_id": "EV-GLOBAL-023",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Apr 9, 2026",
+          "title": "Hydrogen Generation",
+          "url": "https://hattiteknik.com/product-industry/clean-energy/hydrogen-generation",
+          "excerpt": "Sulfide (H2S) / Diode Laser (TDLAS) Electric Power Generation & Distribution Thermal Conductivity Analyzers (TCD) Portable Analyzer for Oxygen and Hydrogen"
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-P2-3Y-01",
+          "track_id": "P2",
+          "sector": "power_energy",
+          "title": "绿氢电解槽膜电极(CCM)贵金属载量高速在线微区XRF+微针孔缺陷协同检测仪",
+          "horizon": "3-5y",
+          "china_priority_score": 91.0,
+          "global_priority_score": 89.0,
+          "physics_principle": "卷对卷涂布产线在线高通量能量色散微区X射线荧光(micro-XRF)实时闭环控制Pt/Ir涂布均匀性（省去10-15%贵金属过量冗余），叠加透射光学微针孔实时拦截",
+          "roi_baseline": {
+            "capex_cny": 1350000,
+            "annual_opex_cny": 110000,
+            "annual_output_value_cny": 180000000,
+            "yield_gain_pct": 0.55,
+            "annual_scrap_saving_cny": 460000,
+            "annual_downtime_saving_cny": 190000,
+            "annual_consumable_ehs_saving_cny": 920000,
+            "market_tam_china_cny_100m": 14.5,
+            "market_tam_global_usd_m": 540.0
+          },
+          "roi_metrics": {
+            "capex_cny": 1350000.0,
+            "annual_opex_cny": 110000.0,
+            "yield_gain_saving_cny": 990000.0,
+            "annual_gross_benefit_cny": 2560000.0,
+            "net_annual_cashflow_cny": 2450000.0,
+            "payback_months": 6.6,
+            "roi_3yr_pct": 444.4,
+            "npv_5yr_cny": 7937427.59,
+            "irr_5yr_pct": 180.4,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 6.09,
+            "china_som_3_5y_cny_100m": 0.97,
+            "global_sam_usd_m": 205.2,
+            "global_som_5_10y_usd_m": 24.62
+          },
+          "weighted_pillar_score": 86.69
+        },
+        {
+          "opp_id": "OPP-P2-5Y-02",
+          "track_id": "P2",
+          "sector": "power_energy",
+          "title": "GW级钙钛矿/晶硅叠层产线纳秒激光PL+高光谱薄膜结晶态在线闭环检测系统",
+          "horizon": "5-10y",
+          "china_priority_score": 93.0,
+          "global_priority_score": 87.0,
+          "physics_principle": "通过时间分辨光致发光(TRPL)与短波红外高光谱成像在涂布与退火后秒级测绘载流子寿命、膜厚及PbI2残留结晶相，联动涂布头/退火温区自动微调",
+          "roi_baseline": {
+            "capex_cny": 1600000,
+            "annual_opex_cny": 130000,
+            "annual_output_value_cny": 240000000,
+            "yield_gain_pct": 0.7,
+            "annual_scrap_saving_cny": 540000,
+            "annual_downtime_saving_cny": 220000,
+            "annual_consumable_ehs_saving_cny": 150000,
+            "market_tam_china_cny_100m": 31.0,
+            "market_tam_global_usd_m": 780.0
+          },
+          "roi_metrics": {
+            "capex_cny": 1600000.0,
+            "annual_opex_cny": 130000.0,
+            "yield_gain_saving_cny": 1680000.0,
+            "annual_gross_benefit_cny": 2590000.0,
+            "net_annual_cashflow_cny": 2460000.0,
+            "payback_months": 7.8,
+            "roi_3yr_pct": 361.2,
+            "npv_5yr_cny": 7725335.45,
+            "irr_5yr_pct": 152.2,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 13.02,
+            "china_som_3_5y_cny_100m": 2.08,
+            "global_sam_usd_m": 296.4,
+            "global_som_5_10y_usd_m": 35.57
+          },
+          "weighted_pillar_score": 88.19
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "sector": "power_energy",
+      "name": "特高压电网装备制造、环保绝缘气体与海缆在线诊断测试",
+      "manufacturing_stages": [
+        "特高压变压器/换流变/GIS工厂自动化局放与无耗材光声光谱/TDLAS油色谱在线标定",
+        "环保型SF6替代气体（C4F7N/C5F10O/干燥空气）充气产线及开关设备痕量分解产物在线质谱/激光分析",
+        "±525kV及以上高压直流海缆XLPE绝缘挤出偏心、微孔与杂质太赫兹/X射线在线扫描"
+      ],
+      "evidence_count_cn": 18,
+      "evidence_count_global": 12,
+      "valid_ev_ids": [
+        "EV-GLOBAL-043",
+        "EV-GLOBAL-044",
+        "EV-CN-037",
+        "EV-CN-038",
+        "EV-CN-039",
+        "EV-CN-040",
+        "EV-CN-041",
+        "EV-CN-042",
+        "EV-CN-043",
+        "EV-CN-044",
+        "EV-CN-045",
+        "EV-CN-046",
+        "EV-CN-047",
+        "EV-CN-048",
+        "EV-CN-049",
+        "EV-CN-050",
+        "EV-CN-051",
+        "EV-CN-052",
+        "EV-CN-053",
+        "EV-CN-054",
+        "EV-GLOBAL-024",
+        "EV-GLOBAL-025",
+        "EV-GLOBAL-026",
+        "EV-GLOBAL-027",
+        "EV-GLOBAL-028",
+        "EV-GLOBAL-029",
+        "EV-GLOBAL-042",
+        "EV-GLOBAL-045",
+        "EV-GLOBAL-046",
+        "EV-GLOBAL-047"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-037",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年03月24日",
+          "title": "光声光谱在线监测仪",
+          "url": "http://www.iee.cas.cn/xwzx/kydt/kxdt2020_187926/202203/t20220330_6409830.html",
+          "excerpt": "3月24日，国内首台自主研发的变压器油中溶解气体光声光谱（PAS）在线监测仪在国网安徽阜阳220kV程集变电站成功挂网试运行。这标志着由安徽省电力公司领衔，电工所为主要参与单位的攻关团队，已成功打破国外技术壁垒，全面掌握变压器油中溶解气体光声光谱在线监测技术。   电力变压器是电力系统的核心关键设备，实时监测其运行状态对保障电力系统的安全稳定运行至关重要。传统监测方法采用气相色谱技术，存在载气消耗、色谱柱易老化、维护量大、后期检测精度差等缺点。光声光谱作为一种先进的光学检测技术，与传统气相色谱技术相比具有精度高、稳定性好、维护工作量小等优势，目前在国内外油中溶解气体检测中已有应用，但该技术一直未能国产化。 项目团队历时3年，突破了光声光谱检高信噪比光声信号激发、微弱光声信号提取、交叉干扰高分辨解析、复杂状态样品前处理等多项关键技术，研发的监测仪实现了核心模块全部国产化，变压器油中溶解气体特征组分甲烷、乙烷、乙烯、一氧化碳、二氧化碳的检测灵敏度达到0.5ppm，乙炔的检测灵敏度达到0.1ppm，核心指标达到国际先进水平。 ![](http://www.iee.cas.cn/xwzx/kydt/kxdt2020_187926/202203/W020220330366345485235.jpg) 光声光谱在线监测仪"
+        },
+        {
+          "ev_id": "EV-CN-038",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月01日",
+          "title": "变压器油色谱在线监测系统",
+          "url": "http://www.shlydl.com/pdlistone/listfirst/3156156/1.html",
+          "excerpt": "0.1HZ超低频高压发生器 高压试验变压器 无局放试验变压器 直流高压发生器 交流耐压机 放电保护球隙 交、直流高压分压器 高压数字微安表、高压泄露表 绝缘靴、手套耐压测试装置 绝缘棒耐压试验装置 高压验电器校验装置 热销产品 三相标准源 交流采样变送器校验装置 JP柜温升试验装置 无线遥测六角图伏安相位仪 变频线路参数测试仪 变压器油色谱在线监测系统"
+        },
+        {
+          "ev_id": "EV-CN-039",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年03月24日",
+          "title": "国内首台自主研发的变压器油中溶解气体光声光谱（PAS）在线监测仪成功挂网试运行",
+          "url": "https://www.ces.org.cn/xhtml/report/22033523-1.htm",
+          "excerpt": "传统方法采用气相色谱技术，存在需消耗载气、色谱柱易老化、维护量大、后期检测精度差等缺点。 光声光谱作为一种先进的光学检测技术，与传统油色谱检测技术相比具有精度高、稳定性好、维护工作量小等优势，但该技术一直未能国产化。 为打破国外技术壁垒，在国家电网公司总部科技项目的支持下，国网安徽省电力科学研究院、中科院电工所、中国电科院高压所等单位的科研团队联合攻关，历时3年实现了光声光谱装置核心模块全部国产化，样机的各项关键技术指标优于或达到国外最好水平。 ! [](https://www.ces.org.cn/res/ces/2203/22033521.jpg) 光声光谱在线监测仪在安徽阜阳220kV程集变电站进行带电安装调试   ! [](https://www.ces.org.cn/res/ces/2203/22033522.jpg) 自主研发的光声光谱在"
+        },
+        {
+          "ev_id": "EV-CN-040",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2021年10月11日",
+          "title": "光声光谱变压器油在线监测装置",
+          "url": "http://www.shengjianjidian.com/index.php?a=index&aid=116&c=View&m=home",
+          "excerpt": "光声光谱变压器油在线监测装置结合半导体激光器技术和光声光谱技术，用于变压器气体检测，具有抗交叉干扰能力强、响应速度快、测量重复性好的特点。该装置不仅能监测变压器油中9种故障气体，还能检测油中的微水含量。相比传统色谱柱，该装置避免了色谱柱老化、污染、饱和等问题，提高了检测的准确性和稳定性。公司提供移动式检测设备、在线监测设备、燃气监测平台等服务，并发布行业新闻，提供联系方式。"
+        },
+        {
+          "ev_id": "EV-CN-041",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年04月10日",
+          "title": "江苏南京实现220千伏主变压器油色谱在线监测装置全覆盖",
+          "url": "https://news.bjx.com.cn/html/20230213/1288131.shtml",
+          "excerpt": "国网山东省电力公司于2023 1月2日，国网天津电科院完成2023年度特高压在线油色谱现场校验工作，首次推动特高压在线油色谱装置改造提升，切实保障天津电网关键设备可控在控。 在线油色谱装置是变压器等油浸式电力设备最灵敏和有效的在线监测手段，通过实时检测油中溶解的各种气体含量，准确判断设备运行状态和故障原因，并在最短时"
+        },
+        {
+          "ev_id": "EV-CN-042",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月01日",
+          "title": "变压器油光谱在线监测装置 - 核心产品",
+          "url": "http://222.85.223.100/ywbk/55.html",
+          "excerpt": "变压器油光谱在线监测装置是用于检测变压器健康状态的重要设备，通过对绝缘油中溶解的特征气体（如H2、CO、CO2、CH4等）种类和含量进行分析，可判断变压器内部是否存在潜伏性隐患，并区分过热性故障与放电性故障。该系统支持在线测量，测量气体包括H2、CO、CO2、CH4、C2H6、C2H2、C2H4及微水，测量范围和分辨率均较高，测量时间小于1小时，支持多种输出协议，适用于110kV至750kV各电压等级的油浸式变压器、电抗器和互感器。已应用于国网新源黑麋峰公司、云霄换流站、内蒙古电网公司等多个场所。"
+        },
+        {
+          "ev_id": "EV-CN-043",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年07月27日",
+          "title": "Perfluoroisobutyronitrile C4F7N Gas",
+          "url": "https://www.asiaisotopeintl.com/product/perfluoroisobutyronitrile-c4f7n-gas",
+          "excerpt": "四氟异丁腈（C4F7N）气体，CAS号42532-60-5，纯度99.5%，规格有4L、8L、10L、40L、47L、50L等，主要用于电气开关设备中的绝缘和灭弧剂，作为六氟化硫（SF6）的环保替代品。该气体具有较低的全球变暖潜能值，适用于气体绝缘开关设备（GIS）等高电压设备。其应用还包括与其他气体混合以达到特定电气和热性能，以及检测其分解产物。同时，研究其与电气设备材料的相容性、毒性及合成方法。产品可提供证书分析，支持客户质量、价格和交付需求。如需了解技术参数，请联系tao.hu@asiaisotope.com。"
+        },
+        {
+          "ev_id": "EV-CN-044",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年11月20日",
+          "title": "全氟异丁腈专题：减碳之下 新一代环保绝缘气体",
+          "url": "https://xueqiu.com/2272053172/344307482",
+          "excerpt": "全氟异丁腈（C4F7N）是六氟化硫（SF6）的环保替代品，具有优异的绝缘性能，GWP值仅为SF6的1/10，适合用于电网设备。SF6是强温室气体，全球限排，中国排放增幅快，推动环保气体应用。目前替代路线包括常规气体、混合气体和环保合成气体，其中全氟异丁腈混合气体性能优越，理论替代空间大。预计2024年全球SF6市场规模7.8万吨，其中50%用于电气绝缘，约3.9万吨。C4F7N与CO2混合气体可替代SF6，市场空间约3900吨。国内企业如新宙邦、昊华科技、北京宇极等已开展生产，安靠智电投资500吨项目。建议关注布局全氟异丁腈的上市公司，如新宙邦、昊华科技。风险提示：本文观点仅供参考，投资需独立判断。"
+        },
+        {
+          "ev_id": "EV-CN-045",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年08月12日",
+          "title": "世界首台550千伏全氟异丁腈环保气体GIL在安徽投运",
+          "url": "https://www.fuwuzaixian.cn/hangyexinwen/71225.html",
+          "excerpt": "全氟异丁腈是六氟化硫(SF6)的可持续替代品，可用于电气设备的绝缘和灭弧，应用场景包括气体绝缘开关设备(GIS)、气体绝缘线路(GIL)和断路器等。 与SF6相比，全氟异丁腈(C4F7N)具有优异的介电性能、较宽的工作温度范围、较低的GWP值及不可燃等特点，助力绿色发展的同时，在实际应用中还具有高性能、高安全系数等优势。"
+        },
+        {
+          "ev_id": "EV-CN-046",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年06月14日",
+          "title": "全氟异丁腈C4F7N电弧分解物-便携原位检测",
+          "url": "https://www.bilibili.com/read/cv25145736",
+          "excerpt": "瑞零科技提供便携全氟异丁腈C4F7N电弧分解物检测仪,可满足不同用户的各种应用需要,在国内外受到电力、能源和气体行业等采用。 背景：环境友好型气体绝缘介质全氟异丁腈C4F7N在介电特性和环保方面表现良好，具有替代SF6气体的可能性。 在电弧作用下分解产物包括CO、CO2、CF4、C2F6、C3F8和C3F6、C2F4、(CF3)3CF、C2F5CN、CF3CN和C2N2，浓度低、不稳定、活性强的特点，对现场原位检测工作造成较大困难。"
+        },
+        {
+          "ev_id": "EV-CN-047",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年01月10日",
+          "title": "全氟异丁腈环保气体环网柜",
+          "url": "https://m.bjx.com.cn/topics/qfydjhbqt",
+          "excerpt": "全氟异丁腈环保气体环网柜是新型环保绝缘气体替代六氟化硫气体的创新产品。此前，国际上六氟化硫与氮气混合气体技术混乱，欧美国家已掌握全氟异丁腈专利和产品垄断。我国自主研发的全氟异丁腈环保气体环网柜可替代传统SF6产品，已在河南、浙江、安徽等地示范应用。2021年5月起，该产品在安徽电网挂网试运行。近日，首台国产126千伏C4F7N/CO混合气体GIS设备在东莞投运，标志着我国在新型环保气体研究领域取得重要进展。平高集团攻克全氟异丁腈气体国产化制备技术，研制出1000千伏环保型Gil设备样机。中国电科院成功研制12千伏C4环网柜样机并通过相关试验，推动电气设备环境友好性升级，具有显著环保效益。"
+        },
+        {
+          "ev_id": "EV-CN-048",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2019年09月19日",
+          "title": "新型C4F7N制备技术研究",
+          "url": "https://www.teqi123.com/dianzi/newslist.php?id=10426",
+          "excerpt": "随着全球能源互联网的不断发展与创新，气体绝缘封闭组合电器(GIS)和气体绝缘输电线路(GIL)在电网中得到大量应用。 作为GIS和GIL内部绝缘介质的SF6，因其极佳的绝缘和灭弧性能以及较低的液化温度而被认为是一种近乎理想的绝缘气体。 然而，SF6是较强的温室效应气体，其温室效应潜能值（GWP）约是CO2的23500倍，大气寿命约为3200a，被列为《京都议定书》六种限排气体之一。 由此，研发SF6替代气体成为迫在眉睫的任务。 3M公司长期致力于绝缘替代气体的研究，经过大量测试研发了七氟异丁腈(C4F7N)气体。"
+        },
+        {
+          "ev_id": "EV-GLOBAL-043",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "by X Yan · 2026",
+          "title": "Emission spectra and diagnosis of C4F7N/CO2 discharge ...",
+          "url": "https://www.nature.com/articles/s41598-026-69532-0",
+          "excerpt": "Abstract The C4F7N/CO2 mixed gas is regarded as one of the most promising environmental-friendly alternatives to SF6. Studying its discharge spectral characteristics under different voltages and fault types is of great significance for insulation condition monitoring and fault diagnosis. Based on a 126kV real-scale GIL experimental platform, this paper conducted DC breakdown, DC surface flashover, and AC surface flashover experiments for 10% C4F7N/90% CO2 mixed gas at 0.1MPa. By constructing a spectral data preprocessing method to eliminate the shot-to-shot variations in discharge emission int"
+        },
+        {
+          "ev_id": "EV-GLOBAL-044",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "Oct 20, 2026",
+          "title": "Pathways to SF6 free GB distribution networks",
+          "url": "https://assets.publishing.service.gov.uk/media/6ad75df7e2ddccf405a7bf3c/pathways-to-sf6-free-networks.pdf",
+          "excerpt": "RAF048/2425:   Pathways to SF6 free GB  distribution networks  Potential impacts and policy  recommendations for a phase-out of SF6 in  new electrical switchgear used in Great  Britain’s electricity distribution networks  (October 2026) Views expressed in this report are those of the researcher and not necessarily those of the UK  government.                                  © Crown copyright 2026  This publication is licensed under the terms of the Open Government Licence v3.0 except  where otherwise stated. To view this licence, visit nationalarchives.gov.uk/doc/open- government-licence/vers"
+        },
+        {
+          "ev_id": "EV-GLOBAL-024",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 12, 2026",
+          "title": "DC electrical breakdown dependence on the radial ...",
+          "url": "https://www.researchgate.net/publication/318332509_DC_electrical_breakdown_dependence_on_the_radial_position_of_specimens_within_HVDc_XLPE_cable_insulation",
+          "excerpt": "HVDC transmission through underground or submarine cables has been reported. In these cables, crosslinked polyethylene (XLPE) is often selected as the primary ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-025",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Dec 14, 2025",
+          "title": "Understanding the Mechanism of Junction Effect of Homo‐ ...",
+          "url": "https://www.researchgate.net/publication/398663966_Understanding_the_Mechanism_of_Junction_Effect_of_Homo-Bilayer_XLPE_for_HVDC_Cable_Factory_Joints",
+          "excerpt": "Crosslinked polyethylene (XLPE) extruded cables have become a key technology in submarine cable systems due to their outstanding electrical and mechanical ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-026",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 14, 2026",
+          "title": "Investigating Transient Fault Characteristics of XLPE Cable ...",
+          "url": "https://www.researchgate.net/publication/394839878_Investigating_Transient_Fault_Characteristics_of_XLPE_Cable_in_a_Bipolar_VSC-HVDC_System-Cable_Modeling_and_Field_Verification",
+          "excerpt": "This paper aims at investigating experimentally the effect of TOVs and SSIs on XLPE insulation for extruded HVDC cables."
+        },
+        {
+          "ev_id": "EV-GLOBAL-027",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 14, 2026",
+          "title": "HVDC Cable Systems—Highlighting Extruded Technology",
+          "url": "https://www.researchgate.net/publication/260722220_HVDC_Cable_Systems-Highlighting_Extruded_Technology",
+          "excerpt": "The HVDC cable systems enable us to integrate these new energy sources in a manner that reduces losses and stabilizes operations."
+        },
+        {
+          "ev_id": "EV-GLOBAL-028",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jun 22, 2026",
+          "title": "(PDF) A Real-Time Inspection System Using a Terahertz ...",
+          "url": "https://www.researchgate.net/publication/311338947_A_Real-Time_Inspection_System_Using_a_Terahertz_Technique_To_Detect_Microleak_Defects_in_the_Seal_of_Flexible_Plastic_Packages",
+          "excerpt": "A method to detect production faults in flexible plastic packages with the use of terahertz radiation is presented. X-ray imaging require more development."
+        },
+        {
+          "ev_id": "EV-GLOBAL-029",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 10, 2026",
+          "title": "Analysis of Harmonics in Subsea Power Transmission ...",
+          "url": "https://www.researchgate.net/publication/3275917_Analysis_of_Harmonics_in_Subsea_Power_Transmission_Cables_Used_in_VSC-HVDC_Transmission_Systems_Operating_Under_Steady-State_Conditions",
+          "excerpt": "In this paper, a mathematical model of an HVDC-VSC transmission system is developed and its harmonic performance is investigated for steady-state operating ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-042",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Mar 24, 2026",
+          "title": "what is sf6 gas-INNO - fjinno",
+          "url": "https://www.fjinno.net/what-is-sf6-gas",
+          "excerpt": "The EU F-Gas Regulation (No. 517/2014, revised 2024) imposes strict reporting requirements and phase-down measures on high-GWP gases including SF6. 7 ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-045",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Aug 14, 2026",
+          "title": "special report for sc a3",
+          "url": "https://session.cigre.org/fileadmin/Session_2026/Special_reports/A3_2026_Special_ReportV2.pdf",
+          "excerpt": "Three mainstream SF6-free technologies are reported for switchgear: 1. Gas mixtures of natural origin gases (CO2, N2, O2) with a small percentage of."
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-P3-3Y-01",
+          "track_id": "P3",
+          "sector": "power_energy",
+          "title": "SF6环保替代气体(C4F7N/混合气)产线纯度及痕量分解物在线红外-质谱分析仪",
+          "horizon": "3-5y",
+          "china_priority_score": 92.0,
+          "global_priority_score": 95.0,
+          "physics_principle": "面向欧盟2026+ F-gas法规禁令与国网/南网环保GIS大规模换装，利用无载气光声光谱(PAS)或量子级联激光(QCL-TDLAS)+软电离质谱，在线 ppb 级监控混气比例偏差、水分及氟化分解毒气(HF/CF3CN/COF2)",
+          "roi_baseline": {
+            "capex_cny": 880000,
+            "annual_opex_cny": 55000,
+            "annual_output_value_cny": 160000000,
+            "yield_gain_pct": 0.3,
+            "annual_scrap_saving_cny": 290000,
+            "annual_downtime_saving_cny": 360000,
+            "annual_consumable_ehs_saving_cny": 450000,
+            "market_tam_china_cny_100m": 19.5,
+            "market_tam_global_usd_m": 690.0
+          },
+          "roi_metrics": {
+            "capex_cny": 880000.0,
+            "annual_opex_cny": 55000.0,
+            "yield_gain_saving_cny": 480000.0,
+            "annual_gross_benefit_cny": 1580000.0,
+            "net_annual_cashflow_cny": 1525000.0,
+            "payback_months": 6.9,
+            "roi_3yr_pct": 419.9,
+            "npv_5yr_cny": 4900949.82,
+            "irr_5yr_pct": 172.1,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 8.19,
+            "china_som_3_5y_cny_100m": 1.31,
+            "global_sam_usd_m": 262.2,
+            "global_som_5_10y_usd_m": 31.46
+          },
+          "weighted_pillar_score": 86.26
+        },
+        {
+          "opp_id": "OPP-P3-5Y-02",
+          "track_id": "P3",
+          "sector": "power_energy",
+          "title": "特高压海缆XLPE交联挤出全周向太赫兹+多角度X射线微杂质/偏心在线检测站",
+          "horizon": "5-10y",
+          "china_priority_score": 89.0,
+          "global_priority_score": 91.0,
+          "physics_principle": "在超高压海缆连续硫化管道前实现亚毫米级绝缘偏心度、微气泡(>30μm)及焦烧颗粒在线全检，彻底消灭数百公里整盘报废风险",
+          "roi_baseline": {
+            "capex_cny": 2400000,
+            "annual_opex_cny": 160000,
+            "annual_output_value_cny": 420000000,
+            "yield_gain_pct": 0.45,
+            "annual_scrap_saving_cny": 1100000,
+            "annual_downtime_saving_cny": 480000,
+            "annual_consumable_ehs_saving_cny": 120000,
+            "market_tam_china_cny_100m": 16.0,
+            "market_tam_global_usd_m": 610.0
+          },
+          "roi_metrics": {
+            "capex_cny": 2400000.0,
+            "annual_opex_cny": 160000.0,
+            "yield_gain_saving_cny": 1890000.0,
+            "annual_gross_benefit_cny": 3590000.0,
+            "net_annual_cashflow_cny": 3430000.0,
+            "payback_months": 8.4,
+            "roi_3yr_pct": 328.8,
+            "npv_5yr_cny": 10602398.62,
+            "irr_5yr_pct": 141.2,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 6.72,
+            "china_som_3_5y_cny_100m": 1.08,
+            "global_sam_usd_m": 231.8,
+            "global_som_5_10y_usd_m": 27.82
+          },
+          "weighted_pillar_score": 86.49
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "sector": "power_energy",
+      "name": "火电深度灵活调峰、重型燃机与电力CCUS碳捕集在线过程分析仪",
+      "manufacturing_stages": [
+        "煤电/垃圾发电锅炉20%超低负荷深度调峰炉膛二维声波测温与在线激光燃气分析闭环优化",
+        "掺氢燃气轮机防回火/NOx排放与透平叶片高温在线红外热辐射测温",
+        "电厂燃烧后胺洗CCUS尾气ppb级亚硝胺、逃逸胺及CO2管道腐蚀杂质(H2S/H2O/O2/SOx)在线软电离质谱"
+      ],
+      "evidence_count_cn": 18,
+      "evidence_count_global": 12,
+      "valid_ev_ids": [
+        "EV-CN-055",
+        "EV-CN-071",
+        "EV-GLOBAL-032",
+        "EV-CN-061",
+        "EV-CN-062",
+        "EV-CN-056",
+        "EV-CN-057",
+        "EV-CN-058",
+        "EV-CN-059",
+        "EV-CN-060",
+        "EV-CN-063",
+        "EV-CN-064",
+        "EV-CN-065",
+        "EV-CN-066",
+        "EV-CN-067",
+        "EV-CN-068",
+        "EV-CN-069",
+        "EV-CN-070",
+        "EV-CN-072",
+        "EV-GLOBAL-030",
+        "EV-GLOBAL-031",
+        "EV-GLOBAL-033",
+        "EV-GLOBAL-034",
+        "EV-GLOBAL-035",
+        "EV-GLOBAL-036",
+        "EV-GLOBAL-037",
+        "EV-GLOBAL-038",
+        "EV-GLOBAL-039",
+        "EV-GLOBAL-040",
+        "EV-GLOBAL-041"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-055",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2019年01月07日",
+          "title": "锅炉燃烧温度测控及性能优化系统技术",
+          "url": "http://ynjn.yn.gov.cn/cnMb/jnzs/7297.html",
+          "excerpt": "Title: 404 Not Found  URL Source: http://ynjn.yn.gov.cn/cnMb/jnzs/7297.html  Final URL: https://ynjn.yn.gov.cn/cnMb/jnzs/7297.html  Warning: Target URL returned error 404: Not Found  Markdown Content: * * *  nginx"
+        },
+        {
+          "ev_id": "EV-CN-071",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2026-09-13",
+          "title": "Topological Flame Bifurcation, Aerodynamic Flashback Margins, and Multi-Pathway NOx Scaling in a 3D Swirl-Stabilized 100% Pure Hydrogen Aero-Engine Combustor",
+          "url": "https://arxiv.org/abs/2609.17600",
+          "excerpt": "Physics > Fluid Dynamics [Submitted on 13 Sep 2026 ( [v1](https://arxiv.org/abs/2609.17600v1)), last revised 1 Nov 2026 (this version, v2)]Title:Flame Bifurcation, Flashback Margins, and NOx Scaling in a Swirl-Stabilized Hydrogen Aero-Engine Combustor [View PDF](https://arxiv.org/pdf/2609.17600) [HTML (experimental)](https://arxiv.org/html/2609.17600v2) > Abstract:Burning neat hydrogen in aircraft turbines eliminates carbon emissions, yet rapid reaction rates trigger nozzle flashback hazards and high nitrogen oxide emissions across flight throttles. This study investigates aerothermal holding "
+        },
+        {
+          "ev_id": "EV-CN-061",
+          "geo_scope": "CN",
+          "authority_tier": "T2",
+          "engine": "metaso",
+          "published_date": "2024年12月13日",
+          "title": "Carbon Dioxide (CO2) Analysis & Monitoring for Carbon Capture, Utilization & Storage (CCUS) | Thermo Fisher Scientific - CN",
+          "url": "https://www.thermofisher.com/hk/zt/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/fourier-transform-infrared-spectroscopy/applications/carbon-dioxide-analysis-monitoring-ccus.html",
+          "excerpt": "为应对气候变化，碳捕集、利用与封存（CCUS）技术成为减少二氧化碳（CO₂）排放的重要手段。CCUS技术包括捕集、利用和储存CO₂，有助于减少温室气体排放，并推动循环经济的发展。傅里叶变换红外（FTIR）技术在CCUS中用于监测CO₂中酸性气体的含量，保护CO₂管道设施。Thermo Fisher Scientific的MAX-iR FTIR气体分析仪和MAX-Bev系统可实时监测CO₂中的杂质，确保其纯度，防止酸性条件形成。FTIR技术非破坏性，能精确检测低浓度杂质，适用于在线监测。该技术在科研和工业中均有广泛应用，有助于提高碳捕集效率。CO₂纯度监测对确保安全和效率至关重要，Thermo Scientific的MAX-Bev系统利用FTIR技术实现实时监测。本产品仅供研究使用，不用于诊断。"
+        },
+        {
+          "ev_id": "EV-CN-062",
+          "geo_scope": "CN",
+          "authority_tier": "T2",
+          "engine": "metaso",
+          "published_date": "2024年09月18日",
+          "title": "Monitor hazardous gases in CO2 to protect valuable pipeline infrastructure",
+          "url": "https://www.thermofisher.com/us/en/home/industrial/spectroscopy-elemental-isotope-analysis/molecular-spectroscopy/fourier-transform-infrared-spectroscopy/applications/carbon-dioxide-analysis-monitoring-ccus.html",
+          "excerpt": "为保护有价值的管道基础设施，需监测二氧化碳中的有害气体。随着应对气候变化和推动可持续发展的重视程度不断提高，碳捕集、利用与封存（CCUS）技术成为减少二氧化碳排放的重要解决方案。CCUS技术包括多种工艺，可有效减少温室气体排放，并促进循环经济的发展。傅里叶变换红外（FTIR）技术可用于实时监测二氧化碳中酸性气体的浓度，保护管道安全。Thermo Scientific MAX-Bev系统通过FTIR技术实现对二氧化碳中杂质的快速、准确检测，确保管道完整性。FTIR技术可实时监测二氧化碳纯度，帮助避免酸性条件的形成，提升碳捕集效率。该技术在科研和工业中均有广泛应用潜力，对碳捕集过程的安全性和有效性至关重要。"
+        },
+        {
+          "ev_id": "EV-CN-056",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年04月05日",
+          "title": "声波测温技术在锅炉燃烧可视化中的应用",
+          "url": "https://m.bjx.com.cn/mnews/20180607/904037.shtml",
+          "excerpt": "（6）优化运后锅炉两侧空预器入口的烟温偏差分别为1.8℃和1.1℃，空预器入口烟温偏差均在10℃以内。 （7）优化后锅炉末级过热器出口两侧汽温偏差分别为2.8℃和0.7℃，高温再热器出口两侧汽温偏差分别为1.7℃和0.8℃，汽温偏差均小于20℃。 （8）优化后，炉膛48000mm处等温线测温断面的最高烟气温度分别为1393℃和1390℃，最高烟气温度均小于1400℃。"
+        },
+        {
+          "ev_id": "EV-CN-057",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年11月16日",
+          "title": "燃烧优化",
+          "url": "https://weibo.com/ttarticle/p/show?id=2309405160822891741310",
+          "excerpt": "! (https://wx1.sinaimg.cn/mw1024/0072SG7Vly4i0xtdpkfecj30og0b4dgq.jpg) 天津滨海电厂：煤耗降低超2g/kWh的成功实践 天津滨海电厂通过部署声波测温技术，显著优化了锅炉燃烧过程，实现了度电煤耗降低超过2g/kWh的卓越成果。 该案例验证了声波测温在燃煤电厂的巨大潜力： 实时温度场监测：系统精准捕捉炉膛温度分布，识别燃烧不均，指导配风和燃烧器调整，优化火焰位置和热量分布。 节能降耗：通过降低过量空气系数和提高燃尽率，减少排烟热损失和燃料浪费，显著降低煤耗。 运行稳定：稳定的温度场减少了结焦和局部过热，延长设备寿命，降低维护成本。 结合行业案例，天津滨海电厂的成果处于领先水平，彰显了技术的经济效益和可复制性。"
+        },
+        {
+          "ev_id": "EV-CN-058",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年03月20日",
+          "title": "深度调峰下的锅炉燃烧优化与声波测温技术应用",
+          "url": "https://weibo.com/ttarticle/p/show?id=2309405328185591202152",
+          "excerpt": "按当前煤价，对一台 60 万千瓦机组，1% 的煤耗改善一年就是一笔可以在技改会上算得清的账。 什么样的机组最该上工程上的实话是：如果一台机组常年带基本负荷、燃烧工况稳定，这套系统的优先级并没有那么高。 它价值最大的场景，恰恰是眼下越来越多的这种——负荷每天在深谷和满发之间穿越、燃煤煤质多变、运行人员需要在不确定中做判断的深调机组。 负荷压得越深，断面温场和在线专家系统的价值越大。"
+        },
+        {
+          "ev_id": "EV-CN-059",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年07月01日",
+          "title": "基于声学技术的声波测温解决方案",
+          "url": "http://big5.china.com.cn/gate/big5/business.china.com.cn/2024-07/26/content_42876004.html",
+          "excerpt": "聲波測溫解決方案高精度監測能力可以實現路徑溫度準確度小于1%，常溫下測溫解析度為0.1℃，熱態下測溫解析度為3℃，為電廠提供了可靠的溫度監測數據，可視化界面可實時呈現爐膛截面燃燒強度、火焰偏心繫數、等溫線圖，實現智慧化管理。 數據顯示，採用該方案後，鍋爐長期優化運作下，可以提升燃燒效率0.5%，機組供電煤耗至少可降低0.5g/kWh，同時可以降低二氧化碳的排放，裝機容量為600MW的燃煤電廠，年減排二氧化碳不少於26萬噸。"
+        },
+        {
+          "ev_id": "EV-CN-060",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年07月01日",
+          "title": "北京奥音贝携手华北电力大学 推动火电行业绿色转型",
+          "url": "http://business.china.com.cn/2024-07/26/content_42876004.html",
+          "excerpt": "! [](http://business.china.com.cn/pic/2024-07/26/18e6af01-c648-4c95-b76c-a3b622b544a2.jpg) 声波测温解决方案高精度监测能力可以实现路径温度准确度小于1%，常温下测温分辨率为0.1℃，热态下测温分辨率为3℃，为电厂提供了可靠的温度监测数据，可视化界面可实时呈现炉膛截面燃烧强度、火焰偏心系数、等温线图，实现智能化管理。 数据显示，采用该方案后，锅炉长期优化运行下，可以提升燃烧效率0.5%，机组供电煤耗至少可降低0.5g/kWh，同时可以降低二氧化碳的排放，装机容量为600MW的燃煤电厂，年减排二氧化碳不少于26万吨。 ! [](http://business.china.com.cn/pic/2024-07/26/9ea1ac4c-0ea3-4e5b-aa87-78"
+        },
+        {
+          "ev_id": "EV-CN-063",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2021年01月01日",
+          "title": "超临界CO2输送环境中的杂质协同作用及腐蚀速率预测",
+          "url": "https://wf.pub/thesis/article%3AD03066930",
+          "excerpt": "超临界CO2输送环境中的杂质协同作用及腐蚀速率预测 碳捕集、利用与封存（CCUS）技术是实现CO2减排的最有效方式之一，CO2管道输送是其重要一环。 由于CO2气源、捕集技术和经济等因素，输送的CO2通常含有少量H2O、H2S、SO2、O2、NO2等杂质，增加CO2输送管线的内腐蚀风险。 系统研究压力和含水量对含杂质超临界CO2腐蚀的影响，并提出适用于超临界CO2输送管线腐蚀预测模型，对于提出合理防腐措施和推进CCUS技术的规模化应用具有重要意义。"
+        },
+        {
+          "ev_id": "EV-CN-064",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月01日",
+          "title": "Research Progress on Corrosion Behavior and Mechanism of Supercritical CO2 Transport Pipeline",
+          "url": "https://www.surface-techj.com/CN/10.16490/j.cnki.issn.1001-3660.2024.24.002",
+          "excerpt": "摘要 碳捕获利用与封存(CCUS)是用于减少二氧化碳排放的有效方法之一。在CCUS技术中，二氧化碳运输起着关键作用。超临界CO2输送以其实用性、高效性和经济性而得到快速发展，成为CCUS技术长期发展的必然选择。超临界CO2管输环境是含有多种气态杂质的高压二氧化碳腐蚀环境，对输送管道腐蚀安全构成严重威胁。综述了超临界CO2输送管道的腐蚀现状和腐蚀机理，重点探讨了杂质气体O2、SO2、H2S和NO2对超临界CO2输送管道腐蚀的影响，各杂质气体相互作用的腐蚀机理还需要进一步研究。此外，还探讨了超临界CO2输送工艺参数，包括流速、含水量、温度和压力对管道腐蚀行为的影响以及其腐蚀机理。目前，超临界CO2管输的临界含水量没有达成一致的认识，实际工况下的临界含水量需要结合温度和压力进行分析。"
+        },
+        {
+          "ev_id": "EV-CN-065",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2016年01月01日",
+          "title": "Corrosion and degradation in MEA based post-combustion CO2 capture",
+          "url": "https://www.academia.edu/101557040/Corrosion_and_degradation_in_MEA_based_post_combustion_CO2_capture",
+          "excerpt": "5 -Advanced absorption processes and technology for carbon dioxide (CO2) capture in power plants. In: Maroto-Valer, M.M. (Ed.), Developments and Innovation in Carbon Dioxide (CO2) Capture and Storage Technology. Woodhead Publishing, pp. 155-182. - DuPart, M.S., Bacon, T.R., Edwards, D.J., 1993. Understanding corrosion in alkanolamine gas treating plants: Part 1. Hydrocarb. Proc"
+        },
+        {
+          "ev_id": "EV-GLOBAL-032",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "",
+          "title": "https://cfpub.epa.gov/si/si_public_record_report.c...",
+          "url": "https://cfpub.epa.gov/si/si_public_record_report.cfm?Lab=NERL&dirEntryID=232465",
+          "excerpt": "You are here: Emerging Contaminants in the Environment Citation: JONES-LEPP, T. L. Emerging Contaminants in the Environment . Chapter 13, A. T. Lebedev (ed.), Comprehensive Environmental Mass Spectrometry. ILM Publications, SAINT ALBANS, HERTFORDSHIRE, Uk, 12:287-307, (2012). Impact/Purpose: What does ―emerging contaminant‖ mean? For example, in 3000 B.C. lead was co-extracted with silver from silver mines in Anatolia and subsequently discarded. To those who lived in the vicinity of the mine, and whose water and food sources were contaminated with leftover lead, the lead may well have been con"
+        },
+        {
+          "ev_id": "EV-GLOBAL-030",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Apr 29, 2026",
+          "title": "An Online-SPE/SEC/LCMS Method for the Detection of N- ...",
+          "url": "https://www.researchgate.net/publication/367598568_An_Online-SPESECLCMS_Method_for_the_Detection_of_N-Nitrosamine_Disinfection_Byproducts_in_Wastewater_Plant_Tailwater",
+          "excerpt": "This method allows for the accurate quantitative analysis of N-nitrosamines with high compatibility in wastewater plant tailwater, rivers, and lakes with a high"
+        },
+        {
+          "ev_id": "EV-GLOBAL-031",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 31, 2026",
+          "title": "A Practical Hplc-Ms Method for the Analysis of Nitrosamine ...",
+          "url": "https://www.researchgate.net/publication/410976016_A_Practical_Hplc-Ms_Method_for_the_Analysis_of_Nitrosamine_Drug_Substance_Related_Impurities_Using_an_Inexpensive_Single_Quadrupole_Mass_Spectrometer",
+          "excerpt": "A Practical Hplc-Ms Method for the Analysis of Nitrosamine Drug Substance Related Impurities Using an Inexpensive Single Quadrupole Mass Spectrometer."
+        },
+        {
+          "ev_id": "EV-GLOBAL-033",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Dec 25, 2025",
+          "title": "Simultaneous determination of low molecular weight ...",
+          "url": "https://www.researchgate.net/publication/373354179_Simultaneous_determination_of_low_molecular_weight_nitrosamines_in_pharmaceutical_products_by_fast_gas_chromatography_mass_spectrometry",
+          "excerpt": "In this work we have developed and validated a generic fast GC-MS method suitable for the quantitative determination of a wide range of low molecular weight ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-034",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Oct 15, 2026",
+          "title": "Nitrosoamine Impurities: Current Status, Challenges and ...",
+          "url": "https://www.ijrtmr.com/archiver/archives/nitrosoamine_impurities_current_status_challenges_and_future_perspectives.pdf",
+          "excerpt": "Nitrosamines are typically formed during the manufacture of active pharmaceutical ingredients (APIs) or during the storage of formulations by nitrosating."
+        },
+        {
+          "ev_id": "EV-GLOBAL-035",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Aug 4, 2026",
+          "title": "Cost Effective Accurate and Precise Analytical Method ...",
+          "url": "https://www.researchgate.net/publication/348553466_Cost_Effective_Accurate_and_Precise_Analytical_Method_Development_of_Content_Estimation_of_N-Nitrosodimethyl_Amine_and_N-Nitrosodiethyl_Amine_in_Olmesartan_Medoxomil_by_GC-MS",
+          "excerpt": "A simple, precise and accurate GCMS method was developed for estimation the content estimation of N-Nitrosodimethylamine (NDMA)"
+        },
+        {
+          "ev_id": "EV-GLOBAL-036",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Sep 30, 2026",
+          "title": "Publications",
+          "url": "https://www.best-research.eu/en/publications?direction=desc&page=8&sort=titel&url=https%3A%2F%2Fwww.best-research.eu%2Fcontent%2Fpublikationen",
+          "excerpt": "Dynamic modelling of hydronic heating systems supplied by a biomass boiler for residential application: solutions for the optimization of the control strategy ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-037",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jul 12, 2026",
+          "title": "(PDF) Influence of biomass on coal combustion based on ...",
+          "url": "https://www.researchgate.net/publication/284737682_Influence_of_biomass_on_coal_combustion_based_on_thermogravimetry_and_Fourier_transform_infrared_spectroscopy",
+          "excerpt": "Co-firing biomass with coal in existing circulating fluidized bed (CFB) boilers is a promising strategy for reducing net CO2 emissions and utilizing renewable ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-038",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Sep 23, 2026",
+          "title": "Comparative emission and energy performance of biochar ...",
+          "url": "https://www.researchgate.net/publication/404164387_Comparative_emission_and_energy_performance_of_biochar_production_versus_in-situ_burning_of_Gorean_agrobyproducts",
+          "excerpt": "This study focuses on a 660 MW coal-fired power plant. A model of the direct mixed combustion biomass system within the coal-fired boiler is constructed,"
+        },
+        {
+          "ev_id": "EV-GLOBAL-039",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "May 7, 2026",
+          "title": "3. experimental investigation on the sound pressure level ...",
+          "url": "https://www.researchgate.net/publication/347064204_3_EXPERIMENTAL_INVESTIGATION_ON_THE_SOUND_PRESSURE_LEVEL_FOR_DIFFERENT_ACOUSTIC_TREATMENT_OF_BOILER_ROOMS",
+          "excerpt": "This article is expected to assist design engineers in improving compliance with legislation, analysis, and optimization of boiler rooms."
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-P4-3Y-01",
+          "track_id": "P4",
+          "sector": "power_energy",
+          "title": "煤电/垃圾焚烧灵活调峰锅炉声波二维测温+原位TDLAS多组分燃烧闭环优化系统",
+          "horizon": "3-5y",
+          "china_priority_score": 95.0,
+          "global_priority_score": 84.0,
+          "physics_principle": "通过多通道声波飞行时间层析重建炉膛二维温度场（免受飞灰辐射干扰），耦合原位可调谐半导体激光吸收光谱(TDLAS)秒级测量CO/O2/NH3逃逸，直接闭环优化配风与SNCR精准喷氨",
+          "roi_baseline": {
+            "capex_cny": 980000,
+            "annual_opex_cny": 65000,
+            "annual_output_value_cny": 280000000,
+            "yield_gain_pct": 0.2,
+            "annual_scrap_saving_cny": 180000,
+            "annual_downtime_saving_cny": 320000,
+            "annual_consumable_ehs_saving_cny": 1050000,
+            "market_tam_china_cny_100m": 34.0,
+            "market_tam_global_usd_m": 620.0
+          },
+          "roi_metrics": {
+            "capex_cny": 980000.0,
+            "annual_opex_cny": 65000.0,
+            "yield_gain_saving_cny": 560000.0,
+            "annual_gross_benefit_cny": 2110000.0,
+            "net_annual_cashflow_cny": 2045000.0,
+            "payback_months": 5.8,
+            "roi_3yr_pct": 526.0,
+            "npv_5yr_cny": 6772158.94,
+            "irr_5yr_pct": 207.9,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 14.28,
+            "china_som_3_5y_cny_100m": 2.28,
+            "global_sam_usd_m": 235.6,
+            "global_som_5_10y_usd_m": 28.27
+          },
+          "weighted_pillar_score": 86.4
+        },
+        {
+          "opp_id": "OPP-P4-5Y-02",
+          "track_id": "P4",
+          "sector": "power_energy",
+          "title": "电力CCUS与掺氢燃机多流路软电离质谱(IMR-MS)痕量杂质及腐蚀预警分析站",
+          "horizon": "5-10y",
+          "china_priority_score": 85.0,
+          "global_priority_score": 94.0,
+          "physics_principle": "采用10-14 eV汞/氪/氙离子-分子反应软电离质谱，抗高湿和高CO2基质干扰，单台毫秒级同时测ppb级致癌亚硝胺、挥发性胺、H2S/SOx/O2及HCl",
+          "roi_baseline": {
+            "capex_cny": 1950000,
+            "annual_opex_cny": 150000,
+            "annual_output_value_cny": 200000000,
+            "yield_gain_pct": 0.25,
+            "annual_scrap_saving_cny": 350000,
+            "annual_downtime_saving_cny": 720000,
+            "annual_consumable_ehs_saving_cny": 420000,
+            "market_tam_china_cny_100m": 12.5,
+            "market_tam_global_usd_m": 580.0
+          },
+          "roi_metrics": {
+            "capex_cny": 1950000.0,
+            "annual_opex_cny": 150000.0,
+            "yield_gain_saving_cny": 500000.0,
+            "annual_gross_benefit_cny": 1990000.0,
+            "net_annual_cashflow_cny": 1840000.0,
+            "payback_months": 12.7,
+            "roi_3yr_pct": 183.1,
+            "npv_5yr_cny": 5025047.66,
+            "irr_5yr_pct": 90.6,
+            "payback_tier": "Tier-B (12-24m Strong ROI)",
+            "china_sam_cny_100m": 5.25,
+            "china_som_3_5y_cny_100m": 0.84,
+            "global_sam_usd_m": 220.4,
+            "global_som_5_10y_usd_m": 26.45
+          },
+          "weighted_pillar_score": 81.72
+        }
+      ]
+    },
+    {
+      "id": "S1",
+      "sector": "semiconductor",
+      "name": "晶圆厂前道AMC分子污染、电子特气与超纯湿化学品ppt/ppb级在线分析",
+      "manufacturing_stages": [
+        "光刻机内部/FOUP微环境/洁净室新风系统 ppt-ppb 级酸碱/有机/难熔金属 AMC 在线监测",
+        "Etch/CVD/ALD 反应腔体原位工艺气体质谱(Process RGA/IMR-MS)与光学发射光谱(OES)终点及微漏诊断",
+        "UPW超纯水与SPM/SC1/HF/电子级IPA循环药液中ppt级金属离子与有机TOC/纳米颗粒在线监控"
+      ],
+      "evidence_count_cn": 17,
+      "evidence_count_global": 13,
+      "valid_ev_ids": [
+        "EV-GLOBAL-050",
+        "EV-GLOBAL-056",
+        "EV-GLOBAL-048",
+        "EV-GLOBAL-054",
+        "EV-CN-074",
+        "EV-CN-075",
+        "EV-CN-076",
+        "EV-CN-077",
+        "EV-CN-078",
+        "EV-CN-079",
+        "EV-CN-080",
+        "EV-CN-081",
+        "EV-CN-082",
+        "EV-CN-083",
+        "EV-CN-084",
+        "EV-CN-085",
+        "EV-CN-086",
+        "EV-CN-087",
+        "EV-CN-088",
+        "EV-CN-089",
+        "EV-GLOBAL-049",
+        "EV-GLOBAL-051",
+        "EV-GLOBAL-052",
+        "EV-GLOBAL-053",
+        "EV-GLOBAL-055",
+        "EV-GLOBAL-057",
+        "EV-GLOBAL-058",
+        "EV-GLOBAL-059",
+        "EV-GLOBAL-060",
+        "EV-CN-073"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-074",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年11月10日",
+          "title": "空气分子污染物（AMC）在半导体制造中的监测与控制",
+          "url": "https://weibo.com/ttarticle/p/show?id=2309405145969154196100",
+          "excerpt": "在众多的AMC在线监测技术中，V&F公司的IMR-MS（离子-分子反应质谱）技术脱颖而出，展现出独特的优势 ： 实时、精准、灵敏的分析能力：V&F AirSense质谱仪采用IMR-MS技术，实现软电离，能够对有机和无机痕量化合物进行实时监测，响应迅速，灵敏度极高，可达ppb级甚至sub-ppb级 。 广泛的化合物覆盖：AirSense质谱仪的质量范围为7-519 amu，能够监测包括酸性气体、碱性气体、VOCs等在内的多种AMC，全面保障生产环境的洁净度 。"
+        },
+        {
+          "ev_id": "EV-CN-075",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月01日",
+          "title": "PTR-MS",
+          "url": "https://www.ionicon.com/publications?amp%253Bqt-main_navigation=4&f%255Bauthor%255D=832&o=desc&s=title",
+          "excerpt": "PTR-MS（质子转移反应-质谱）是实时监测挥发性有机物（VOCs）的基准方法，无需样品前处理，可在极低浓度下检测。IONICON的PTR-MS技术具有专利的TRU-E/N离子化学质量，结合SRI-MS和FUSION PTR等技术，提供高灵敏度和高检测限。PTR3可检测挥发性有机物及其氧化产物，包括高度氧化有机分子（HOMs）。CHARON PTR-TOFMS是集成在线分析技术，可实时定量检测亚微米颗粒有机物。IONICON PTR-MS系统由离子源、漂移管和质谱仪组成，TOF-MS在分析仪器中广泛应用。AMC（气相分子污染）定义及其来源在半导体行业中尤为重要。IONICON提供多种质谱技术，包括PTR-MS、SRI-MS等，适用于不同分析需求。"
+        },
+        {
+          "ev_id": "EV-CN-076",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2017年11月15日",
+          "title": "质子转移反应质谱（PTR-MS）",
+          "url": "https://www.instrument.com.cn/show/C279009.html",
+          "excerpt": "报价 面议 品牌 型号 产地 应用领域 仪器简介： 质子转移反应质谱（PTR-MS）是通过待测组份与试剂离子在特定的条件下发生质子转移反应而成为质子化的带电粒子，进入后一级的质量分析器被分离检测。 该仪器主要用于是测量、监测、挥发性有机化合物（VOCs）的超灵敏检测，可以满足实时在线连续监测、连续定量测量挥发性有机化合物，理论上只要质子亲和力大于691(kJ mol-1)的化合物都可以发生质子转移反应被检测。 基本上常见的大气环境中的有机污染物。 比如苯系物、大部分烷烃、烯烃、醚类、脂类都可以被检测。 质子转移反应质谱（PTR-MS）主要特点是采用了基于PTR原理的装置叫做为离子源。"
+        },
+        {
+          "ev_id": "EV-CN-077",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月29日",
+          "title": "痕量挥发性有机物在线质谱PTR-MS高灵敏检测方法研究",
+          "url": "https://baike.baidu.com/item/%E7%97%95%E9%87%8F%E6%8C%A5%E5%8F%91%E6%80%A7%E6%9C%89%E6%9C%BA%E7%89%A9%E5%9C%A8%E7%BA%BF%E8%B4%A8%E8%B0%B1PTR-MS%E9%AB%98%E7%81%B5%E6%95%8F%E6%A3%80%E6%B5%8B%E6%96%B9%E6%B3%95%E7%A0%94%E7%A9%B6/58989403",
+          "excerpt": "《痕量挥发性有机物在线质谱PTR-MS高灵敏检测方法研究》是依托中国科学院合肥物质科学研究院，由储焰南负责的面上项目。项目旨在提升PTR-MS的检测灵敏度。PTR-MS是一种实时在线质谱技术，广泛应用于大气挥发性有机物监测及多个前沿领域。项目组已建成国内第一套PTR-MS实验装置，但检测限为200ppt。本项目通过改进离子源和反应漂移管结构，提升离子信号强度，使检测灵敏度提高100倍以上，检测限预期优于1ppt。结合GC-MS/MS技术，开展大气、食品和药品包装顶空气体检测，获取超痕量VOC信息，展现PTR-MS技术优势。项目成果为提升国产PTR-MS仪器水平奠定基础。"
+        },
+        {
+          "ev_id": "EV-CN-078",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "气态分子污染物 (AMC) 对半导体厂的影响及常用离线采样分析方法",
+          "url": "http://www.ai-microtech.com/",
+          "excerpt": "- 场发射扫描电镜Apreo 2 SEM - 台式X射线衍射仪MiniFlex - 激光粒度仪LA-960V2 - 晶圆厚度/电阻率测试仪 - XploRA™ PLUS共聚焦拉曼光谱仪 - Vista One纳米红外成像系统 - NX20原子力显微镜 - Apreo 2 SEM扫描电子显微镜 - Vista One纳米红外成像系统 - Lumina AT1光学表面缺陷扫描仪 - Zeta-300光学轮廓仪 - P-7台阶仪 - NexION 1000/2000电感耦合等离子体质谱仪 - 280SI四探针测试仪 - 汞探针CV测试仪 - NX20原子力显微镜 - P-7台阶仪 - JNM-ECZ400S核磁共振谱仪 - NexION 5000电感耦合等离子体质谱仪 - KS-41A/B液体颗粒度仪"
+        },
+        {
+          "ev_id": "EV-CN-079",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "ICP-MS 在线取样装置及金属杂质在线监测方法",
+          "url": "https://qxb-img-osscache.qixin.com/patents_pdf/608be2b61a192dba062a607f2b9b643e.pdf?response-content-type=application%2Foctet-stream%27",
+          "excerpt": "## ICP-MS 在线取样装置及金属杂质在线监测方法 ## 技术领域 [0001] 本发明涉及半导体集成电路制造领域，尤其涉及一种用于监测半导体制造用液体化学品中金属杂质的 ICP-MS 在线取样装置及金属杂质在线监测方法。 ## 背景技术 [0002] 在半导体行业的生产过程中，所使用的超纯水、液体化学品中的金属杂质，甚至空气中的金属杂质对半导体产品的良率影响重大；其中，由于直接参与器件的制造，超纯水和液体化学品中的金属杂质对半导体产品的影响更是重中之重。 ## 背景技术 因此，通常来说，芯片加工厂针对不同线宽的产品所需使用的超纯水和液体化学品，都制定了一系列严谨的规格，从而确保所生产的产品良率不因金属杂质而受到影响。 [0003] 然而，随着器件线宽的不断缩小，超纯水和液体化学品中的金属污染问题对产品良率的影响尤为突出。 因此，要求超纯水和液体"
+        },
+        {
+          "ev_id": "EV-CN-080",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "使用 ICP-MS/MS 测定半导体光刻胶中的超痕量杂质元素",
+          "url": "https://www.agilent.com/cs/library/applications/an-semiconductor-photoresist-8900-icp-ms-5994-6089zh-cn-agilent.pdf",
+          "excerpt": "目前，针对 IC PR 中的金属杂质，每种元素的最大可接受含量在 1-10 ppb 范围内，未来将降至 1 ppb 以下。 因此，监测 PR 中超痕量的金属元素非常重要，这项工作通常由 PR 供应商和 IC 制造商共同完成。 随着 IC 制程线宽不断缩小，线宽更小的电路更容易受到溶解态和颗粒金属污染物的影响，因此必须对更低浓度的杂质进行监测。 为了满足半导体行业测定原材料中超痕量元素杂质的需求，不断提高分析仪器的性能非常重要。 先进半导体制程中使用的化学品和超纯水 (UPW) 要求将杂质元素含量控制在 ppt 甚至亚 ppt 水平。"
+        },
+        {
+          "ev_id": "EV-CN-081",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "单四极杆 ICP-MS 与串联四极杆 ICP-MS",
+          "url": "https://www.agilent.com/cs/library/primers/public/primer-icp-mq-icp-qqq-5994-4830zh-cn-agilent.pdf",
+          "excerpt": "# 高纯度化学品中痕量和超痕量污染物的分析 高纯度化学品（例如用于半导体晶圆制造或其他电子制造工艺的化学品）的金属杂质含量必须非常低。 该应用场景通常涉及： - 每天的样品数量不定，可多达 50 个 - 通常检测约 20 种元素，涉及一系列高纯度样品类型 - 浓度通常为几 ppb，或低至几 ppt 或亚 ppt 级 ICP-MS 提供的低检测限对于该行业至关重要，但单四极杆 ICP-MS 可能无法满足某些应用的亚 ppt 级要求。 为何使用 ICP-MS/MS？ ICP-MS/MS 使用 MS/MS 模式和反应性池气体方法，能够解决质谱重叠问题，并提供比单四极杆 ICP-MS 更低的检测限和更高的准确度。 例如，用于电子制造的超纯水的污染物通常要求 < 1 ppt（硼 <50 ppt），并且要求检测限 < 0.5 ppt（硼 < 15 ppt）。 I"
+        },
+        {
+          "ev_id": "EV-CN-082",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "Characterization of Ultrapure Water Using NexION 5000 ICP-MS",
+          "url": "https://pepolska.pl/app/uploads/2020/05/NexION-5000-ICP-MS-Semiconductor-Ultrapure-Water-App-Note.pdf",
+          "excerpt": "本文介绍了使用NexION 5000 ICP-MS对超纯水进行表征的方法。半导体行业不断追求更小、更快、更节能的设备，因此对材料的纯度要求也越来越高。超纯水（UPW）是半导体生产中最重要的化学品之一，广泛应用于湿加工步骤，包括晶圆冲洗和化学浴中化合物的稀释。文中详细介绍了NexION 5000 ICP-MS的仪器配置和分析条件，并展示了使用该仪器对UPW中26种对半导体至关重要的元素进行检测的结果。结果显示，所有26种元素的检测限（DL）均低于0.3ppt，远低于SEMI或ASTM标准中规定的1ppt要求。此外，文中还讨论了冷等离子体模式和MS/MS模式在去除光谱干扰方面的有效性，并展示了使用NexION 5000 ICP-MS对UPW中额外24种元素进行检测的结果。结论是，NexION 5000多四极杆ICP-MS具有出色的分析性能，能够满足半导体"
+        },
+        {
+          "ev_id": "EV-CN-083",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "NexION 5000 ICP-MS在超纯水分析中的应用",
+          "url": "https://resources.perkinelmer.com/lab-solutions/resources/docs/NexION_5000_ICP-MS_Application_Brief_(300029_CHN_01).pdf",
+          "excerpt": "# NexION 5000 ICP-MS 在超纯水分析中的应用 ### 引言 超纯水 (UPW) 被广泛地用于半导体器件生产中所有湿法工艺步骤，包括晶片冲洗和化学浴中化合物的稀释。 在这些关键步骤中，可能会吸收来自化学浴和冲洗水中的污染物，然后通过一系列的化学和电化学反应沉淀到硅表面。 在成品的重点区域中，如果金属污染物的浓度达到 50 ppq，就会改变集成电路部件的电气参数，导致其无法通过最后的电气测试。 因此超纯水纯度测定至关重要。 # NexION 5000 ICP-MS 在超纯水分析中的应用 ### 引言 在 SEMI F63-0918《半导体加工中超纯水使用指南》中，除 B（50 ppt）和 Ni（3 ppt）外，26 种金属污染物的目标值应小于 1 ppt。 在此，我们将展示出珀金埃尔默最新的化学高分辨多重四极杆 ICP-MS 仪器 Ne"
+        },
+        {
+          "ev_id": "EV-CN-084",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2016-01-25",
+          "title": "Reduction of airborne molecular contamination on an extreme ultraviolet reticle dual pod using clean dry air purging technology",
+          "url": "https://doi.org/10.1016/J.MEE.2015.10.009",
+          "excerpt": "As a result, the lithography area is always a critical factor in semiconductor manufacturing processes, and it is always the area most affected by AMC. Online analysis of AMC in semiconductor manufacturing cleanrooms has become more important of late. As the industry arranges to migrate to EUV lithography to draw back chip dimensions, the requirements to decrease airborne conta"
+        },
+        {
+          "ev_id": "EV-CN-085",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2007-03-01",
+          "title": "Measurements of volatile organic compounds in the earth's atmosphere using proton-transfer-reaction mass spectrometry.",
+          "url": "https://doi.org/10.1002/MAS.20119",
+          "excerpt": "Proton-transfer-reaction mass spectrometry (PTR-MS) allows real-time measurements of volatile organic compounds (VOCs) in air with a high sensitivity and a fast time response. The use of PTR-MS in atmospheric research has expanded rapidly in recent years, and much has been learned about the instrument response and specificity of the technique in the analysis of air from differe"
+        },
+        {
+          "ev_id": "EV-GLOBAL-050",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2024",
+          "title": "Virtual metrology of critical dimensions in plasma etch processes using entire optical emission spectrum",
+          "url": "https://ieeexplore.ieee.org/abstract/document/10570074",
+          "excerpt": "### IEEE Account  *   [Change Username/Password](https://www.ieee.org/profile/changeusrpwd/showChangeUsrPwdPage.html?refSite=https://ieeexplore.ieee.org&refSiteName=IEEE%20Xplore) *   [Update Address](https://www.ieee.org/profile/address/getAddrInfoPage.html?refSite=https://ieeexplore.ieee.org&refSiteName=IEEE%20Xplore)  ### Purchase Details  *   [Payment Options](https://www.ieee.org/profile/payment/showPaymentHome.html?refSite=https://ieeexplore.ieee.org&refSiteName=IEEE%20Xplore) *   [Order History](https://www.ieee.org/profile/vieworder/showOrderHistory.html?refSite=https://ieeexplore.ieee"
+        },
+        {
+          "ev_id": "EV-GLOBAL-056",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2026",
+          "title": "Mutual information-based wavelength selection for micro-leak detection in N2 semiconductor process environments",
+          "url": "https://www.sciencedirect.com/science/article/pii/S0042207X26007621",
+          "excerpt": "ScienceDirect  Are you a robot? Please confirm you are a human by completing the captcha challenge below. - Reference number: a5ab22bab96fc10b - IP Address: 175.27.234.154 t;t++)a=Math.floor(Math.random()*o),6>t&&l[t]a||2a||20&&(t=!1)),{corsType:e,corsCookiesEnabled:t}}(),getCORSInstance:function(){return\"none\"===this.corsMetadata.corsType?null:new b[this.corsMetadata.corsType]},fireCORS:function(t,a){function n(e){var a;try{if((a=JSON.parse(e))!==Object(a))return void r.handleCORSError(t,null,\"Response is not JSON\")}catch(e){return void r.handleCORSError(t,e,\"Error parsing response as JSON\")}"
+        },
+        {
+          "ev_id": "EV-GLOBAL-048",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T2",
+          "engine": "serper",
+          "published_date": "2015",
+          "title": "Process Modeling and Optimization Using Industrial Semiconductor Fabrication Data",
+          "url": "https://search.proquest.com/openview/579b08cec85ea29356888834f93c9601/1?cbl=18750&diss=y&pq-origsite=gscholar",
+          "excerpt": "## 版权信息  Database copyright ProQuest LLC; ProQuest does not claim copyright in the individual underlying works; open.access  ## 访问完整全文文献  以下是本文档的简短预览。您的图书馆或单位可能授予您访问权限，允许在 ProQuest 中访问本文档的完整全文文献。  [浏览 ProQuest](https://www.proquest.com/openview/579b08cec85ea29356888834f93c9601/1?cbl=18750&diss=y&pq-origsite=gscholar&login=true\"通过您的图书馆或单位连接至ProQuest\")  或者，您可以通过以下选项直接从 ProQuest 购买本文档完整全文文献的副本：  [订购](https://www.proquest.com/openview.unauthdocview:setshowcart/https:$2f$2forder.proquest.com$2fOA_HTML$2fpqdtibeCCtpItmDspRte.jsp$3fsitex$3d10020:22372:US$26item$3d32311560$26dlnow$3d1$26track$3d1SRCH$"
+        },
+        {
+          "ev_id": "EV-GLOBAL-054",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T2",
+          "engine": "serper",
+          "published_date": "2012",
+          "title": "Statistical methods for enhanced metrology in semiconductor/photovoltaic manufacturing",
+          "url": "https://escholarship.org/uc/item/2n32m8xq",
+          "excerpt": "… of metrology variables with the process and chamber state information as W2W Virtual Metrology (… with OES sensors reading from plasma etching tools. We can observe the resetting of …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-049",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2010",
+          "title": "Real-time plasma process condition sensing and abnormal process detection",
+          "url": "https://www.mdpi.com/1424-8220/10/6/5703",
+          "excerpt": "… (OES) and residual gas analysis (RGA). While etching is performed, OES and RGA data are … electrodes induces the physical etching process in the etch chamber. Since electrons have …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-051",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2011",
+          "title": "Virtual metrology for plasma etch processes.",
+          "url": "https://mural.maynoothuniversity.ie/id/eprint/2657",
+          "excerpt": "… (OES) measurements from the VASIMR engine plasma to … electron density in a production plasma etch chamber. To the best … of virtual metrology for real-time control of plasma electron …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-052",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2002",
+          "title": "Multivariate endpoint detection of plasma etching processes",
+          "url": "https://dspace.mit.edu/entities/publication/f440b92b-15dc-4c17-b711-fa4a30e16331",
+          "excerpt": "… with Leybold, for his help with the RGA work at TI. To the folks … So how does one go about achieving endpoint detection … a chamber that is physically connected to the process chamber. If …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-053",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2001",
+          "title": "In Situ Metrology",
+          "url": "https://api.taylorfrancis.com/content/chapters/edit/download?identifierName=doi&identifierValue=10.1201%2F9780203904541-29&type=chapterpdf",
+          "excerpt": "… An OES system consists of a viewport to the plasma chamber… use of OES sensors is for endpoint detection. Historically, … Since both the process tools and the RGA sensors are vacuum …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-055",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2015",
+          "title": "Process diagnostics of industrial plasma systems",
+          "url": "https://doras.dcu.ie/20813",
+          "excerpt": "… coupled 13.56 MHz plasma etch chamber was modified with a … Virtual metrology predicting etch rate was designed and … models predicting etch rate, in real time, using OES. The author …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-057",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2018",
+          "title": "Experimental investigation of atomic fluorine and oxygen densities in plasma etch processes",
+          "url": "https://doras.dcu.ie/22176",
+          "excerpt": "… Typical RGA energy spectra from a probe with a. (on left) … reactive particle density in the plasma chamber can provide better … Actinometry, one of the popular OES based plasma …"
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-S1-3Y-01",
+          "track_id": "S1",
+          "sector": "semiconductor",
+          "title": "12英寸晶圆厂多流路切换ppt级AMC分子污染在线软电离质谱/CRDS监控系统",
+          "horizon": "3-5y",
+          "china_priority_score": 96.0,
+          "global_priority_score": 94.0,
+          "physics_principle": "结合化学电离/PTR/IMR软电离飞行时间质谱与光腔衰荡光谱(CRDS)，在10-30秒切换巡检40+采样点（FOUP/光刻机/化学过滤塔前后），实时捕捉NH3/SO2/硅氧烷/有机胺ppt级突增，防止光刻镜头雾化(Haze)与金属腐蚀",
+          "roi_baseline": {
+            "capex_cny": 2200000,
+            "annual_opex_cny": 180000,
+            "annual_output_value_cny": 1200000000,
+            "yield_gain_pct": 0.22,
+            "annual_scrap_saving_cny": 650000,
+            "annual_downtime_saving_cny": 1400000,
+            "annual_consumable_ehs_saving_cny": 380000,
+            "market_tam_china_cny_100m": 38.0,
+            "market_tam_global_usd_m": 1150.0
+          },
+          "roi_metrics": {
+            "capex_cny": 2200000.0,
+            "annual_opex_cny": 180000.0,
+            "yield_gain_saving_cny": 2640000.0,
+            "annual_gross_benefit_cny": 5070000.0,
+            "net_annual_cashflow_cny": 4890000.0,
+            "payback_months": 5.4,
+            "roi_3yr_pct": 566.8,
+            "npv_5yr_cny": 16336947.3,
+            "irr_5yr_pct": 221.6,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 15.96,
+            "china_som_3_5y_cny_100m": 2.55,
+            "global_sam_usd_m": 437.0,
+            "global_som_5_10y_usd_m": 52.44
+          },
+          "weighted_pillar_score": 90.06
+        },
+        {
+          "opp_id": "OPP-S1-5Y-02",
+          "track_id": "S1",
+          "sector": "semiconductor",
+          "title": "先进制程循环湿法清洗(SC1/HF/SPM)单机台原位金属杂质与药液组分在线光学-质谱联用仪",
+          "horizon": "5-10y",
+          "china_priority_score": 91.0,
+          "global_priority_score": 93.0,
+          "physics_principle": "用在线拉曼/中红外衰减全反射光谱实时测H2O2/HF/NH4OH浓度配比（减少换液频次30%），配合微流控在线ICP-MS/激光诱导击穿实时监测ppt级Fe/Cu/Ni金属反弹",
+          "roi_baseline": {
+            "capex_cny": 2600000,
+            "annual_opex_cny": 220000,
+            "annual_output_value_cny": 1000000000,
+            "yield_gain_pct": 0.25,
+            "annual_scrap_saving_cny": 580000,
+            "annual_downtime_saving_cny": 820000,
+            "annual_consumable_ehs_saving_cny": 1150000,
+            "market_tam_china_cny_100m": 29.0,
+            "market_tam_global_usd_m": 980.0
+          },
+          "roi_metrics": {
+            "capex_cny": 2600000.0,
+            "annual_opex_cny": 220000.0,
+            "yield_gain_saving_cny": 2500000.0,
+            "annual_gross_benefit_cny": 5050000.0,
+            "net_annual_cashflow_cny": 4830000.0,
+            "payback_months": 6.5,
+            "roi_3yr_pct": 457.3,
+            "npv_5yr_cny": 15709500.1,
+            "irr_5yr_pct": 184.8,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 12.18,
+            "china_som_3_5y_cny_100m": 1.95,
+            "global_sam_usd_m": 372.4,
+            "global_som_5_10y_usd_m": 44.69
+          },
+          "weighted_pillar_score": 88.54
+        }
+      ]
+    },
+    {
+      "id": "S2",
+      "sector": "semiconductor",
+      "name": "晶圆前道先进工艺光学/声学/X射线纳米在线量测与缺陷检测",
+      "manufacturing_stages": [
+        "28nm-14nm-7nm及以下套刻误差(Overlay)、关键尺寸(OCD)与薄膜厚度机台内集成量测(Integrated Metrology)",
+        "3D NAND 超深孔刻蚀与GAA全环绕栅极沟道结构无损CD-SAXS/高能XRF在线量测",
+        "晶圆边缘与背面晶圆隐形缺陷、CMP后微划痕/蝶形凹陷皮秒超声及暗场光学检测"
+      ],
+      "evidence_count_cn": 18,
+      "evidence_count_global": 12,
+      "valid_ev_ids": [
+        "EV-CN-090",
+        "EV-CN-100",
+        "EV-CN-101",
+        "EV-GLOBAL-067",
+        "EV-GLOBAL-069",
+        "EV-GLOBAL-061",
+        "EV-GLOBAL-065",
+        "EV-GLOBAL-071",
+        "EV-CN-091",
+        "EV-CN-092",
+        "EV-CN-093",
+        "EV-CN-094",
+        "EV-CN-095",
+        "EV-CN-096",
+        "EV-CN-097",
+        "EV-CN-098",
+        "EV-CN-099",
+        "EV-CN-102",
+        "EV-CN-103",
+        "EV-CN-104",
+        "EV-CN-105",
+        "EV-CN-106",
+        "EV-CN-107",
+        "EV-GLOBAL-062",
+        "EV-GLOBAL-063",
+        "EV-GLOBAL-064",
+        "EV-GLOBAL-066",
+        "EV-GLOBAL-068",
+        "EV-GLOBAL-070",
+        "EV-GLOBAL-072"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-090",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2023年08月01日",
+          "title": "湖北省集成电路产业计量测试中心通过验收，成为全国第一家省级集成电路产业计量测试中心",
+          "url": "https://www.wuhan.gov.cn/sy/whyw/202308/t20230813_2246154.shtml",
+          "excerpt": "“常温25℃测试、低温-55℃测试、高温125℃测试，还有-55℃～125℃循环测试5次。”近日，长江日报记者在湖北省集成电路产业计量测试中心看到，一块块集成电路板在“冰柜”和“火炉”之间来回“煎熬”，经历着不同温度下的严苛筛选。 湖北省集成电路产业计量测试中心最近通过验收，成为全国第一家省级集成电路产业计量测试中心。 ![](http://www.app.dawuhanapp.com/c/10001/202308/dcede25dc3b6c5a3622632eb5ecf1d60.jpeg) 具有自主知识产权的测试设备攻关微纳米尺度下精密测量技术。长江日报记者 刘斌 摄 集成电路领域计量基础能力建设走在全国前列 记者获悉，湖北省集成电路产业计量测试中心由中国船舶集团第七〇九研究所筹建，通过考核验收并获批成立，标志着湖北省在集成电路领域计量基础能力建设走在全国前列，服务经济社会发展的能力水平有了新的突破。 集成电路产业属于国家十大重点产业“新一代信息技术产业”领域，俗称“芯片”产业，是信息技术产业的核心，是支撑经济社会发展和保障国家安全的战略性、基础性和先导性产业。 湖北省目前拥有芯片设计、芯片制造、封装材料等相关企业200多家，是国家集成电路产业四大集聚区之一。集成电路产业也是武汉大力发展的重点产业之一。2022年1月，武汉市发布了《关于促进半导体产业创新发展的意见》，到2025年"
+        },
+        {
+          "ev_id": "EV-CN-100",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2026年01月09日",
+          "title": "国家标准计划《纳米技术 纳米尺度薄膜厚度测量 椭圆偏振法应用指南》",
+          "url": "https://std.samr.gov.cn/gb/search/gbDetailed?id=47EF6019B1A5D3EDE06397BE0A0AE91B",
+          "excerpt": "国家标准计划《纳米技术 纳米尺度薄膜厚度测量 椭圆偏振法应用指南》由 TC279（全国纳米技术标准化技术委员会）归口，TC279SC2（全国纳米技术标准化技术委员会纳米检测技术分会）执行 ，主管部门为中国科学院。 主要起草单位 泰州飞荣达新材料科技有限公司 、东南大学 、南京大学海安高技术研究院 、泰州巨纳新能源有限公司 、南京大学等 。 20260021-Z-491 正在起草 | 17 计量学和测量、物理现象 |  | 17.180 光学和光学测量 |  | 17.180.30 光学测量仪器 |  本标准等同采用IEC国际标准：IEC/TR 63258:2021。 采标中文名称:纳米技术 纳米尺度薄膜厚度测量 椭圆偏振法应用指南。"
+        },
+        {
+          "ev_id": "EV-CN-101",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2014年09月30日",
+          "title": "椭圆偏振仪测量硅表面上二氧化硅薄层厚度的方法",
+          "url": "https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=619E71E33C8CF9DA9C3A8238F223EE36",
+          "excerpt": "Title: 国家标准|GB/T 31225-2014  URL Source: https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=619E71E33C8CF9DA9C3A8238F223EE36  Final URL: https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=619E71E33C8CF9DA9C3A8238F223EE36  Markdown Content: ![Image 1](https://openstd.samr.gov.cn/bzgk//images/bgrep.gif)![Image 2](https://openstd.samr.gov.cn/bzgk//images/logonew.png)  Toggle navigation[![Image 3](https://openstd.samr.gov.cn/bzgk//images/shareLogo.png) 全国标准信息公共服务平台](https://std.samr.gov.cn/)  *   [首页](https://std.samr.gov.cn/) *   [国家标准](https://openstd.samr.gov.cn/bzgk//std/) *   [强制性国家标准](https"
+        },
+        {
+          "ev_id": "EV-CN-091",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年12月05日",
+          "title": "缺陷检测占比 62.6%，量测占比 33.5%",
+          "url": "https://www.vzkoo.com/question/1701764910551023",
+          "excerpt": "缺陷检测占62.6%，量测占33.5%。缺陷检测主要分为无图形晶圆检测、有图形晶圆检测和电子束检测。无图形晶圆检测主要用光学检测，如KLA的Surfscan SP系列和中科飞测的SPRUCE系列；有图形晶圆检测采用明场/暗场光学检测，如KLA的29xx/39xx系列和上海精测设备；电子束检测用于纳米级缺陷复检，如应用材料的SEMVision系列和KLA的eSL10系列。掩模版检测主要用EUV光源，如Lasertec的ACTIS A150。量测主要为关键尺寸、套刻误差、膜厚等，CD-SEM和OCD为主流技术，如KLA的SpectraShape系列和上海精测的IM系列。套刻误差测量采用衍射技术，如KLA的ATL系列和ASML的YieldStar系列。膜厚测量用光学方法，如KLA的SpectraFilm系列和上海精测的MetaPAM系列。整体国产化率不足5"
+        },
+        {
+          "ev_id": "EV-CN-092",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年08月09日",
+          "title": "晶圆缺陷光学检测设备赋能半导体质控新高度",
+          "url": "https://sunny-instrument.com/news-detail/66",
+          "excerpt": "二、国产突围：打破垄断重塑格局 长期以来，晶圆检测设备市场由国际巨头主导，其中KLA占据52%份额。 如今，国产力量正以技术创新破局：北京邮电大学团队研发的智能算法提升缺陷识别效率，兆维智能的专利技术实现缺陷自动分类与溯源，思波微则通过超声检测融合光学方案拓展应用边界。 这些突破不仅降低30%以上的设备采购成本，更推动检测技术本土化适配，为芯片制造企业提供“即时响应、深度定制”的质控解决方案。"
+        },
+        {
+          "ev_id": "EV-CN-093",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年05月29日",
+          "title": "中国晶圆检测设备厂商基本实现了28nm及以上制程产品的初步覆盖",
+          "url": "http://stockfinance.sina.cn/stock/go.php/paper/reportid/770281920642/index.phtml?cid=76524&node_id=76524&vt=4",
+          "excerpt": "产品细分领域中，高精度Overlay测量设备国产化率接近于0；X光量检测设备国产化率不足1%；膜厚厚度量测设备国产化率已达到15%；光学复查设备国产化率已达到10% ；AOI检测设备国产化率可达到15%。 国产晶圆检测设备厂商有中科飞测、上海精测、上海睿励、赛腾股份、诚锋科技、矽行半导体、东方晶圆、上海御微、南京中安等。"
+        },
+        {
+          "ev_id": "EV-CN-094",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年09月15日",
+          "title": "晶圆量测与检测设备",
+          "url": "https://www.eet-china.com/mp/a527950.html",
+          "excerpt": "20世纪是电的世纪，21世纪是光的世纪。晶圆量测与检测设备是芯片产线的隐形基石，通过纳米级量测与缺陷筛查守住良率底线。高端芯片生产需经历上百道工序，任何微小偏差都可能导致芯片失效。晶圆量测用于定量采集工艺参数，确保工艺精度；检测则定位缺陷隐患，拦截不良晶圆。主流技术包括光学检测、电子束检测和精密量测，CD-SEM等设备在其中发挥关键作用。国产厂商如中科飞测已实现技术突破，设备性能对标国际水平，推动国产替代加速。晶圆量测检测设备是半导体设备国产化的重要突破口，助力国内芯片产业实现自主可控。"
+        },
+        {
+          "ev_id": "EV-CN-095",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2001年10月15日",
+          "title": "Lam Research Corporation Announces Integrated Metrology Program For CMP",
+          "url": "https://newsroom.lamresearch.com/2001-10-15-Lam-Research-Corporation-Announces-Integrated-Metrology-Program-For-CMP",
+          "excerpt": "Sensys' software architecture provides easier implementation of run-to-run control of Teres. \"We chose Sensys for its superior technology and technical expertise-involving experience with leading metrology equipment suppliers-which we will leverage in developing next-generation metrology solutions,\" stated Kevin Crofton, general manager for Lam's CMP/Clean Products Group. Teres"
+        },
+        {
+          "ev_id": "EV-CN-096",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年05月17日",
+          "title": "中科飞测-公司新股研究报告：专注半导体质控设备国产破局现曙光",
+          "url": "https://www.sgpjbg.com/baogao/125877.html?newsid=1700146",
+          "excerpt": "59、薄膜膜厚量测设备系列 在前道制程中，需在晶圆表面覆盖包括金属、绝缘体、多晶硅、氮化硅等多种材质的多层薄膜，膜厚测量环节通过精准测量每一层薄膜的厚度、折射率和反射率，并进一步分析晶圆表面薄膜膜厚的均匀性分布，从而保证晶圆的高良品率。 薄膜膜厚测量设备主要应用于晶圆上纳米级的单/多层膜的膜厚测量，采用椭圆偏振技术和光谱反射技术。 自然光经偏振器变成偏振光入射到待测膜上，反射光的偏振状态发生变化，检测这种变化便可推算出待测膜面的膜厚度和折射率等光学特性。 图29：薄膜膜厚量测技术 资料来源：帕克公司官网，民生证券研究院 4.1.2 关键尺寸量测（CD）（1）OCD OCD（光学方法测关键尺寸）与膜厚量测原"
+        },
+        {
+          "ev_id": "EV-CN-097",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2022年08月10日",
+          "title": "精测电子:多台光学前道测量设备从上海精测半导体新工厂启运",
+          "url": "http://m.jrj.com.cn/madapter/stock/2022/08/11175036891680.shtml",
+          "excerpt": "其中，该光学膜厚测量设备适用于28nm FEOL和14nm BEOL节点制程，搭载多套测量系统，可以支持宽谱穆勒椭偏测量、高精度单波长椭偏测量，垂直反射率测量，混合测量等多种模式，可根据客户需求进行最优化弹性配置，适用于Gate Ox、SiON、HK/MG、SiGe、Thin ONO、ILD/IMD、SOI 等膜层结构的厚度、折射率、组分、反射率、膜应力等测量；OCD测量设备，主要应用于28nm节点及以上制程，满足客户二维或三维浅沟槽隔离、栅极、源漏区等结构的线宽、侧壁角、高度/深度等关键尺寸在线量测的多方面需求，进而可为客户创造更多价值。"
+        },
+        {
+          "ev_id": "EV-CN-098",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年04月30日",
+          "title": "半导体量测检测设备：国产化短板，替代潜力巨大",
+          "url": "https://xueqiu.com/1464699229/288540594",
+          "excerpt": "这些 时变的涡流反过来产生一个磁场，改变驱动线圈的阻抗，该阻抗与薄膜材料的电 阻成反比，同样通过换算可以得出薄膜厚度参数。 椭圆偏振法基本原理为：将一束椭圆偏振光按照一定的入射角照射到样品上，已 知入射光的偏振态，可根据偏振态的改变来确定薄膜材料的具体结构，得到其厚 度和光学参数信息（如复折射率、厚度或复介电常数等）。"
+        },
+        {
+          "ev_id": "EV-CN-099",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月01日",
+          "title": "信批获A级评定",
+          "url": "https://finance.sina.cn/stock/ywgg/2024-03-06/detail-inamkcmt0225340.d.html?oid=sumo+slot%28SEO%3A~PG99.Asia~%29%2Csumo+slot%28SEO%3A~PG99.Asia~%29%2Csumo+slotht9&vt=4",
+          "excerpt": "在半导体光学量测领域，公司作为 国内少数拥有完全自主知识产权的穆勒矩阵椭圆偏振仪的企业， 在此核心技术基 础上完成了光学关键尺寸量测系统的研究开发和产业化， 不同于此前业内流行的 分离式全斯托克斯型 OCD，公司完成开发的是分离式穆勒矩阵增强型OCD，是目 前业内最新一代的 OCD 检测手段， 测量精度和量测稳定性相较全斯托克斯型 OCD 有着明显的优势。"
+        },
+        {
+          "ev_id": "EV-GLOBAL-067",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2023",
+          "title": "Review of the key milestones in the development of critical dimension small angle x-ray scattering at National Institute of Standards and Technology",
+          "url": "https://www.spiedigitallibrary.org/journals/journal-of-micro-nanopatterning-materials-and-metrology/volume-22/issue-3/031206/Review-of-the-key-milestones-in-the-development-of-critical/10.1117/1.JMM.22.3.031206.short",
+          "excerpt": "… new fabrication processes and for in-line fabrication … high aspect ratio (HAR) and/or with structures inside buried layers.Now, the number of layers in memory chips, such as 3D NAND, is …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-069",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "2021",
+          "title": "Metrology",
+          "url": "https://ieeexplore.ieee.org/abstract/document/9827533",
+          "excerpt": "… As device structures evolve from FinFETs to GAA-based on … are able to measure very high aspect ratio structures made from … of CD-SAXS utilized large synchrotron facilities for the X-ray …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-061",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T2",
+          "engine": "serper",
+          "published_date": "2026",
+          "title": "X-ray metrology for advanced semiconductor manufacturing of next-generation logic devices",
+          "url": "https://www.spiedigitallibrary.org/journals/journal-of-micro-nanopatterning-materials-and-metrology/volume-25/issue-1/010901/X-ray-metrology-for-advanced-semiconductor-manufacturing-of-next-generation/10.1117/1.JMM.25.1.010901.short",
+          "excerpt": "… GAA devices has been reached by conventional metrology, … control are encountered, as aspect ratios greater than 10:1 are … By contrast, the CD-SAXS, an X-ray-based CD-measurement …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-065",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T2",
+          "engine": "serper",
+          "published_date": "2021",
+          "title": "X-ray critical dimension metrology solution for high aspect ratio semiconductor structures",
+          "url": "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/11611/116110W/X-ray-critical-dimension-metrology-solution-for-high-aspect-ratio/10.1117/12.2583966.short",
+          "excerpt": "… diameters and depths are smaller than in 3D-NAND, high aspect ratio (AR ~30:1) holes are … shape metrology of extreme HAR structures based on transmission geometry CD-SAXS that …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-071",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T2",
+          "engine": "serper",
+          "published_date": "Nov 17, 2025",
+          "title": "Semiconductor Metrology Products",
+          "url": "https://ontoinnovation.com/product-categories/metrology",
+          "excerpt": "We offer integrated and inline metrology solutions, Critical Process Steps in 3D NAND using Picosecond Ultrasonic Metrology with both Thickness and Sound ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-062",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2025",
+          "title": "Emerging x-ray metrology techniques with evolving front-end-of-line high-technology IC nodes",
+          "url": "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/13426/0000/Emerging-x-ray-metrology-techniques-with-evolving-front-end-of/10.1117/12.3051692.short",
+          "excerpt": "… The CD-SAXS, a well-established X-ray technique for CD … high-aspect-ratio (HAR, up to 50:1) structures in 3D NAND … in-line metrology in the GAA applications. A recent review on …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-063",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2016",
+          "title": "HVM metrology challenges towards the 5nm node",
+          "url": "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/9778/1/HVM-metrology-challenges-towards-the-5nm-node/10.1117/12.2218375.short",
+          "excerpt": "… 3D NAND memories will continue to increase in aspect ratios… The main alternative to OCD is CD-SAXS, which uses X-ray … in the form of gate all around (GAA) structures. Similarly, future …"
+        },
+        {
+          "ev_id": "EV-GLOBAL-064",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2018",
+          "title": "7/5nm logic manufacturing capabilities and requirements of metrology",
+          "url": "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/10585/105850I/75nm-logic-manufacturing-capabilities-and-requirements-of-metrology/10.1117/12.2296679.short",
+          "excerpt": "… The main alternative to OCD is CD-SAXS, which uses X-ray … (GAA) structures. Similarly, future 3D memory devices will include multiple gate-level structures defined by high-aspect ratio (…"
+        },
+        {
+          "ev_id": "EV-GLOBAL-066",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2017",
+          "title": "Metrology capabilities and needs for 7nm and 5nm logic nodes",
+          "url": "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/10145/101450G/Metrology-capabilities-and-needs-for-7nm-and-5nm-logic-nodes/10.1117/12.2260870.short",
+          "excerpt": "… The main alternative to OCD is CD-SAXS, which uses X-ray … (GAA) structures. Similarly, future 3D memory devices will include multiple gate-level structures defined by high-aspect ratio (…"
+        },
+        {
+          "ev_id": "EV-GLOBAL-068",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "2022",
+          "title": "Inline metrology of high aspect ratio hole tilt using small-angle x-ray scattering",
+          "url": "https://www.spiedigitallibrary.org/conference-proceedings-of-spie/12053/1205312/Inline-metrology-of-high-aspect-ratio-hole-tilt-using-small/10.1117/12.2614312.short",
+          "excerpt": "… High aspect ratio (HAR) structures found in 3D NAND … angle X-ray scattering (CD-SAXS), is a powerful technique that can provide valuable insights on the arrangement, shape, and size …"
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-S2-3Y-01",
+          "track_id": "S2",
+          "sector": "semiconductor",
+          "title": "机台内嵌式(Integrated)宽光谱穆勒矩阵椭偏+皮秒超声膜厚/OCD在线闭环量测模块",
+          "horizon": "3-5y",
+          "china_priority_score": 97.0,
+          "global_priority_score": 91.0,
+          "physics_principle": "直接集成于CMP/CVD/刻蚀设备EFEM传片前端，用深紫外-近红外穆勒矩阵光谱椭偏反演三维线宽/侧壁角，叠加皮秒激光声波无损测量不透明Cu/Co/W金属互联厚度，实现每片晶圆R2R实时反馈",
+          "roi_baseline": {
+            "capex_cny": 3100000,
+            "annual_opex_cny": 210000,
+            "annual_output_value_cny": 1800000000,
+            "yield_gain_pct": 0.28,
+            "annual_scrap_saving_cny": 950000,
+            "annual_downtime_saving_cny": 1200000,
+            "annual_consumable_ehs_saving_cny": 260000,
+            "market_tam_china_cny_100m": 62.0,
+            "market_tam_global_usd_m": 2400.0
+          },
+          "roi_metrics": {
+            "capex_cny": 3100000.0,
+            "annual_opex_cny": 210000.0,
+            "yield_gain_saving_cny": 5040000.0,
+            "annual_gross_benefit_cny": 7450000.0,
+            "net_annual_cashflow_cny": 7240000.0,
+            "payback_months": 5.1,
+            "roi_3yr_pct": 600.6,
+            "npv_5yr_cny": 24345296.21,
+            "irr_5yr_pct": 233.0,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 26.04,
+            "china_som_3_5y_cny_100m": 4.17,
+            "global_sam_usd_m": 912.0,
+            "global_som_5_10y_usd_m": 109.44
+          },
+          "weighted_pillar_score": 91.9
+        },
+        {
+          "opp_id": "OPP-S2-5Y-02",
+          "track_id": "S2",
+          "sector": "semiconductor",
+          "title": "面向3D NAND超深孔与GAA/CFET的紧凑型高亮度液态金属靶X射线CD-SAXS/XRF在线量测系统",
+          "horizon": "5-10y",
+          "china_priority_score": 88.0,
+          "global_priority_score": 96.0,
+          "physics_principle": "利用高亮度液态金属射流微焦斑X射线源突破光学衍射极限与不透明多层遮挡，在量测站内无损重建200层+高深宽比通孔倾斜度、底径及GAA纳米片内硅锗刻蚀残留",
+          "roi_baseline": {
+            "capex_cny": 5500000,
+            "annual_opex_cny": 380000,
+            "annual_output_value_cny": 2200000000,
+            "yield_gain_pct": 0.32,
+            "annual_scrap_saving_cny": 1300000,
+            "annual_downtime_saving_cny": 1650000,
+            "annual_consumable_ehs_saving_cny": 180000,
+            "market_tam_china_cny_100m": 45.0,
+            "market_tam_global_usd_m": 1850.0
+          },
+          "roi_metrics": {
+            "capex_cny": 5500000.0,
+            "annual_opex_cny": 380000.0,
+            "yield_gain_saving_cny": 7040000.0,
+            "annual_gross_benefit_cny": 10170000.0,
+            "net_annual_cashflow_cny": 9790000.0,
+            "payback_months": 6.7,
+            "roi_3yr_pct": 434.0,
+            "npv_5yr_cny": 31611802.47,
+            "irr_5yr_pct": 176.9,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 18.9,
+            "china_som_3_5y_cny_100m": 3.02,
+            "global_sam_usd_m": 703.0,
+            "global_som_5_10y_usd_m": 84.36
+          },
+          "weighted_pillar_score": 89.7
+        }
+      ]
+    },
+    {
+      "id": "S3",
+      "sector": "semiconductor",
+      "name": "SiC/GaN宽禁带功率半导体衬底、外延与晶圆级动态KGD在线测试（电力×半导体核心交叉）",
+      "manufacturing_stages": [
+        "8英寸SiC晶锭/衬底微管、TSD/TED/BPD位错与残余应力高速光学PL/拉曼全片在线扫描",
+        "SiC/GaN外延层厚度与掺杂浓度在线FTIR/非接触电晕电荷(Corona-Kelvin)CV测试",
+        "新能源汽车主驱/特高压柔性直流/光储逆变器用SiC MOSFET晶圆级动态雪崩、短路、体二极管退化与HTRB/HTGB在线KGD全检分选"
+      ],
+      "evidence_count_cn": 17,
+      "evidence_count_global": 6,
+      "valid_ev_ids": [
+        "EV-CN-114",
+        "EV-CN-116",
+        "EV-GLOBAL-078",
+        "EV-CN-108",
+        "EV-CN-109",
+        "EV-CN-110",
+        "EV-CN-111",
+        "EV-CN-112",
+        "EV-CN-113",
+        "EV-CN-115",
+        "EV-CN-117",
+        "EV-CN-118",
+        "EV-CN-119",
+        "EV-CN-120",
+        "EV-CN-121",
+        "EV-CN-122",
+        "EV-CN-123",
+        "EV-CN-124",
+        "EV-GLOBAL-073",
+        "EV-GLOBAL-074",
+        "EV-GLOBAL-075",
+        "EV-GLOBAL-076",
+        "EV-GLOBAL-077"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-114",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2021年11月23日",
+          "title": "半导体器件 功率器件用碳化硅同质外延片缺陷的无损检测识别判据 第3部分：缺陷的光致发光检测方法",
+          "url": "https://std.samr.gov.cn/gb/search/gbDetailed?id=C73861A68BDA902DE05397BE0A0A5CF8",
+          "excerpt": "国家标准计划《半导体器件 功率器件用碳化硅同质外延片缺陷的无损检测识别判据 第3部分：缺陷的光致发光检测方法》由 TC203（全国半导体设备和材料标准化技术委员会）归口，TC203SC2（全国半导体设备和材料标准化技术委员会材料分会）执行 ，主管部门为国家标准委。 主要起草单位 中国电子科技集团公司第十三研究所 、中国电子科技集团公司第四十六研究所 、之江实验室 、浙江大学 、芜湖启迪半导体有限公司 。 | 77 冶金 |  | 77.040 金属材料试验 |  本标准等同采用IEC国际标准：IEC 63068-3:2020。 采标中文名称:半导体器件 功率器件用碳化硅同质外延片缺陷的无损检测识别判据 第3部分：缺陷的光致发光检测方法。 碳化硅材料作为典型的宽禁带半导体材料，因其优越的物理特性非常适合在大功率、高温和高频环境下应用，属于典型的新材料。 《新材料标准领航行动计划（2018-2020年）》中二、主要行动-（二）4先进半导体材料明确提及建立碳化硅标准；《新材料产业发展指南》中三、发展方向（二）中明确提及宽禁带半导体材料；《重点新材料首批次应用示范指导目录（2019年版）》中关键战略材料-三、第284项对应碳化硅外延片。 碳化硅外延材料作为连接单晶衬底和功率器件之间的技术桥梁，是整个产业链中的必不可少的一环。 SiC同质外延片中存在的缺陷直接影响SiC基功率器件的成品率和器"
+        },
+        {
+          "ev_id": "EV-CN-116",
+          "geo_scope": "CN",
+          "authority_tier": "T1",
+          "engine": "metaso",
+          "published_date": "2020年01月03日",
+          "title": "碳化硅外延片基面位错的测试 光致发光法",
+          "url": "https://std.samr.gov.cn/gb/search/gbDetailed?id=9B2BD8583ABF26E2E05397BE0A0AC2D1",
+          "excerpt": "国家标准计划《碳化硅外延片基面位错的测试 光致发光法》由 TC203（全国半导体设备和材料标准化技术委员会）归口，TC203SC2（全国半导体设备和材料标准化技术委员会材料分会）执行 ，主管部门为国家标准委。 主要起草单位 芜湖启迪半导体有限公司 、中国电子科技集团第五十五研究所 、中国电子科技集团第四十六研究所 、瀚天天成电子科技（厦门）有限公司 、东莞市天域半导体科技有限公司 、北京天科合达半导体股份有限公司 、中关村天合宽禁带半导体技术创新联盟 。 | 77 冶金 |  | 77.040 金属材料试验 |  碳化硅为典型的第三代宽禁带半导体材料。 《战略性新兴产业分类（2018）》中3.4.3.1半导体晶体制造-3985*-电子专用材料制造（碳化硅单晶和单晶片）；《新材料标准领航行动计划（2018-2020年）》中二、主要行动-（二）4先进半导体材料明确提及建立碳化硅标准；《新材料产业发展指南》中三、发展方向（二）中明确提及宽禁带半导体材料；《重点新材料首批次应用示范指导目录（2019年版）》中关键战略材料-三、第284项对应碳化硅外延片。 基于碳化硅材料的电力电子器件作为新兴的第三代半导体器件的杰出代表，以其优越的综合性能表现正在受到越来越多的关注，在电网应用中具有明显的优势。 与传统的硅器件相比较，碳化硅器件工作电压、工作频率可以达到硅器件的10倍，电流密度达到硅器件的4"
+        },
+        {
+          "ev_id": "EV-CN-108",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年06月01日",
+          "title": "蓉矽黑科技正式亮相：切实保障SiC MOSFET栅极氧化层可靠性",
+          "url": "https://www.ab-sm.com/en/a/31021",
+          "excerpt": "在第三代半导体领域，联讯仪器提供功率芯片KGD测试机，KGD转料机，串/并行半导体参数测试系统（Wafer Acceptance Test），SiC/GaN HTGB（High Temperature Gate Bias）和HTRB（High Temperature Reverse Bias）晶圆老化测试/分选系统等高端测试设备。 蓉矽半导体拥有高性价比“NovuSiC®”和高可靠性“DuraSiC®”产品系列，涵盖碳化硅二极管EJBS™与碳化硅MOSFET；硅基FR MOS与理想硅基二极管MCR®，应用于光伏逆变器、储能、充电桩、OBC及新能源汽车等领域。"
+        },
+        {
+          "ev_id": "EV-CN-109",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年05月28日",
+          "title": "推出SiC MOSFETKGD及晶圆级动态WLR测试设备，高电流源表首次亮相",
+          "url": "https://www.eet-china.com/mp/a317856.html",
+          "excerpt": "公司推出SiC MOSFET晶圆级动态WLR测试系统及裸芯片KGD测试系统，同时首次亮相高电流源表。SiC MOSFET晶圆级动态WLR测试系统适用于6/8英寸SiC MOSFET晶圆老化测试，温度最高达200℃，支持6晶圆并行测试，具备全面保护功能，符合AQG324或JEP195标准。SiC MOSFET裸芯片KGD测试系统提供快速测试体验，支持多种测试类型，具备三重保护方案。IPF 2024第二届碳化硅功率器件制造与应用测试大会暨化合物半导体产业高峰论坛同期举办，提供大会报名通道。"
+        },
+        {
+          "ev_id": "EV-CN-110",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年07月08日",
+          "title": "第三代半导体技术与产业链创新发展论坛",
+          "url": "http://www.casmita.com/news/202407/08/15894.html",
+          "excerpt": "忱芯科技(上海)有限公司创始人毛赛君 《碳化硅功率半导体器件KGD和晶圆级可靠性测试面临的挑战和解决方案》 忱芯科技(上海)有限公司创始人毛赛君做了“碳化硅功率半导体器件KGD和晶圆级可靠性测试面临的挑战和解决方案”的主题报告，详细分享了SiC MOSFET精确静态特性测试、SiC MOSFET精确动态特性测试、SiC MOSFET可靠性测试、SiC MOSFET在电动汽车应用中动态可靠性测试、SiC MOSFET在电动汽车应用中的功率循环测试等面临的挑战，以及SiC MOSFET栅极氧化物的可靠性因素，SiC MOSFET的FBSOA测试，电动汽车应用中SiC MOSFET的KGD测试仪，用于电动汽车应用的SiC MOSFET晶片级烧入测试仪等内容。 报告指出，SiC MOSFET在电动汽车中的大规模应用正在成为一种不可抗拒的趋势。"
+        },
+        {
+          "ev_id": "EV-CN-111",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年01月01日",
+          "title": "KGD Test System for SiC MOSFET",
+          "url": "https://www.unisic-tech.com/new/117.html",
+          "excerpt": "关于忱芯科技UniSiC 忱芯科技(UniSiC)是功率半导体自动化测试系统解决方案创新领导者，产品可覆盖SiC、GaN以及Si基功率半导体器件各测试环节，为功率半导体IDM企业、新能源车厂及Tier1、功率器件设计与封装企业提供精准、可靠、高性价比的测试解决方案。 忱芯科技的SiC功率半导体测试系统产品包括：晶圆级动态WLR测试系统、芯片级KGD测试系统、高温正偏测试系统、动态测试系统、静态测试系统、动态可靠性测试系统、连续功率测试系统等，全面覆盖功率半导体晶圆级测试、芯片级测试、单管/模块级测试和系统级测试，可满足实验室与生产线的多种场景需求。"
+        },
+        {
+          "ev_id": "EV-CN-112",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年01月01日",
+          "title": "KGD 测试分选设备",
+          "url": "https://www.sharetek.com.cn/index.php?c=show&id=1224",
+          "excerpt": "KGD 测试分选设备 • 可自动实现Die的取料、搬运、测试与下料 芯片支持晶圆、华夫盒等上下料形式，每个测试工位单独配置不良品收料工位；• 支持动态、静态、雪崩等不同功能测试• 支持4工位串并行测试，不同工位支持不同温度与测试项目• UPH（4个测试平台，串行测）≥1000pcs（根据测试时间变化）• 放置精度≤±30μm• 支持高温测试，温度范围从室温~200℃• Chuck为密封设计，具备氮气保护且防高压打火功能• 支持六面外观检测功能； 模组接口通用化, 快速装拆，可扩展性强• 适用产品： 晶圆芯片、散料芯片等"
+        },
+        {
+          "ev_id": "EV-CN-113",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年08月27日",
+          "title": "一文了解KGD测试",
+          "url": "https://m.douban.com/note/875459054",
+          "excerpt": "KGD测试是功率半导体制造中确保裸芯片质量的关键环节。在SiC模块封装技术发展背景下，多芯片封装对裸Die品质要求极高，单芯片失效可能引发模块失效率指数上升。KGD测试通过静态、动态测试及高应力筛选，剔除早期失效或缺陷芯片，确保封装成品质量与可靠性。其必要性包括：晶圆级测试局限性、SiC切割导致的芯片缺陷、提升封装质量。测试难点包括高应力环境、测试效率、精确性与安全性、成本控制。KGD测试设备需支持高压、大电流、高温测试，具备高速Handler方案，UPH达1200，并采用三重保护方案保障测试精度与系统安全。"
+        },
+        {
+          "ev_id": "EV-CN-115",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2013年07月19日",
+          "title": "Thea C520 碳化硅晶圆衬底及外延片缺陷检测系统",
+          "url": "https://purechip.cn/page12?product_id=62",
+          "excerpt": "Thea C520碳化硅晶圆衬底及外延片缺陷检测系统是一款专门用于识别碳化硅衬底和外延片缺陷的检测系统。该系统采用暗场、明场、表面斜率变化、相位、光致发光五种互补检测技术，可对Scratch、Particle、Pits、堆垛层错、微管、基平面错位（BPDs）、Carrot、Triangle、SF、Step Bunching等缺陷进行精细分类。系统具备分析工具，可生成全面的检查报告，帮助制造商识别影响良率的缺陷。系统可检测4、6、8英寸晶圆，灵敏度为60nm @PSL on Si，重复性≤5%。晶圆标准产率：4英寸>15WPH，6英寸>10WPH，8英寸>7WPH；高产率分别为>30WPH、>20WPH、>14WPH。检测范围包括SiC晶圆上的Micro Pipe、SF、Particle、Pits、Scratch、Stain，以及SiC外延片上的BPD"
+        },
+        {
+          "ev_id": "EV-CN-117",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2023年07月28日",
+          "title": "SiC衬底位错缺陷检测专用设备",
+          "url": "http://www.timetechspectra.com/h-col-108.html",
+          "excerpt": "|  | SiC衬底位错缺陷检测专用设备 光学非接触无损检测 BPD、TSD、TED分类识别 SiC衬底：4'/6'/8'；导电、半绝缘 最高检测速度：<17 min/片(6\") SiC晶圆少子寿命质量成像监测系统 晶圆衬底质量(载流子寿命)高速成像 快速筛查外延片晶格质量 高时空分辨率 多激发波长可切换 全自动送样测试 钙钛矿太阳能电池综合性能分析系统 兼容各种 电池尺寸10 cm*10 cm，30 cm*30 cm 集成多种检测手段 明场成像/光致发光成像/电致发光成像/光电压(电流)成像"
+        },
+        {
+          "ev_id": "EV-CN-118",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "碳化硅缺陷检测技术以及缺陷对碳化硅器件的影响",
+          "url": "https://kuaibao.lzzcloud.net/news_info/1177778.html",
+          "excerpt": "光致发光（PL） 光致发光（PL）是用于检测晶体缺陷的最常用的亚表面检测技术之一。 PL的高产量使其适用于在线批量生产。 SiC是一种间接带隙半导体，在约380nm波长的近带边缘发射处显示PL。 SiC晶片中在贯穿缺陷水平的重组可能是辐射性的。 基于UV激发的PL技术已被开发用于识别SiC晶片内部存在的缺陷，如BPDs和SFs。"
+        },
+        {
+          "ev_id": "EV-CN-119",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年06月13日",
+          "title": "SiC衬底外延及器件制造系列(三):SiC外延层中的缺陷及部分表征技术",
+          "url": "https://www.ewsemi.com/NewsDetail/5970040.html",
+          "excerpt": "光致发光PL 当光激发一些过量载流子出现出辐照复合时，这种称谓光致发光（Photoluminescence，PL）。 激发源的光子能量一般要大于带隙，如果被测样品是非常完美的单晶，只能观察到游离的峰。 如果实际材料中存在缺陷和杂质，存在多个复合路径，这会导致PL光谱中出现各种发射峰。 所以PL是评估衬底材料的缺陷和纯度的关键技术。"
+        },
+        {
+          "ev_id": "EV-GLOBAL-078",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "Jan 24, 2026",
+          "title": "mEgspectrum",
+          "url": "https://spectrum.ieee.org/files/65853/ieee-spectrum-first-issue.pdf",
+          "excerpt": "THE INST UTE OF ELECTR 'AL AND ELECT-ON Co ENGINEERS INC. JANUARY 1964 mEg spectrum JOHN D. RYDER ELWOOD K. GANNETT RONALD K. JURGEN ROBERT E. WHITLOCK SAMUEL WALTERS Editor Managing Editor Executive Editor Technical Editor Technzical Editor GORDON D. FRIEDLANDER Technical Editor ELEANOR F. PECK GLADYS CHARITZ Copy Editor IEEE Neivs Editor STELLA GRAZOA Editorial Assistanit HERBERT TAYLOR A rt Director THE INSTITUTE OF ELECTRICAL AND ELECTRONICS ENGINEERS, INC. RUTH M. EDMISTON Production Elditor BOARD OF DIRECTORS, 1963* EDITORIAL OPERATIONS Ernst Weber, President B. R. Teare, Jr., Vice Presi"
+        },
+        {
+          "ev_id": "EV-GLOBAL-073",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "",
+          "title": "on the path to tokamak burning plasma operation - JuSER",
+          "url": "https://juser.fz-juelich.de/record/1055345/files/Mazon_2025_Nucl._Fusion_65_113001.pdf",
+          "excerpt": "by D Mazon · 2025 · Cited by 31 — ... test of the ITER borosilicate glass inserts for vacuum electrical feedthroughs are summarized finding negligible swelling at target level ... metrology ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-074",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Dec 2, 2025",
+          "title": "E-Tender for Supply, Installation, Testing and ...",
+          "url": "https://rbi.org.in/hindi1/Upload/content/PDFs/SITCAC12022025_A1.pdf",
+          "excerpt": "This document is the property of Reserve Bank of India (RBI). It may not be copied, distributed or recorded on any medium, electronic or otherwise, ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-075",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Apr 15, 2026",
+          "title": "ii technical specification",
+          "url": "https://indianbank.bank.in/documents/20117/518589/TECHNICAL-BID-VOL-II-INDSETI-Krishnagiri2026_04_15_11_27_40.pdf/69c0d1a5-816b-23a9-785f-2971601c375a",
+          "excerpt": "... TEST: After completion of waterproofing treatment, it shall be tested for waterproofing by storing water for 10 days, to the following depths: 75 mm over ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-076",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "20 hours ago",
+          "title": "Many visions. Many solutions. One provider.",
+          "url": "https://grindsurf.com/images/magazine_pdf_downloads/2026/GSF_NOVEMBER_2026_WEB.pdf",
+          "excerpt": "With a measurement uncertainty of EUX,. MPE = 1.4 + l/300 μm, it performs at a level typically reserved for significantly more expensive measurement systems."
+        },
+        {
+          "ev_id": "EV-GLOBAL-077",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jan 8, 2026",
+          "title": "Safety | PDF | Science",
+          "url": "https://www.scribd.com/document/518127743/Safety",
+          "excerpt": "Safety - Free download as Excel Spreadsheet (.xls), PDF File (.pdf), Text File (.txt) or read online for free."
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-S3-3Y-01",
+          "track_id": "S3",
+          "sector": "semiconductor",
+          "title": "8英寸SiC外延片UV-PL缺陷映射+非接触FTIR/电晕电荷掺杂厚度一体化在线量测仪",
+          "horizon": "3-5y",
+          "china_priority_score": 98.0,
+          "global_priority_score": 94.0,
+          "physics_principle": "单台产线量测台集成多波长深紫外光致发光(实时定位BPD/堆垛层错与杀手级缺陷)、微区拉曼应力测绘及非接触FTIR外延厚度测量，彻底替代破坏性汞探针CV并提升切片/外延返工闭环效率",
+          "roi_baseline": {
+            "capex_cny": 2800000,
+            "annual_opex_cny": 180000,
+            "annual_output_value_cny": 550000000,
+            "yield_gain_pct": 0.95,
+            "annual_scrap_saving_cny": 1450000,
+            "annual_downtime_saving_cny": 620000,
+            "annual_consumable_ehs_saving_cny": 280000,
+            "market_tam_china_cny_100m": 36.0,
+            "market_tam_global_usd_m": 980.0
+          },
+          "roi_metrics": {
+            "capex_cny": 2800000.0,
+            "annual_opex_cny": 180000.0,
+            "yield_gain_saving_cny": 5225000.0,
+            "annual_gross_benefit_cny": 7575000.0,
+            "net_annual_cashflow_cny": 7395000.0,
+            "payback_months": 4.5,
+            "roi_3yr_pct": 692.3,
+            "npv_5yr_cny": 25232868.16,
+            "irr_5yr_pct": 263.7,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 15.12,
+            "china_som_3_5y_cny_100m": 2.42,
+            "global_sam_usd_m": 372.4,
+            "global_som_5_10y_usd_m": 44.69
+          },
+          "weighted_pillar_score": 93.32
+        },
+        {
+          "opp_id": "OPP-S3-3Y-02",
+          "track_id": "S3",
+          "sector": "semiconductor",
+          "title": "高压碳化硅功率芯片晶圆级动态开关/栅氧早期失效(KGD)高通量在线测试分选平台",
+          "horizon": "3-5y",
+          "china_priority_score": 96.0,
+          "global_priority_score": 95.0,
+          "physics_principle": "在封装前对8英寸SiC晶圆实施高di/dt-dv/dt双脉冲动态开关、雪崩耐量及高温高栅压(HTGB)应力筛选，避免把单颗价值50-100元的不良裸片封入价值上千元的汽车电驱多芯片并联模块",
+          "roi_baseline": {
+            "capex_cny": 3400000,
+            "annual_opex_cny": 240000,
+            "annual_output_value_cny": 680000000,
+            "yield_gain_pct": 0.75,
+            "annual_scrap_saving_cny": 2150000,
+            "annual_downtime_saving_cny": 540000,
+            "annual_consumable_ehs_saving_cny": 140000,
+            "market_tam_china_cny_100m": 42.0,
+            "market_tam_global_usd_m": 1250.0
+          },
+          "roi_metrics": {
+            "capex_cny": 3400000.0,
+            "annual_opex_cny": 240000.0,
+            "yield_gain_saving_cny": 5100000.0,
+            "annual_gross_benefit_cny": 7930000.0,
+            "net_annual_cashflow_cny": 7690000.0,
+            "payback_months": 5.3,
+            "roi_3yr_pct": 578.5,
+            "npv_5yr_cny": 25751150.26,
+            "irr_5yr_pct": 225.6,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 17.64,
+            "china_som_3_5y_cny_100m": 2.82,
+            "global_sam_usd_m": 475.0,
+            "global_som_5_10y_usd_m": 57.0
+          },
+          "weighted_pillar_score": 91.48
+        }
+      ]
+    },
+    {
+      "id": "S4",
+      "sector": "semiconductor",
+      "name": "2.5D/3D Chiplet、HBM高带宽内存与混合键合先进封装在线无损检测",
+      "manufacturing_stages": [
+        "HBM/CoWoS 微凸点(Micro-bump <=10μm)、TSV硅通孔及RDL重布线在线3D高速X射线断层扫描",
+        "Cu-Cu 无凸点混合键合(Hybrid Bonding)界面纳米级空洞非接触激光超声/高频C-SAM在线检测",
+        "大尺寸面板级封装(FOPLP)/玻璃基板翘曲度(Warpage)、共面度及玻璃通孔(TGV)在线干涉量测"
+      ],
+      "evidence_count_cn": 18,
+      "evidence_count_global": 5,
+      "valid_ev_ids": [
+        "EV-GLOBAL-083",
+        "EV-CN-125",
+        "EV-CN-126",
+        "EV-CN-127",
+        "EV-CN-128",
+        "EV-CN-129",
+        "EV-CN-130",
+        "EV-CN-131",
+        "EV-CN-132",
+        "EV-CN-133",
+        "EV-CN-134",
+        "EV-CN-135",
+        "EV-CN-136",
+        "EV-CN-137",
+        "EV-CN-138",
+        "EV-CN-139",
+        "EV-CN-140",
+        "EV-CN-141",
+        "EV-CN-142",
+        "EV-GLOBAL-079",
+        "EV-GLOBAL-080",
+        "EV-GLOBAL-081",
+        "EV-GLOBAL-082"
+      ],
+      "evidence_pack": [
+        {
+          "ev_id": "EV-CN-125",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年02月06日",
+          "title": "AI for Advanced Packaging: CoWoS, HBM, and Chiplet Process Intelligence",
+          "url": "https://mst-sg.com/ai-for-advanced-packaging-cowos-hbm-and-chiplet-process-intelligence",
+          "excerpt": "![AI for Advanced Packaging: CoWoS, HBM, and Chiplet Process Intelligence](https://mst-sg.com/wp-content/uploads/2026/03/post_158-1-1024x800.png)  - →Why Is Advanced Packaging Suddenly the Most Critical Bottleneck in Semiconductor Manufacturing? - →What Makes Advanced Packaging Process Control Different from Front-End Manufacturing? - →How Does AI Address TSV Etch and Fill Challenges? - →How Does AI Improve Bonding and Assembly Yield? - →How Is AI Deployed for Advanced Packaging Lines? Key Takeaway Advanced packaging technologies like CoWoS, HBM stacking, and chiplet integration are growing at"
+        },
+        {
+          "ev_id": "EV-CN-126",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年05月20日",
+          "title": "不只是HBM： Optima 所处的“2.5D/3D 先进封装量检测”",
+          "url": "https://xueqiu.com/4770193017/389957076",
+          "excerpt": "回复@我要翻烧: 不只是HBM： Optima 所处的“2.5D/3D 先进封装量检测”不仅服务于 HBM，它同样适用于 NVIDIA GPU、AMD 加速器所使用的 CoWoS、晶圆级封装（WLP）等主流先进封装工艺。先进封装带来的规模激增： 根据市场研究，随着 AI 芯片对多芯片堆叠（Chiplet）和混合键合（Hybrid Bonding）的需求爆发，先进封装检测因其容错率极低、步骤极其繁琐，在未来几年的需求增长率（CAGR）远超传统半导体设备。//@我要翻烧:回复@别想太多1:单看hbm检测设备可能市场规模太小了，有可能这是赛腾太垃的原因  回复风险提示：用户发表的所有文章仅代表个人观点，与雪球的立场无关。投资决策需建立在独立思考之上。"
+        },
+        {
+          "ev_id": "EV-CN-127",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年01月01日",
+          "title": "先进封装技术详解：Chiplet、CoWoS与HBM背后的设备挑战",
+          "url": "https://ai-mst.com/insight/advanced-packaging-chiplet-cowos-hbm",
+          "excerpt": "2.4 3D堆叠后的检测”黑箱” 当芯片堆叠到第8层、第12层甚至第16层时，传统的光学检测和X-ray检测都面临严峻挑战。 TSV的空洞缺陷（Void）、微凸块的桥接（Bridging）和开路（Open）缺陷、层间的分层（Delamination）——这些隐藏在堆叠结构内部的缺陷，需要更高分辨率、更大穿透深度的检测手段。 SAT（超声扫描显微镜）、高能X-ray CT等技术正在被引入，但检测速度和产线节拍的矛盾仍然突出。"
+        },
+        {
+          "ev_id": "EV-CN-128",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "良率：Chiplet时代半导体制造的终极挑战",
+          "url": "https://www.eet-china.com/mp/a525545.html",
+          "excerpt": "5纳米如此。 3纳米如此。 2纳米同样如此。 先进封装其实也正在经历同样的过程。 过去人们讨论良率，主要想到晶圆。 未来讨论良率，还要看CoWoS中介层、RDL、微凸点、Hybrid Bonding、SoIC堆叠、HBM以及最终封装。 每一个环节都有自己的良率。 而最终客户真正关心的是： 整个系统的良率。 所以Chiplet时代一个非常重要的变化，就是良率计算开始从“单颗芯片”走向“系统”。 这会让半导体制造经济学变得更加复杂。 但也会让真正拥有大规模制造经验的公司拥有更深的护城河。 Chiplet为什么会出现？ 很多人第一反应是模块化设计。"
+        },
+        {
+          "ev_id": "EV-CN-129",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年03月19日",
+          "title": "Advanced Packaging Deep Dive: Equipment Challenges Behind Chiplet, CoWoS, and HBM",
+          "url": "https://ai-mst.com/insight/en-advanced-packaging-chiplet-cowos-hbm",
+          "excerpt": "先进封装技术（Chiplet、CoWoS、HBM）正在重塑半导体设备需求。CoWoS产能占台积电先进封装的20%以上，HBM堆叠从8层发展到12-16层，设备精度要求达到亚微米级，AI过程控制变得至关重要。自2025年起，“先进封装”成为半导体行业关键词，NVIDIA、AMD、苹果均视其为突破计算瓶颈的关键路径。TSMC CoWoS产能已超订，交货周期超50周；SK hynix HBM产线满负荷运行，订单至2026年。先进封装面临三大挑战：AI大模型对计算和带宽的激增需求、摩尔定律在先进节点的经济放缓、Chiplet成为主流架构。先进封装对设备提出极高要求，本文系统分析三种核心技术及其对设备的影响，并探讨AI如何帮助应对挑战。Chiplet实现异构解耦，CoWoS解决再组装问题，HBM突破带宽瓶颈。先进封装对精度、热应力控制、良率、检测等提出极端要求"
+        },
+        {
+          "ev_id": "EV-CN-130",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年01月15日",
+          "title": "HBM4不用等混合键合了",
+          "url": "https://www.thepaper.cn/newsDetail_forward_32383611",
+          "excerpt": "“目前的检测技术包括光学干涉测量、声学显微镜和用于检测微孔和错位的在线空隙检测。在良率管理方面，相关工具能够进行垂直谱系分析，追溯堆叠中每个存储芯片的晶圆批次、老化历史和键合对准指标。通过将HBM堆叠中每一层的测试数据与组装和工艺计量数据关联起来，工程师可以隔离与混合键合对准、TSV电阻漂移或材料分层相关的缺陷，从而将传统的3D盲区转变为透明、可追溯的工艺窗口。”"
+        },
+        {
+          "ev_id": "EV-CN-131",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2024年12月05日",
+          "title": "TGV：Cowos的另一种基板形式",
+          "url": "https://xueqiu.com/1820120030/315550802?_ugc_source=ugcbaiducard",
+          "excerpt": "TGV是Cowos封装的一种基板形式，Cowos是一种2.5D封装理念，目前台积电主要使用Cowos-S，即硅中介层（SI），通过在中介层中打孔（TSV）和重布线（RDL）实现HBM与GPU高速互联。TGV则采用玻璃基板，取消中介层，直接在玻璃上打孔（TGV）实现互联，无需TSV。其优势包括：降低高度、提高互连密度、工艺更简单高效、成本更低。玻璃基板在Chiplet、SIP等封装中也逐渐替代硅基。目前，苹果、英特尔、三星等企业正积极布局该技术。玻璃基板材料和设备厂商如沃格光电、北方华创、拓荆科技将受益。玻璃材料可靠性仍需时间验证，但其在高密度封装中具有明显优势。"
+        },
+        {
+          "ev_id": "EV-CN-132",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年01月01日",
+          "title": "基于玻璃基板的2.5D CoWoS封装翘曲研究",
+          "url": "https://www.ab-sm.com/a/73752",
+          "excerpt": "1. CoWoS 封装结构与翘曲测试方法 本文选用典型 CoWoS 封装结构，包括硅芯片、硅转接板及有机或玻璃基板，核心层间由填充胶稳固，外围设有加强筋以抑制翘曲。 芯片尺寸分为两种，硅转接板集成有直径12μm、高度100μm的硅通孔（TSV）。 有机基板厚度约1602μm，玻璃基板厚度1172μm。 采用阴影云纹法基于 Akrometrix AXP2.0 设备，非接触、实时测量封装在 28℃至 245℃过程中的翘曲变形，涵盖主要工艺温度范围，为仿真验证提供精确实验数据。 ! [](https://file.ab-sm.com/103/uploads/2026/04/9451c3d9f6055f104fe43d7fd45286e8.png! a) 图 CoWoS 封装结构"
+        },
+        {
+          "ev_id": "EV-CN-133",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2026年06月22日",
+          "title": "国产TGV玻璃基板突破量产关",
+          "url": "https://news.sina.cn/bignews/summary/2026-06-22/detail-iniehscr7034104.d.html?search_keyword=%24search_keyword&search_keyword=%24search_keyword",
+          "excerpt": "国产TGV玻璃基板突破量产关摘要 TGV玻璃基板凭借低损耗、抗翘曲、高密度布线及低成本优势，成为AI芯片与HBM封装的理想‘新地基’，突破传统硅基板物理极限，2026年被业界公认为产业化关键窗口期。 国产企业已攻克百万级微米通孔零不通率、激光诱导蚀刻、孔金属化等核心工艺，蓝思科技、京东方、海目星等加速中试验证并布局专用产线，部分指标达国际顶尖水平。 依托显示玻璃领域深厚积累，合肥、蚌埠等四大产业集群推动材料-工艺-装备协同创新，预计‘十五五’末期TGV将形成万亿元新赛道，重塑全球先进封装产业格局。"
+        },
+        {
+          "ev_id": "EV-CN-134",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2017年09月15日",
+          "title": "TGV玻璃基板设备，10家国产厂商集体突破",
+          "url": "https://guba.sina.cn/view_967_283989.html",
+          "excerpt": "TGV玻璃基板设备，10家国产厂商集体突破 前言：先进封装迭代，玻璃基板成国产替代新主战场在半导体先进封装快速迭代的当下，传统硅基封装、树脂基板的工艺瓶颈逐步凸显，无法适配高端芯片高密度互连、高频高速、轻薄化的发展需求。 在此背景下，TGV玻璃通孔技术、玻璃基板封装凭借绝缘性佳、平整度高、热稳定性好、成本可控等核心优势，成为CoWoS、2.5D/3D先进封装、Mini/Micro LED高端显示的核心解决方案，也是当前半导体产业链最具确定性的增量赛道之一。 过去数年，玻璃基板精密加工、镀膜、光刻、清洗等核心设备长期被海外巨头垄断，国内产业链受制于设备卡脖子问题，产业化进度缓慢。"
+        },
+        {
+          "ev_id": "EV-CN-135",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "",
+          "title": "集邦咨询先进封装专题：CoWoS、玻璃基板",
+          "url": "https://sina.cn/news/detail/5344796659942661.html",
+          "excerpt": "3、成本：CoWoS‑L更大尺寸中介层，直接推高单颗芯片封装成本；也是产业链积极寻找玻璃基板替代路线的直接动因。 二、TGV玻璃基板的现实瓶颈（翘曲、良率两大硬卡点） 玻璃基板理论优势：低热膨胀系数、高频信号损耗更低，适合高密度高速互连；可以走面板级大尺寸生产，长期具备降本想象空间。 但是当下工程层面障碍非常明确： 1、翘曲问题没有彻底解决：玻璃原片本身热膨胀低，但后续RDL重布线、多次高温制程之后，多层金属薄膜与玻璃之间应力仍然会引发基板翘曲；翘曲会直接造成后续芯片贴片时对位偏移、虚焊；"
+        },
+        {
+          "ev_id": "EV-CN-136",
+          "geo_scope": "CN",
+          "authority_tier": "T3",
+          "engine": "metaso",
+          "published_date": "2025年01月16日",
+          "title": "精测电子2024年度大事件盘点",
+          "url": "https://www.instrument.com.cn/news/20250121/764873.shtml",
+          "excerpt": "子公司台湾宏濑推出TGV自动量测AOI设备，主要用于TGV玻璃基板于镭射改质与蚀刻制程后的半自动量、检测，主要为针对检查表面划伤划痕、通孔率、堵孔率、上下孔同心度、真圆度以及TOP、WAIST、BOTTOM量测。 ! [image.png image.png](https://img1.17img.cn/17img/images/202501/uepic/7c0b973f-4a80-41e8-bf1e-c30ad4fe4724.jpg)"
+        },
+        {
+          "ev_id": "EV-GLOBAL-083",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T1",
+          "engine": "serper",
+          "published_date": "Sep 23, 2026",
+          "title": "Under Graduate (UG) course in Biomedical Engineering",
+          "url": "https://ncahp.abdm.gov.in/DraftCurriculum/DraftUG_BMEcurriculum.pdf",
+          "excerpt": "Title: The request could not be satisfied  URL Source: https://ncahp.abdm.gov.in/DraftCurriculum/DraftUG_BMEcurriculum.pdf  Warning: Target URL returned error 403: Forbidden  Markdown Content: ## 403 ERROR  * * *   Request blocked. We can't connect to the server for this app or website at this time. There might be too much traffic or a configuration error. Try again later, or contact the app or website owner.     If you provide content to customers through CloudFront, you can find steps to troubleshoot and help prevent this error by reviewing the CloudFront documentation.     * * *  Generated "
+        },
+        {
+          "ev_id": "EV-GLOBAL-079",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Nov 4, 2026",
+          "title": "High-resolution 3D Inspection of Bonding Defects in HBM ...",
+          "url": "https://imapsource.org/article/173599-high-resolution-3d-inspection-of-bonding-defects-in-hbm-using-optically-coupled-x-ray-computed-laminography",
+          "excerpt": "High-resolution 3D Inspection of Bonding Defects in HBM using Optically-coupled X-ray Computed Laminography. Hybrid Pneumatic–Electromagnetic Bonding System. X ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-080",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Aug 20, 2026",
+          "title": "How to Detect Hidden Voids in 2.5D Wafer Bonding?",
+          "url": "https://www.sbt-ultrasonic.com/news/how-to-detect-hidden-voids-in-25d-wafer-bonding",
+          "excerpt": "X-Ray & High-Resolution CT: Standard 2D X-ray systems struggle with low density contrast at thin hybrid bonding interfaces (e.g., SiO₂-to-SiO₂ or Cu-to-Cu)."
+        },
+        {
+          "ev_id": "EV-GLOBAL-081",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "May 26, 2026",
+          "title": "2026 Conference Program & Exhibitor Listings",
+          "url": "https://ectc.net/wp-content/uploads/2026/05/76-ECTCFinal-Web.v2.pdf",
+          "excerpt": "Authors from over 20 countries share their latest research on topics including: 3D integration, hybrid bonding, wafer-to-wafer and chip-to-wafer bonding, ( ..."
+        },
+        {
+          "ev_id": "EV-GLOBAL-082",
+          "geo_scope": "GLOBAL",
+          "authority_tier": "T3",
+          "engine": "serper",
+          "published_date": "Jun 22, 2026",
+          "title": "Where Does the Next $100 Billion of AI Capex Actually Go?",
+          "url": "https://transurf.cc/2026/06/22/ai-datacenter-supply-chain/en",
+          "excerpt": "HBM (high-bandwidth memory, CoWoS advanced packaging and HBM all sit here. Capacity can expand, but it has to clear qualification, ramp yield and find skilled ..."
+        }
+      ],
+      "seeds": [
+        {
+          "opp_id": "OPP-S4-3Y-01",
+          "track_id": "S4",
+          "sector": "semiconductor",
+          "title": "亚10微米TSV/微凸点高速在线3D X射线层析成像(AXI/CT)与AI缺陷判别站",
+          "horizon": "3-5y",
+          "china_priority_score": 94.0,
+          "global_priority_score": 96.0,
+          "physics_principle": "采用微焦斑透射靶X射线结合限定角平面层析重构(Laminography)及GPU端到端三维去噪算法，在产线节拍内全检HBM堆叠焊接桥连、冷焊与空洞率，防止整颗AI加速卡因单颗HBM封装报废",
+          "roi_baseline": {
+            "capex_cny": 3600000,
+            "annual_opex_cny": 260000,
+            "annual_output_value_cny": 1500000000,
+            "yield_gain_pct": 0.35,
+            "annual_scrap_saving_cny": 2400000,
+            "annual_downtime_saving_cny": 850000,
+            "annual_consumable_ehs_saving_cny": 160000,
+            "market_tam_china_cny_100m": 39.0,
+            "market_tam_global_usd_m": 1480.0
+          },
+          "roi_metrics": {
+            "capex_cny": 3600000.0,
+            "annual_opex_cny": 260000.0,
+            "yield_gain_saving_cny": 5250000.0,
+            "annual_gross_benefit_cny": 8660000.0,
+            "net_annual_cashflow_cny": 8400000.0,
+            "payback_months": 5.1,
+            "roi_3yr_pct": 600.0,
+            "npv_5yr_cny": 28242608.86,
+            "irr_5yr_pct": 232.8,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 16.38,
+            "china_som_3_5y_cny_100m": 2.62,
+            "global_sam_usd_m": 562.4,
+            "global_som_5_10y_usd_m": 67.49
+          },
+          "weighted_pillar_score": 91.1
+        },
+        {
+          "opp_id": "OPP-S4-5Y-02",
+          "track_id": "S4",
+          "sector": "semiconductor",
+          "title": "免耦合水非接触激光超声+红外光热混合键合(Hybrid Bonding)纳米空洞及玻璃TGV在线检测仪",
+          "horizon": "5-10y",
+          "china_priority_score": 89.0,
+          "global_priority_score": 97.0,
+          "physics_principle": "传统水浸C-SAM会污染裸露Cu-Cu键合表面；采用脉冲激光激发表面/界面声波(LUS)配合外差激光干涉非接触接收，在干态洁净腔室内探测纳米级键合空洞与玻璃基板TGV微裂纹",
+          "roi_baseline": {
+            "capex_cny": 4200000,
+            "annual_opex_cny": 290000,
+            "annual_output_value_cny": 1900000000,
+            "yield_gain_pct": 0.42,
+            "annual_scrap_saving_cny": 2950000,
+            "annual_downtime_saving_cny": 980000,
+            "annual_consumable_ehs_saving_cny": 220000,
+            "market_tam_china_cny_100m": 28.5,
+            "market_tam_global_usd_m": 1620.0
+          },
+          "roi_metrics": {
+            "capex_cny": 4200000.0,
+            "annual_opex_cny": 290000.0,
+            "yield_gain_saving_cny": 7980000.0,
+            "annual_gross_benefit_cny": 12130000.0,
+            "net_annual_cashflow_cny": 11840000.0,
+            "payback_months": 4.3,
+            "roi_3yr_pct": 745.7,
+            "npv_5yr_cny": 40682915.35,
+            "irr_5yr_pct": 281.6,
+            "payback_tier": "Tier-A (<=12m Ultra-High ROI)",
+            "china_sam_cny_100m": 11.97,
+            "china_som_3_5y_cny_100m": 1.92,
+            "global_sam_usd_m": 615.6,
+            "global_som_5_10y_usd_m": 73.87
+          },
+          "weighted_pillar_score": 93.01
+        }
+      ]
+    }
+  ]
+}

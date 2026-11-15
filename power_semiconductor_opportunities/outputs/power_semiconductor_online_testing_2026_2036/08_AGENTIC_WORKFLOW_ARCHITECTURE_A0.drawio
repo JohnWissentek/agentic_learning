@@ -1,0 +1,628 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="Antigravity-Agent" modified="2026-11-15T05:40:00.000Z" agent="PSO-Workflow-Drawio-Generator" version="32.6.1" type="device">
+  <diagram id="pso_a0_workflow_architecture" name="A0_Workflow_Architecture_And_Context_Assembly">
+    <mxGraphModel dx="1800" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4681" pageHeight="3311" math="0" shadow="0" background="#F8FAFC">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="band_11" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="36" width="4460" height="274" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_12" value="全景架构总览 · 设计模式谱系 · 节点性质色标与双运行模式大模型底座实证 (ISO A0 Landscape: 4681 × 3311 px)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#0F172A;strokeColor=#0F172A;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="44" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="band_13" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="368" width="4460" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_14" value="Phase 1: 契约本体装载 · 付费双引擎 AI 检索 · SQLite 持久化证据库 · Python PALMs 财务预计算 [100% 硬编码确定性执行]" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="376" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="band_15" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="818" width="4460" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_16" value="Phase 2: 范围护栏校验 · 可选 HITL 检查点 · 上下文组装 #1 · Step-Back 物理第一性原理总规划" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="826" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="band_17" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1248" width="4460" height="430" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_18" value="Phase 3: 8 赛道并行动态扇出 · 零串扰赛道隔离 Context 组装 #2 · 8 路并行深研与 STORM 四角色拷问 · 确定性锚定归并" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="1256" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="band_19" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1748" width="4460" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_20" value="Phase 4: AI Co-Scientist 瑞士制配对器 · Context 组装 #3 · 16 场并行 Elo 锦标赛裁决 · K=32 排位冻结与分赛道切片编译" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="1756" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="band_21" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2188" width="4460" height="430" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_22" value="Phase 5: Zero-LLM SQLite 证据索引直出 (Vol 05) · 分卷精细裁剪 Context 组装 #4 · 5 路并行旗舰长文合成 (Vol 00–04)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#065F46;strokeColor=#065F46;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="2196" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="band_23" value="" style="rounded=1;arcSize=2;whiteSpace=wrap;html=0;fillColor=#FFFFFF;strokeColor=#CBD5E1;strokeWidth=2;shadow=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2688" width="4460" height="570" as="geometry" />
+        </mxCell>
+        <mxCell id="ribbon_24" value="Phase 6 &amp; 7: 确定性正则审计 · 异构 Critic 反思闭环 · Corrective RAG / 定向重修路由 · Stage-Gate 100分裁判 · 终稿编译落盘" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#9F1239;strokeColor=#9F1239;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=14;spacingRight=12;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="74" y="2696" width="4432" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="node_title" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F1F5F9;strokeColor=#334155;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="78" width="1460" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_title_hdr" value="电力能源 × 半导体芯片制造 在线测试仪器仪表智能体发现工作流 (2026–2036)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#0F172A;strokeColor=#0F172A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="78" width="1460" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_title_body" value="• 战略定位：【中国市场优先 (2027–2031 国产替代与高ROI放量) → 全球市场跟进 (2031–2036 代际跃迁与标准出海)】。&#10;• 八大赛道：电力 P1(储能/固态电池) P2(钙钛矿/绿氢) P3(特高压/SF6替代/海缆) P4(调峰/CCUS) × 半导体 S1(AMC/湿化) S2(前道/SAXS) S3(SiC/GaN) S4(混合键合/HBM)。&#10;• 四大价值：品质良率提升 (25%) ｜ 制造降本与TCO/环保EHS (20%) ｜ 高制造ROI回报与产业升级 (35%+20%)。&#10;• 架构融合：Agentic Design Patterns (Ch 1–21) + open_deep_research + Stanford STORM + Deer-Flow PALMs + AI Co-Scientist Elo。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="122" width="1460" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="node_legend" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1596" y="78" width="1380" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_legend_hdr" value="[图例约定] 五类节点执行性质 · 上下文组装标示 · 箭头语义" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#065F46;strokeColor=#065F46;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1596" y="78" width="1380" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_legend_body" value="• 深蓝 [硬编码 · 确定性 Python]：零 LLM 参与；负责搜索/去重、SQLite I/O、PALMs ROI/IRR/NPV 算账、Elo 更新与正则核验。&#10;• 深紫 [LLM 分析 · 智能体认知]：模式1 Antigravity run_workflow 或模式2 DashScope 网关；仅做机理推导与文本合成，禁止心算数字。&#10;• 琥珀 [Context 组装 · 上下文载荷]：虚线框标出每次 LLM 调用 Prompt 精准注入的切片来源、封闭引用白名单与 JSON Schema 约束。&#10;• 翠绿 [持久化存储 · 契约 / SQLite / 终稿]：YAML 契约本体、Git 隔离密钥 .env.ai_search、evidence_vault.db 及 00–08 交付物。&#10;• 玫红 [条件路由 · 质量门禁循环]：route_after_critic 分支路由、可选 HITL 检查点与循环次数熔断 (loop_count &lt;= max_loops)。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#064E3B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1596" y="122" width="1380" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="node_provenance" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3024" y="78" width="1468" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_provenance_hdr" value="[底层模型实证溯源] 班次 native-88e91cf7 双运行模式真实模型路由" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3024" y="78" width="1468" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_provenance_body" value="• 主会话规划层 (Plan Mode)：gemini-pro-orchestrator [Orchestrator (Carbon) = Gemini 4 Carbon] ｜ 执行层：gemini-flash-worker-agy。&#10;• 模式 1 (run_workflow 传 model=&quot;pro&quot;)：接口仅接收 4 档抽象别名；经 transcript.jsonl 实证，全部 32 个子智能体均路由至&#10;  gemini-3.8-flash-tiered（输入 681,829 + 输出 356,946 = 1,038,775 tokens，耗时 13m14s），并非 Argon / Carbon / 3.1 Pro / Claude Opus 5.5。&#10;• 精准锁定顶级底座：(a) IDE 选定 Claude Opus 5.5 / Gemini 4 Argon 并传 model=&quot;inherit&quot;；(b) 用 swarm(model=...) 按具体 ID 绑定。&#10;• 模式 2 (Standalone CLI 终端 graph.py)：直连 .env.llm DashScope 异构梯队 (qwen3.8-flash / qwen3.8-max / critic: deepseek-v4-pro)。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3024" y="122" width="1468" height="174" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_1_cfg" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="410" width="970" height="322" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_1_cfg_hdr" value="[持久化存储 · 输入基座] 契约 YAML + 8 赛道本体 + 密钥隔离" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#065F46;strokeColor=#065F46;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="410" width="970" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_1_cfg_body" value="• 形式化契约 config/research_contract.yaml (PSO-CONTRACT-2026-V1)：&#10;  强制中国信源 &gt;= 45%、总证据 &gt;= 48、Stage-Gate 通过线 &gt;= 85/100、四大价值权重 (35/25/20/20)。&#10;• 行业本体 config/domain_taxonomy.yaml：&#10;  定义 P1–P4 与 S1–S4 共 8 条赛道、核心产线工艺工段、CN/GLOBAL 检索式及 16 个校准&#10;  基准机会种子 (seed_opportunities + roi_baseline)。&#10;• 密钥物理隔离 (.gitignore)：.env.ai_search 独立存 METASO_API_KEY 与 SERPER_API_KEY；&#10;  .env.llm 仅用于模式2；WorkflowSettings.load() (config.py) 统一校验加载。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#064E3B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="454" width="970" height="278" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_2_search" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="410" width="1080" height="322" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_2_search_hdr" value="[硬编码 · Python] DualEngineSearchRouter 双引擎 AI 检索网关" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="410" width="1080" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_2_search_body" value="• 中国优先引擎 MetasoClient (tools/search_router.py)：&#10;  调用 POST https://metaso.cn/api/v1/search (webpage/scholar)；强制 size 与 page 互斥传参，&#10;  并主动拦截 HTTP 200 响应体内隐藏的 errCode != 0 业务报错。&#10;• 全球主力引擎 SerperClient：并发查询 Google search / scholar / patents (默认 qdr:y 时效)。&#10;• 全文增强与容错 (Ch 12)：Top T1–T3 URL 经 r.jina.ai (备援 Metaso reader) 抓取至多&#10;  10,000 字符 Markdown 正文；指数退避重试 + Semaphore(6) + CostLedger (40 次查询入库)。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="454" width="1080" height="278" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_3_vault" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2278" y="410" width="1060" height="322" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_3_vault_hdr" value="[持久化存储 · SQLite] EvidenceVault 去重入库与权威分级记忆库" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#065F46;strokeColor=#065F46;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2278" y="410" width="1060" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_3_vault_body" value="• 介质：data/evidence_vault.db (evidences + query_log 双表，tools/evidence_vault.py)。&#10;• URL 归一化与 SHA-1 去重：normalize_url() 剥离 utm_*/spm/ref 参数，url_sha1() 跨赛道&#10;  幂等 Upsert 去重，避免重复写入并保留已抓取全文 Markdown。&#10;• 权威分级 (score_source_authority)：T1 (.gov, ieee, semi, iec, nature, patents.google)&#10;  / T2 (KLA, ASML, CATL, Yole) / T3 / T4。&#10;• 本次实测固化成果：分配唯一编号 EV-CN-001..142 (142 条占 63.11%) 与 EV-GL-001..083&#10;  (83 条)，总计 225 条去重核验证据（含 24 篇全文深抓）。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#064E3B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2278" y="454" width="1060" height="278" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_4_palms" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3408" y="410" width="1084" height="322" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_4_palms_hdr" value="[硬编码 · Python] PALMs 确定性财务计算 &amp; prepare-context 打包器" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3408" y="410" width="1084" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n1_4_palms_body" value="• 确定性财务算账 tools/roi_calculator.py（严格禁止 LLM 心算任何投资数据）：&#10;  NetCF = YieldGain + ScrapAvoid + DowntimeAvoid + EHS_Save - OPEX；计算静态回收期&#10;  (Payback 月)、3Y ROI%、5Y NPV (WACC=10%)、5Y IRR (80 轮二分法)、Tier 分级及 SAM/SOM。&#10;• 四支柱加权打分 compute_weighted_pillar_score()：按 35/25/20/20 权重生成基准排序。&#10;• 原生桥接 cli.py::_cmd_prepare_context：&#10;  按赛道裁剪导出 Top 12 CN + 10 GLOBAL 证据包与 16 项 [ROI-CALC] → data/native_context_bundle.json。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3408" y="454" width="1084" height="278" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_1_guard" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="860" width="970" height="302" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_1_guard_hdr" value="[硬编码 · 门禁护栏] 输入范围校验 + LangGraph 可选 HITL 审批门禁" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="860" width="970" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_1_guard_body" value="• 行业作用域校验 (nodes/planner.py::_select_tracks &amp; cli.py)：&#10;  验证 sector_filter in {all, power, semiconductor}，锁定 8 条正交赛道 (P1–P4 &amp; S1–S4) 及核心工段。&#10;• 契约底线注入：强制锁定【中国优先 → 全球跟进】与【3–5年 vs 5–10年双时间窗】不可删减。&#10;• 可选人类审批检查点 (node_hitl_approval_gate)：&#10;  模式2 启用 --hitl 时，基于 SQLite Checkpointer (langgraph_checkpoints.db) 调用&#10;  langgraph.types.interrupt()，先呈报 8 赛道规划并暂停等待确认，再行全并发深度研究。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="904" width="970" height="258" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_2_ctx1" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="860" width="1180" height="302" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_2_ctx1_hdr" value="[Context 组装 #1] Step-Back Planner Prompt 上下文结构" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#B45309;strokeColor=#B45309;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="860" width="1180" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_2_ctx1_body" value="• 角色设定：Chief Industrial Metrology Architect（工业计量首席架构师）。&#10;• 注入内容（故意轻量化隔离 — 本跳不注入任何网页碎片，防止高层物理抽象受局部噪音干扰）：&#10;  1. Mandate：CN-First (2027–2031 放量 / 2031–2036 跃迁) → Global Second；四大价值支柱。&#10;  2. track_briefs：仅拼接 8 赛道的 id、sector、name 与 manufacturing_stages 工艺工段清单。&#10;• 输出与工具锁定：&#10;  - 模式1 追加 NO_TOOL_DIRECTIVE（禁用文件/命令行/搜索工具）+ PLAN_SCHEMA (step_back_thesis 等)。&#10;  - 模式2 注入 PLANNER_SYSTEM + ResearchPlan Schema。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#451A03;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="904" width="1180" height="258" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_3_planner" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2378" y="860" width="1050" height="302" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_3_planner_hdr" value="[LLM 分析 #1] Chief Metrology Architect (Step-Back 规划节点)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2378" y="860" width="1050" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_3_planner_body" value="• 调用方式与真实底座：&#10;  - 模式1 (antigravity_run_workflow.py Phase 2)：1 次调用 agent(model=&quot;pro&quot;) -&gt; gemini-3.8-flash-tiered。&#10;  - 模式2 (nodes/planner.py)：tier=&quot;producer&quot; -&gt; qwen3.8-max (关闭思维链加速结构化生成)。&#10;• Step-Back 第一性原理抽象推导：&#10;  从“能量量子（光子/声子/X射线/THz）或分子质荷比与制造界面的微观相互作用”出发，界定离线&#10;  抽检为何必然被原位 R2R/APC 闭环取代，输出全局 step_back_thesis 及 8 赛道专属物理失效准则。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2378" y="904" width="1050" height="258" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_4_pmap" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3498" y="860" width="994" height="302" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_4_pmap_hdr" value="[硬编码 · Python] 物理原理映射提取与权威检索式回填" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3498" y="860" width="994" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n2_4_pmap_body" value="• 物理引导映射构建 (phys_by_track)：&#10;  解析 Planner 结构化返回值，提取 track_id -&gt; step_back_physics_principle 字典；&#10;  若任何赛道缺失，自动回退填充默认赛道物理不变量。&#10;• 防搜索漂移保护（模式2）：&#10;  强制覆盖清空 LLM 生成的泛化查询词，直接从 config/domain_taxonomy.yaml 确定性挂载经过&#10;  校准的 cn_queries (Metaso) 与 global_queries (Serper)，保证后续检索信噪比。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3498" y="904" width="994" height="258" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_1_fanout" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="1290" width="970" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_1_fanout_hdr" value="[硬编码 · 并行扇出] 动态 8 路隔离认知分发器 (Factored Cognition)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="1290" width="970" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_1_fanout_body" value="• 并发扇出：模式1 await parallel(ctx[&quot;tracks&quot;], ...) ｜ 模式2 Send(&quot;track_researcher&quot;, ...)。&#10;• 8 条正交细分工业赛道同步启动：&#10;  [电力能源] P1 储能/固态电池 ｜ P2 钙钛矿/绿氢 ｜ P3 特高压/SF6替代/海缆 ｜ P4 调峰/CCUS。&#10;  [半导体制造] S1 Fab AMC/湿化 ｜ S2 前道膜厚/OCD/SAXS ｜ S3 SiC/GaN ｜ S4 HBM/混合键合。&#10;• 认知隔离准则 (Factored Cognition)：每名并发 Worker 仅获准读取自身所属赛道切片，零跨赛道&#10;  上下文泄漏或 Token 相互污染。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="1334" width="970" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_2_ctx2" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="1290" width="1220" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_2_ctx2_hdr" value="[Context 组装 #2] Per-Track 隔离 Prompt 装配 (_build_track_prompt)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#B45309;strokeColor=#B45309;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="1290" width="1220" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_2_ctx2_body" value="• 精准组装 5 层赛道隔离上下文：&#10;  1. phys_by_track[track_id]（Phase 2 输出）+ 本赛道制造工段 manufacturing_stages。&#10;  2. 本赛道 2 项机会种子 + Python 预计算 [ROI-CALC]（CAPEX/NetCF/Payback/IRR/NPV/CN&amp;GL TAM）。&#10;  3. 本赛道 Top 22 条 SQLite 权威证据：12 条 CN + 10 条 GLOBAL [EV-CN/GL-...]&#10;     （full_markdown[:600] 或 snippet[:380]），同步形成严格封闭引用白名单 valid_ev_ids。&#10;  4. 强制四角色 STORM 买方审查定义：Fab/Plant Yield VP、Metrology Chief Engineer、&#10;     EHS Compliance Director、CFO / Procurement ROI Gatekeeper。&#10;  5. 中国优先+双时间窗要求 + NO_TOOL_DIRECTIVE + 扁平化 TRACK_SCHEMA。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#451A03;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1128" y="1334" width="1220" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_3_res_storm" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2418" y="1290" width="1050" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_3_res_storm_hdr" value="[LLM 分析 #2] 8× 并行赛道深研 + 4 角色 STORM 买方拷问智能体" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2418" y="1290" width="1050" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_3_res_storm_body" value="• 执行架构与底层模型：&#10;  - 模式1 (Phase 3)：8 路全并发 agent() (gemini-3.8-flash-tiered) 在单回合结构化输出内&#10;    一体完成赛道痛点研究与 4 角色 STORM 买方委员会抗拒点拷问（共 16 组完整对话画像）。&#10;  - 模式2：8 路 qwen3.8-flash (TrackDossier) → 16 路并发 qwen3.8-max (OpportunityStormMemo)。&#10;• 产出要素：先中国市场动态、后全球市场对标；区分 3–5 年 vs 5–10 年演进；&gt;=4 项产线痛点；&#10;  每项机会的量子/分子传感机理、在线 Form Factor、四大价值机制与工程改型破局动作。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2418" y="1334" width="1050" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_4_align" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3538" y="1290" width="954" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_4_align_hdr" value="[硬编码 · Python] 证据白名单清洗 · 财务重锚定 · Elo 初始化" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3538" y="1290" width="954" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n3_4_align_body" value="• 确定性对齐与清洗器 (aligned_opps / _merge_baseline_opportunities)：&#10;  1. 引用幻觉物理拦截：逐项校验 evidence_ids 是否落在本赛道 valid_ev_ids 白名单内；&#10;     任意虚构或跨号引用立即丢弃并回填核验 ID。&#10;  2. 财务数据重锚定：强行用 Phase 1 Python 计算的权威 roi_metrics / roi_baseline 覆盖，&#10;     确保 LLM 无法修改哪怕小数点后一位数字。&#10;  3. 初始 Elo 赋分：按 1500.0 + (weighted_pillar_score - 75.0) * 4.0 为全部 16 项&#10;     机会计算锦标赛起始天梯分。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3538" y="1334" width="954" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_1_swiss" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="1790" width="950" height="312" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_1_swiss_hdr" value="[硬编码 · Python] Swiss-System 瑞士制双轮成对配对器" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="1790" width="950" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_1_swiss_body" value="• 双轮赛制控制（Flagship 2 轮 × 8 对 = 16 场裁决；Fast 1 轮 8 场）：&#10;  - Round 1：按初始 Elo 降序排序 16 项机会，相邻两两配对 (0,1), (2,3), ..., (14,15)。&#10;  - Round 2：第 1 轮并行裁决完并刷新 elo_rating 后重新降序排序配对，让一线头部机会&#10;    与同梯队强手直接正面交锋，拉开真实区分度。&#10;• 原理 (Ch 21 AI Co-Scientist)：通过成对相对比较消除大模型单表一次性排序的头部偏置。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="1834" width="950" height="268" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_2_ctx3" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="1108" y="1790" width="1200" height="312" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_2_ctx3_hdr" value="[Context 组装 #3] 两两对抗裁判 Prompt 装配 (Elo Matchup Payload)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#B45309;strokeColor=#B45309;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1108" y="1790" width="1200" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_2_ctx3_body" value="• 单场裁判隔离上下文（仅含对阵双方，无其他 14 项干扰）：&#10;  1. [Option A] vs [Option B] 标牌：opp_id、sector、horizon (3-5y/5-10y)、title。&#10;  2. 双方逐字不变 [ROI-CALC] 数据：CAPEX、NetCF、Payback (月)、5Y IRR、China TAM。&#10;  3. 双方核心工程机理：quality_yield_mechanism + industrial_upgrade_mechanism。&#10;• 量化权重标尺：ROI &amp; 回本速度 (35%) ｜ 良率控制 (25%) ｜ 产业升级与中国优先 (20%) ｜ TCO与环保 (20%)。&#10;• 约束输出：NO_TOOL_DIRECTIVE + ELO_SCHEMA (仅返回合法 winner_id 与中文裁决理据 rationale)。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#451A03;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1108" y="1834" width="1200" height="268" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_3_elo_llm" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2378" y="1790" width="1030" height="312" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_3_elo_llm_hdr" value="[LLM 分析 #3] 16× 并行 Elo 锦标赛裁判 (2 轮 × 8 路并发)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2378" y="1790" width="1030" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_3_elo_llm_body" value="• 调度模型：模式1 Round 1(8并发) + Round 2(8并发) 共 16 次 agent() (gemini-3.8-flash-tiered)；&#10;  模式2 tier=&quot;producer&quot; -&gt; qwen3.8-max (EloPairDecision)。&#10;• 典型高价值跨赛道裁决（本次实测）：&#10;  榜首 OPP-S4-5Y-02（混合键合激光超声：4.3月回本 / 281.6% IRR / 年净现 ¥1,184万）在两轮中&#10;  先后击败 OPP-S3-3Y-01（SiC外延）与 OPP-S2-3Y-01（内嵌椭偏），体现超高盈利体量与原子级&#10;  突破的双重胜出逻辑；大模型严禁自行计算 Elo 加减分。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2378" y="1834" width="1030" height="268" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_4_table" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3478" y="1790" width="1014" height="312" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_4_table_hdr" value="[硬编码 · Python] Elo K=32 更新 · 综合排名 · 分域 Markdown 预编译" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3478" y="1790" width="1014" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n4_4_table_body" value="• K=32 确定性积分更新 (_update_elo)：Ea = 1 / (1 + 10^((Rb - Ra)/400))。&#10;• 综合排位公式 (#1 .. #16)：&#10;  Composite = 0.55 * weighted_pillar_score + 0.45 * (60.0 + ((Elo - Elo_min) / span) * 38.0)。&#10;• 不可篡改分域表格渲染器 (_fmt_roi_table, _fmt_dossiers, _fmt_storm, _fmt_vault)：&#10;  预先生成精准切片文本块：roi_all / power / semi、power / semi_dossiers、storm_all / power / semi、&#10;  elo_digest 与 ev_power / semi / all，作为 Phase 5 唯一真值数据源。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3478" y="1834" width="1014" height="268" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_3_vol05" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="2230" width="1340" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_3_vol05_hdr" value="[硬编码 + 持久化交付] Zero-LLM Vol 05 证据索引编译器 (render_evidence_index)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#065F46;strokeColor=#065F46;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="2230" width="1340" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_3_vol05_body" value="• 100% 零大模型直出（物理杜绝 225 条真实 URL、日期、机构标题的改写与编造风险）：&#10;  由 synthesizer.py::render_evidence_index(all_records) 直接遍历 SQLite EvidenceVault 生成。&#10;• 确定性中国优先分节排版：&#10;  1. 第一节完整列出全部中国市场证据 EV-CN-001..142（142 条，Metaso / 中文权威源）。&#10;  2. 第二节完整列出全部全球市场证据 EV-GL-001..083（83 条，Serper / Scholar / Patents）。&#10;  3. 自动转义 Markdown 竖线符，附摘要前 180 字与原始可点击核验链接。&#10;• 输出交付物：05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md（实测 113 KB，225 条零误差全量溯源表）。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#064E3B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="2274" width="1340" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_1_ctx4" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="1498" y="2230" width="1480" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_1_ctx4_hdr" value="[Context 组装 #4] 5 卷分域精确切片 Prompt 装配 (volumes_spec)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#B45309;strokeColor=#B45309;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1498" y="2230" width="1480" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_1_ctx4_body" value="• 按卷实施【严格分域切片隔离 (Strict Context Slicing)】，防止上下文过载失焦：&#10;  - Vol 00 总报告：step_back_thesis + roi_all + storm_all + elo_digest + ev_all (每赛道 5 条)。&#10;  - Vol 01 电力能源 P1–P4：仅注入 roi_power + power_dossiers + storm_power + ev_power（零半导噪声）。&#10;  - Vol 02 半导体 S1–S4：仅注入 roi_semi + semi_dossiers + storm_semi + ev_semi（零电力噪声）。&#10;  - Vol 03 ROI与Elo专题：roi_all + elo_digest + storm_all（含 WACC=10% 方法论与 CFO 算账模版）。&#10;  - Vol 04 技术平台与出海手册：roi_all + power/semi_dossiers[:3800] + storm_all + ev_all。&#10;• 共同注入：SYNTH_RULES（CN优先、双时间窗、逐字保留 [ROI-CALC] 与 [EV-...]）+ NO_TOOL_DIRECTIVE（重修时附 critique_note）。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#451A03;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1498" y="2274" width="1480" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_2_synth" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3048" y="2230" width="1444" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_2_synth_hdr" value="[LLM 分析 #4] 5× 并行旗舰长文合成智能体 (Synthesizer 00–04)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=15;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3048" y="2230" width="1444" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n5_2_synth_body" value="• 并发架构（麦肯锡 / SEMI / 中金行研旗舰标准）：&#10;  - 模式1 (Phase 5)：5 路全并发 agent(model=&quot;pro&quot;, schema=string) -&gt; gemini-3.8-flash-tiered。&#10;  - 模式2 (nodes/synthesizer.py)：5 路并发 qwen3.8-max (max_tokens=7500, timeout=300s)。&#10;• 本次班次实测产出（总计 231 KB，五卷正文去重精确引用 81 个 [EV-...] 编号、80 处 [ROI-CALC]）：&#10;  1. 00_EXECUTIVE_SUMMARY_AND_TOP_OPPORTUNITIES.md (32 KB · 含跨赛道平台复用 Mermaid 图)&#10;  2. 01_POWER_ENERGY_ONLINE_TESTING_OPPORTUNITIES.md (65 KB · P1–P4 四节闭环研报)&#10;  3. 02_SEMICONDUCTOR_ONLINE_TESTING_OPPORTUNITIES.md (52 KB · S1–S4 四节闭环研报)&#10;  4. 03_ROI_FINANCIAL_MODEL_AND_ELO_RANKING.md (31 KB) &amp; 04_STRATEGY_PLAYBOOK.md (51 KB)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=14;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3048" y="2274" width="1444" height="326" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_1_det" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="2728" width="820" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_1_det_hdr" value="[硬编码] 契约正则核验与头尾摘要截取" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="2728" width="820" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_1_det_body" value="• _previews_and_checks / deterministic_contract_checks：&#10;  - 正则 EV-(CN|GL)-\d{3} 核验去重引用数（本次 81 条）。&#10;  - 统计 [ROI-CALC] 锚点数（80 处）、CN 占比 (63.11%) 与 5 卷长度。&#10;• 上下文压缩保护：每卷仅截取 前 2,200 字 + 尾 800 字 送审，&#10;  防止 231 KB 全文塞爆审查上下文窗导致注意力退化。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="2770" width="820" height="176" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_2_ctx5" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="958" y="2728" width="920" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_2_ctx5_hdr" value="[Context 组装 #5] 异构 Critic 审稿载荷" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#B45309;strokeColor=#B45309;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="958" y="2728" width="920" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_2_ctx5_body" value="• 组装送交 Critic 的 4 项审计材料：&#10;  1. det_summary JSON (Vault 统计 / 引用数 / 财务标签数 / 各卷长)。&#10;  2. 五卷 Head 2200 + Tail 800 拼装摘要文本 (previews)。&#10;  3. 五项契约刚性准则（先中国后全球、双时间窗、物理机制精确等）。&#10;  4. NO_TOOL_DIRECTIVE + CRITIC_SCHEMA / CritiqueVerdict。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#451A03;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="958" y="2770" width="920" height="176" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_3_critic" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1928" y="2728" width="960" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_3_critic_hdr" value="[LLM 分析 #5] 异构 Chief Reviewer (Critic)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1928" y="2728" width="960" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_3_critic_body" value="• 角色：Metrology Fellow &amp; Industrial PE Partner 联合审稿人。&#10;• 底座：模式1 gemini-3.8-flash-tiered ｜ 模式2 跨家族 deepseek-v4-pro。&#10;• 本次实测 (native-88e91cf7)：首轮判定 decision=&quot;pass&quot;，&#10;  overall_confidence = 98.5，仅附 2 项供应链与国际专利长期&#10;  minor 观察建议，未触发重写。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1928" y="2770" width="960" height="176" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_4_router" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFF1F2;strokeColor=#E11D48;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2938" y="2728" width="610" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_4_router_hdr" value="[条件路由] route_after_critic" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#9F1239;strokeColor=#9F1239;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2938" y="2728" width="610" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_4_router_body" value="• 防死循环熔断 (loop_count &lt;= max_loops, 默认 2 次)。&#10;• 3 路确定性条件分流：&#10;  1. needs_more_evidence (LangGraph) → 补搜。&#10;  2. needs_rewrite → 并行重修受损分卷。&#10;  3. pass → 直接进入 Stage-Gate 独立终审裁判。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#4C0519;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2938" y="2770" width="610" height="176" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_5_crag" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3748" y="2728" width="744" height="218" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_5_crag_hdr" value="[硬编码 · 条件分支] Corrective RAG 定向补搜" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3748" y="2728" width="744" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_5_crag_body" value="• node_corrective_rag_refill (模式2 LangGraph)：&#10;  - 提取 gap_queries[:4] 并用 SHA-1(geo:query) 核验防重复查询。&#10;  - 调度 DualEngineSearchRouter 定向补采并 Upsert 写入&#10;    EvidenceVault，经右侧闭环回流总线重触发 Phase 5 合成。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3748" y="2770" width="744" height="176" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_6_reviser" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="88" y="3020" width="1010" height="222" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_6_reviser_hdr" value="[Context #6 + LLM #6] 定向分卷重写并行智能体 (Reviser 00–04)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="3020" width="1010" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_6_reviser_body" value="• 触发门限：仅当 decision == &quot;needs_rewrite&quot; 时按需唤醒（本次 pass 跳过，执行 0 次）。&#10;• Context #6 精准切片：按 issues[].section 前缀只锁定问题分卷，注入整改清单&#10;  issues_txt + 该卷完整当前草稿 volumes[spec[0]] + [EV-...]/[ROI-CALC] 防篡改指令。&#10;• 重写后重新运行 _previews_and_checks() 刷新统计与摘要，送交 Stage-Gate Judge。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="88" y="3062" width="1010" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_7_ctx7" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;dashed=1;dashPattern=6 4;" vertex="1" parent="1">
+          <mxGeometry x="1158" y="3020" width="1050" height="222" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_7_ctx7_hdr" value="[Context 组装 #7] Stage-Gate 独立裁判 Prompt 装配" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#B45309;strokeColor=#B45309;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1158" y="3020" width="1050" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_7_ctx7_body" value="• Ch 19 终审裁判载荷（量化硬指标与定性摘要合一）：&#10;  1. det_summary / vault_stats (225 证据 / CN 63.11% / 81 引用 / 80 [ROI-CALC])。&#10;  2. Critic 终审评语摘要 + 5 卷头尾拼装预览 (previews)。&#10;  3. 5×20 分仲裁 Rubric（中国优先、双时间窗、物理机理、ROI与升级、引用与行文）+&#10;     NO_TOOL_DIRECTIVE + JUDGE_SCHEMA (JudgeRubricScores)。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#451A03;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1158" y="3062" width="1050" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_8_judge" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2268" y="3020" width="1030" height="222" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_8_judge_hdr" value="[LLM 分析 #7] Stage-Gate Quality Judge (Ch 19 独立裁判)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#5B21B6;strokeColor=#5B21B6;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2268" y="3020" width="1030" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_8_judge_body" value="• 执行底座：模式1 gemini-3.8-flash-tiered ｜ 模式2 deepseek-v4-pro。&#10;• 独立仲裁实测结果 (native-88e91cf7)：100.0 / 100（门禁 &gt;= 85 通过）：&#10;  中国优先 20.0 + 双时间窗 20.0 + 物理精度 20.0 + ROI与升级 20.0 + 引用行文 20.0。&#10;• 输出行长级结论 executive_verdict、5 项核心优势与 3 项产业链残余风险。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#1E1B4B;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="2268" y="3062" width="1030" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_9_fin" value="" style="rounded=1;arcSize=4;whiteSpace=wrap;html=0;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="3358" y="3020" width="1134" height="222" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_9_fin_hdr" value="[硬编码 + 终稿归档] finalize-native 与全套交付物 (00–08)" style="rounded=0;whiteSpace=wrap;html=0;fillColor=#1E3A8A;strokeColor=#1E3A8A;strokeWidth=1;fontColor=#FFFFFF;fontStyle=1;fontSize=14;align=left;verticalAlign=middle;spacingLeft=12;spacingRight=10;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3358" y="3020" width="1134" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="node_n6_9_fin_body" value="• cli.py::_cmd_finalize_native 终审校验防线：&#10;  1. 按实际通过白名单的 len(cleaned_evs) 确定性重算终审支柱分与 Elo 排名；&#10;  2. 强制 Python 精确重算 5 项评分和 (exact_sum = 100.0)，消除大模型算术漂移；&#10;  3. 输出至 outputs/power_semiconductor_online_testing_2026_2036/ (00–08 全套交付物)。" style="rounded=0;whiteSpace=wrap;html=0;fillColor=none;strokeColor=none;fontColor=#0F172A;fontSize=13;align=left;verticalAlign=top;spacingLeft=13;spacingRight=12;spacingTop=8;spacingBottom=8;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3358" y="3062" width="1134" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="pill_branch_crag" value="needs_more_evidence" style="rounded=1;arcSize=50;whiteSpace=wrap;html=0;fillColor=#FFF1F2;strokeColor=#9F1239;strokeWidth=2;fontColor=#881337;fontStyle=1;fontSize=12;align=center;verticalAlign=middle;spacingLeft=6;spacingRight=6;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="3562" y="2820" width="172" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="pill_branch_rew" value="needs_rewrite (0次)" style="rounded=1;arcSize=50;whiteSpace=wrap;html=0;fillColor=#FFF1F2;strokeColor=#9F1239;strokeWidth=2;fontColor=#881337;fontStyle=1;fontSize=12;align=center;verticalAlign=middle;spacingLeft=6;spacingRight=6;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="503" y="2966" width="180" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="pill_branch_pass" value="pass (置信度 98.5)" style="rounded=1;arcSize=50;whiteSpace=wrap;html=0;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;fontColor=#064E3B;fontStyle=1;fontSize=12;align=center;verticalAlign=middle;spacingLeft=6;spacingRight=6;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1593" y="2966" width="180" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="pill_bus_refill" value="补搜入库并&#10;重触发合成" style="rounded=1;arcSize=50;whiteSpace=wrap;html=0;fillColor=#FFF1F2;strokeColor=#E11D48;strokeWidth=2;fontColor=#881337;fontStyle=1;fontSize=12;align=center;verticalAlign=middle;spacingLeft=6;spacingRight=6;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="4534" y="2560" width="132" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="pill_vault_bus" value="SQLite EvidenceVault 直供下游通道" style="rounded=1;arcSize=50;whiteSpace=wrap;html=0;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;fontColor=#064E3B;fontStyle=1;fontSize=12;align=center;verticalAlign=middle;spacingLeft=6;spacingRight=6;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="120" y="766" width="290" height="32" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_b1_12" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1058" y="571" as="sourcePoint" />
+            <mxPoint x="1128" y="571" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b1_23" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2208" y="571" as="sourcePoint" />
+            <mxPoint x="2278" y="571" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b1_34" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3338" y="571" as="sourcePoint" />
+            <mxPoint x="3408" y="571" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b1_to_b2" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3950" y="732" as="sourcePoint" />
+            <mxPoint x="573" y="860" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="3950" y="782" />
+              <mxPoint x="573" y="782" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b2_12" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1058" y="1011" as="sourcePoint" />
+            <mxPoint x="1128" y="1011" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b2_23" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#6D28D9;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2308" y="1011" as="sourcePoint" />
+            <mxPoint x="2378" y="1011" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b2_34" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3428" y="1011" as="sourcePoint" />
+            <mxPoint x="3498" y="1011" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b2_to_b3" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3995" y="1162" as="sourcePoint" />
+            <mxPoint x="573" y="1290" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="3995" y="1213" />
+              <mxPoint x="573" y="1213" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_vault_to_pill" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#059669;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2808" y="732" as="sourcePoint" />
+            <mxPoint x="410" y="782" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="2808" y="756" />
+              <mxPoint x="434" y="756" />
+              <mxPoint x="434" y="782" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_vault_pill_to_vol05" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#059669;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="120" y="782" as="sourcePoint" />
+            <mxPoint x="88" y="2415" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="32" y="782" />
+              <mxPoint x="32" y="2415" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_vault_pill_to_ctx2" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="265" y="798" as="sourcePoint" />
+            <mxPoint x="1738" y="1290" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="265" y="804" />
+              <mxPoint x="46" y="804" />
+              <mxPoint x="46" y="1198" />
+              <mxPoint x="1738" y="1198" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b3_12" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1058" y="1475" as="sourcePoint" />
+            <mxPoint x="1128" y="1475" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b3_23" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#6D28D9;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2348" y="1475" as="sourcePoint" />
+            <mxPoint x="2418" y="1475" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b3_34" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3468" y="1475" as="sourcePoint" />
+            <mxPoint x="3538" y="1475" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b3_to_b4" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="4015" y="1660" as="sourcePoint" />
+            <mxPoint x="563" y="1790" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="4015" y="1713" />
+              <mxPoint x="563" y="1713" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b4_12" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1038" y="1946" as="sourcePoint" />
+            <mxPoint x="1108" y="1946" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b4_23" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#6D28D9;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2308" y="1946" as="sourcePoint" />
+            <mxPoint x="2378" y="1946" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b4_34" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3408" y="1946" as="sourcePoint" />
+            <mxPoint x="3478" y="1946" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b4_to_b5" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3985" y="2102" as="sourcePoint" />
+            <mxPoint x="2238" y="2230" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="3985" y="2153" />
+              <mxPoint x="2238" y="2153" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b5_12" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#6D28D9;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2978" y="2415" as="sourcePoint" />
+            <mxPoint x="3048" y="2415" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b5_to_b6_det" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3770" y="2600" as="sourcePoint" />
+            <mxPoint x="498" y="2728" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="3770" y="2653" />
+              <mxPoint x="498" y="2653" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_vol05_to_finalize" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#059669;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="758" y="2600" as="sourcePoint" />
+            <mxPoint x="3925" y="3242" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="758" y="2668" />
+              <mxPoint x="22" y="2668" />
+              <mxPoint x="22" y="3280" />
+              <mxPoint x="3925" y="3280" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_12" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="908" y="2837" as="sourcePoint" />
+            <mxPoint x="958" y="2837" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_23" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#6D28D9;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1878" y="2837" as="sourcePoint" />
+            <mxPoint x="1928" y="2837" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_34" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2888" y="2837" as="sourcePoint" />
+            <mxPoint x="2938" y="2837" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_4_crag_p" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3548" y="2837" as="sourcePoint" />
+            <mxPoint x="3562" y="2837" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_crag_p_5" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3734" y="2837" as="sourcePoint" />
+            <mxPoint x="3748" y="2837" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_4_to_rew_p" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3118" y="2946" as="sourcePoint" />
+            <mxPoint x="593" y="2966" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="3118" y="2956" />
+              <mxPoint x="593" y="2956" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_rew_p_to_6" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="593" y="2998" as="sourcePoint" />
+            <mxPoint x="593" y="3020" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_4_to_pass_p" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#059669;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3368" y="2946" as="sourcePoint" />
+            <mxPoint x="1773" y="2982" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="3368" y="2982" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_pass_p_to_7" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#059669;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1683" y="2998" as="sourcePoint" />
+            <mxPoint x="1683" y="3020" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_67" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#D97706;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1098" y="3131" as="sourcePoint" />
+            <mxPoint x="1158" y="3131" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_78" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#6D28D9;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2208" y="3131" as="sourcePoint" />
+            <mxPoint x="2268" y="3131" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_b6_89" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#1E3A8A;strokeWidth=2.6;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="3298" y="3131" as="sourcePoint" />
+            <mxPoint x="3358" y="3131" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_crag_to_pill" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="4492" y="2837" as="sourcePoint" />
+            <mxPoint x="4600" y="2602" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="4600" y="2837" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_crag_pill_to_synth" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="4600" y="2560" as="sourcePoint" />
+            <mxPoint x="4492" y="2415" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="4600" y="2415" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_crag_pill_to_vault" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=0;rounded=1;arcSize=8;strokeColor=#BE123C;strokeWidth=2.6;dashed=1;dashPattern=8 5;startArrow=none;endArrow=classic;endFill=1;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="4666" y="2581" as="sourcePoint" />
+            <mxPoint x="2808" y="410" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="4662" y="2581" />
+              <mxPoint x="4662" y="338" />
+              <mxPoint x="2808" y="338" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

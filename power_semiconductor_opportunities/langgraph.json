@@ -1,0 +1,10 @@
+{
+  "graphs": {
+    "pso_opportunity_researcher": "./src/pso_workflow/graph.py:build_studio_graph"
+  },
+  "env": "./.env",
+  "python_version": "3.12",
+  "dependencies": [
+    "."
+  ]
+}

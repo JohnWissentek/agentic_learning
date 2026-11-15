@@ -1,0 +1,415 @@
+{
+  "run_id": "native-88e91cf7",
+  "completed_at_utc": "2026-11-15T03:58:10.140602+00:00",
+  "profile": "flagship",
+  "sector_filter": "all",
+  "llm_engine": "antigravity_native:pro",
+  "stage_gate_passed": true,
+  "pass_threshold": 85.0,
+  "judge_rubric": {
+    "china_first_then_global_depth": 20.0,
+    "dual_horizon_3_5y_vs_5_10y_rigor": 20.0,
+    "pain_point_and_physics_specificity": 20.0,
+    "roi_and_industrial_upgrade_value": 20.0,
+    "citation_grounding_and_prose": 20.0,
+    "total_score": 100.0,
+    "executive_verdict": "通过（PASS）。五卷战略研报兼具国家级工业计量学者的物理严谨性与全球顶尖工业PE合伙人的商业洞察力。研报以物理第一性原理深刻解构了先进制造与微纳量测的信号作用机理，坚决贯彻了“中国极端工况筑基→全球行业标准外溢”的双轨战略演进。3-5年近端现金牛与5-10年远期代际跃迁边界清晰明辨，80项确定性[ROI-CALC]财务指标跨卷完全一致闭环，81处核心证据库编码引用坚实无缝，具备极高的产业落地指导与资本投资决策价值。",
+    "strengths": [
+      "战略框架结构严谨：坚决执行“中国场景优先（2027-2031）→全球高端跟进（2031-2036）”双轨战略，依托中国电池/电网/先进制程的超快节拍与严苛工况锤炼设备鲁棒性，以自主标准（IEC 63068、IEC/TR 63258）赋能出海反哺。",
+      "时间维度代际清晰：严格区分3-5年成熟期高ROI设备（无氦化质谱、内嵌椭偏、声波测温、SiC外延检测）与5-10年微观物理极限攻坚（钙钛矿叠层PL、免水浸激光超声混合键合、CD-SAXS/XRF），形成自我造血的梯队投资范式。",
+      "底层物性机理扎实：深入纳观与原子级尺度，对皮秒超声、穆勒矩阵椭偏、高亮度液态金属X射线散射、可调软电离质谱等机理分析透彻，且对自伴热微阀、防爆抗振、SECS/GEM协议等产线Form Factor工程改型定义精准。",
+      "财务模型严密闭环：80项确定性[ROI-CALC]指标在各卷与Elo天梯榜中高度一致，将现金流收益细分拆解为良率增益、批量报废阻断与贵金属/氦气耗材节约，全系Tier-A设备静态回收期（4.3-12.7个月）具备极强说服力。",
+      "证据链翔实完备：详尽引用81处权威专业证据库编码，五卷报告篇幅厚实，逻辑自洽且行文流畅，展现出国家级行研与产业决策智库的标准品质。"
+    ],
+    "residual_risks": [
+      "关键上游核心光学与能谱物理元器件（如外腔量子级联激光器QCL、全无油磁悬浮分子泵、飞秒光导天线、液态金属靶X射线源）海外供应链依存度仍待进一步攻关突破。",
+      "若下游先进制程（如Sub-2nm GAA/CFET、无凸点Cu-Cu低温混合键合）的规模化量产节点发生宏观推迟，5-10年远期前沿机台的产线折旧摊销与产能爬坡可能面临短期财务承压。",
+      "量测设备从“单机离线质检台”向“主机台嵌入式APC/R2R闭环中枢”改造过程中，需深度贯通主机厂刻蚀/镀膜及MES总线协议，存在跨厂商软硬件生态协同壁垒。"
+    ]
+  },
+  "deterministic_contract_checks": {
+    "total_evidences_pass": true,
+    "china_ratio_pass": true,
+    "tracks_covered_pass": true,
+    "opportunities_ranked_count": 16,
+    "citations_used_count": 81,
+    "roi_calc_tags_count": 80,
+    "china_first_global_second_present": true,
+    "dual_horizon_present": true,
+    "all_5_volumes_non_empty": true
+  },
+  "evidence_vault_stats": {
+    "total": 225,
+    "cn_count": 142,
+    "global_count": 83,
+    "cn_ratio": 0.6311,
+    "with_fulltext_count": 24,
+    "by_track": {
+      "P1": {
+        "CN": 18,
+        "GLOBAL": 16
+      },
+      "P2": {
+        "CN": 18,
+        "GLOBAL": 7
+      },
+      "P3": {
+        "CN": 18,
+        "GLOBAL": 12
+      },
+      "P4": {
+        "CN": 18,
+        "GLOBAL": 12
+      },
+      "S1": {
+        "CN": 17,
+        "GLOBAL": 13
+      },
+      "S2": {
+        "CN": 18,
+        "GLOBAL": 12
+      },
+      "S3": {
+        "CN": 17,
+        "GLOBAL": 6
+      },
+      "S4": {
+        "CN": 18,
+        "GLOBAL": 5
+      }
+    }
+  },
+  "evaluated_opportunities_top10": [
+    {
+      "rank": 1,
+      "opp_id": "OPP-S4-5Y-02",
+      "track_id": "S4",
+      "sector": "semiconductor",
+      "horizon": "5-10y",
+      "title": "免耦合水非接触激光超声+红外光热混合键合(Hybrid Bonding)纳米空洞及玻璃TGV在线检测仪",
+      "weighted_pillar_score": 96.21,
+      "elo_rating": 1616.4,
+      "payback_months": 4.3,
+      "irr_5yr_pct": 281.6,
+      "npv_5yr_cny": 40682915.35,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 2,
+      "opp_id": "OPP-S2-5Y-02",
+      "track_id": "S2",
+      "sector": "semiconductor",
+      "horizon": "5-10y",
+      "title": "面向3D NAND超深孔与GAA/CFET的紧凑型高亮度液态金属靶X射线CD-SAXS/XRF在线量测系统",
+      "weighted_pillar_score": 92.9,
+      "elo_rating": 1603.22,
+      "payback_months": 6.7,
+      "irr_5yr_pct": 176.9,
+      "npv_5yr_cny": 31611802.47,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 3,
+      "opp_id": "OPP-S2-3Y-01",
+      "track_id": "S2",
+      "sector": "semiconductor",
+      "horizon": "3-5y",
+      "title": "机台内嵌式(Integrated)宽光谱穆勒矩阵椭偏+皮秒超声膜厚/OCD在线闭环量测模块",
+      "weighted_pillar_score": 95.1,
+      "elo_rating": 1580.38,
+      "payback_months": 5.1,
+      "irr_5yr_pct": 233.0,
+      "npv_5yr_cny": 24345296.21,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 4,
+      "opp_id": "OPP-S3-3Y-01",
+      "track_id": "S3",
+      "sector": "semiconductor",
+      "horizon": "3-5y",
+      "title": "8英寸SiC外延片UV-PL缺陷映射+非接触FTIR/电晕电荷掺杂厚度一体化在线量测仪",
+      "weighted_pillar_score": 94.92,
+      "elo_rating": 1579.73,
+      "payback_months": 4.5,
+      "irr_5yr_pct": 263.7,
+      "npv_5yr_cny": 25232868.16,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 5,
+      "opp_id": "OPP-P4-3Y-01",
+      "track_id": "P4",
+      "sector": "power_energy",
+      "horizon": "3-5y",
+      "title": "煤电/垃圾焚烧灵活调峰锅炉声波二维测温+原位TDLAS多组分燃烧闭环优化系统",
+      "weighted_pillar_score": 89.6,
+      "elo_rating": 1590.07,
+      "payback_months": 5.8,
+      "irr_5yr_pct": 207.9,
+      "npv_5yr_cny": 6772158.94,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 6,
+      "opp_id": "OPP-S4-3Y-01",
+      "track_id": "S4",
+      "sector": "semiconductor",
+      "horizon": "3-5y",
+      "title": "亚10微米TSV/微凸点高速在线3D X射线层析成像(AXI/CT)与AI缺陷判别站",
+      "weighted_pillar_score": 92.7,
+      "elo_rating": 1570.78,
+      "payback_months": 5.1,
+      "irr_5yr_pct": 232.8,
+      "npv_5yr_cny": 28242608.86,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 7,
+      "opp_id": "OPP-S1-3Y-01",
+      "track_id": "S1",
+      "sector": "semiconductor",
+      "horizon": "3-5y",
+      "title": "12英寸晶圆厂多流路切换ppt级AMC分子污染在线软电离质谱/CRDS监控系统",
+      "weighted_pillar_score": 92.46,
+      "elo_rating": 1569.61,
+      "payback_months": 5.4,
+      "irr_5yr_pct": 221.6,
+      "npv_5yr_cny": 16336947.3,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 8,
+      "opp_id": "OPP-P1-3Y-01",
+      "track_id": "P1",
+      "sector": "power_energy",
+      "horizon": "3-5y",
+      "title": "无氦化高频在线质谱/VOC微漏检测系统（替代传统真空氦检与产线电解液泄漏筛查）",
+      "weighted_pillar_score": 86.76,
+      "elo_rating": 1580.01,
+      "payback_months": 5.5,
+      "irr_5yr_pct": 217.1,
+      "npv_5yr_cny": 8345920.86,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 9,
+      "opp_id": "OPP-P2-5Y-02",
+      "track_id": "P2",
+      "sector": "power_energy",
+      "horizon": "5-10y",
+      "title": "GW级钙钛矿/晶硅叠层产线纳秒激光PL+高光谱薄膜结晶态在线闭环检测系统",
+      "weighted_pillar_score": 89.79,
+      "elo_rating": 1558.66,
+      "payback_months": 7.8,
+      "irr_5yr_pct": 152.2,
+      "npv_5yr_cny": 7725335.45,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    },
+    {
+      "rank": 10,
+      "opp_id": "OPP-S3-3Y-02",
+      "track_id": "S3",
+      "sector": "semiconductor",
+      "horizon": "3-5y",
+      "title": "高压碳化硅功率芯片晶圆级动态开关/栅氧早期失效(KGD)高通量在线测试分选平台",
+      "weighted_pillar_score": 93.88,
+      "elo_rating": 1543.93,
+      "payback_months": 5.3,
+      "irr_5yr_pct": 225.6,
+      "npv_5yr_cny": 25751150.26,
+      "payback_tier": "Tier-A (<=12m Ultra-High ROI)"
+    }
+  ],
+  "elo_tournament_matches": [
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-S3-3Y-01",
+      "opp_b_id": "OPP-S4-5Y-02",
+      "winner_id": "OPP-S4-5Y-02",
+      "rationale": "在四大维度综合评估中，OPP-S4-5Y-02全面胜出：\n1. 制造ROI与回收期（35%权重）：回收期仅4.3个月（优于A的4.5个月），5年IRR高达281.6%（优于A的263.7%），净现金流达¥1,184万元（显著高于A的¥739.5万元），资本效率与盈利体量更优。\n2. 品质与良率影响（25%权重）：具备横向≤50nm、纵向≤5nm纳米级微空洞识别与TGV缺陷100%拦截能力，直接带动关键混合键合与玻璃基板综合封装良率跃升3%~5%，价值拦截效益更高。\n3. 产业升级与国产化杠杆（20%权重）：推动检测体系从“后道机械/电离粗检”跨越至“前道光声原子级表征”，攻克亚微米先进互连界面物理原位评测的卡脖子瓶颈。\n4. 成本TCO与绿色EHS（20%权重）：免耦合水非接触设计彻底消除传统水浸对活化Cu界面的氧化腐蚀隐患与化学废液排放，大幅削减清洗维护TCO，完美契合超净制造与绿色EHS要求。",
+      "elo_a_after": 1563.92,
+      "elo_b_after": 1600.6
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-S2-3Y-01",
+      "opp_b_id": "OPP-S3-3Y-02",
+      "winner_id": "OPP-S2-3Y-01",
+      "rationale": "综合四项维度加权评估，OPP-S2-3Y-01全面胜出：\n1. 制造ROI与回收期（35%）：Option A CAPEX更低（¥310万 vs ¥340万）、回本更快（5.1个月 vs 5.3个月）、5年IRR更高（233.0% vs 225.6%），且中国市场空间显著更大（¥62.0亿 vs ¥42.0亿），资本效率更具优势。\n2. 质量与良率影响（25%）：Option A在晶圆前道制造发生点实现100%原位全片闭环监控与R2R自适应调控，消除4-8小时离线盲区，将NU%与CD偏差压低60%以上，从源头彻底根治批次性过磨与报废；相较于Option B的后道分选拦截，前道源头控制对良率杠杆效应更强。\n3. 产业升级与国产替代杠杆（20%）：Option A直接打破美商KLA和Nova在机台集成量测领域的垄断封锁，推动国产主设备由开环盲跑升级为闭环智能工业母机，有力加速黑灯工厂进程，战略卡位价值突出。\n4. 成本/TCO与绿色EHS（20%）：内嵌式量测省去独立离线机台占地与Fab内晶圆流转搬运能耗，从工艺端大幅压减原料/耗材损耗与废片排放，TCO及绿色制造表现更优。",
+      "elo_a_after": 1596.18,
+      "elo_b_after": 1559.74
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-S4-3Y-01",
+      "opp_b_id": "OPP-S1-3Y-01",
+      "winner_id": "OPP-S4-3Y-01",
+      "rationale": "综合四项加权维度，Option A (OPP-S4-3Y-01) 全面胜出：\n1. 制造ROI与投资回收期（权重35%）：Option A关键财务指标全面领先，年净现金流达¥840万（较Option B的¥489万高出71.8%），投资回收期仅5.1个月（优于B的5.4个月），5年IRR高达232.8%（优于B的221.6%），对应国内市场TAM达¥39.0亿。\n2. 质量与良率提升（权重25%）：实现≤10μm微凸点100%全检与99.9%缺陷识别率，精准阻断焦耳热集聚与电迁移早期开路，直接挽回高附加值先进封装2%~4%综合良率。\n3. 产业升级与国产自主（权重20%）：填补国内高端高通量在线3D AXI检测设备空白，破解三维堆叠内部“物理黑箱”，并将点云数据实时闭环联动MES自校正键合与回流工艺，赋能黑灯工厂。\n4. 综合成本与绿色EHS（权重20%）：凭借极强现金流快速覆盖CAPEX差额，大幅降低高端封装模组批次报废及物料能耗，具备更优全生命周期TCO与绿色效益。",
+      "elo_a_after": 1586.76,
+      "elo_b_after": 1553.88
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-S2-5Y-02",
+      "opp_b_id": "OPP-S1-5Y-02",
+      "winner_id": "OPP-S2-5Y-02",
+      "rationale": "综合四项维度加权评估，OPP-S2-5Y-02（面向3D NAND与GAA的CD-SAXS/XRF在线量测系统）为明确优胜方案：\n\n1. 质量与良率影响（25%）：Option A以在线无损量测彻底替代耗时12-24小时且破坏晶圆的FIB-SEM切片，将缺陷拦截率提至99.9%以上并挽回5%-15%的良率损失，较Option B（0.5%-1.2%）具有数量级上的压倒性优势。\n2. 制造ROI与回收期（35%）：Option A年净现金流达¥9,790,000，面向¥45.0亿TAM，盈利体量与市场空间显著优于Option B（¥4,830,000与¥29.0亿）；二者投资回收期极为接近（6.7个月 vs 6.5个月），Option A的绝对回报规模与资本回报深度更强。\n3. 产业升级与自主可控（20%）：Option A跨越深紫外波长衍射极限与深层光学屏蔽，实现国家级同步辐射技术向洁净室紧凑在线机台的划时代飞跃，攻克先进制程超深孔与微纳隐藏界面无损检测的战略级核心卡点。\n4. 成本/TCO与绿色EHS（20%）：Option A大幅杜绝先进制程昂贵晶圆的破坏性报废与批次性刻蚀失准返工，全流程TCO收益显著。",
+      "elo_a_after": 1587.24,
+      "elo_b_after": 1548.12
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-P1-3Y-01",
+      "opp_b_id": "OPP-P2-5Y-02",
+      "winner_id": "OPP-P1-3Y-01",
+      "rationale": "综合四维度加权评估，OPP-P1-3Y-01以绝对优势胜出：\n1. 制造ROI与回收期（35%权重）：Option A财务模型全面领先，CAPEX更低（115万 vs 160万）、净现金流更高（250.5万 vs 246万），投资回收期仅5.5个月（Option B为7.8个月），5年IRR高达217.1%（显著优于Option B的152.2%），投资见效速度与资金效率极高；\n2. 成本TCO与绿色EHS（20%权重）：Option A实现“无氦化”质谱检测，彻底摆脱对昂贵、稀缺战略进口氦气的消耗依赖，大幅降低运维耗材TCO，同时杜绝含氟电解液产线微漏挥发与环境污染风险；\n3. 质量与良率（25%权重）：检出限达1.0E-7 mbar·L/s，在前道封口即精准拦截电解液微漏，从根本上杜绝电池腐蚀短路自燃与电芯/模组召回的灾难性质量风险；\n4. 产业升级与本土杠杆（20%权重）：依托中国全球主导的动力与储能锂电产业集群，推动后道工序由离线间歇抽真空升级为常压连续在线闭环，3-5年量产落地确定性与国产化替代杠杆远高于尚处产业化早期的钙钛矿方案（5-10年）。",
+      "elo_a_after": 1563.6,
+      "elo_b_after": 1542.6
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-P1-5Y-02",
+      "opp_b_id": "OPP-P2-3Y-01",
+      "winner_id": "OPP-P2-3Y-01",
+      "rationale": "综合四个维度的加权评估，OPP-P2-3Y-01胜出：\n1. 制造ROI与回收期（35%）：Option B全面占优。CAPEX更低（135万 vs 185万），净现金流更高（245万 vs 236万），回收期仅6.6个月（优于A的9.4个月），5年IRR高达180.4%（远超A的125.4%）。\n2. 质量与良率提升（25%）：Option B实现卷对卷微针孔零漏检与±0.005 mg/cm²的Pt/Ir载量高精度监测，将电堆总装一次合格率提升至99.2%以上，相比处于5-10年周期的固态电池，其良率改进更具确定性与量化价值。\n3. 产业升级与自主可控（20%）：Option B建立“在线测绘-模头微调联动”闭环，终结切片破坏性抽检，直接推动绿氢电堆核心部件精密智造升级。\n4. 成本/TCO与绿色EHS（20%）：Option B设备投入更低且精准优化贵金属涂布消耗，直接降低电解槽制氢TCO，高度契合双碳与绿色装备战略。",
+      "elo_a_after": 1543.83,
+      "elo_b_after": 1572.53
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-P3-5Y-02",
+      "opp_b_id": "OPP-P4-3Y-01",
+      "winner_id": "OPP-P4-3Y-01",
+      "rationale": "综合四维加权评估，OPP-P4-3Y-01（Option B）以更优的综合回报胜出：\n1. 制造ROI与投资回收（35%）：Option B以极具竞争力的CAPEX（98万元，不到A的一半）实现了更短的回收期（5.8个月 vs A的8.4个月）和更高的5年IRR（207.9% vs A的141.2%），且对应中国TAM达34.0亿元（为A的2.1倍），财务回报与商业落地速度全面占优。\n2. 质量与良率/运行影响（25%）：Option A在±525kV超高压海缆的微米级全扫描与99.5%一次通过率上具备顶尖制程工艺价值；Option B则根除受热面爆管隐患，使机组非计划停运率骤降70%以上，运行良率与连续可靠性同样极高。\n3. 产业升级与自主可控（20%）：Option A推动高端海缆CT断层与模头伺服动态补偿的深层突破；Option B则将传统模糊看火推进至空间连续声波/TDLAS全场闭环与黑灯运行，赋能国家新型电力系统灵活调峰刚需。\n4. 成本/TCO与绿色EHS（20%）：Option B凭借极低初置成本与轻量化TCO优势明显，同时原位监测实现精准喷氨与高效减碳减排，在绿色EHS与环保合规维度效益更为突出。",
+      "elo_a_after": 1536.64,
+      "elo_b_after": 1574.12
+    },
+    {
+      "round_idx": 1,
+      "opp_a_id": "OPP-P3-3Y-01",
+      "opp_b_id": "OPP-P4-5Y-02",
+      "winner_id": "OPP-P3-3Y-01",
+      "rationale": "综合评估四个维度，OPP-P3-3Y-01（Option A）以显著优势胜出：\n1. 制造ROI与投资回报（35%权重，核心胜负手）：Option A 的财务表现全面碾压，CAPEX（88万元）不足Option B的一半，投资回收期仅6.9个月（vs B选项12.7个月），5年IRR高达172.1%（vs 90.6%），且中国市场TAM达19.5亿元（vs 12.5亿元），商业化变现与周转效率极高。\n2. 质量与产线良率（25%权重）：Option A 深度嵌入开关设备产线工频耐压试验闭环，10ppb级微放电分解物秒级告警，直接将GIS装配及耐压测试的二次拆装返工率降低85%以上，对制造端一次交检良率的提升直接且确定性高。\n3. 产业升级与中国首发杠杆（20%权重）：紧扣我国特高压装备制造的绝对全球优势，推动SF6环保气体替代关键技术落地，形成“在线标定-原位诊断-闭环回收”工业4.0绿色产线标杆，其3-5年期成熟度显著高于5-10年期的电力CCUS质谱站。\n4. 成本/TCO与绿色EHS（20%权重）：设备初始投入低，全生命周期运维与合规成本优势明显；精准攻克超强温室气体SF6替代减排与无害化闭环痛点，全面满足电网绿色供应链考核标准。",
+      "elo_a_after": 1573.0,
+      "elo_b_after": 1524.52
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-S4-5Y-02",
+      "opp_b_id": "OPP-S2-3Y-01",
+      "winner_id": "OPP-S4-5Y-02",
+      "rationale": "综合四项加权维度，Option A (OPP-S4-5Y-02) 综合胜出：\n1. 制造ROI与投资回收 (35%)：Option A 优势显著，投资回收期仅 4.3 个月（优于 B 的 5.1 个月），年净现金流达 1,184 万元（较 B 高出 63.5%），5年 IRR 高达 281.6%（优于 B 的 233.0%），在第一大权重项上全面领先；\n2. 质量与良率提升 (25%)：Option A 在线精准拦截 ≤50nm 界面微空洞与 100% TGV 裂纹/堵孔，直接为超高价值的混合键合及玻璃基板带来 3%~5% 的最终良率提升，相比 Option B 的面内均匀度控制具备更高的单片良率经济价值；\n3. 产业升级与战略纵深 (20%)：推动先进封装检测跨入“前道超纯超净光声原子级表征”新纪元，为亚微米节距混合键合提供底层物理支撑，技术代际跨越度高；\n4. TCO与绿色EHS (20%)：采用非接触光声技术彻底免除耦合水介质，杜绝水汽对活化Cu表面的氧化腐蚀与清洗废液排放，在超净间零污染与绿色安全EHS上表现更优。",
+      "elo_a_after": 1616.4,
+      "elo_b_after": 1580.38
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-S4-3Y-01",
+      "opp_b_id": "OPP-S2-5Y-02",
+      "winner_id": "OPP-S2-5Y-02",
+      "rationale": "在四项加权维度综合对比下，Option B（OPP-S2-5Y-02）整体胜出：1. 制造ROI与回收期（35%）：Option A在IRR（232.8% vs 176.9%）和回收期（5.1m vs 6.7m）上更优，但Option B的年净现金流（¥9.79M vs ¥8.4M）更高、China TAM（¥45亿 vs ¥39亿）更大，且6.7个月回收期同样处于极优区间；2. 质量与良率影响（25%）：Option B在前道超深孔与GAA关键工序挽回5%~15%良率损失，远超Option A在后道封装挽回的2%~4%，前道晶圆价值极高，经济收益呈量级倍增；3. 产业升级与战略自主（20%）：Option B跨越深紫外衍射极限，实现从国家级同步辐射装置向晶圆厂紧凑型在线机台的划时代突破，填补前道微纳结构量测战略空白，战略价值远高于封装端AXI；4. 成本/TCO与绿色EHS（20%）：Option B以全局无损量测替代传统12~24小时破坏性FIB-SEM抽检，从源头消除昂贵晶圆物理报废与制样化学废弃，大幅降低长期TCO并符合绿色制造标准。Option B在良率、战略升级与TCO/EHS三维度（合计65%权重）具备决定性优势。",
+      "elo_a_after": 1570.78,
+      "elo_b_after": 1603.22
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-P1-3Y-01",
+      "opp_b_id": "OPP-P2-3Y-01",
+      "winner_id": "OPP-P1-3Y-01",
+      "rationale": "在四大维度综合评估中，Option A (OPP-P1-3Y-01) 展现出全方位的领先优势：1. 制造ROI与回收期（35%权重）：Option A财务回报全面占优，CAPEX更低（115万元 vs 135万元）、年净现金流更高（250.5万元 vs 245万元）、投资回收期更短（5.5个月 vs 6.6个月）、5年IRR显著领先（217.1% vs 180.4%），且对应中国TAM规模（28.0亿元 vs 14.5亿元）翻倍，商业化变现爆发力更强；2. 质量与良率（25%权重）：检出限达1.0E-7 mbar·L/s级别，在注液封口初期即精准拦截微滴电解液渗漏，直接消除微漏电池流向模组引发的短路自燃等灾难性安全隐患；3. 产业升级与自主可控（20%权重）：推动锂电后道工序从传统“离线间歇抽真空”跃升至“常压连续流高频闭环感知”，加速确立中国电池智造无氦检测产业新标准；4. 成本/TCO与绿色EHS（20%权重）：实现无氦化替代，彻底规避不可再生稀缺战略气体依赖与高昂用氦/回收TCO，同时原位杜绝含氟VOC挥发对产线工人的健康与环境危害。综合胜出者为 OPP-P1-3Y-01。",
+      "elo_a_after": 1580.01,
+      "elo_b_after": 1556.12
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-P4-3Y-01",
+      "opp_b_id": "OPP-P3-3Y-01",
+      "winner_id": "OPP-P4-3Y-01",
+      "rationale": "在四大维度综合评估中，OPP-P4-3Y-01（锅炉声波测温+原位TDLAS闭环系统）全面胜出：\n1. 制造ROI与回收期（权重35%）：A方案财务回报显著更优，NetCF达204.5万元（比B方案高34.1%），投资回收期仅5.8个月（优于B的6.9个月），5年IRR高达207.9%（vs 172.1%），国内TAM达34.0亿元（vs 19.5亿元），具备更大的市场体量与资本收益优势。\n2. 质量/良率影响（权重25%）：从物理源头根除20%~30%超低负荷深度调峰下的偏斜与贴壁燃烧失稳，将烟温与汽温偏差大幅压降，机组非计划停运率下降70%以上，避免百万级停炉爆管损失。\n3. 产业升级与中国首倡红利（权重20%）：精准卡位中国新型电力系统煤电灵活性调峰战略改造刚需，实现离散测温向空间连续等温/浓度场升维，联动APC实现全自动配风与喷氨，推动火电机组迈向数字化黑灯运行。\n4. TCO与绿色EHS（权重20%）：显著降低重大运维与停机TCO，精准喷氨从源头抑制氨逃逸与NOx超标，兼顾经济性与绿色环保。",
+      "elo_a_after": 1590.07,
+      "elo_b_after": 1557.05
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-S3-3Y-01",
+      "opp_b_id": "OPP-S3-3Y-02",
+      "winner_id": "OPP-S3-3Y-01",
+      "rationale": "综合四项维度加权评估，OPP-S3-3Y-01（8英寸SiC外延在线量测仪）综合优势更显著：1. 制造ROI与回收期（35%）：CAPEX更低（280万 vs 340万）、投资回收期更短（4.5个月 vs 5.3个月）、5年IRR显著领先（263.7% vs 225.6%），资金回报效率与周转确定性更高；2. 质量与良率（25%）：实现0.1μm级缺陷全片定位并将Cpk提至1.67，在价值链前端“治未病”，阻断缺陷晶圆流入光刻/注入等高价值制程；3. 产业升级与自主化（20%）：精准卡位国产8英寸SiC大尺寸放量关键期，彻底终结“破坏试片、事后推导”旧范式；4. 成本与绿色EHS（20%）：非接触FTIR/电晕电荷检测完全规避昂贵外延片损耗与化学前处理废液，显著降低TCO并符合绿色制造标准。",
+      "elo_a_after": 1579.73,
+      "elo_b_after": 1543.93
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-S1-3Y-01",
+      "opp_b_id": "OPP-S1-5Y-02",
+      "winner_id": "OPP-S1-3Y-01",
+      "rationale": "综合四项加权维度，Option A (OPP-S1-3Y-01) 全面胜出：1. 制造ROI与回收期 (35%)：Option A 资本开支更低（¥2.2M vs ¥2.6M）、净现金流更高（¥4.89M vs ¥4.83M），投资回收期缩短至5.4个月，5年IRR高达221.6%（领先B项36.8个百分点），且中国TAM达38亿元，商业回报更具确定性；2. 质量与良率影响 (25%)：截获光刻微环境ppt级AMC可杜绝掩模版雾化（Haze）及光酸淬灭，降低前道光刻缺陷率15-25%并阻断批量报废，影响量级远高于B项清洗环节0.5-1.2%的良率挽回；3. 产业升级与自主可控 (20%)：3-5年落地窗口契合国产12英寸先进逻辑与存储产线扩产急需，填补高通量前道在线分析空白；4. TCO与绿色EHS (20%)：多流路切换大幅摊薄单点监控TCO，非接触/软电离无浓酸废液产生，EHS风险显著低于B项单机台强酸原位检测。",
+      "elo_a_after": 1569.61,
+      "elo_b_after": 1532.39
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-P2-5Y-02",
+      "opp_b_id": "OPP-P1-5Y-02",
+      "winner_id": "OPP-P2-5Y-02",
+      "rationale": "在四大维度综合评估中，Option A（OPP-P2-5Y-02）表现更优，获胜原因如下：1. 制造ROI与投资回收（35%）：Option A 财务表现全面领先，CAPEX更低（¥160万 vs ¥185万）、年净现金流更高（¥246万 vs ¥236万）、回收期更短（7.8个月 vs 9.4个月）、5年IRR达152.2%（vs 125.4%），且对应中国市场TAM更广阔（¥31亿 vs ¥22亿）。2. 质量与良率影响（25%）：Option A 实现大尺寸组件（1.2m×2.4m）全幅在线全检与微米级精度，划线微伤及寿命猝灭点识别率>99.5%，杜绝废次品流入昂贵的后道层压。3. 产业升级与本土赋能（20%）：紧扣国内GW级钙钛矿/叠层量产加速窗口，建立退火相态动力学前馈反馈数字孪生闭环，相较于尚处产业化早期验证阶段的全固态/干法电池（Option B），规模化落地確定性更高。4. 成本/TCO与绿色EHS（20%）：前端及早拦截缺陷极大减少后续昂贵封装材料与高耗能工序浪费，TCO与减碳综合效益显著。",
+      "elo_a_after": 1558.66,
+      "elo_b_after": 1527.77
+    },
+    {
+      "round_idx": 2,
+      "opp_a_id": "OPP-P3-5Y-02",
+      "opp_b_id": "OPP-P4-5Y-02",
+      "winner_id": "OPP-P3-5Y-02",
+      "rationale": "综合四维度评估，OPP-P3-5Y-02胜出：\\n1. 制造ROI与回收期（35%权重，核心优势）：Option A财务回报全面碾压，投资回收期仅8.4个月（B为12.7个月），5年IRR高达141.2%（B为90.6%），年净现金流343万元且中国TAM达16亿元，资本增值与变现效率显著领先；\\n2. 质量与良率价值（25%权重）：直接赋能±525kV超高压海缆制造，实现全周向<5μm偏心测控与100%微杂质全长扫描，将数百公里整盘出厂耐压及局放试验一次通过率提升至99.5%以上，避免整盘报废的重大损失；\\n3. 产业升级与自主可控（20%权重）：终结落后的人工离线切片抽检，确立“原位360度CT重构+模头偏摆伺服闭环动态补偿”的工业4.0新标杆，有力支撑国家深远海能源大动脉建设；\\n4. 成本与绿色EHS（20%权重）：通过全在线闭环控制大幅降低XLPE绝缘原料浪费与高耗能返工，以极低TCO助力海缆制造绿色低碳转型。",
+      "elo_a_after": 1552.08,
+      "elo_b_after": 1509.08
+    }
+  ],
+  "critique_loops_executed": 0,
+  "critique_history": [
+    {
+      "decision": "pass",
+      "issues": [
+        {
+          "description": "虽然整机架构已实现高度自主可控与商业化闭环，但在极端核心底层物理器件（如外腔量子级联激光器QCL、超低噪声高计数率硅漂移探测器SDD芯片、太赫兹宽谱飞秒光导天线、无油磁悬浮分子泵）方面，国内产业链上游仍存在局部进口依存度。建议在工程产业化落地过程中，持续将供应链国产化率与第二备选方案列为持续监控的跟踪指标。",
+          "issue_type": "supply_chain_resilience",
+          "section": "Vol 01 & Vol 04 核心零部件供应链安全性评估",
+          "severity": "minor"
+        },
+        {
+          "description": "在面向海外市场（2031-2036）输出中国主导技术标准（如IEC 63068系列、薄膜椭偏IEC/TR 63258）时，需防范国际半导体巨头的专利池包围壁垒，建议产业基金与装备龙头进一步加强核心传感构型与反演算法的PCT国际专利提前布局。",
+          "issue_type": "ip_strategy",
+          "section": "Vol 00 & Vol 04 标准出海与知识产权战略",
+          "severity": "minor"
+        }
+      ],
+      "overall_confidence": 98.5,
+      "summary": "经计量院士与工业PE合伙人联合严格审计，五卷研报完全通过（PASS）。报告坚决执行了“中国优先→全球跟进”的双轨战略演化结构，明确划定了3-5年（2027-2031）与5-10年（2031-2036）的代际工艺边界。底层传感物理机制（如PIC/MMSE/皮秒超声/免水浸激光超声/高亮度CD-SAXS/软电离质谱/声波测温/TDLAS）无概念混淆，产线嵌入式Form Factor工程定义精准。80项确定性[ROI-CALC]财务指标跨卷完全一致，81处核心证据库编码引用真实坚实，全书无截断或空章节，具备极高的产业指导与资本投资落地决策价值。"
+    }
+  ],
+  "cost_and_token_telemetry": {
+    "billing_mode": "Antigravity IDE Native Frontier Quota + Paid Search APIs (.env.ai_search)",
+    "total_cost_cny": 0.0,
+    "llm_engine": "antigravity_native:pro",
+    "orchestrator_planning_model": "gemini-pro-orchestrator (Orchestrator (Carbon) / Gemini 4 Carbon)",
+    "orchestrator_execution_model": "gemini-flash-worker-agy",
+    "run_workflow_requested_tier": "pro",
+    "run_workflow_resolved_child_model": "gemini-3.8-flash-tiered",
+    "child_agent_conversations_count": 32,
+    "child_agent_input_tokens": 681829,
+    "child_agent_output_tokens": 356946,
+    "child_agent_total_tokens": 1038775,
+    "native_agent_invocations": {
+      "planner": 1,
+      "track_analysts_and_storm": 8,
+      "elo_pairwise_matches": 16,
+      "volume_synthesizers": 5,
+      "heterogeneous_critic": 1,
+      "targeted_revisions": 0,
+      "stage_gate_judge": 1
+    },
+    "search_queries_in_vault": 40
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PSO: 1. Verify Search & LLM Env",
+      "type": "shell",
+      "command": "/Users/john/.local/bin/uv run pso-research verify-env",
+      "options": {
+        "cwd": "${workspaceFolder}/power_semiconductor_opportunities"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PSO: 2. Run Pytest Harness",
+      "type": "shell",
+      "command": "/Users/john/.local/bin/uv run pytest -v",
+      "options": {
+        "cwd": "${workspaceFolder}/power_semiconductor_opportunities"
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "PSO: 3. Run Flagship Opportunity Workflow",
+      "type": "shell",
+      "command": "/Users/john/.local/bin/uv run pso-research run --sector all --profile flagship --output-dir outputs/power_semiconductor_online_testing_2026_2036",
+      "options": {
+        "cwd": "${workspaceFolder}/power_semiconductor_opportunities"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PSO: 4. Run Stage-Gate Evaluator",
+      "type": "shell",
+      "command": "/Users/john/.local/bin/uv run pso-research evaluate outputs/power_semiconductor_online_testing_2026_2036",
+      "options": {
+        "cwd": "${workspaceFolder}/power_semiconductor_opportunities"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

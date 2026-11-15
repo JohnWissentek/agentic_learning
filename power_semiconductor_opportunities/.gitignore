@@ -1,0 +1,19 @@
+# 密钥与环境文件（禁止提交）
+.env
+.env.*
+
+# Python 环境与缓存
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 运行时证据数据库与本地中间状态
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.sqlite*
+*.log
+.DS_Store
