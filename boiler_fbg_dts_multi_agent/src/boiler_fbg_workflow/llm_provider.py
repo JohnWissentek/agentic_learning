@@ -56,10 +56,13 @@ class LLMCallTrace:
     latency_ms: int = 0
     status: Literal["success", "error", "timeout", "fallback"] = "success"
     error_message: str = ""
+    finish_reason: str = "unknown"  # stop, length, error
     
     # Parsed output if applicable
     parsed_output: dict[str, Any] = field(default_factory=dict)
     parse_success: bool = True
+    validation_status: str = ""  # VALID, TRUNCATED, PARSE_FAILED, etc.
+    validation_issues: list[str] = field(default_factory=list)
     
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -80,8 +83,11 @@ class LLMCallTrace:
             "latency_ms": self.latency_ms,
             "status": self.status,
             "error_message": self.error_message,
+            "finish_reason": self.finish_reason,
             "parsed_output": self.parsed_output,
             "parse_success": self.parse_success,
+            "validation_status": self.validation_status,
+            "validation_issues": self.validation_issues,
         }
 
 
@@ -189,18 +195,38 @@ class DeterministicProvider(LLMProvider):
 class LocalModelProvider(LLMProvider):
     """Local model provider using HuggingFace transformers.
     
-    Uses Qwen2.5-0.5B-Instruct for CPU inference.
+    Supports Qwen2.5 instruction models (0.5B, 1.5B, 3B).
+    Default: 1.5B for better quality while staying on CPU.
     
-    Model card: https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct
     License: Apache 2.0
     """
     
-    MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
-    MODEL_REVISION = "7ae557604adf67be50417f59c2c2f167def9a775"
+    # Model configurations
+    MODELS = {
+        "0.5B": {
+            "model_id": "Qwen/Qwen2.5-0.5B-Instruct",
+            "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+        },
+        "1.5B": {
+            "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+            "revision": "main",
+        },
+        "3B": {
+            "model_id": "Qwen/Qwen2.5-3B-Instruct",
+            "revision": "main",
+        },
+    }
+    
     MODEL_LICENSE = "Apache-2.0"
     CACHE_DIR = "/tmp/hf_models"
     
-    def __init__(self):
+    def __init__(self, model_size: str = "1.5B"):
+        """Initialize with specified model size."""
+        if model_size not in self.MODELS:
+            raise ValueError(f"Unknown model size: {model_size}. Available: {list(self.MODELS.keys())}")
+        
+        self._model_size = model_size
+        self._model_config = self.MODELS[model_size]
         self._model = None
         self._tokenizer = None
         self._loaded = False
@@ -211,15 +237,19 @@ class LocalModelProvider(LLMProvider):
     
     @property
     def model_id(self) -> str:
-        return self.MODEL_ID
+        return self._model_config["model_id"]
     
     @property
     def model_revision(self) -> str:
-        return self.MODEL_REVISION
+        return self._model_config["revision"]
     
     @property
     def model_license(self) -> str:
         return self.MODEL_LICENSE
+    
+    @property
+    def model_size(self) -> str:
+        return self._model_size
     
     def _load_model(self):
         """Lazy load model on first use."""
@@ -229,13 +259,15 @@ class LocalModelProvider(LLMProvider):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
         
+        print(f"    加载模型: {self.model_id} ({self._model_size})...")
+        
         self._tokenizer = AutoTokenizer.from_pretrained(
-            self.MODEL_ID,
+            self.model_id,
             cache_dir=self.CACHE_DIR,
         )
         
         self._model = AutoModelForCausalLM.from_pretrained(
-            self.MODEL_ID,
+            self.model_id,
             cache_dir=self.CACHE_DIR,
             torch_dtype=torch.float32,
             device_map="cpu",
@@ -243,6 +275,7 @@ class LocalModelProvider(LLMProvider):
         )
         
         self._loaded = True
+        print(f"    模型加载完成: {self.model_id}")
     
     def generate(
         self,
@@ -280,14 +313,22 @@ class LocalModelProvider(LLMProvider):
                     temperature=temperature if temperature > 0 else 0.01,
                     do_sample=True,
                     pad_token_id=self._tokenizer.eos_token_id,
+                    return_dict_in_generate=True,
+                    output_scores=False,
                 )
             
             end_time = time.time()
             latency_ms = int((end_time - start_time) * 1000)
             
-            response_ids = outputs[0][inputs["input_ids"].shape[1]:]
-            response = self._tokenizer.decode(response_ids, skip_special_tokens=True)
-            output_tokens = len(response_ids)
+            # Extract response
+            generated_ids = outputs.sequences[0][inputs["input_ids"].shape[1]:]
+            response = self._tokenizer.decode(generated_ids, skip_special_tokens=True)
+            output_tokens = len(generated_ids)
+            
+            # Determine finish reason
+            finish_reason = "stop"
+            if output_tokens >= max_tokens:
+                finish_reason = "length"
             
             return LLMCallTrace(
                 call_id=call_id,
@@ -306,6 +347,7 @@ class LocalModelProvider(LLMProvider):
                 response_tokens=output_tokens,
                 latency_ms=latency_ms,
                 status="success",
+                finish_reason=finish_reason,
             )
             
         except Exception as e:
@@ -326,11 +368,15 @@ class LocalModelProvider(LLMProvider):
 class LLMProviderFactory:
     """Factory for creating LLM providers."""
     
-    _local_provider: LocalModelProvider | None = None
+    _local_providers: dict[str, LocalModelProvider] = {}
     
     @classmethod
-    def create(cls, provider_type: ProviderType | str) -> LLMProvider:
-        """Create provider by type."""
+    def create(
+        cls,
+        provider_type: ProviderType | str,
+        model_size: str = "1.5B",
+    ) -> LLMProvider:
+        """Create provider by type and model size."""
         if isinstance(provider_type, str):
             provider_type = ProviderType(provider_type)
         
@@ -338,16 +384,15 @@ class LLMProviderFactory:
             return DeterministicProvider()
         
         elif provider_type == ProviderType.LOCAL:
-            # Reuse local provider to avoid reloading model
-            if cls._local_provider is None:
-                cls._local_provider = LocalModelProvider()
-            return cls._local_provider
+            # Reuse provider by model size
+            if model_size not in cls._local_providers:
+                cls._local_providers[model_size] = LocalModelProvider(model_size)
+            return cls._local_providers[model_size]
         
         elif provider_type == ProviderType.OPENAI:
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
                 raise ValueError("OPENAI_API_KEY not set")
-            # Could implement OpenAI provider here
             raise NotImplementedError("OpenAI provider not implemented - use local instead")
         
         elif provider_type == ProviderType.ANTHROPIC:
@@ -358,6 +403,11 @@ class LLMProviderFactory:
         
         else:
             raise ValueError(f"Unknown provider type: {provider_type}")
+    
+    @classmethod
+    def create_local(cls, model_size: str = "1.5B") -> LocalModelProvider:
+        """Create local provider with specific model size."""
+        return cls.create(ProviderType.LOCAL, model_size)
     
     @classmethod
     def get_available_providers(cls) -> list[ProviderType]:
@@ -378,6 +428,11 @@ class LLMProviderFactory:
             available.append(ProviderType.ANTHROPIC)
         
         return available
+    
+    @classmethod
+    def get_available_model_sizes(cls) -> list[str]:
+        """Get available local model sizes."""
+        return list(LocalModelProvider.MODELS.keys())
 
 
 class LLMCallRegistry:
