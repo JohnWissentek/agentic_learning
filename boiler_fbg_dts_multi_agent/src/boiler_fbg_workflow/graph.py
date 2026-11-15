@@ -449,7 +449,7 @@ def _simulation_qa_review(stage: str, run_id: str) -> dict[str, Any]:
                 "overall_assessment": (
                     "❌ QA审查未通过 - 存在阻塞性问题。"
                     f"现场不确定度{ENGINEERING_CALCULATIONS['uncertainty_budget']['field_U_k2_C']}°C "
-                    f"超过目标±{ENGINEERING_CALCULATIONS['uncertainty_budget']['target_uncertainty_C']}°C。"
+                    f"超过目标±{ENGINEERING_CALCULATIONS['uncertainty_budget']['target_MPE_C']}°C。"
                     "全部BOM价格为预算情景无实际报价。Technica规格仅为网页索引待原厂确认。"
                 ),
                 "issues": qa_decision["critical_issues"],
@@ -576,7 +576,7 @@ def _simulation_stage_1_output(run_id: str) -> dict[str, Any]:
                 "source_status": "PDF_VERIFIED",
                 "specs": VENDOR_SPECS["luna_si255"]["specs"],
                 "hold_items": VENDOR_SPECS["luna_si255"]["hold_items"],
-                "evidence_ids": ["[EV-SPEC-LUNA-001]"],
+                "evidence_ids": ["[E05]"],
             },
             {
                 "spec_id": "DEMOD-HBK-001",
@@ -585,17 +585,40 @@ def _simulation_stage_1_output(run_id: str) -> dict[str, Any]:
                 "source_status": "PDF_VERIFIED",
                 "specs": VENDOR_SPECS["hbk_fs22si"]["specs"],
                 "hold_items": VENDOR_SPECS["hbk_fs22si"]["hold_items"],
-                "evidence_ids": ["[EV-SPEC-HBK-001]"],
+                "evidence_ids": ["[E06]"],
             },
+            # v0.2: FiSens as LAB RFQ PRIORITY (Technica REVOKED)
             {
-                "spec_id": "PROBE-T890-001",
+                "spec_id": "PROBE-FISENS-001",
+                "vendor": "FiSens",
+                "model": "1550 STD narrow + AC",
+                "source_status": "PDF_VERIFIED",
+                "v0_2_status": "LAB_RFQ_PRIORITY",
+                "specs": VENDOR_SPECS["fisens_1550"]["specs_from_pdf"],
+                "hold_items": VENDOR_SPECS["fisens_1550"]["hold_items"],
+                "evidence_ids": ["[E17]"],
+            },
+            # v0.2: CALSENS as second RFQ source
+            {
+                "spec_id": "PROBE-CALSENS-001",
+                "vendor": "CALSENS",
+                "model": "High Temperature FBG Sensor",
+                "source_status": "PDF_VERIFIED",
+                "v0_2_status": "SECOND_RFQ_SOURCE",
+                "specs": VENDOR_SPECS["calsens_ht"]["specs_from_pdf"],
+                "hold_items": VENDOR_SPECS["calsens_ht"]["hold_items"],
+                "evidence_ids": ["[E18]"],
+            },
+            # v0.2: Technica REVOKED - for reference only
+            {
+                "spec_id": "PROBE-T890-REVOKED",
                 "vendor": "Technica",
                 "model": "T890",
-                "source_status": "WEB_INDEX_ONLY_PDF_DOWNLOAD_FAILED",
-                "specs_from_webpage": VENDOR_SPECS["technica_t890"]["specs_from_webpage"],
-                "hold_items": VENDOR_SPECS["technica_t890"]["hold_items"],
-                "evidence_ids": ["[EV-SPEC-T890-001]"],
-                "limitation": "⚠️ 仅网页索引，待原厂确认，不能认为兼容已证实",
+                "source_status": "REVOKED_UNVERIFIED_SEARCH_ONLY",
+                "v0_2_status": "REVOKED_FROM_MAIN_SELECTION",
+                "revocation_reason": "v0.2撤销：PDF未取得，HTML挑战失败，参数UNVERIFIED",
+                "evidence_ids": ["[E08]"],
+                "limitation": "⚠️ 仅作RFI线索，不作选型依据",
             },
         ],
         "wavelength_budget": ENGINEERING_CALCULATIONS["wavelength_budget"],
@@ -607,8 +630,12 @@ def _simulation_stage_1_output(run_id: str) -> dict[str, Any]:
                 "工业PC→HMI→单向/隔离接口至获准目的系统"
             ),
             "components": [
-                "Luna si255-EV 8CH解调仪 (商用) / HBK FS22SI (实验)",
-                "Technica T890/T885 高温FBG探头 (HOLD-待确认)",
+                "Luna si255-EV 8CH解调仪 (商用HOLD) / HBK FS22SI (实验HOLD)",
+                "FiSens 1550 STD+AC 高温FBG探头 (LAB_RFQ_PRIORITY)",
+                "CALSENS高温FBG (SECOND_RFQ)",
+                "OSENSA PRB1000HT 非FBG对照 (CONTRAST_SYSTEM)",
+                "⚠️ Technica T890/T885 v0.2撤销 (REVOKED)",
+                "现场高温阵列 NOT_SELECTED",
                 "Advantech UNO-2484G V2 工业计算机",
                 "隔离网络/UPS/机柜",
             ],
@@ -640,7 +667,8 @@ def _simulation_stage_1_output(run_id: str) -> dict[str, Any]:
             "event": "stage_1_completed",
             "run_id": run_id,
             "mode": "simulation_with_real_research_data",
-            "data_source": "engineering_research_package_v0.1",
+            "data_source": "engineering_research_package_v0.2",
+            "v0_2_changes": ["Technica_REVOKED", "FiSens_LAB_RFQ_PRIORITY", "CALSENS_SECOND_RFQ"],
         }],
     }
 
@@ -695,10 +723,14 @@ def _simulation_stage_2_output(run_id: str) -> dict[str, Any]:
                 "hold_reason": "租借可用性未确认",
             },
             "sensors": {
-                "primary": "Technica T890 8点高温阵列 (WEB_INDEX_ONLY)",
-                "lab": "Technica T885 单点探头 (WEB_INDEX_ONLY)",
-                "release_status": "HOLD",
-                "hold_reason": "PDF下载失败仅网页索引，全温谱/寿命未确认",
+                # v0.2: Technica REVOKED, FiSens as RFQ priority
+                "lab_rfq_priority": "FiSens 1550 STD narrow + AC (PDF_VERIFIED, RFQ_PRIORITY)",
+                "lab_rfq_second": "CALSENS High Temp FBG (PDF_VERIFIED, RFQ_CANDIDATE)",
+                "field_array": "NOT_SELECTED",
+                "independent_contrast": "OSENSA PRB1000HT (非FBG, CONTRAST_SYSTEM)",
+                "v0_2_revoked": "⚠️ Technica T890/T885 已撤销 (REVOKED_UNVERIFIED)",
+                "release_status": "NOT_PROCUREMENT_READY",
+                "hold_reason": "待FiSens/CALSENS询价完成和原厂确认",
             },
             "ipc": "Advantech UNO-2484G V2 (PDF_VERIFIED)",
             "power_budget_w": ENGINEERING_CALCULATIONS["power_storage"]["power_load_W"],
@@ -726,22 +758,51 @@ def _simulation_stage_2_output(run_id: str) -> dict[str, Any]:
                 "release_status": "HOLD",
                 "evidence_ids": ["[EV-SUP-LUNA-001]"],
             },
+            # v0.2: FiSens as LAB RFQ PRIORITY
             {
-                "supplier_id": "SUP-TECHNICA-001",
+                "supplier_id": "SUP-FISENS-001",
+                "name": "FiSens GmbH",
+                "country": "Germany",
+                "products": ["1550 STD narrow + AC complete factory assembly"],
+                "spec_status": "PDF_VERIFIED",
+                "v0_2_status": "LAB_RFQ_PRIORITY",
+                "clarifications_needed": [
+                    "600°C完整成品订货配置",
+                    "引纤/过渡/应变自由度",
+                    "漂移/寿命数据",
+                ],
+                "release_status": "RFQ_PRIORITY_NOT_PROCUREMENT_READY",
+                "evidence_ids": ["[E17]"],
+            },
+            # v0.2: CALSENS as second RFQ source
+            {
+                "supplier_id": "SUP-CALSENS-001",
+                "name": "CALSENS",
+                "country": "China",
+                "products": ["High Temperature FBG Sensor"],
+                "spec_status": "PDF_VERIFIED",
+                "v0_2_status": "SECOND_RFQ_SOURCE",
+                "clarifications_needed": [
+                    "完整保护图",
+                    "1200°C可用保护类型",
+                    "尺寸和封装解耦",
+                ],
+                "release_status": "RFQ_CANDIDATE_NOT_PROCUREMENT_READY",
+                "evidence_ids": ["[E18]"],
+                "note": "2nm FWHM不满足16.5nm槽预算",
+            },
+            # v0.2: Technica REVOKED
+            {
+                "supplier_id": "SUP-TECHNICA-001-REVOKED",
                 "name": "Technica Optical Components",
                 "country": "USA(总部)/China(制造)/Singapore(技术)",
                 "products": ["T885单点探头", "T890多点阵列"],
-                "spec_status": "WEB_INDEX_ONLY_PDF_DOWNLOAD_FAILED",
-                "clarifications_needed": [
-                    "原厂正式PDF数据表",
-                    "连续600°C时长/寿命",
-                    "应变系数",
-                    "校准不确定度",
-                    "全温光谱",
-                ],
-                "release_status": "HOLD",
-                "evidence_ids": ["[EV-SUP-TECHNICA-001]"],
-                "limitation": "⚠️ 仅网页索引，待原厂确认，不能认为兼容已证实",
+                "spec_status": "REVOKED_UNVERIFIED_SEARCH_ONLY",
+                "v0_2_status": "REVOKED_FROM_SELECTION",
+                "revocation_reason": "PDF未取得，HTML挑战失败，参数UNVERIFIED",
+                "release_status": "NOT_SELECTED",
+                "evidence_ids": ["[E08]"],
+                "limitation": "⚠️ v0.2撤销，仅作RFI线索",
             },
             {
                 "supplier_id": "SUP-HBK-001",
@@ -762,7 +823,7 @@ def _simulation_stage_2_output(run_id: str) -> dict[str, Any]:
         "uncertainty_analysis": {
             "lab_U_k2_C": ENGINEERING_CALCULATIONS["uncertainty_budget"]["lab_U_k2_C"],
             "field_U_k2_C": ENGINEERING_CALCULATIONS["uncertainty_budget"]["field_U_k2_C"],
-            "target_C": ENGINEERING_CALCULATIONS["uncertainty_budget"]["target_uncertainty_C"],
+            "target_C": ENGINEERING_CALCULATIONS["uncertainty_budget"]["target_MPE_C"],
             "status": "NOT_MET",
             "conclusion": ENGINEERING_CALCULATIONS["uncertainty_budget"]["conclusion"],
             "required_action": ENGINEERING_CALCULATIONS["uncertainty_budget"]["required_action"],

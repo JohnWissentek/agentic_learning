@@ -70,7 +70,7 @@ class TestRiskDetectorEdgeCases:
                 temperature_c=float('nan'),
                 timestamp=datetime.now().isoformat(),
                 quality_flag="missing",
-                data_source="[SYNTHETIC]",
+                data_source="synthetic",
             )
         ]
         
@@ -88,7 +88,7 @@ class TestRiskDetectorEdgeCases:
                 temperature_c=600.0,  # Would trigger alert if not bad quality
                 timestamp=datetime.now().isoformat(),
                 quality_flag="bad",
-                data_source="[SYNTHETIC]",
+                data_source="synthetic",
             )
         ]
         
@@ -106,7 +106,7 @@ class TestRiskDetectorEdgeCases:
                 position_m=0.0,
                 temperature_c=350.0,
                 timestamp=datetime.now().isoformat(),
-                data_source="[SYNTHETIC]",
+                data_source="synthetic",
             )
         ]
         
@@ -122,7 +122,7 @@ class TestRiskDetectorEdgeCases:
                 position_m=i * 0.5,
                 temperature_c=350.0 + i * 10,
                 timestamp=datetime.now().isoformat(),
-                data_source="[SYNTHETIC]",
+                data_source="synthetic",
             )
             for i in range(8)
         ]
@@ -145,7 +145,7 @@ class TestAlertMessage:
                 position_m=2.5,
                 temperature_c=550.0,
                 timestamp=datetime.now().isoformat(),
-                data_source="[SYNTHETIC]",
+                data_source="synthetic",
             )
         ]
         
@@ -163,7 +163,7 @@ class TestAlertMessage:
                 position_m=0.0,
                 temperature_c=550.0,
                 timestamp=datetime.now().isoformat(),
-                data_source="[SYNTHETIC]",
+                data_source="synthetic",
             )
         ]
         

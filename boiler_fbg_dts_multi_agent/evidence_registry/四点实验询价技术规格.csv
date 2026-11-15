@@ -1,0 +1,10 @@
+﻿tag,qty,item,technical_request,evidence,hold,release
+P01-P04,4,原厂完整1550nm单点高温封装,STD窄峰+AC保护；目标25–600℃；FC/APC冷端；完整热过渡/应变隔离/温标,FiSensRev7 p1–3列可选件；不是精确订货配置,600℃连续/漂移/校准/热引纤/机械图未确认,NOT_PROCUREMENT_READY
+I01,1,HBK FS22SI四通道标准型,FC/APC/1500–1600nm/1Hz/SCPI/校准/配套PSU,B04203 p3–4;A04249物理43/54,交付校准/PSU连接/固件/租赁/许可未知,NOT_PROCUREMENT_READY
+F01-F04,4,单模FC/APC冷区跳线,暂2m；芯型/额定/弯曲/端面IL证据,设计需求非已定SKU,实际布局/适配待确认,NOT_PROCUREMENT_READY
+R01-R02,2,可溯源参考测温链租借或实验室服务,25–600℃；拟U≤0.6℃(k≈2)；修正/插深/读出匹配,目标预算非现货型号,证书和温场适配未知,NOT_PROCUREMENT_READY
+H01,1,合格热工实验室/温源服务,25℃稳定平台+50–600℃；有过温保护和均温测绘,Fluke9144仅50–660℃产品页可读,探头尺寸/温场/安全/报价未知,NOT_PROCUREMENT_READY
+M01,1,等温校准支架/块,按探头实际图纸出图，不夹陶瓷感温段，不约束热胀,设计需求,无批准加工图不得加工装配,NOT_PROCUREMENT_READY
+M02,1,非受压模拟管接触工装,批准材料/尺寸/参考位置/夹具与保温图/扭矩,设计需求，不是电厂施工图,热接触工艺未资格化,NOT_PROCUREMENT_READY
+O01-O02,1,端面清洁/光学测量租借服务,1550适用端面检测+谱/光损/衰减测量；安全功率确认,设计需求,无设备原厂限值不盲接光源,NOT_PROCUREMENT_READY
+C01-N01,1,隔离测试PC/交换机/日志备份,1Hz四通道原始λ/参考/质量/配置/证书hash/时间,接口要求,真实硬件驱动未验证,NOT_PROCUREMENT_READY

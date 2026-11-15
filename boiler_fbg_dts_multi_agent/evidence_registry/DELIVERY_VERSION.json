@@ -1,0 +1,19 @@
+{
+  "version": "v0.2",
+  "supersedes": "v0.1",
+  "prepared_CST": "2026-11-16T01:25:34.742498+08:00",
+  "procurement_readiness": "NOT_READY",
+  "field_packaged_sensor": "NOT_SELECTED",
+  "lab_RFQ_priority": "FiSens1550 STD narrow+AC complete factory assembly; exact code NOT_ASSIGNED",
+  "valid_primary_pdf_count": 13,
+  "original_v01_zip": "versions/研究工程交付包_v0.1.zip",
+  "not_executed": [
+    "hardware",
+    "calibration",
+    "FAT",
+    "SAT",
+    "purchases",
+    "supplier_contact",
+    "this_research_stream_agent_runtime"
+  ]
+}

@@ -326,6 +326,62 @@ class StageOutput(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
+class RunMode(str, Enum):
+    """Workflow execution mode - critical transparency requirement.
+    
+    CRITICAL: Final reports MUST clearly state the actual run mode.
+    """
+    LIVE = "LIVE"  # Real LLM API calls with configured provider
+    REPLAY = "REPLAY"  # Replaying recorded LLM responses
+    DETERMINISTIC = "DETERMINISTIC"  # Fixed template outputs, NO LLM calls
+    LIVE_NOT_RUN = "LIVE_NOT_RUN"  # LLM provider not configured, cannot run live
+
+
+class LLMCallRecord(BaseModel):
+    """Record of a single LLM API call attempt.
+    
+    If mode is DETERMINISTIC or LIVE_NOT_RUN, no LLMCallRecord should exist.
+    """
+    call_id: str
+    timestamp: str
+    provider: str  # e.g., "openai", "anthropic"
+    model_id: str  # e.g., "gpt-4o", "claude-3-sonnet"
+    role: RoleCode
+    stage: StageCode
+    input_hash: str  # SHA256 of prompt (truncated, first 16 chars)
+    output_hash: str  # SHA256 of response (truncated, first 16 chars)
+    tokens_in: int = 0
+    tokens_out: int = 0
+    latency_ms: int = 0
+    status: Literal["success", "error", "timeout", "rate_limited"] = "success"
+    error_message: str = ""
+
+
+class LLMCallSummary(BaseModel):
+    """Summary of all LLM calls in a workflow run.
+    
+    CRITICAL: This MUST be included in final reports for transparency.
+    If is_real_agent_execution is False, all outputs are predetermined scripts.
+    """
+    run_mode: RunMode
+    provider_configured: bool = False
+    provider_name: str = ""
+    model_id: str = ""
+    total_calls: int = 0
+    successful_calls: int = 0
+    failed_calls: int = 0
+    total_tokens_in: int = 0
+    total_tokens_out: int = 0
+    calls: list[LLMCallRecord] = Field(default_factory=list)
+    
+    # CRITICAL: Explicit declaration for audit
+    is_real_agent_execution: bool = False
+    offline_simulation_boundary: str = (
+        "当前运行为DETERMINISTIC模式：所有角色输出为预定义固定字符串模板，"
+        "非真实LLM智能体调用。LLM provider未配置。"
+    )
+
+
 class TemperatureReading(BaseModel):
     """Single temperature reading from FBG/DTS system.
     
@@ -365,9 +421,13 @@ class WorkflowState(TypedDict, total=False):
     """
     run_id: str
     mode: Literal["simulation", "offline-replay", "live"]
+    run_mode_detail: str  # RunMode.value for explicit tracking
     current_stage: str
     hitl_enabled: bool
     output_dir: str
+    
+    # LLM Call Tracking (CRITICAL for transparency)
+    llm_call_summary: dict[str, Any]  # LLMCallSummary serialized
     
     # Stage 0: Requirements
     market_segments: list[dict[str, Any]]

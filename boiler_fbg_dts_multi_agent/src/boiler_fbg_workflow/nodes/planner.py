@@ -20,11 +20,16 @@ def generate_final_report(state: WorkflowState, deps: RuntimeDeps) -> dict[str, 
     """Generate final workflow report.
     
     Consolidates all stage outputs into a comprehensive report.
+    CRITICAL: Must accurately reflect run mode and LLM call status.
     """
     run_id = state.get("run_id", "unknown")
     mode = state.get("mode", "simulation")
+    run_mode_detail = state.get("run_mode_detail", "DETERMINISTIC")
     output_dir = Path(state.get("output_dir", "./outputs"))
     output_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Get LLM call summary from state, or create default
+    llm_call_summary = state.get("llm_call_summary", _get_default_llm_summary())
     
     # Collect all evidence IDs
     all_evidence_ids = set()
@@ -46,7 +51,25 @@ def generate_final_report(state: WorkflowState, deps: RuntimeDeps) -> dict[str, 
         "report_id": f"REPORT-{run_id}",
         "generated_at": datetime.now().isoformat(),
         "mode": mode,
+        "run_mode_detail": run_mode_detail,
         "mode_disclaimer": _get_mode_disclaimer(mode),
+        
+        # CRITICAL: LLM call transparency
+        "llm_execution_status": {
+            "run_mode": llm_call_summary.get("run_mode", "DETERMINISTIC"),
+            "is_real_agent_execution": llm_call_summary.get("is_real_agent_execution", False),
+            "provider_configured": llm_call_summary.get("provider_configured", False),
+            "provider_name": llm_call_summary.get("provider_name", ""),
+            "model_id": llm_call_summary.get("model_id", ""),
+            "total_llm_calls": llm_call_summary.get("total_calls", 0),
+            "successful_calls": llm_call_summary.get("successful_calls", 0),
+            "failed_calls": llm_call_summary.get("failed_calls", 0),
+            "offline_simulation_boundary": llm_call_summary.get(
+                "offline_simulation_boundary",
+                "当前运行为DETERMINISTIC模式：所有角色输出为预定义固定字符串模板，"
+                "非真实LLM智能体调用。LLM provider未配置。"
+            ),
+        },
         
         "executive_summary": {
             "project": "燃煤锅炉水冷壁光纤测温产品研发",
@@ -154,12 +177,32 @@ def generate_final_report(state: WorkflowState, deps: RuntimeDeps) -> dict[str, 
     }
 
 
+def _get_default_llm_summary() -> dict:
+    """Get default LLM call summary for DETERMINISTIC mode."""
+    return {
+        "run_mode": "DETERMINISTIC",
+        "is_real_agent_execution": False,
+        "provider_configured": False,
+        "provider_name": "",
+        "model_id": "",
+        "total_calls": 0,
+        "successful_calls": 0,
+        "failed_calls": 0,
+        "offline_simulation_boundary": (
+            "当前运行为DETERMINISTIC模式：所有角色输出为预定义固定字符串模板，"
+            "非真实LLM智能体调用。LLM provider未配置(OPENAI_API_KEY/ANTHROPIC_API_KEY未设置)。"
+            "工作流逻辑执行但智能体决策为脚本化模板。"
+        ),
+    }
+
+
 def _get_mode_disclaimer(mode: str) -> str:
     """Get disclaimer based on run mode."""
     disclaimers = {
         "simulation": (
-            "本报告由模拟模式生成，所有角色输出为预定义模板数据，"
-            "标记为[SIMULATION]。不代表真实LLM调用或实际产品开发结果。"
+            "⚠️ DETERMINISTIC模式(非真实智能体)：本报告由确定性模拟生成，"
+            "所有角色输出为预定义固定字符串模板，不存在真实LLM API调用。"
+            "LLM provider未配置。这不代表真正的多智能体协作结果。"
         ),
         "offline-replay": (
             "本报告由离线重放模式生成，基于历史trace数据，"
@@ -191,35 +234,68 @@ def _count_completed_stages(state: WorkflowState) -> int:
 
 
 def _determine_overall_status(state: WorkflowState) -> str:
-    """Determine overall project status."""
+    """Determine overall project status.
+    
+    CRITICAL: BLOCKED status takes precedence over stage completion count.
+    A workflow that ran through all stages but had BLOCKED reviews is NOT "completed".
+    """
     qa_reviews = state.get("qa_reviews", [])
     
-    # Check for any BLOCKED reviews
-    for review in qa_reviews:
-        if review.get("gate_status") == "BLOCKED":
-            return "BLOCKED - 存在阻塞性问题"
+    # Count BLOCKED reviews (they take absolute precedence)
+    blocked_reviews = [r for r in qa_reviews if r.get("gate_status") == "BLOCKED"]
+    if blocked_reviews:
+        blocked_stages = set(r.get("stage", "unknown") for r in blocked_reviews)
+        return (
+            f"BLOCKED - {len(blocked_reviews)}个阻塞性问题未解决 "
+            f"(阶段: {', '.join(blocked_stages)})"
+        )
     
-    # Check for HOLD reviews
-    for review in qa_reviews:
-        if review.get("gate_status") == "HOLD":
-            return "HOLD - 等待人工决策"
+    # Check for unresolved HOLD reviews
+    hold_reviews = [r for r in qa_reviews if r.get("gate_status") == "HOLD"]
+    if hold_reviews:
+        return "HOLD - 等待人工决策"
     
-    # Check completion
+    # Check if all stages have PASS or CONDITIONAL_PASS and production is ready
+    # Note: Running through stages does NOT mean approval
     if state.get("production_readiness"):
-        return "COMPLETED - 所有阶段完成（需实际验证）"
+        # Verify no blocking conditions
+        if all(r.get("gate_status") in ["PASS", "CONDITIONAL_PASS"] for r in qa_reviews):
+            return "CONDITIONAL_COMPLETE - 工作流完成但存在条件（需实际验证）"
+        else:
+            return "INCOMPLETE - 工作流执行但存在未通过的审查"
     
     return "IN_PROGRESS - 工作流进行中"
 
 
 def _write_markdown_summary(report: dict, path: Path) -> None:
     """Write human-readable markdown summary."""
+    llm_status = report.get("llm_execution_status", {})
     summary = f"""# 燃煤锅炉水冷壁光纤测温产品研发报告
 
 **报告ID**: {report['report_id']}
 **生成时间**: {report['generated_at']}
-**运行模式**: {report['mode']}
+**运行模式**: {report['mode']} ({report.get('run_mode_detail', 'DETERMINISTIC')})
 
-> ⚠️ {report['mode_disclaimer']}
+---
+
+## ⚠️ 关键声明：LLM执行状态
+
+| 项目 | 状态 |
+|------|------|
+| 运行模式 | {llm_status.get('run_mode', 'DETERMINISTIC')} |
+| 是否真实智能体执行 | {'是' if llm_status.get('is_real_agent_execution') else '**否**'} |
+| LLM Provider已配置 | {'是' if llm_status.get('provider_configured') else '**否**'} |
+| Provider名称 | {llm_status.get('provider_name') or 'N/A'} |
+| 模型ID | {llm_status.get('model_id') or 'N/A'} |
+| LLM调用总数 | {llm_status.get('total_llm_calls', 0)} |
+| 成功调用 | {llm_status.get('successful_calls', 0)} |
+| 失败调用 | {llm_status.get('failed_calls', 0)} |
+
+**离线模拟边界说明**:
+
+> {llm_status.get('offline_simulation_boundary', 'N/A')}
+
+> {report['mode_disclaimer']}
 
 ---
 
@@ -228,10 +304,10 @@ def _write_markdown_summary(report: dict, path: Path) -> None:
 | 项目 | 状态 |
 |------|------|
 | 技术路线 | {report['executive_summary']['tech_route']} |
-| 完成阶段数 | {report['executive_summary']['stages_completed']} / 6 |
+| 工作流阶段执行数 | {report['executive_summary']['stages_completed']} / 6 (⚠️ 执行≠审批通过) |
 | QA审查次数 | {report['executive_summary']['qa_reviews_count']} |
 | HITL决策次数 | {report['executive_summary']['hitl_decisions_count']} |
-| 总体状态 | {report['executive_summary']['overall_status']} |
+| **总体状态** | **{report['executive_summary']['overall_status']}** |
 
 ---
 
