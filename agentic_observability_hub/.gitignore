@@ -1,0 +1,21 @@
+# Python & uv
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Local runtime DB, logs & secrets
+data/
+volumes/
+*.db
+*.db-shm
+*.db-wal
+*.log
+.env
+.env.*
+
+# OS
+.DS_Store
