@@ -4,12 +4,12 @@
 
 ## 1. 证据库覆盖统计
 
-- **总核验证据条数**: `166` 条
+- **总核验证据条数**: `178` 条
 - **本地历史研究参考 (`EV-BASE`)**: `18` 条
 - **中国市场与电力政策/竞品检索 (`EV-CN`)**: `62` 条
 - **全球光电硬件与国际竞品检索 (`EV-GL`)**: `68` 条
-- **原厂 PDF 规格书解析条目 (`EV-PDF`)**: `18` 条
-- **已验真落盘的原厂 PDF 物理文件**: `18` 份（位于 [`./datasheets_pdf/`](./datasheets_pdf/)）
+- **原厂 PDF 规格书解析条目 (`EV-PDF`)**: `30` 条
+- **已验真落盘的原厂 PDF 物理文件**: `30` 份（位于 [`./datasheets_pdf/`](./datasheets_pdf/)）
 
 ## 2. 已验真原厂 PDF 规格书物理台账 (`./datasheets_pdf/`)
 
@@ -33,6 +33,18 @@
 | `EV-PDF-0016` | 量产 650°C 高温干体/管式计量标定炉 (NPI 标定核心工装) | AMETEK Jofra (Denmark) | `CTC-660 / RTC-700` | downloaded_online | 15p / 4650 KB | `1ee37b19ccc9` | [17_AMETEK_Jofra_CTC660_DryBlock_Calibrator_Datasheet.pdf](./datasheets_pdf/17_AMETEK_Jofra_CTC660_DryBlock_Calibrator_Datasheet.pdf) |
 | `EV-PDF-0017` | 高可靠发电厂防浪涌 24V 电源备选 | Phoenix Contact (Germany) | `QUINT4-PS/1AC/24DC/10` | downloaded_online | 50p / 660 KB | `8d199e4281c5` | [18_Phoenix_Contact_QUINT4_PS_Redundant_Datasheet.pdf](./datasheets_pdf/18_Phoenix_Contact_QUINT4_PS_Redundant_Datasheet.pdf) |
 | `EV-PDF-0018` | 电厂 DCS 只读通讯协议网关 (Modbus RTU/TCP) | Moxa (Taiwan / Global) | `MGate MB3180 / MB3280` | downloaded_online | 5p / 1411 KB | `b41912cb1e5e` | [12_Moxa_MGate_MB3180_Modbus_Gateway_Datasheet.pdf](./datasheets_pdf/12_Moxa_MGate_MB3180_Modbus_Gateway_Datasheet.pdf) |
+| `EV-PDF-0019` | 高速可调谐扫频激光成品主机 (机架可选配) | EXFO (Canada) | `T100S-HP` | downloaded_online | 5p / 1028 KB | `d5a91214b52a` | [19_EXFO_T100S-HP_Swept_Tunable_Laser_Datasheet.pdf](./datasheets_pdf/19_EXFO_T100S-HP_Swept_Tunable_Laser_Datasheet.pdf) |
+| `EV-PDF-0020` | 19英寸机架多通道 InGaAs 检测与同步采样主机 | Santec (Japan) | `MPM-210H / MPM-211 / MPM-215` | downloaded_online | 4p / 497 KB | `54d878f2226e` | [20_Santec_MPM-210H_Rackmount_MultiPort_Detector_Mainframe.pdf](./datasheets_pdf/20_Santec_MPM-210H_Rackmount_MultiPort_Detector_Mainframe.pdf) |
+| `EV-PDF-0021` | 扫频激光+多通道同步检测成套机架系统集成架构 | Santec (Japan) | `TSL-570 + MPM-210H Swept System` | downloaded_online | 4p / 1000 KB | `52bd26d8f9b4` | [21_Santec_Swept_Test_System_TSL_MPM_Integration.pdf](./datasheets_pdf/21_Santec_Swept_Test_System_TSL_MPM_Integration.pdf) |
+| `EV-PDF-0022` | 19英寸4U电信旗舰级扫频光谱检测平台 | EXFO (Canada) | `CTP10 (4U Rackmount)` | downloaded_online | 12p / 3086 KB | `333740d3d3b5` | [22_EXFO_CTP10_Rackmount_Swept_Detector_Platform.pdf](./datasheets_pdf/22_EXFO_CTP10_Rackmount_Swept_Detector_Platform.pdf) |
+| `EV-PDF-0023` | 19英寸机架式 LXI 千兆网口 16-bit 同步数字采集主机 | Spectrum Instrumentation (Germany) | `DN2.592-04 / DN2.592-08 (digitizerNETBOX)` | downloaded_online | 10p / 935 KB | `8906df4d1515` | [23_Spectrum_digitizerNETBOX_19inch_LXI_Digitizer_Catalog.pdf](./datasheets_pdf/23_Spectrum_digitizerNETBOX_19inch_LXI_Digitizer_Catalog.pdf) |
+| `EV-PDF-0024` | 全固态体光栅 512 像元 InGaAs 近红外光谱检测主机 | BaySpec / Advanced Energy (USA) | `WaveCapture FBGA-IRS` | downloaded_online | 4p / 1050 KB | `937b5a88d59f` | [24_BaySpec_WaveCapture_FBGA_Rackmount_Analyzer_Datasheet.pdf](./datasheets_pdf/24_BaySpec_WaveCapture_FBGA_Rackmount_Analyzer_Datasheet.pdf) |
+| `EV-PDF-0025` | 19英寸1U/2U 机架单模 MEMS 多光纤切换主机 | DiCon Fiberoptics (USA) | `SCD-0143 1xN (1x16 ~ 1x128)` | downloaded_online | 2p / 106 KB | `e218c87358cb` | [25_DiCon_SCD0143_19inch_Rackmount_MEMS_1xN_Optical_Switch.pdf](./datasheets_pdf/25_DiCon_SCD0143_19inch_Rackmount_MEMS_1xN_Optical_Switch.pdf) |
+| `EV-PDF-0026` | 19英寸机架网管型 REST/SCPI 多路光开关系统 | DiCon Fiberoptics (USA) | `GP800-1x32-SM` | downloaded_online | 2p / 266 KB | `dcc394e27361` | [26_DiCon_GP800_Rackmount_1x32_Optical_Switch_System.pdf](./datasheets_pdf/26_DiCon_GP800_Rackmount_1x32_Optical_Switch_System.pdf) |
+| `EV-PDF-0027` | 19英寸3U 模块化仪器机箱与多路光切换平台 | EXFO (Canada) | `LTB-8 (3U Rackmount)` | downloaded_online | 8p / 8194 KB | `ce0b6cf84c6b` | [27_EXFO_LTB-8_Rackmount_Platform_Datasheet.pdf](./datasheets_pdf/27_EXFO_LTB-8_Rackmount_Platform_Datasheet.pdf) |
+| `EV-PDF-0028` | LTB-8 机箱配套 MEMS 1x32 光开关插卡 | EXFO (Canada) | `FTBx-9160 MEMS (1x16 / 1x32)` | downloaded_online | 5p / 3343 KB | `24be4398599c` | [28_EXFO_FTBx-9160_MEMS_Optical_Switch_Module.pdf](./datasheets_pdf/28_EXFO_FTBx-9160_MEMS_Optical_Switch_Module.pdf) |
+| `EV-PDF-0029` | 19英寸机架式 4通道全光谱原始流一体化光学引擎 | Luna Innovations / Micron Optics (USA) | `HYPERION si155 (4-Ch)` | downloaded_online | 2p / 510 KB | `d674283ec6c3` | [29_Luna_HYPERION_si155_4Ch_Swept_Interrogator_Datasheet.pdf](./datasheets_pdf/29_Luna_HYPERION_si155_4Ch_Swept_Interrogator_Datasheet.pdf) |
+| `EV-PDF-0030` | 19英寸机架式 16通道全光谱原始流一体化光学引擎 | Luna Innovations / Micron Optics (USA) | `HYPERION si255 (16-Ch)` | downloaded_online | 2p / 694 KB | `492f9498e324` | [30_Luna_HYPERION_si255_16Ch_Swept_Interrogator_Datasheet.pdf](./datasheets_pdf/30_Luna_HYPERION_si255_16Ch_Swept_Interrogator_Datasheet.pdf) |
 
 ## 3. 全量可追溯证据索引 (`[EV-*]`)
 
@@ -204,3 +216,15 @@
 | `EV-PDF-0016` | `PDF` | `PDF_ONLINE` | `pdf_datasheet` | OEM Datasheet: AMETEK Jofra (Denmark) CTC-660 / RTC-700 | https://www.ametekcalibration.com/-/media/ametekcalibration/download_links/temperature/rtc/reference-temperature-calibrator-rtc-700-datasheet-us.pdf?la=en&revision=d2d1f647-76c5-426f-b809-eaf355b40aeb |
 | `EV-PDF-0017` | `PDF` | `PDF_ONLINE` | `pdf_datasheet` | OEM Datasheet: Phoenix Contact (Germany) QUINT4-PS/1AC/24DC/10 | https://www.calvek.com/wp-content/uploads/2019/09/db_en_quint4_ps_1ac_24dc_10_107100_en_01.pdf |
 | `EV-PDF-0018` | `PDF` | `PDF_ONLINE` | `pdf_datasheet` | OEM Datasheet: Moxa (Taiwan / Global) MGate MB3180 / MB3280 | https://www.moxa.com/getmedia/26637f2b-d605-4e98-9b29-aae1e08ad011/moxa-mgate-mb3180-mb3280-mb3480-series-datasheet-v1.0.pdf |
+| `EV-PDF-0019` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: EXFO (Canada) T100S-HP | https://www.opt-ron.com/wp-content/uploads/2021/09/t100s-hp-spec-sheet-en.pdf |
+| `EV-PDF-0020` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: Santec (Japan) MPM-210H / MPM-211 / MPM-215 | https://www.lasercomponents.com/fileadmin/user_upload/home/Datasheets/santec/mpm-210h-multi-port-optical-power-meter.pdf |
+| `EV-PDF-0021` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: Santec (Japan) TSL-570 + MPM-210H Swept System | https://www.santec.com/dcms_media/other/instruments_SweptTestSystem-C-E.pdf |
+| `EV-PDF-0022` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: EXFO (Canada) CTP10 (4U Rackmount) | https://www.exfo.com/contentassets/8558bfa55d4f4141b92801d9708a1cd9/ctp10-spec-sheet-en.pdf |
+| `EV-PDF-0023` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: Spectrum Instrumentation (Germany) DN2.592-04 / DN2.592-08 (digitizerNETBOX) | https://www.mish.co.jp/doc/dn2_59x_datasheet_english.pdf |
+| `EV-PDF-0024` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: BaySpec / Advanced Energy (USA) WaveCapture FBGA-IRS | https://www.advancedenergy.com/getmedia/0c9f74ca-7375-4207-b17a-71db1c4d72f2/en-fot-fbg-analyzer-series-data-sheet.pdf |
+| `EV-PDF-0025` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: DiCon Fiberoptics (USA) SCD-0143 1xN (1x16 ~ 1x128) | https://diconfiberoptics.com/products/scd0143/SCD_0143G.pdf |
+| `EV-PDF-0026` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: DiCon Fiberoptics (USA) GP800-1x32-SM | https://diconfiberoptics.com/products/scd0569/SCD-0569A%20(Generic,%20GP800%20Model,%201x32%20Single%20Mode%20Fiber).pdf |
+| `EV-PDF-0027` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: EXFO (Canada) LTB-8 (3U Rackmount) | https://www.exfo.com/contentassets/28da7ccff0bf4d30bf5fe87149f8c4c2/ltb-8-spec-sheet-en.pdf |
+| `EV-PDF-0028` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: EXFO (Canada) FTBx-9160 MEMS (1x16 / 1x32) | https://www.exfo.com/contentassets/9d215d98f7594ac6a94e72a2de958524/ftbx-9160-fiche-technique-fr4.pdf |
+| `EV-PDF-0029` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: Luna Innovations / Micron Optics (USA) HYPERION si155 (4-Ch) | https://www.lunainc.com/sites/default/files/assets/files/data-sheets/HYPERION%20si155%20Data%20Sheet.pdf |
+| `EV-PDF-0030` | `PDF` | `T3_OPTICS_HARDWARE` | `pdf_datasheet` | OEM Datasheet: Luna Innovations / Micron Optics (USA) HYPERION si255 (16-Ch) | https://www.lunainc.com/sites/default/files/assets/files/data-sheets/HYPERION%20si255%20Data%20Sheet.pdf |
