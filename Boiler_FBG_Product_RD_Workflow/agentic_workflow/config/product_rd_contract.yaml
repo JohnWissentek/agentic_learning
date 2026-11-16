@@ -1,0 +1,62 @@
+contract_id: "BFBG-IPD-CONTRACT-2026-V1"
+product_family: "BoilerSense-AI™ 燃煤电站锅炉水冷壁 FBG 智能测温与AI优化系统"
+design_pattern_basis: "Google Agentic Design Patterns (21 Patterns + Appendices A-G)"
+
+stage_gate_rules:
+  minimum_pass_score: 85
+  rubric_dimensions:
+    - id: "market_and_competitive_rigor"
+      label: "中国煤电市场趋势与国内外竞品定位深度"
+      max_score: 20
+    - id: "hardware_selection_and_interface_completeness"
+      label: "国际现货硬件选型、原厂PDF验真与电气/光学/协议接口详尽度"
+      max_score: 20
+    - id: "software_demod_and_boiler_ai_actionability"
+      label: "寻峰算法/上位机软件与一期旁路→二期闭环锅炉AI可工程化落地性"
+      max_score: 20
+    - id: "npi_qaqc_bringup_and_field_sop"
+      label: "量产导入NPI工艺、来料IQC/出厂FAT、高低温标定及电厂焊接安装SOP完备度"
+      max_score: 20
+    - id: "financial_gtm_training_and_traceability"
+      label: "双轨BOM成本竞争力、精益财务NPV/IRR、销售/工程师培训与零虚构[EV-*]溯源"
+      max_score: 20
+
+evidence_and_pdf_gates:
+  min_total_evidence_records: 60
+  min_cn_evidence_records: 20
+  min_global_evidence_records: 15
+  min_verified_pdf_datasheets: 14
+  max_pdf_size_mb: 9.5
+  max_reflection_loops: 2
+
+product_tiers:
+  - code: "BS-STD-600"
+    name: "BoilerSense-AI 标准版（300–600 测温点/台炉）"
+    target_units: "300MW–600MW 亚临界/超临界灵活性改造煤电机组"
+    coverage_zones: "主燃烧器高热负荷区、折焰角、冷灰斗、屏底易超温爆管区"
+    interrogator_architecture: "进口 C+L 波段 ASE 宽带光源 + 瑞士 MEMS 1×16/1×32 光开关 + 丹麦 512 像元 InGaAs 光谱 OEM 模块 + 工业工控机"
+    points_per_fiber: 25
+    optical_channels: "12–24 路（光开关选配 1×16 / 1×32）"
+    prototype_lead_time_days: 35
+
+  - code: "BS-PRO-2000"
+    name: "BoilerSense-AI 旗舰版（1000–2000+ 测温点/台炉）"
+    target_units: "600MW–1000MW 超超临界深度调峰（15%–30% 负荷）主力机组"
+    coverage_zones: "四面水冷壁全炉膛网格化三维温度场、热流密度与结焦洁净因子全景重构"
+    interrogator_architecture: "进口窄线宽可调谐扫频激光模块 + 美国 NIST 溯源 HCN 气室与 50GHz 无热标准具 + 德国 200MHz InGaAs PIN+TIA + 德国 16-bit 同步 PCIe 采集卡 + 瑞士多路 MEMS 光开关"
+    points_per_fiber: "25–40 点（高反 WDM）可扩展至 80–125 点（弱光栅 WDM+TDM 混复）"
+    optical_channels: "32–48 路（单机覆盖 1000–2000 点，可扩展双机级联）"
+    prototype_lead_time_days: 55
+
+boiler_ai_phasing:
+  phase_1: "旁路只读模式：经工业单向隔离网闸/只读 OPC UA/Modbus TCP 接入电厂 DCS 负荷、给煤量、一二次风门与吹灰状态，融合高密度 FBG 实时温度场输出三维热云图、洁净因子按需吹灰指导、Larson-Miller 蠕变寿命与爆管提前预警、火焰偏斜与高温腐蚀诊断。"
+  phase_2: "闭环寻优模式：经电厂等保三级与电力监控系统安全防护验收后，向 DCS 输出吹灰程控触发建议与风煤配比偏置指令。"
+
+required_output_volumes:
+  - "00_EXECUTIVE_PRODUCT_CHARTER_AND_ROADMAP.md"
+  - "01_CHINA_COAL_BOILER_MARKET_AND_COMPETITIVE_LANDSCAPE.md"
+  - "02_SYSTEM_ARCHITECTURE_SUPPLIER_SELECTION_AND_BOM.md"
+  - "03_COMPONENT_INTERFACES_AND_DETAILED_INTEGRATION_DESIGN.md"
+  - "04_SOFTWARE_DEMODULATION_AND_BOILER_AI_SPEC.md"
+  - "05_SYSTEM_BRINGUP_FIELD_INSTALLATION_AND_QAQC_SOP.md"
+  - "06_FINANCIAL_ANALYSIS_GTM_MARKETING_AND_TRAINING_PLAYBOOK.md"

@@ -1,0 +1,218 @@
+# 确定性工程链路参数、国际/双轨硬件选型目录与精益财务基线（用于 PALMs Python 计算引擎）
+
+physics_link_params:
+  temp_min_c: 20.0
+  temp_max_c: 600.0
+  temp_nominal_waterwall_c: 420.0
+  thermo_optic_sensitivity_pm_per_c: 13.2     # 石英光纤高温平均灵敏度 (20~600°C 非线性二阶基准斜率)
+  quadratic_coeff_pm_per_c2: 0.0042           # 高温段热膨胀+热光非线性项
+  std_band_nm: 85.0                           # Ibsen I-MON 512 (1510-1595 nm)
+  std_channel_spacing_nm: 3.2
+  pro_band_nm: 100.0                          # Swept Laser (1500-1600 nm)
+  pro_channel_spacing_nm: 2.8
+  std_ase_power_dbm: 15.0                     # Amonics ALS-CL-15 (15 dBm = 31.6 mW)
+  pro_swept_power_dbm: 13.0                   # Santec WSL-110 / Lumentum MG-Y (13 dBm = 20 mW)
+  circulator_il_db: 1.6                       # 往返两程损耗 (0.8 dB * 2)
+  mems_switch_il_db: 2.2                      # 往返两程损耗 (1.1 dB * 2)
+  connector_and_splice_loss_db: 2.4           # 4对 FC/APC 法兰 + 2个熔接点双向损耗
+  fiber_transmission_loss_db: 0.6             # 200m 耐高温/铠装传输缆往返损耗
+  fbg_peak_reflectivity_db: -7.0              # 20% 峰值反射率 -> -7.0 dB 回波
+  uwfbg_peak_reflectivity_db: -25.0           # 0.3% 弱光栅反射率 -> -25 dB 回波
+  std_spectrometer_noise_floor_dbm: -42.0     # I-MON 512 典型满积分可检下限
+  pro_femto_tia_noise_floor_dbm: -56.0        # FEMTO HCA-S-200M-IN + 16-bit ADC 等效有效动态下限
+  mems_switch_settle_ms: 1.5
+  std_exposure_per_ch_ms: 8.0
+  pro_sweep_per_ch_ms: 20.0                   # 50 Hz 全谱扫频单通道周期
+  thermal_block_steel_k_w_mk: 38.0            # 15CrMoG 在 420°C 下导热系数
+  thermal_block_path_mm: 10.0                 # 水冷壁焊缝表面至中心测温孔壁距离
+
+candidate_architectures:
+  - arch_id: "ARCH_1_DUAL_TIER_MODULAR"
+    name: "双档模块化国际成品集成架构 (BS-STD-600 光谱OEM + BS-PRO-2000 扫频+NIST气室)"
+    host_capex_std_cny: 61500
+    host_capex_pro_cny: 108500
+    sensor_unit_track_a_cny: 215              # 德国 FBGS FSG + OFS PyroCoat + 316L/Inconel毛细管 + 导热块
+    sensor_unit_track_b_cny: 118              # 严选认证碳聚酰亚胺飞秒光栅/DTG + 精密15CrMoG导热块铠装缆
+    rd_cycle_months: 2.5
+    hardware_risk_score: 9.2
+    scalability_score: 9.5
+    supply_resilience_score: 9.1
+
+  - arch_id: "ARCH_2_PURE_RAYLEIGH_OFDR"
+    name: "纯连续无光栅瑞利散射 OFDR 架构 (低反射率散射斑解调)"
+    host_capex_std_cny: 145000
+    host_capex_pro_cny: 210000
+    sensor_unit_track_a_cny: 65
+    sensor_unit_track_b_cny: 42
+    rd_cycle_months: 11.0
+    hardware_risk_score: 4.5                  # 炉膛风机强振易导致散射谱失相干退化
+    scalability_score: 7.0
+    supply_resilience_score: 6.0
+
+  - arch_id: "ARCH_3_LEGACY_UV_FBG"
+    name: "传统剥涂覆层紫外(UV)相位掩模 FBG 架构"
+    host_capex_std_cny: 54000
+    host_capex_pro_cny: 88000
+    sensor_unit_track_a_cny: 130
+    sensor_unit_track_b_cny: 78
+    rd_cycle_months: 4.0
+    hardware_risk_score: 3.2                  # >300°C 热擦除漂移 + 剥皮后抗拉脆弱易断纤
+    scalability_score: 5.5
+    supply_resilience_score: 7.5
+
+  - arch_id: "ARCH_4_CUSTOM_PCB_SCRATCH"
+    name: "从裸芯片自研激光驱动/高速TIA模拟前端PCB自主开发路线"
+    host_capex_std_cny: 39000
+    host_capex_pro_cny: 66000
+    sensor_unit_track_a_cny: 215
+    sensor_unit_track_b_cny: 118
+    rd_cycle_months: 16.5                     # 14-18月硬件踩坑与EMC整改周期，违背快速入市
+    hardware_risk_score: 4.8
+    scalability_score: 8.0
+    supply_resilience_score: 7.2
+
+  - arch_id: "ARCH_5_THERMOCOUPLE_MATRIX"
+    name: "传统 K/N 型铠装热电偶+冷端补偿I/O柜对照方案"
+    host_capex_std_cny: 42000
+    host_capex_pro_cny: 115000
+    sensor_unit_track_a_cny: 285              # 含单点独立铠装偶丝、补偿导线、穿墙密封与海量I/O卡
+    sensor_unit_track_b_cny: 195
+    rd_cycle_months: 2.0
+    hardware_risk_score: 5.8                  # 强EMI漂移、点少施工巨复杂、无高密度云图能力
+    scalability_score: 3.0
+    supply_resilience_score: 9.0
+
+bom_line_items:
+  std_600_host:
+    - item: "宽波段 512 像元 InGaAs 光谱解调 OEM 模块 (含体光栅+TIA+16位ADC)"
+      primary_vendor: "Ibsen Photonics (丹麦)"
+      part_number: "I-MON 512 USB (1510-1595 nm)"
+      backup_vendor: "国科光芯 / 卓立汉光 OEM 模块"
+      unit_cost_proto_cny: 36000
+      unit_cost_10u_cny: 31500
+      unit_cost_50u_cny: 26800
+    - item: "高平坦度 C+L 波段 ASE 宽带光源模块 (内置TEC与恒流源)"
+      primary_vendor: "Amonics (中国香港/北美芯片)"
+      part_number: "ALS-CL-15-M-FA (OEM Module)"
+      backup_vendor: "Thorlabs ASE730 / 康冠世纪"
+      unit_cost_proto_cny: 12500
+      unit_cost_10u_cny: 10800
+      unit_cost_50u_cny: 9200
+    - item: "军工级 MEMS 1×32 多通道光开关 + 光学环形器"
+      primary_vendor: "Sercalo Microtechnology (瑞士)"
+      part_number: "SW1x32-9N-FA + 三端口高功率环形器"
+      backup_vendor: "Agiltron MEMS 1×32 / 桂林光隆"
+      unit_cost_proto_cny: 14800
+      unit_cost_10u_cny: 12600
+      unit_cost_50u_cny: 10500
+    - item: "工业边缘主控 + DCS 只读网关 + 冗余电源 + 2U 机箱"
+      primary_vendor: "Advantech 研华 / Kontron 控创 + Moxa + MeanWell"
+      part_number: "ARK/UNO 边缘AI工控机 + Moxa MGate MB3180 + NDR-240-24"
+      backup_vendor: "倍福 Beckhoff / 东土科技网关"
+      unit_cost_proto_cny: 8500
+      unit_cost_10u_cny: 7500
+      unit_cost_50u_cny: 6400
+
+  pro_2000_host:
+    - item: "窄线宽高速可调谐扫频激光源 OEM 模块 (含同步 Trigger)"
+      primary_vendor: "Santec (日本) / Lumentum (美国)"
+      part_number: "Santec WSL-110 OEM / TSL-570 / Lumentum S7500"
+      backup_vendor: "Luna Phoenix OEM / 源国光电"
+      unit_cost_proto_cny: 42000
+      unit_cost_10u_cny: 36500
+      unit_cost_50u_cny: 31000
+    - item: "200MHz 超低噪声 InGaAs PIN+TIA 成品光电接收盒 (2只: 主路+参考)"
+      primary_vendor: "FEMTO Messtechnik (德国)"
+      part_number: "HCA-S-200M-IN-FC (×2)"
+      backup_vendor: "Thorlabs PDB470C-AC"
+      unit_cost_proto_cny: 12000
+      unit_cost_10u_cny: 10400
+      unit_cost_50u_cny: 8900
+    - item: "NIST 溯源 HCN-13 氰化氢吸收气室 + 50GHz 无热 F-P 标准具 + 分路环形器"
+      primary_vendor: "Wavelength References (美国) + ITF"
+      part_number: "HCN-13-C-100-FC/APC + Etalon-50G"
+      backup_vendor: "Thorlabs CQ15-HCN"
+      unit_cost_proto_cny: 13500
+      unit_cost_10u_cny: 11800
+      unit_cost_50u_cny: 10200
+    - item: "16-bit 多通道同步 PCIe 高速数字化仪采集卡"
+      primary_vendor: "Spectrum Instrumentation (德国)"
+      part_number: "M2p.5922-x4 (16-bit, 20-125 MS/s)"
+      backup_vendor: "NI PCIe-6363 / ALINX Zynq-AD9268"
+      unit_cost_proto_cny: 14500
+      unit_cost_10u_cny: 12800
+      unit_cost_50u_cny: 11200
+    - item: "高通道 MEMS 光开关集成矩阵 (1×48 级联) + 环形器"
+      primary_vendor: "Sercalo Microtechnology (瑞士)"
+      part_number: "SW1x48-9N-FA (或双 1×24 级联)"
+      backup_vendor: "Agiltron / DiCon MEMS"
+      unit_cost_proto_cny: 24000
+      unit_cost_10u_cny: 20500
+      unit_cost_50u_cny: 17200
+    - item: "工业 AI 服务器机箱 + 硬件物理隔离网闸/双网口 + 双冗余电源"
+      primary_vendor: "Kontron / Advantech + Moxa + MeanWell"
+      part_number: "4U 工控机 (GPU/NPU 推理加速) + Moxa EDS/MGate + UHP-350"
+      backup_vendor: "研祥智能 + 南瑞网闸"
+      unit_cost_proto_cny: 12500
+      unit_cost_10u_cny: 11000
+      unit_cost_50u_cny: 9500
+
+  field_assemblies:
+    track_a_per_point_proto: 225.0             # 德国 FBGS FSG 飞秒串 + OFS PyroCoat + Sandvik 316L毛细管 + 导热块
+    track_a_per_point_10u: 190.0
+    track_a_per_point_50u: 162.0
+    track_b_per_point_proto: 132.0             # 长飞/OFS碳聚酰亚胺纤 + 严选飞秒/DTG OEM阵列 + 本土CNC 15CrMoG导热块+铠装缆
+    track_b_per_point_10u: 105.0
+    track_b_per_point_50u: 86.0
+    moh_calibration_and_qa_per_sys_cny: 14500.0 # 单套总装、650°C 多温区标定、72h高低温老化人工及治具摊销
+
+pricing_and_lean_finance:
+  # 定价与毛利率策略：兼具竞品价格杀伤力与健康商业毛利
+  std_500_track_b_list_price_cny: 368000.0    # 竞品传统方案通常 55~85 万元，具备极强杀伤力
+  std_500_track_a_list_price_cny: 468000.0
+  pro_1500_track_b_list_price_cny: 798000.0   # 竞品千点级通常 130~240 万元
+  pro_1500_track_a_list_price_cny: 980000.0
+  channel_commission_rate: 0.12               # 12% 销售提成与渠道伙伴返点
+  warranty_reserve_rate: 0.04                 # 4% 质保备品备件计提
+  field_commissioning_cost_std_cny: 28000.0   # 单套现场督导与DCS联调差旅成本
+  field_commissioning_cost_pro_cny: 48000.0
+
+  # 精益创业团队 CAPEX 与 OPEX (RMB)
+  startup_capex:
+    calibration_furnace_and_ref_cny: 165000.0 # 650°C 三温区管式标定炉 + NIST 铂电阻标准器 + 光谱参考仪租购
+    fiber_splicer_otdr_and_bench_cny: 140000.0 # 精密熔接机 + 高分辨OTDR + 洁净光学组装台 + 高低温老化箱
+    software_testbed_and_certs_cny: 245000.0  # 电厂EMC/防爆/电科院第三方型式试验与等保认证费用
+    initial_demo_inventory_cny: 250000.0      # 首套挂网样机物料周转备库
+  annual_fixed_opex_y1_cny: 1850000.0         # Y1 精益6人核心团队（PM/光电/软件AI/质检现场）+ 场地办公
+  annual_fixed_opex_growth_rate: 0.24         # 随产能放量扩充交付与售后工程师
+  tax_and_vat_effective_rate: 0.18
+  discount_rate: 0.10
+
+  sales_ramp_5yr:
+    conservative:
+      std_units: [1, 5, 11, 18, 26]
+      pro_units: [0, 2, 5, 9, 14]
+      track_b_share: 0.70
+    baseline:
+      std_units: [2, 8, 18, 30, 46]
+      pro_units: [0, 4, 10, 20, 34]
+      track_b_share: 0.75
+    optimistic:
+      std_units: [3, 12, 26, 44, 68]
+      pro_units: [1, 6, 16, 32, 52]
+      track_b_share: 0.80
+
+plant_roi_scenarios:
+  # 电厂买方侧经济性模型 (对比单套 600MW 机组采购 BS-STD-600 Track B = 36.8万 或 BS-PRO-2000 = 79.8万)
+  unit_600mw_std:
+    capex_cny: 368000.0
+    annual_service_opex_cny: 18000.0
+    avoided_tube_leak_expected_cny_yr: 420000.0  # 600MW 单次爆管非停损失约400万元，年降风险概率10.5%
+    sootblowing_steam_saving_cny_yr: 145000.0    # 按需吹灰节汽+减缓吹损延长水冷壁寿命
+    coal_rate_reduction_saving_cny_yr: 310000.0  # 修正燃烧偏斜供电煤耗降 0.7 g/kWh (按30亿度/年×0.7g×0.9元/kg约189万，保守计取20%归因或半效)
+  unit_1000mw_pro:
+    capex_cny: 798000.0
+    annual_service_opex_cny: 35000.0
+    avoided_tube_leak_expected_cny_yr: 780000.0  # 1000MW 超超临界单次非停损失650万元+考核，年降风险12%
+    sootblowing_steam_saving_cny_yr: 290000.0
+    coal_rate_reduction_saving_cny_yr: 620000.0  # 全炉膛三维温度场+二期燃烧偏置寻优降煤耗 1.1 g/kWh

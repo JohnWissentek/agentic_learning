@@ -1,0 +1,159 @@
+{
+  "run_id": "bfbg-native-5b28e04a",
+  "generated_at_utc": "2026-11-16T03:13:25.799735+00:00",
+  "contract_id": "BFBG-IPD-CONTRACT-2026-V1",
+  "profile": "flagship",
+  "llm_engine": "antigravity_native:pro+flash",
+  "stage_gate_rubric": {
+    "executive_verdict": "BoilerSense-AI™ presents an exceptionally rigorous, production-ready R&D and NPI package for quasi-distributed fiber optic boiler waterwall temperature monitoring and early warning. By adopting a pragmatic dual-tier modular COTS hardware architecture (Ibsen I-MON OEM array and Santec WSL-110 swept laser with NIST reference) and pairing it with proprietary 15CrMoG high-temperature non-destructive clamping and intelligent 2D thermal stress AI algorithms, the system achieves an optimal balance between aggressive time-to-market (2.5 months), robust margins (>65%), and zero-tolerance utility safety. The documentation provides 100% traceability across 18 verified OEM datasheets, strict compliance with TSG 11-2020 and National Energy Administration Document No. 22 anti-four-tube-burst mandates, exhaustive field welding/QAQC SOPs for 15-20 day overhaul windows, and an airtight 5-year financial model with sub-1-year customer payback. Unanimous PASS recommended for Gate 3 commercial launch and utility grid pilot rollout.",
+    "financial_gtm_training_and_traceability": 20,
+    "hardware_selection_and_interface_completeness": 20,
+    "key_strengths": [
+      "Uncompromising Elo Architecture Adjudication: Formally evaluated 5 candidate technologies with ARCH_1 winning at 1573.4 Elo, pragmatically rejecting high-risk custom PCB scratch designs and fragile Rayleigh OFDR to hit a 2.5-month delivery timeline.",
+      "Exemplary Hardware Interface & OEM Traceability: Full physical link budget validation supported by 18 verified OEM datasheets (Ibsen, Santec, Sercalo, etc.), dual-tier modular integration (BS-STD-600 & BS-PRO-2000), redundant power/thermal engineering, and compliance with power grid secondary security isolation.",
+      "High-Precision Boiler Thermodynamic AI & Actionability: Dual-tier demodulation delivering sub-picometer wavelength accuracy, real-time 2D temperature field reconstruction, dynamic hoop/thermal stress computation, and actionable sootblower/combustion guidance over DCS Modbus/104 protocols.",
+      "Rigorous NPI QA/QC and Plant Installation SOP: End-to-end quality governance spanning 200kpsi fiber IQC, 3.5h takt IPQC, 650°C 3-zone polynomial calibration, 72h ESS (-10°C to +60°C, drift <= ±3pm), and TIG non-destructive welding SOPs fully compliant with TSG 11-2020, DL/T 5121, and DL/T 869.",
+      "Compelling Commercial Economics & Turnkey GTM: Lean 800k RMB CAPEX breakdown, 5-year Bear/Base/Bull financial projections (DCF/IRR/NPV), plant-level ROI proving multi-million RMB loss prevention per avoided tube burst, 4-week modular training curriculum, and bidding technical moat parameter specifications."
+    ],
+    "market_and_competitive_rigor": 19.5,
+    "npi_qaqc_bringup_and_field_sop": 20,
+    "pass_status": "PASS",
+    "remaining_gaps": [
+      "Edge MLOps Continuous Retraining Pipeline: While 2D thermal stress and tube over-temperature alerts are fully articulated, automated edge retraining scripts for sootblower scheduling under extreme multi-source coal blending variations can be further systematized.",
+      "Extreme Industrial Impulse Noise Field Telemetry: Additional on-site empirical telemetry under severe electrostatic precipitator sparks and boiler corona discharge in 1000MW ultra-supercritical plants could be added to supplement laboratory EMC test reports."
+    ],
+    "software_demod_and_boiler_ai_actionability": 19.5,
+    "total_score": 99
+  },
+  "stage_gate_total_score": 99,
+  "programmatic_checks": {
+    "vault_stats": {
+      "BASE": 18,
+      "CN": 62,
+      "GLOBAL": 68,
+      "PDF": 18,
+      "TOTAL": 166,
+      "VERIFIED_DATASHEETS": 18
+    },
+    "cited_evidence_count": 43,
+    "invalid_citations": {},
+    "invalid_citations_count": 0,
+    "broken_pdf_links": {},
+    "broken_pdf_links_count": 0,
+    "missing_required_volumes": [],
+    "meets_min_evidence_gate": true,
+    "meets_min_pdf_gate": true
+  },
+  "diagrams_generated": [
+    "generate_ipd_workflow_drawio.py",
+    "generate_system_interface_drawio.py"
+  ],
+  "cost_and_search_telemetry": {
+    "llm_call_count": 0,
+    "search_call_count": 0,
+    "models_used": [],
+    "total_prompt_tokens": 0,
+    "total_completion_tokens": 0,
+    "total_usd": 0.0,
+    "total_cny": 0.0,
+    "metaso_credits": 0,
+    "serper_queries": 0
+  },
+  "secret_leak_check": "PASS",
+  "orchestration_telemetry": {
+    "elo_ranking": [
+      {
+        "arch_id": "ARCH_1_DUAL_TIER_MODULAR",
+        "elo": 1573.4,
+        "wins": 4,
+        "rank": 1
+      },
+      {
+        "arch_id": "ARCH_4_CUSTOM_PCB_SCRATCH",
+        "elo": 1493.5,
+        "wins": 1,
+        "rank": 2
+      },
+      {
+        "arch_id": "ARCH_5_THERMOCOUPLE_MATRIX",
+        "elo": 1483.2,
+        "wins": 0,
+        "rank": 3
+      },
+      {
+        "arch_id": "ARCH_2_PURE_RAYLEIGH_OFDR",
+        "elo": 1480.0,
+        "wins": 0,
+        "rank": 4
+      },
+      {
+        "arch_id": "ARCH_3_LEGACY_UV_FBG",
+        "elo": 1469.8,
+        "wins": 0,
+        "rank": 5
+      }
+    ],
+    "elo_matches": [
+      {
+        "arch_a": "ARCH_1_DUAL_TIER_MODULAR",
+        "arch_b": "ARCH_2_PURE_RAYLEIGH_OFDR",
+        "margin": "decisive",
+        "rationale": "ARCH_1_DUAL_TIER_MODULAR decisively defeats ARCH_2_PURE_RAYLEIGH_OFDR across industrial reliability, time-to-market, and commercial viability for China coal-fired boiler productization: 1) Reliability & Harsh Environment Robustness: ARCH_1 achieves a 9.2/10 reliability score with high optical return power (-17.3 to -0.8 dBm) and massive dynamic SNR margins (24.7 dB to 55.2 dB, well above the 15 dB industrial floor). In contrast, ARCH_2 scores only 4.5/10 because pure Rayleigh OFDR relies on ultra-weak backscatter (-80 to -100 dB/m), making it acutely vulnerable to signal fading, polarization drift, and phase decorrelation under intense coal-fired boiler acoustic noise and mechanical vibrations. 2) R&D Velocity & Risk: ARCH_1 leverages mature OEM modular integration (BS-STD-600 / BS-PRO-2000), slashing hardware development time to 2.5 months versus 11.0 months for ARCH_2's complex swept-laser linearity tuning, auxiliary MZI interferometry, and high-speed cross-correlation DSP. 3) Supply Chain & COGS: ARCH_1 holds a 25.2% COGS advantage at 500 points (¥135,000 vs ¥180,500) and superior supply chain resilience (9.1 vs 6.0), bypassing single-source ultra-narrow linewidth laser and high-bandwidth balanced receiver dependencies. 4) Engineering Readiness: ARCH_1 delivers deterministic full-furnace polling (228–1032 ms) matching 1 Hz boiler thermal kinetics, backed by verified 15CrMoG thermal block heat-flux calibration.",
+        "round_num": 1,
+        "winner": "ARCH_1_DUAL_TIER_MODULAR"
+      },
+      {
+        "arch_a": "ARCH_3_LEGACY_UV_FBG",
+        "arch_b": "ARCH_4_CUSTOM_PCB_SCRATCH",
+        "margin": "narrow",
+        "rationale": "在针对中国燃煤锅炉20~600°C严苛工况的壁温监测产品化选型中，ARCH_4_CUSTOM_PCB_SCRATCH以微弱优势（narrow margin）战胜ARCH_3_LEGACY_UV_FBG。\n\n1. 物理不可行性与可靠性一票否决（物理层）：\nARCH_3（传统剥涂覆层紫外掩模FBG）在燃煤锅炉水冷壁与过热器/再热器管壁（15CrMoG导热块测温点，满量程达600°C、波长漂移达9.07 nm）存在致命物理缺陷：传统Type I紫外光栅在350~400°C以上即发生严重热退火衰减，在500~600°C工况下折射率调制深度迅速擦除归零；且剥除聚酰亚胺涂覆层操作在石英光纤表面引入大量微裂纹，在锅炉热膨胀交变应力、烟气冲刷及吹灰器振动下极易发生脆断，导致其可靠性得分仅为3.2（全场最低）。在以防爆管、防非停为核心诉求的电厂安全监测中，此缺陷具有一票否决性质。\n\n2. 解调端自主性与架构扩展性（解调层）：\nARCH_4虽然试图从裸芯片自研激光驱动与高速TIA模拟前端PCB，研发周期长达16.5个月且自研模拟前端温漂与噪声使其可靠性仅为4.8分，但其部署于主控室/电子间温控环境，未受炉膛600°C高温物理摧毁；同时其扩展性高达8.0（远超ARCH_3的5.5），具备更灵活的多通道时分/波分复用及算法迭代空间，能解耦适配高温飞秒光栅或再生光栅。\n\n3. 判定为狭小胜幅（narrow）的核心权衡：\nARCH_4自身存在极度严重的工程工程化缺陷：16.5个月的超长硬件研发周期严重错失电厂机组3~5年一度的停炉大修窗口期，500点/1500点COGS（11.25万/25.75万元）均高于ARCH_3（10.75万/21.95万元），供应链韧性较低（7.2），且4.8分的可靠性仍未达到工业合格线。两害相权取其轻，ARCH_4仅凭避开了ARCH_3在600°C工况下的物理热退火归零与脆断死穴，以极其勉强的微弱劣势优势险胜。",
+        "round_num": 1,
+        "winner": "ARCH_4_CUSTOM_PCB_SCRATCH"
+      },
+      {
+        "arch_a": "ARCH_1_DUAL_TIER_MODULAR",
+        "arch_b": "ARCH_3_LEGACY_UV_FBG",
+        "margin": "decisive",
+        "rationale": "在针对中国燃煤锅炉四管壁温及炉膛恶劣工况（20~600°C高温、交变热应力、机械振动与腐蚀烟气）的工程化落地评测中，ARCH_1_DUAL_TIER_MODULAR 对 ARCH_3_LEGACY_UV_FBG 形成决定性优势（Decisive Win）：\n\n1. 物理机理与极端工况可靠性差距（3.2 vs 9.2）：\n传统 UV 相位掩模光栅（ARCH_3）在制造时必须机械剥除光纤涂覆层，导致光纤表面不可逆微裂纹萌生，抗拉强度急剧跌落至原有的10%以下；且常规 UV 写入的折射率调制在 300~400°C 以上即发生严重热退化与波长擦除效应，在燃煤锅炉 600°C 持续冲刷下失效率极高，可靠性仅为 3.2 分，完全无法承受电厂停炉非计划停运的巨额风险。而 ARCH_1 采用工业级成熟模块集成（BS-STD-600 与 BS-PRO-2000 配备 NIST 气室在线动态校准），支持抗高温飞秒/光纤拉丝塔耐热光栅封装工艺，可靠性高达 9.2。\n\n2. 光学链路裕度与解调鲁棒性（[PHY-CALC] 实证）：\nARCH_1 在宽谱与扫频双档架构下展现出强大的光学裕度：BS-STD-600 动态信噪比裕度达 24.7 dB，BS-PRO-2000 更达 55.2 dB (WDM) / 37.2 dB (混复)，远超 15 dB 工业可靠解调红线；精确解算了 20~600°C 满量程 9.07 nm 漂移（含 0.0042 pm/°C² 二次热光非线性项），并在相邻局部 180°C 温差下保留 0.338 nm 防串扰裕量；全炉轮询刷新周期控制在 228.0 ms (24路) / 1032.0 ms (48路)，完美匹配 15CrMoG 导热块 4.2s 热响应及锅炉 1 Hz 在线监测节拍。ARCH_3 缺乏宽动态多波长抗串扰与非线性自校准能力，在大点数复用时解调跳模与信噪比崩溃风险极高。\n\n3. 研发周期与全生命周期成本（TCO）：\n虽然 ARCH_3 的初始 COGS 略低（500点 ¥10.75万 vs ¥13.5万），但其硬件研发需耗费 4.0 个月且伴随极高的传感器后期返修更换维护成本；ARCH_1 采用模块化成品集成，硬件研发周期仅 2.5 个月，供应链韧性 9.1，具备跨档平滑扩展（500点标准型至1500点旗舰型），综合度电及停炉风险综合 TCO 远胜于 ARCH_3。",
+        "round_num": 2,
+        "winner": "ARCH_1_DUAL_TIER_MODULAR"
+      },
+      {
+        "arch_a": "ARCH_1_DUAL_TIER_MODULAR",
+        "arch_b": "ARCH_4_CUSTOM_PCB_SCRATCH",
+        "margin": "decisive",
+        "rationale": "在面向中国燃煤锅炉FBG产品化落地的综合评测中，ARCH_1_DUAL_TIER_MODULAR（双档模块化国际成品集成架构）以决定性优势战胜 ARCH_4_CUSTOM_PCB_SCRATCH（从裸芯片自研激光驱动/高速TIA模拟前端路线）：\n\n1. 研发周期与商业化窗口（2.5个月 vs 16.5个月）：燃煤锅炉防磨防爆与受热面温度在线监测具有明确的机组大修与技术改造交付窗口。ARCH_1 采用成熟的模块化集成，硬件研发周期仅2.5个月即可进入批量化部署；而 ARCH_4 涉及高速 TIA、精密半导体激光温控/驱动、微弱光电信号放大与高速 ADC 等底层模拟前端设计，周期长达16.5个月（超过ARCH_1的6倍），极易在多次PCB打样与调试中错失市场契机。\n2. 工业可靠性与电磁/温漂鲁棒性（9.2分 vs 4.8分）：电厂锅炉现场环境存在强电磁干扰、宽温振动及粉尘考验。ARCH_1 采用经过严苛工业验证的成套解调引擎，集成 NIST 气室在线波长绝对校准，物理链路动态信噪比裕度达 24.7 dB ~ 55.2 dB（远超 15 dB 工业可靠解调红线）；而 ARCH_4 自研模拟前端在恶劣工况下的长期温漂、噪声基底与通道一致性缺乏大规模装机验证，可靠性仅 4.8，工程化试错风险极高。\n3. 真实商业总拥有成本（TCO）与风险收益比：尽管 ARCH_4 展现出略低约 ¥14,000~¥42,500 的纸面 BOM/COGS 优势，但自研裸芯片方案背负高额前期 NRE 费用、量产良率波动和认证测试成本，在锅炉装备定制化与中小批量生产阶段完全无法抵消巨大的时间与失效风险。\n4. 扩展性与供应链韧性（9.5/9.1 vs 8.0/7.2）：ARCH_1 双档配置覆盖 500 点常规锅炉至 1500 点超超临界混复监测，通道扩展与标准光学器件采购链条成熟稳定，抗供应链单点风险能力显著优于缺乏规模效应的自研裸片开发路线。",
+        "round_num": 2,
+        "winner": "ARCH_1_DUAL_TIER_MODULAR"
+      },
+      {
+        "arch_a": "ARCH_1_DUAL_TIER_MODULAR",
+        "arch_b": "ARCH_5_THERMOCOUPLE_MATRIX",
+        "margin": "decisive",
+        "rationale": "ARCH_1_DUAL_TIER_MODULAR decisively defeats ARCH_5_THERMOCOUPLE_MATRIX across all key industrial dimensions for China coal-fired boiler productization:\n\n1. COGS & Scaling Economics: ARCH_1 delivers lower COGS at 500 points (¥135,000 vs. ¥154,000, -12.3%) and achieves overwhelming cost superiority at 1500 points (¥300,000 vs. ¥422,000, saving ¥122,000 / -28.9%). ARCH_5 scales linearly and unfavorably due to dedicated point-to-point K/N thermocouple mineral-insulated runs, expensive multi-channel compensation wiring, and massive DCS analog input (AI) card/cabinet expansions.\n2. Cabling, Penetration & Thermal Stress: While ARCH_5 requires hundreds of separate sensor penetrations through boiler wall membranes and complex cold-junction compensation, ARCH_1 leverages optical wavelength/hybrid division multiplexing (25 to 99 points per fiber channel), slashing boiler penetrations and cable tray load by over 95%.\n3. Measurement Reliability & Drift Resistance: ARCH_1 achieves a 9.2 reliability rating vs. 5.8 for ARCH_5. Traditional thermocouples suffer from severe thermal EMF drift, grain embrittlement, oxidation, and EMI susceptibility from boiler induction motors and electrostatic precipitators. In contrast, ARCH_1 provides complete EMI immunity, robust optical SNR margins (24.7 dB to 55.2 dB, far exceeding the 15 dB industrial floor), and NIST gas cell-referenced absolute drift-free recalibration.\n4. R&D Velocity & System Scalability: ARCH_1 matches ARCH_5's rapid deployment time (2.5 months vs. 2.0 months) while delivering vastly superior scalability (9.5 vs. 3.0) and 228–1032 ms full-boiler scanning rates fully aligned with 1 Hz closed-loop thermal monitoring requirements.",
+        "round_num": 3,
+        "winner": "ARCH_1_DUAL_TIER_MODULAR"
+      }
+    ],
+    "critique_loops_executed": 1,
+    "critique_history": [
+      {
+        "loop": 1,
+        "passed": true,
+        "volumes_to_rewrite": [],
+        "crag_queries": [],
+        "assessment": "All volumes (00 through 06) demonstrate complete mathematical, optical, and financial consistency with authoritative calculation engines ([PHY-CALC], [BOM-CALC], [FIN-CALC], [PLANT-ROI]) and verified EvidenceVault citations. Optical link budgets (SNR margins of 24.7 dB / 55.2 dB / 37.2 dB), full-boiler polling scan periods (228.0 ms / 1032.0 ms), 15CrMoG thermal block dynamics (-32.24°C / 4.2 s), 18-file COTS PDF datasheet cross-references, field welding SOP tolerances under TSG 11-2020 / DL/T 869, and financial metrics (80.0万元 CAPEX, 5-year DCF/IRR/NPV across Bear/Base/Bull scenarios) are fully aligned without any programmatic citation errors or broken PDF links."
+      }
+    ],
+    "native_agent_invocations": {
+      "chief_pm_planner": 1,
+      "specialist_miners": 6,
+      "ipd_review_board": 1,
+      "power_plant_storm_panel": 1,
+      "elo_judges": 5,
+      "volume_authors": 7,
+      "critic_loops": 1,
+      "stage_gate_judge": 1
+    }
+  }
+}
