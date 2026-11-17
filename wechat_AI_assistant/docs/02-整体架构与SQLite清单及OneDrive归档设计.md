@@ -59,7 +59,7 @@ flowchart TB
 
     subgraph L3["3. Ch.8 三层记忆 SQLite · 同进程驾驶舱 · 世纪互联 OneDrive"]
         SQL["checkpoints.db（短期断点）<br/>+ app.db（三层记忆 + 排期工时字段 + 混合检索）"]
-        WEB["📊 同进程董事长项目管理驾驶舱 Web App<br/>（FastAPI + ECharts/甘特图，走 Tailscale 内网访问）"]
+        WEB["📊 同进程董事长项目管理驾驶舱 Web App<br/>（127.0.0.1:8090 ← Nginx 已备案 HTTPS 反代，自适应微信 WebView 与电脑大屏）"]
         OD["☁️ Wissentek 世纪互联版 OneDrive<br/>microsoftgraph.chinacloudapi.cn + Sites.Selected 私有库<br/>（00_我的四大清单/*.md + PARA 分类文档，分片上传后清缓存）"]
         CARD -->|"回 1 令牌放行"| SQL
         SQL <--> WEB
@@ -67,12 +67,13 @@ flowchart TB
     end
 
     subgraph L4["4. 多端消费"]
-        MAC["💻 Mac / 手机 OneDrive（Finder / Obsidian）& 驾驶舱网页"]
-        WX_R["📱 个人微信（Ch.20 P0–P2 早晚简报 · 打卡 · Agentic RAG 问答）"]
+        MAC["💻 Mac / 手机 OneDrive（Finder / Obsidian）& 电脑大屏浏览器"]
+        WX_R["📱 个人微信（早晚简报 · 打卡 · 魔法链接直开驾驶舱 · Agentic RAG 问答）"]
     end
 
     OD <-->|"系统原生自动同步"| MAC
-    WEB -.->|"Tailscale / HTTPS"| MAC
+    WEB <-->|"已备案 HTTPS + 验证码鉴权"| MAC
+    WEB <-->|"微信内直开（单次魔法链接）"| WX_R
     SQL --> WX_R
 ```
 
@@ -153,7 +154,7 @@ wechat_assistant/
 │   │   ├── calc_tools.py     # analyze_excel_quote（报价单逐行 Diff 与含税精算）
 │   │   ├── search_tools.py   # 脱敏前置拦截器 + Metaso/Serper/Jina 异步并发外搜
 │   │   └── onedrive_tools.py # 世纪互联 Graph Sites.Selected 读写、分片上传与四大清单渲染
-│   ├── web/                  # 同进程内嵌 FastAPI 董事长项目管理驾驶舱（负荷热力图/精力占比/甘特图/看板API）
+│   ├── web/                  # 同进程内嵌 FastAPI 董事长项目管理驾驶舱（响应式移动端卡片+桌面端甘特图，及微信魔法链接/6位验证码鉴权）
 │   ├── intake/               # 企微长连接 websockets 接收器、60s 静默合并器、Graph Mail/IMAP 只读拉取器
 │   ├── storage/              # SQLite 3+1 表、FTS5 索引、PDF/Office 按页提取
 │   └── prompts/              # 节点提示词版本包（严禁含真实密钥、私有 URL 或商业底数）

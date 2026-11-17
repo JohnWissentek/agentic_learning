@@ -65,7 +65,7 @@ flowchart TB
 | **系统边界与载体** | v1 自造 20 表 / v2 耦合 Odoo+OSS | 去 Odoo 化，3 表 SQLite + 国际版 OneDrive 设想 | **锁定 ECS `firematrix` 单进程 + Wissentek 世纪互联版 OneDrive (`Sites.Selected`)** |
 | **智能体内核** | 单步或固定流 | v3.1 引入《Agentic Design Patterns》三档异构反思 | **严格延续 v3.1 满配内核**（LangGraph + Level 2 上下文工程 + `qwen3.8-max` × `deepseek-v4-pro`） |
 | **时间与工时管控** | 仅有单一截止日期 `due_date` | 仅有 `due_date` 与 `P0-P2` | **自动评估起止时间、日历周期与「个人净投入工时(h)」** + 微信一句话打卡校准 |
-| **可视化管理界面** | 无（只能看零散文本或 Markdown） | 仅 Markdown 清单 | **同进程内嵌「董事长项目管理驾驶舱 Web App」**（负荷热力图/精力占比/甘特图，经 Tailscale 安全访问） |
+| **可视化管理界面** | 无（只能看零散文本或 Markdown） | 仅 Markdown 清单 | **同进程内嵌「董事长项目管理驾驶舱 Web App」**（复用 `firematrix` 已备案域名 Nginx HTTPS，手机微信内魔法链接直开 + 电脑大屏自适应） |
 | **实操可落地性** | 存在待定假设（如消费版 `AppFolder`） | 仍留有 3 项未定配置 | **全部拍板落定**，附企微建机器人/个人微信扫码置顶与世纪互联授权完整实操手册 |
 
 ---
@@ -77,7 +77,7 @@ flowchart TB
 | [01-需求定义与日常场景.md](docs/01-需求定义与日常场景.md) | 董事长助理定位、“空壳传声筒”通信本质、三大入口、四大清单、**自动工时/周期评估与项目管理驾驶舱需求**及四大场景演示 |
 | [02-整体架构与SQLite清单及OneDrive归档设计.md](docs/02-整体架构与SQLite清单及OneDrive归档设计.md) | 不接 Odoo/OpenClaw/重型开源 PM 软件的原因、Ch.8 三层记忆与排期表结构、**Wissentek 世纪互联版 `Sites.Selected` 隔离设计**、及含 `web/` 的代码结构 |
 | [03-AI分拣工作流与确认机制.md](docs/03-AI分拣工作流与确认机制.md) | 《Agentic Design Patterns》15+ 模式 1:1 映射、LangGraph 有界闭环、含 **`check_workload_and_schedule`** 的四大工具箱、异构 Critic 契约与 `开始/完成` 打卡指令 |
-| [04-阿里云部署与分阶段实施路线.md](docs/04-阿里云部署与分阶段实施路线.md) | ECS 同进程部署边界、防外泄六道硬防线（含驾驶舱 Tailscale 隐身访问）、**企微 API 长连接与个人微信扫码指南 + 世纪互联授权步骤**、`.env` 模板与 Ch.19 质量门禁 |
+| [04-阿里云部署与分阶段实施路线.md](docs/04-阿里云部署与分阶段实施路线.md) | ECS 同进程部署边界、防外泄六道硬防线（含复用 Nginx 已备案 HTTPS 与微信双端无感登录）、**企微 API 长连接与个人微信扫码指南 + 世纪互联授权步骤**、`.env` 模板与 Ch.19 质量门禁 |
 | [05-全流程实操SOP与验收Checklist.md](docs/05-全流程实操SOP与验收Checklist.md) | **开工执行手册**：区分「👤 本人 vs 🤖 AI」的 Stage 0–6 分步 SOP、四路连通性探针、F1–F8 真人验收用例及总控打勾表 |
 
 ---
