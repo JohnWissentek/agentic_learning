@@ -679,3 +679,135 @@ def test_discontinuous_long_horizon_context_recall(tmp_path):
     assert len(qa_prompts) == 1
     assert "苏州精工陈总" in qa_prompts[0]
     eng.close()
+
+
+def test_mail_poller_company_allowlist(tmp_path, monkeypatch):
+    from wechat_assistant.intake.mail_poller import poll_mailbox_once
+
+    settings = Settings(
+        dashscope_api_key="sk-fakeunit1234567890abcdef",
+        mail_enabled=True,
+        mail_allowlist=("V&F", "Tera", "B&D"),
+        data_dir=str(tmp_path / "data"),
+    )
+
+    sample_msgs = [
+        {
+            "id": "m1",
+            "internetMessageId": "<vf-1>",
+            "subject": "Quotation update from V&F Austria",
+            "from": {"emailAddress": {"address": "sales@vandf.at", "name": "V&F Sales"}},
+            "toRecipients": [{"emailAddress": {"address": "info@wissentek.com", "name": "Wissentek"}}],
+            "ccRecipients": [],
+            "bodyPreview": "Attached is the updated IMR-MS price list.",
+        },
+        {
+            "id": "m2",
+            "internetMessageId": "<other-1>",
+            "subject": "Monthly SaaS newsletter",
+            "from": {"emailAddress": {"address": "news@randomvendor.com", "name": "Random Vendor"}},
+            "toRecipients": [{"emailAddress": {"address": "info@wissentek.com", "name": "Wissentek"}}],
+            "ccRecipients": [],
+            "bodyPreview": "Product updates for November.",
+        },
+        {
+            "id": "m3",
+            "internetMessageId": "<tera-1>",
+            "subject": "Re: Spectrometer delivery schedule",
+            "from": {"emailAddress": {"address": "info@wissentek.com", "name": "Wissentek"}},
+            "toRecipients": [{"emailAddress": {"address": "support@tera-germany.de", "name": "Tera GmbH"}}],
+            "ccRecipients": [],
+            "bodyPreview": "Confirmed shipment next Tuesday.",
+        },
+    ]
+
+    class _FakeResp:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"value": sample_msgs}
+
+    class _FakeAsyncClient:
+        def __init__(self, *a, **kw):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *a):
+            return False
+
+        async def get(self, *a, **kw):
+            return _FakeResp()
+
+    monkeypatch.setattr("wechat_assistant.intake.mail_poller.httpx.AsyncClient", _FakeAsyncClient)
+    dummy_od = SimpleNamespace(_get_token=lambda: "fake-graph-token")
+    captured = []
+
+    async def on_email(body, sender, ext_id):
+        captured.append((ext_id, sender, body))
+
+    cnt = asyncio.run(poll_mailbox_once(settings, dummy_od, on_email))
+    assert cnt == 2
+    assert [c[0] for c in captured] == ["<vf-1>", "<tera-1>"]
+    assert "[UNTRUSTED_EXTERNAL_DATA]" in captured[0][2]
+
+
+def test_market_research_task_does_not_auto_search(tmp_path):
+    """PMO/secretary mode logs market-research tasks without triggering external web search."""
+    class _ForceResearchFlagGateway:
+        def generate_structured(self, tier, messages, schema_cls, **kwargs):
+            name = schema_cls.__name__
+            if name == "IntentRoute":
+                # Even if an LLM sets needs_deep_research=True on a PMO task, code guard must block it
+                obj = schema_cls(
+                    intent="work_triage",
+                    confidence=0.95,
+                    summary="记录市场调研任务",
+                    resolved_intent_text="下月底前完成华东市场调研，下周约王经理开会并联系张总",
+                    needs_deep_research=True,
+                    search_queries=["华东市场调研"],
+                )
+            elif name == "TriageProposal":
+                from wechat_assistant.schemas import ActionMutation
+                obj = schema_cls(
+                    headline="记录华东市场调研与会议安排",
+                    executive_summary="记录市场调研项目、会议及干系人跟踪",
+                    project_name="华东市场调研",
+                    work_domain="客户销售",
+                    actions=[
+                        ActionMutation(
+                            title="与王经理开启动碰头会并联系张总调研需求",
+                            list_type="project_action",
+                            project_name="华东市场调研",
+                            work_domain="客户销售",
+                            owner="董事长",
+                            planned_start_at="2026-11-18",
+                            planned_end_at="2026-11-25",
+                            priority="P1",
+                        )
+                    ],
+                )
+            else:
+                obj = schema_cls(passed=True, numeric_fidelity_ok=True, schedule_reasonable=True)
+            rec = SimpleNamespace(
+                tier=tier,
+                model=tier,
+                prompt_tokens=10,
+                completion_tokens=10,
+                reasoning_tokens=0,
+                latency_ms=1,
+                success=True,
+            )
+            return obj, rec
+
+    settings = Settings(dashscope_api_key="sk-fakeunit1234567890abcdef", data_dir=str(tmp_path / "data"))
+    db = Database(tmp_path / "app.db")
+    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_ForceResearchFlagGateway())
+    res = eng.handle_incoming_turn(
+        "我需要做一次华东市场调研，下月底前完成，下周约王经理开会并联系张总，先看去年报价汇总",
+        external_msg_id="pmo_no_search_1",
+    )
+    assert "tool:search_public_tech_intel" not in res["trajectory"]
+    assert "node:hitl_preview_gate" in res["trajectory"]

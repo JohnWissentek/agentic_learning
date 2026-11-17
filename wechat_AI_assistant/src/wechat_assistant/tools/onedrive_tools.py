@@ -27,20 +27,37 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
     # 1. 01_今日与行动待办.md
     action_types = {ListType.PROJECT_ACTION.value, ListType.NEXT_ACTION.value}
     actions = [i for i in items if i["list_type"] in action_types]
-    today_str = next(iter(workload["days"]), "")
-    today_hrs = workload["days"].get(today_str, {}).get("booked_hours", 0.0)
+    open_actions = [i for i in actions if i["status"] != "done"]
     lines_01 = [
         "# 01｜今日与行动待办（自动重绘）\n",
-        f"> 今日已排个人净工时：**{today_hrs}h / {workload['capacity_hours']}h**\n",
-        "| ID | 优先级 | 状态 | 事项 | 项目/板块 | 日历起止周期 | 预计/实际净工时 |",
+        f"> 当前未完成行动项：**{len(open_actions)} 项**\n",
+        "| ID | 优先级 | 状态 | 事项 | 项目/板块 | 计划起止周期 | 计划/实际完成跨度 |",
         "| :---: | :---: | :---: | :--- | :--- | :--- | :---: |",
     ]
     for it in actions:
         status_icon = "✅ 已完成" if it["status"] == "done" else ("🔄 进行中" if it["status"] == "in_progress" else "⬜ 待办")
         span = f"{it['planned_start_at'] or '-'} ~ {it['planned_end_at'] or '-'}"
-        hrs = f"{it['estimated_hours']}h" + (f" / 实{it['actual_hours']}h" if it["actual_hours"] is not None else "")
+        try:
+            from datetime import date as _d
+            ps = _d.fromisoformat((it["planned_start_at"] or "")[:10])
+            pe = _d.fromisoformat((it["planned_end_at"] or it["planned_start_at"] or "")[:10])
+            p_days = max(1, (pe - ps).days + 1)
+        except ValueError:
+            p_days = 1
+        span_col = f"计划 {p_days} 天"
+        if it["status"] == "done":
+            try:
+                from datetime import date as _d
+                a_s = _d.fromisoformat((it.get("actual_start_at") or it["planned_start_at"] or it["created_at"])[:10])
+                a_e = _d.fromisoformat((it.get("actual_end_at") or it["updated_at"])[:10])
+                a_days = max(1, (a_e - a_s).days + 1)
+                span_col = f"实耗 {a_days} 天"
+                if (it.get("actual_hours") or 0) > 0:
+                    span_col += f"（实{it['actual_hours']}h）"
+            except ValueError:
+                span_col = "已完成"
         lines_01.append(
-            f"| {it['id']} | **{it['priority']}** | {status_icon} | {it['title']} | {it['project_name']}（{it['work_domain']}） | {span} | {hrs} |"
+            f"| {it['id']} | **{it['priority']}** | {status_icon} | {it['title']} | {it['project_name']}（{it['work_domain']}） | {span} | {span_col} |"
         )
     if not actions:
         lines_01.append("| - | - | - | 暂无行动待办 | - | - | - |")
@@ -48,15 +65,17 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
     # 2. 02_在途项目总览.md
     lines_02 = [
         "# 02｜在途项目总览（自动重绘）\n",
-        "| 项目名称 | 板块 | 状态 | 计划周期 | 累计预计 / 实耗工时 | 最新进展 | 云端文件夹 |",
+        "| 项目名称 | 板块 | 状态 | 计划周期 | 事项统计 | 最新进展 | 云端文件夹 |",
         "| :--- | :--- | :---: | :--- | :---: | :--- | :--- |",
     ]
     for p in projects:
         span = f"{p['planned_start_date'] or '-'} ~ {p['target_end_date'] or '-'}"
-        hrs = f"{p['total_estimated_hours']}h / {p['total_actual_hours']}h"
+        p_items = [x for x in items if x.get("project_name") == p["name"]]
+        p_done = sum(1 for x in p_items if x["status"] == "done")
+        stat_str = f"共 {len(p_items)} 项（完成 {p_done}）"
         link = f"[打开云端目录]({p['onedrive_web_url']})" if p.get("onedrive_web_url") else p.get("onedrive_folder", "-")
         lines_02.append(
-            f"| **{p['name']}** | {p['work_domain']} | {p['status']} | {span} | {hrs} | {p['latest_brief'] or '-'} | {link} |"
+            f"| **{p['name']}** | {p['work_domain']} | {p['status']} | {span} | {stat_str} | {p['latest_brief'] or '-'} | {link} |"
         )
     if not projects:
         lines_02.append("| 暂无在途项目 | - | - | - | - | - | - |")
@@ -72,7 +91,7 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
         else:
             for it in matched:
                 lines_03.append(
-                    f"- `#{it['id']}` **[{it['project_name']}]** {it['title']}（预估净工时 `{it['estimated_hours']}h`）"
+                    f"- `#{it['id']}` **[{it['project_name']}]** {it['title']}（{it['work_domain']}）"
                 )
             lines_03.append("")
 
@@ -80,13 +99,19 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
     waits = [i for i in items if i["list_type"] == ListType.WAITING_FOR.value and i["status"] != "done"]
     lines_04 = [
         "# 04｜等待他人清单（自动重绘）\n",
-        "| ID | 优先级 | 对方/责任人 | 等待事项 | 所属项目 | 启动~承诺日 | 个人跟进净工时 |",
+        "| ID | 优先级 | 对方/责任人 | 等待事项 | 所属项目 | 启动~承诺日 | 已等待跨度 |",
         "| :---: | :---: | :--- | :--- | :--- | :--- | :---: |",
     ]
     for it in waits:
         span = f"{it['planned_start_at'] or '-'} ~ {it['planned_end_at'] or '-'}"
+        try:
+            from datetime import date as _d
+            w_s = _d.fromisoformat((it["planned_start_at"] or it["created_at"])[:10])
+            w_days = max(0, (_d.today() - w_s).days)
+        except ValueError:
+            w_days = 0
         lines_04.append(
-            f"| {it['id']} | **{it['priority']}** | {it['owner']} | {it['title']} | {it['project_name']} | {span} | {it['estimated_hours']}h |"
+            f"| {it['id']} | **{it['priority']}** | {it['owner']} | {it['title']} | {it['project_name']} | {span} | {w_days} 天 |"
         )
     if not waits:
         lines_04.append("| - | - | - | 暂无外部卡点等待 | - | - | - |")

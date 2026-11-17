@@ -81,7 +81,7 @@ class ActionMutation(BaseModel):
     owner: str = "本人"
     planned_start_at: str = Field(description="ISO date YYYY-MM-DD")
     planned_end_at: str = Field(description="ISO date YYYY-MM-DD")
-    estimated_hours: float = Field(ge=0.0, le=200.0)
+    estimated_hours: float = Field(default=0.0, ge=0.0, le=200.0)
     priority: PriorityLevel = PriorityLevel.P1
     onedrive_target_dir: str = "01_项目归档"
 

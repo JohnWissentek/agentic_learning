@@ -710,6 +710,9 @@ class Database:
             if not row:
                 return None
             hours = round(float(actual_hours if actual_hours is not None else row["estimated_hours"]), 2)
+            start_str = row["actual_start_at"] or now
+            start_d = _parse_iso_date(row["actual_start_at"]) or _parse_iso_date(row["planned_start_at"]) or _parse_iso_date(row["created_at"]) or date.today()
+            span_days = max(1, (date.today() - start_d).days + 1)
             conn.execute(
                 """
                 UPDATE list_items
@@ -720,25 +723,27 @@ class Database:
                     updated_at = ?
                 WHERE id = ?
                 """,
-                (now, now, hours, now, item_id),
+                (start_str, now, hours, now, item_id),
             )
             if row["project_id"]:
                 self._recalculate_project_hours(conn, int(row["project_id"]))
 
-            # Record procedural effort calibration rule
+            # Record actual completion calendar span into memory rules
             conn.execute(
                 """
                 INSERT INTO memory_rules (memory_kind, trigger_tags_json, rule_text, baseline_hours, correction_count, status, updated_at)
-                VALUES ('effort_baseline', ?, ?, ?, 1, 'confirmed', ?)
+                VALUES ('span_baseline', ?, ?, ?, 1, 'confirmed', ?)
                 """,
                 (
                     json.dumps([row["work_domain"], row["project_name"]], ensure_ascii=False),
-                    f"同类事项「{row['title'][:40]}」实际净耗时 {hours}h（原预估 {row['estimated_hours']}h）",
-                    hours,
+                    f"同类事项「{row['title'][:40]}」实际完成跨度 {span_days} 天（{start_d.isoformat()} ~ {date.today().isoformat()}）",
+                    float(span_days),
                     now,
                 ),
             )
-            return dict(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
+            out = dict(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
+            out["actual_span_days"] = span_days
+            return out
 
     def update_item_fields(self, item_id: int, updates: dict[str, Any]) -> dict[str, Any] | None:
         allowed_cols = {
@@ -938,12 +943,27 @@ class Database:
         domains = self.get_domain_analytics()
         waiting = [i for i in items if i["list_type"] == ListType.WAITING_FOR.value and i["status"] != "done"]
         today = date.today()
+        done_spans: list[int] = []
+        for it in items:
+            ps = _parse_iso_date(it.get("planned_start_at"))
+            pe = _parse_iso_date(it.get("planned_end_at")) or ps
+            it["planned_span_days"] = max(1, (pe - ps).days + 1) if (ps and pe) else 1
+            if it.get("status") == "done":
+                a_s = _parse_iso_date(it.get("actual_start_at")) or ps or _parse_iso_date(it.get("created_at")) or today
+                a_e = _parse_iso_date(it.get("actual_end_at")) or today
+                sp = max(1, (a_e - a_s).days + 1)
+                it["actual_span_days"] = sp
+                done_spans.append(sp)
+            else:
+                it["actual_span_days"] = None
         for w in waiting:
             start_d = _parse_iso_date(w.get("planned_start_at")) or _parse_iso_date(w.get("created_at")) or today
             w["waiting_days"] = max(0, (today - start_d).days)
+        avg_span = round(sum(done_spans) / len(done_spans), 1) if done_spans else 0.0
         return {
             "today": today.isoformat(),
             "daily_capacity_hours": daily_capacity,
+            "avg_completion_span_days": avg_span,
             "workload": workload,
             "domains": domains,
             "projects": projects,

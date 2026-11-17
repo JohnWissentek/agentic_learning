@@ -1128,8 +1128,8 @@
         <span class="nav-count" id="cnt-proj">0</span>
       </button>
       <button class="nav-item" id="side-workload" onclick="switchView('workload')">
-        <span>Capacity Workload</span>
-        <span class="nav-count" id="cnt-today-badge">0h</span>
+        <span>Schedule Load</span>
+        <span class="nav-count" id="cnt-today-badge">0</span>
       </button>
       <button class="nav-item" id="side-analytics" onclick="switchView('analytics')">
         <span>Executive Analytics</span>
@@ -1148,11 +1148,11 @@
 
       <div class="sidebar-cap-card">
         <div class="cap-row">
-          <span style="font-weight:600;color:var(--text);">Today Net Effort</span>
-          <span id="side-cap-text" style="font-weight:700;color:var(--text);">0h / 6h</span>
+          <span style="font-weight:600;color:var(--text);">Active Schedule</span>
+          <span id="side-cap-text" style="font-weight:700;color:var(--text);">0 tasks today</span>
         </div>
         <div class="cap-bar"><div class="cap-bar-fill" id="side-cap-fill" style="width:0%;"></div></div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Synced with 21Vianet Markdown boards</div>
+        <div id="side-cap-sub" style="font-size:11px;color:var(--text-muted);margin-top:6px;">Avg. Completion Span: —</div>
       </div>
     </aside>
 
@@ -1167,7 +1167,7 @@
                 <button class="star-btn" title="Favorite board">★</button>
                 <span class="live-pill"><span class="live-dot"></span>21Vianet Live Sync</span>
               </div>
-              <p class="board-subtitle">Separate net personal hours from external wait days · Changes sync automatically to cloud Markdown boards</p>
+              <p class="board-subtitle">Track planned calendar timelines &amp; actual completion spans · Changes sync automatically to cloud Markdown boards</p>
             </div>
             <div class="board-actions">
               <a class="btn" id="hdr-vault-link" target="_blank" rel="noopener">Cloud Vault ↗</a>
@@ -1179,7 +1179,7 @@
           <div class="view-tabs" role="tablist">
             <button class="view-tab active" id="tab-table" onclick="switchView('table')">Main Table</button>
             <button class="view-tab" id="tab-gantt" onclick="switchView('gantt')">Gantt &amp; Timeline</button>
-            <button class="view-tab" id="tab-workload" onclick="switchView('workload')">Workload</button>
+            <button class="view-tab" id="tab-workload" onclick="switchView('workload')">Schedule Load</button>
             <button class="view-tab" id="tab-analytics" onclick="switchView('analytics')">Analytics</button>
           </div>
         </header>
@@ -1201,7 +1201,7 @@
           <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
             <input type="checkbox" id="toggle-done" checked onchange="renderActiveView()" /> Show Completed
           </label>
-          <div class="toolbar-right" id="toolbar-stats">0 pulses · 0.0h total</div>
+          <div class="toolbar-right" id="toolbar-stats">0 items · Avg span 0d</div>
         </div>
 
         <div class="board-body" id="board-body"></div>
@@ -1213,7 +1213,7 @@
   <nav class="mobile-bottom-nav" id="mobile-nav" style="display:none;">
     <button class="active" id="mob-table" onclick="switchView('table')">Board</button>
     <button id="mob-gantt" onclick="switchView('gantt')">Timeline</button>
-    <button id="mob-workload" onclick="switchView('workload')">Workload</button>
+    <button id="mob-workload" onclick="switchView('workload')">Schedule</button>
     <button id="mob-analytics" onclick="switchView('analytics')">Analytics</button>
   </nav>
 
@@ -1450,22 +1450,26 @@
 
       const items = ov.items || [];
       const openCount = items.filter(i => i.status !== "done").length;
-      const cap = ov.daily_capacity_hours || 6.0;
-      const todayBooked = ((ov.workload?.days || {})[ov.today] || { booked_hours: 0 }).booked_hours || 0;
-      const capPct = Math.min(100, Math.round((todayBooked / Math.max(cap, 1)) * 100));
+      const todayItems = ((ov.workload?.days || {})[ov.today] || { items: [] }).items || [];
+      const todayCount = todayItems.length;
+      const loadPct = Math.min(100, Math.round((todayCount / 6) * 100));
+      const avgSpan = ov.avg_completion_span_days ?? 0;
 
       document.getElementById("cnt-open").textContent = openCount;
       document.getElementById("cnt-proj").textContent = (ov.projects || []).length;
-      document.getElementById("cnt-today-badge").textContent = `${todayBooked}h`;
+      document.getElementById("cnt-today-badge").textContent = todayCount;
       document.getElementById("cnt-wait").textContent = (ov.waiting_items || []).length;
-      document.getElementById("side-cap-text").textContent = `${todayBooked}h / ${cap}h`;
+      document.getElementById("side-cap-text").textContent = `${todayCount} ${todayCount === 1 ? "task" : "tasks"} today`;
+      const capSub = document.getElementById("side-cap-sub");
+      if (capSub) capSub.textContent = avgSpan ? `Avg. Completion Span: ${avgSpan}d` : "Synced with 21Vianet Markdown boards";
       const fill = document.getElementById("side-cap-fill");
-      fill.style.width = `${capPct}%`;
-      fill.style.background = todayBooked > cap ? "var(--status-stuck)" : (capPct > 75 ? "var(--status-working)" : "var(--status-done)");
+      fill.style.width = `${loadPct}%`;
+      fill.style.background = todayCount > 5 ? "var(--status-stuck)" : (todayCount >= 3 ? "var(--status-working)" : "var(--status-done)");
 
       const filtered = getFilteredItems();
-      const hrs = filtered.reduce((acc, x) => acc + Number(x.estimated_hours || 0), 0);
-      document.getElementById("toolbar-stats").textContent = `${filtered.length} items · ${hrs.toFixed(1)}h est.`;
+      const spanVals = filtered.map(x => Number(x.status === "done" ? (x.actual_span_days || x.planned_span_days || 1) : (x.planned_span_days || 1)));
+      const avgF = spanVals.length ? (spanVals.reduce((a, b) => a + b, 0) / spanVals.length).toFixed(1) : "0.0";
+      document.getElementById("toolbar-stats").textContent = `${filtered.length} items · Avg span ${avgF}d`;
     }
 
     function renderActiveView() {
@@ -1501,7 +1505,8 @@
       root.innerHTML = visibleGroups.map(g => {
         const rows = items.filter(i => classifyGroup(i) === g.key);
         const collapsed = !!COLLAPSED_GROUPS[g.key];
-        const totalHrs = rows.reduce((a, b) => a + Number(b.estimated_hours || 0), 0);
+        const spanList = rows.map(r => Number(r.status === "done" ? (r.actual_span_days || r.planned_span_days || 1) : (r.planned_span_days || 1)));
+        const avgGroupSpan = spanList.length ? (spanList.reduce((a, b) => a + b, 0) / spanList.length).toFixed(1) : "0.0";
         const minDate = rows.map(r => r.planned_start_at).filter(Boolean).sort()[0] || "";
         const maxDate = rows.map(r => r.planned_end_at).filter(Boolean).sort().slice(-1)[0] || "";
 
@@ -1564,10 +1569,9 @@
                 </button>
               </div>
               <div class="cell">
-                <div class="effort-wrap">
-                  <input type="number" step="0.5" min="0" max="200" class="effort-input" value="${item.estimated_hours}" onchange="patchField(${item.id}, 'estimated_hours', parseFloat(this.value || '0.5'))" />
-                  <span class="effort-unit">h</span>
-                </div>
+                <span class="summary-pill" style="font-size:12px;">
+                  ${st.key === "done" ? `Done in ${item.actual_span_days || 1}d` : `${item.planned_span_days || 1}d`}
+                </span>
               </div>
             </div>
           `;
@@ -1595,7 +1599,7 @@
                     <div class="cell">Status</div>
                     <div class="cell">Priority</div>
                     <div class="cell">Timeline</div>
-                    <div class="cell">Est. Effort</div>
+                    <div class="cell">Span</div>
                   </div>
                   ${rowsHtml}
                   <div class="grid-row add-row">
@@ -1613,7 +1617,7 @@
                     <div class="cell">${statusBattery}</div>
                     <div class="cell">${prioBattery}</div>
                     <div class="cell"><span class="summary-pill">${minDate || maxDate ? escHtml(fmtRange(minDate, maxDate)) : "—"}</span></div>
-                    <div class="cell"><span class="summary-pill">&Sigma; ${totalHrs.toFixed(1)}h</span></div>
+                    <div class="cell"><span class="summary-pill">Avg ${avgGroupSpan}d</span></div>
                   </div>
                 </div>
               </div>
@@ -1662,7 +1666,7 @@
             work_domain: "产品研发",
             project_name: "General Ops",
             owner: "Chairman",
-            estimated_hours: 1.0,
+            estimated_hours: 0.0,
             priority: "P1"
           })
         });
@@ -1832,19 +1836,13 @@
                   <input type="date" id="ni-end" class="input" value="${addDaysIso(STATE.today, 2)}" />
                 </div>
               </div>
-              <div class="form-row-2">
-                <div>
-                  <label class="form-label">Priority</label>
-                  <select id="ni-prio" class="input">
-                    <option value="P0">Critical (P0)</option>
-                    <option value="P1" selected>High (P1)</option>
-                    <option value="P2">Normal (P2)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="form-label">Estimated Net Effort (hrs)</label>
-                  <input type="number" step="0.5" id="ni-hrs" class="input" value="1.5" />
-                </div>
+              <div>
+                <label class="form-label">Priority</label>
+                <select id="ni-prio" class="input">
+                  <option value="P0">Critical (P0)</option>
+                  <option value="P1" selected>High (P1)</option>
+                  <option value="P2">Normal (P2)</option>
+                </select>
               </div>
             </div>
             <div class="modal-footer">
@@ -1870,7 +1868,7 @@
           planned_start_at: document.getElementById("ni-start").value || STATE.today,
           planned_end_at: document.getElementById("ni-end").value || STATE.today,
           priority: document.getElementById("ni-prio").value,
-          estimated_hours: parseFloat(document.getElementById("ni-hrs").value || "1.0")
+          estimated_hours: 0.0
         })
       });
       closeModal();
@@ -1900,10 +1898,6 @@
                   <input type="date" id="pm-end" class="input" value="${escHtml(item.planned_end_at || addDaysIso(STATE.today, 7))}" />
                 </div>
               </div>
-              <div>
-                <label class="form-label">Estimated Net Effort (hrs)</label>
-                <input type="number" step="0.5" id="pm-hrs" class="input" value="${item.estimated_hours || 2.0}" />
-              </div>
             </div>
             <div class="modal-footer">
               <button class="btn" onclick="closeModal()">Cancel</button>
@@ -1921,7 +1915,7 @@
           project_name: document.getElementById("pm-proj").value.trim() || "New Project",
           planned_start_at: document.getElementById("pm-start").value || STATE.today,
           planned_end_at: document.getElementById("pm-end").value || STATE.today,
-          estimated_hours: parseFloat(document.getElementById("pm-hrs").value || "2.0")
+          estimated_hours: 0.0
         })
       });
       closeModal();
@@ -1966,7 +1960,7 @@
               <span class="owner-dot" style="width:20px;height:20px;font-size:9px;background:${domainMeta(item.work_domain).color};">${escHtml(initials(displayOwner(item.owner)))}</span>
               <div style="min-width:0;flex:1;">
                 <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(item.title)}</div>
-                <div style="font-size:11px;color:var(--text-muted);">${escHtml(displayProject(item.project_name))} · ${item.estimated_hours}h</div>
+                <div style="font-size:11px;color:var(--text-muted);">${escHtml(displayProject(item.project_name))} · ${item.planned_span_days || 1}d span</div>
               </div>
             </div>
             <div class="gantt-track" data-track>
@@ -1975,7 +1969,7 @@
                    data-id="${item.id}" data-start="${escHtml(sRaw)}" data-end="${escHtml(eRaw)}"
                    onmousedown="startGanttDrag(event, this)">
                 <span style="overflow:hidden;text-overflow:ellipsis;">${escHtml(fmtRange(sRaw, eRaw))}</span>
-                <span>${item.estimated_hours}h</span>
+                <span>${item.planned_span_days || 1}d</span>
               </div>
             </div>
           </div>
@@ -2040,48 +2034,52 @@
       document.addEventListener("mouseup", onUp);
     }
 
-    /* ---------- View 3: Workload Capacity Matrix ---------- */
+    /* ---------- View 3: Schedule Load Matrix ---------- */
     function renderWorkloadView(root) {
       const days = Object.values(STATE.workload?.days || {});
-      const cap = STATE.daily_capacity_hours || 6.0;
       if (!SELECTED_WL_DATE && days.length) SELECTED_WL_DATE = days[0].date;
 
       const cardsHtml = days.map(d => {
-        const pct = Math.round((d.booked_hours / Math.max(cap, 1)) * 100);
-        const color = d.overloaded ? "var(--status-stuck)" : (pct >= 75 ? "var(--status-working)" : "var(--status-done)");
+        const cnt = (d.items || []).length;
+        const color = cnt > 5 ? "var(--status-stuck)" : (cnt >= 3 ? "var(--status-working)" : "var(--status-done)");
         const selClass = d.date === SELECTED_WL_DATE ? "selected" : "";
         return `
           <div class="wl-card ${selClass}" onclick="SELECTED_WL_DATE='${d.date}';renderActiveView();">
             <div class="wl-date">${escHtml(fmtShortDate(d.date))} ${d.date === STATE.today ? "· Today" : ""}</div>
-            <div class="wl-bubble" style="background:${color};">${d.booked_hours}h</div>
-            <div class="wl-sub">${d.overloaded ? "Over Capacity" : `${d.remaining_hours}h free`}</div>
+            <div class="wl-bubble" style="background:${color};">${cnt}</div>
+            <div class="wl-sub">${cnt === 1 ? "1 task" : `${cnt} tasks`}</div>
           </div>
         `;
       }).join("");
 
       const activeDay = days.find(x => x.date === SELECTED_WL_DATE) || days[0];
-      const dayItemsHtml = (activeDay?.items || []).map(it => `
-        <div class="grid-row" style="grid-template-columns:60px 1fr 110px 90px;border-left:4px solid var(--primary);">
-          <div class="cell" style="color:var(--text-muted);">#${it.id}</div>
-          <div class="cell cell-left" style="font-weight:600;">${escHtml(it.title)}</div>
-          <div class="cell bleed-cell"><span class="bleed-btn" style="background:${prioMeta(it.priority).color};">${prioMeta(it.priority).label}</span></div>
-          <div class="cell" style="font-weight:700;">${it.hours}h</div>
-        </div>
-      `).join("") || '<div style="padding:24px;text-align:center;color:var(--text-muted);">No net hours booked on this day.</div>';
+      const allById = Object.fromEntries((STATE.items || []).map(x => [x.id, x]));
+      const dayItemsHtml = (activeDay?.items || []).map(it => {
+        const full = allById[it.id] || {};
+        const spanD = full.planned_span_days || 1;
+        return `
+          <div class="grid-row" style="grid-template-columns:60px 1fr 110px 100px;border-left:4px solid var(--primary);">
+            <div class="cell" style="color:var(--text-muted);">#${it.id}</div>
+            <div class="cell cell-left" style="font-weight:600;">${escHtml(it.title)}</div>
+            <div class="cell bleed-cell"><span class="bleed-btn" style="background:${prioMeta(it.priority).color};">${prioMeta(it.priority).label}</span></div>
+            <div class="cell" style="font-weight:700;">${spanD}d span</div>
+          </div>
+        `;
+      }).join("") || '<div style="padding:24px;text-align:center;color:var(--text-muted);">No items scheduled on this day.</div>';
 
       root.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
-          <div style="font-size:13px;color:var(--text-secondary);">Daily executive net capacity threshold: <b>${cap}h / day</b> (wait days excluded)</div>
+          <div style="font-size:13px;color:var(--text-secondary);">Daily scheduled item density across the 7-day rolling window</div>
           <div style="display:flex;gap:12px;font-size:12px;">
-            <span><b style="color:var(--status-done);">●</b> Healthy (&lt;75%)</span>
-            <span><b style="color:var(--status-working);">●</b> High Load</span>
-            <span><b style="color:var(--status-stuck);">●</b> Overloaded (&gt;${cap}h)</span>
+            <span><b style="color:var(--status-done);">●</b> Light (&le;2)</span>
+            <span><b style="color:var(--status-working);">●</b> Busy (3–5)</span>
+            <span><b style="color:var(--status-stuck);">●</b> Crowded (&gt;5)</span>
           </div>
         </div>
         <div class="workload-grid">${cardsHtml}</div>
         <div class="widget-card" style="padding:0;overflow:hidden;">
           <div style="padding:14px 18px;border-bottom:1px solid var(--border-light);font-weight:600;">
-            Scheduled Effort Breakdown — ${activeDay ? escHtml(fmtShortDate(activeDay.date)) : ""} (${activeDay ? activeDay.booked_hours : 0}h / ${cap}h)
+            Scheduled Tasks — ${activeDay ? escHtml(fmtShortDate(activeDay.date)) : ""} (${(activeDay?.items || []).length} tasks)
           </div>
           ${dayItemsHtml}
         </div>
@@ -2093,35 +2091,36 @@
       const items = STATE.items || [];
       const projects = STATE.projects || [];
       const domains = STATE.domains || [];
-      const cap = STATE.daily_capacity_hours || 6.0;
-      const todayBooked = ((STATE.workload?.days || {})[STATE.today] || { booked_hours: 0 }).booked_hours || 0;
+      const avgSpan = STATE.avg_completion_span_days ?? 0;
       const doneN = items.filter(i => i.status === "done").length;
       const openN = items.filter(i => i.status !== "done").length;
       const waitN = (STATE.waiting_items || []).length;
 
-      // SVG Donut geometry
-      const totalDomHrs = domains.reduce((a, d) => a + Number(d.estimated_hours || 0), 0);
+      // SVG Donut geometry by item count
+      const totalDomItems = domains.reduce((a, d) => a + Number(d.item_count || 0), 0);
       const radius = 56;
       const circ = 2 * Math.PI * radius;
       let offset = 0;
       const donutSlices = domains.map(d => {
         const meta = domainMeta(d.work_domain);
-        const val = Number(d.estimated_hours || 0);
-        const len = totalDomHrs > 0 ? (val / totalDomHrs) * circ : 0;
+        const val = Number(d.item_count || 0);
+        const len = totalDomItems > 0 ? (val / totalDomItems) * circ : 0;
         const dash = `${len} ${circ - len}`;
         const seg = `<circle cx="75" cy="75" r="${radius}" fill="transparent" stroke="${meta.color}" stroke-width="22" stroke-dasharray="${dash}" stroke-dashoffset="${-offset}"></circle>`;
         offset += len;
-        return { ...d, meta, seg, pct: totalDomHrs > 0 ? Math.round((val / totalDomHrs) * 100) : 0 };
+        return { ...d, meta, seg, pct: totalDomItems > 0 ? Math.round((val / totalDomItems) * 100) : 0 };
       });
 
       const projRows = projects.map(p => {
         const dm = domainMeta(p.work_domain);
+        const pItems = items.filter(x => x.project_name === p.name);
+        const pDone = pItems.filter(x => x.status === "done").length;
         return `
           <div class="grid-row" style="grid-template-columns:1.6fr 140px 140px 110px 120px;">
             <div class="cell cell-left" style="font-weight:600;">${escHtml(displayProject(p.name))}</div>
             <div class="cell bleed-cell"><span class="bleed-btn" style="background:${dm.color};">${escHtml(dm.label)}</span></div>
             <div class="cell">${escHtml(fmtRange(p.planned_start_date, p.target_end_date))}</div>
-            <div class="cell" style="font-weight:600;">${p.total_estimated_hours}h / ${p.total_actual_hours}h</div>
+            <div class="cell" style="font-weight:600;">${pDone} / ${pItems.length} done</div>
             <div class="cell">${p.onedrive_web_url ? `<a href="${escHtml(p.onedrive_web_url)}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:600;text-decoration:none;">Open Vault ↗</a>` : `<span style="color:var(--text-muted);">Synced</span>`}</div>
           </div>
         `;
@@ -2130,9 +2129,9 @@
       root.innerHTML = `
         <div class="kpi-row">
           <div class="widget-card" style="border-top:4px solid var(--primary);">
-            <div class="widget-title">Today Booked Effort</div>
-            <div class="kpi-number">${todayBooked}h</div>
-            <div class="kpi-hint">Daily cap: ${cap}h net work</div>
+            <div class="widget-title">Avg. Completion Span</div>
+            <div class="kpi-number">${avgSpan}d</div>
+            <div class="kpi-hint">Calendar days to complete</div>
           </div>
           <div class="widget-card" style="border-top:4px solid var(--status-done);">
             <div class="widget-title">Completion Rate</div>
@@ -2153,8 +2152,8 @@
 
         <div class="analytics-2col">
           <div class="widget-card">
-            <div class="widget-title">Effort Share by Business Domain</div>
-            ${totalDomHrs > 0 ? `
+            <div class="widget-title">Task Share by Business Domain</div>
+            ${totalDomItems > 0 ? `
               <div class="donut-wrap">
                 <svg width="150" height="150" viewBox="0 0 150 150" style="transform:rotate(-90deg);flex-shrink:0;">
                   <circle cx="75" cy="75" r="${radius}" fill="transparent" stroke="#eef0f6" stroke-width="22"></circle>
@@ -2165,30 +2164,32 @@
                     <div class="legend-row">
                       <span class="legend-swatch" style="background:${s.meta.color};"></span>
                       <span style="flex:1;font-weight:500;">${escHtml(s.meta.label)}</span>
-                      <span style="font-weight:700;">${s.estimated_hours}h (${s.pct}%)</span>
+                      <span style="font-weight:700;">${s.item_count} items (${s.pct}%)</span>
                     </div>
                   `).join("")}
                 </div>
               </div>
-            ` : '<p style="color:var(--text-muted);padding:16px 0;">No domain effort metrics logged yet.</p>'}
+            ` : '<p style="color:var(--text-muted);padding:16px 0;">No domain metrics logged yet.</p>'}
           </div>
 
           <div class="widget-card">
-            <div class="widget-title">Estimated vs Actual Effort Breakdown</div>
+            <div class="widget-title">Domain Completion Progress</div>
             ${domains.map(d => {
               const meta = domainMeta(d.work_domain);
-              const maxV = Math.max(1, ...domains.map(x => Number(x.estimated_hours || 0)));
-              const estW = Math.round((Number(d.estimated_hours || 0) / maxV) * 100);
+              const domItems = items.filter(x => x.work_domain === d.work_domain);
+              const domDone = domItems.filter(x => x.status === "done").length;
+              const maxV = Math.max(1, ...domains.map(x => Number(x.item_count || 0)));
+              const barW = Math.round((Number(d.item_count || 0) / maxV) * 100);
               return `
                 <div style="margin-bottom:12px;">
                   <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">
                     <span style="font-weight:600;">${escHtml(meta.label)}</span>
-                    <span style="color:var(--text-secondary);">Est ${d.estimated_hours}h / Act ${d.actual_hours}h</span>
+                    <span style="color:var(--text-secondary);">${domDone} / ${d.item_count} done</span>
                   </div>
-                  <div class="cap-bar"><div class="cap-bar-fill" style="width:${estW}%;background:${meta.color};"></div></div>
+                  <div class="cap-bar"><div class="cap-bar-fill" style="width:${barW}%;background:${meta.color};"></div></div>
                 </div>
               `;
-            }).join("") || '<p style="color:var(--text-muted);padding:16px 0;">Add tasks to analyze effort balance.</p>'}
+            }).join("") || '<p style="color:var(--text-muted);padding:16px 0;">Add tasks to analyze domain progress.</p>'}
           </div>
         </div>
 
@@ -2199,7 +2200,7 @@
               <div class="cell cell-left">Project</div>
               <div class="cell">Domain</div>
               <div class="cell">Schedule</div>
-              <div class="cell">Est / Act</div>
+              <div class="cell">Progress</div>
               <div class="cell">OneDrive Folder</div>
             </div>
             ${projRows}

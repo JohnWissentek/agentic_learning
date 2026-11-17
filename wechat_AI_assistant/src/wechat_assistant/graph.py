@@ -97,16 +97,21 @@ def format_decision_card(proposal_id: int, proposal: TriageProposal, cockpit_url
     """Format a compact high-density Chief-of-Staff HITL preview card for WeChat."""
     lines = [f"📋 **确认 #{proposal_id}｜{proposal.headline}**", proposal.executive_summary]
     if proposal.actions:
-        lines.append("\n**拟入库动作与工时排期：**")
+        lines.append("\n**拟入库动作与日程跨度：**")
         for idx, act in enumerate(proposal.actions, 1):
             span = (
                 act.planned_start_at
                 if act.planned_start_at == act.planned_end_at
                 else f"{act.planned_start_at} ~ {act.planned_end_at}"
             )
+            try:
+                span_days = max(1, (date.fromisoformat(act.planned_end_at[:10]) - date.fromisoformat(act.planned_start_at[:10])).days + 1)
+            except ValueError:
+                span_days = 1
+            hr_note = f"｜指定工时 `{act.estimated_hours}h`" if act.estimated_hours and act.estimated_hours > 0 else ""
             lines.append(
                 f"{idx}. `[{act.priority.value}][{act.list_type.value}]` **{act.project_name}**（{act.work_domain.value}）："
-                f"{act.title}｜周期 `{span}`｜净工时 **`{act.estimated_hours}h`**"
+                f"{act.title}｜周期 `{span}`（{span_days}天）{hr_note}"
             )
     if proposal.overload_warning:
         lines.append(f"\n⚠️ **负荷提醒**：{proposal.overload_warning}")
@@ -299,8 +304,11 @@ class ChiefOfStaffEngine:
         self._record_latest_call(rec)
 
         effective_intent = route.intent
+        explicit_search_req = bool(
+            re.search(r"(?:查一下|上网查|联网查|联网搜|搜一下|帮我查|查一查|查下)", raw_text)
+        )
         extra_updates: dict[str, Any] = {
-            "needs_deep_research": route.needs_deep_research,
+            "needs_deep_research": bool(route.needs_deep_research and explicit_search_req),
             "resolved_text": route.resolved_intent_text or raw_text,
             "search_queries": list(route.search_queries or []),
             "target_item_id": route.target_item_id,
@@ -398,10 +406,12 @@ class ChiefOfStaffEngine:
                 return {"reply_text": f"未找到待办编号 #{target_id}。", "trajectory": traj}
             if self.onedrive is not None:
                 self.onedrive.sync_all_lists(self.db)
+            span_days = item.get("actual_span_days", 1)
+            hrs_note = f"（指定实耗 {item['actual_hours']}h）" if (item.get("actual_hours") or 0) > 0 else ""
             return {
                 "reply_text": (
                     f"✅ 已标记 **#{item['id']}** 完成：`{item['title']}`\n"
-                    f"实际计入个人净工时：**`{item['actual_hours']}h`**（已同步刷新云端 `.md`）。"
+                    f"实际完成跨度：**`{span_days} 天`**{hrs_note}（已同步刷新云端 `.md`）。"
                 ),
                 "trajectory": traj,
             }
@@ -931,11 +941,14 @@ class ChiefOfStaffEngine:
             w = self.db.get_daily_workload(days=3, daily_capacity=self.settings.daily_capacity_hours)
             items = self.db.list_items(include_done=False)[:6]
             day_lines = [
-                f"- {d}: 已排 **`{v['booked_hours']}h / {v['capacity']}h`**" + (" ⚠️超载" if v["overloaded"] else "")
+                f"- {d}: 排期 **{len(v['items'])} 项**"
                 for d, v in w["days"].items()
             ]
-            item_lines = [f"- `#{it['id']}` `[{it['priority']}]` {it['title']}（{it['estimated_hours']}h）" for it in items]
-            reply = "🔥 **近3日净工时负荷**：\n" + "\n".join(day_lines) + "\n\n📌 **Top 待办**：\n" + ("\n".join(item_lines) or "- 暂无")
+            item_lines = [
+                f"- `#{it['id']}` `[{it['priority']}]` {it['title']}（{it['planned_start_at'] or '-'}~{it['planned_end_at'] or '-'}）"
+                for it in items
+            ]
+            reply = "📅 **近3日日程分布**：\n" + "\n".join(day_lines) + "\n\n📌 **Top 待办**：\n" + ("\n".join(item_lines) or "- 暂无")
             self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:workload")
             return {"reply_text": reply, "trajectory": ["shortcut:workload"]}
 
@@ -970,9 +983,11 @@ class ChiefOfStaffEngine:
                 return {"reply_text": reply, "trajectory": ["shortcut:done_not_found"]}
             if self.onedrive is not None:
                 self.onedrive.sync_all_lists(self.db)
+            span_days = item.get("actual_span_days", 1)
+            hrs_note = f"（指定实耗 {item['actual_hours']}h）" if (hrs is not None or (item.get("actual_hours") or 0) > 0) else ""
             reply = (
                 f"✅ 已标记 **#{item['id']}** 完成：`{item['title']}`\n"
-                f"实际计入个人净工时：**`{item['actual_hours']}h`**（已同步刷新云端 `.md` 与工时校准基准）。"
+                f"实际完成跨度：**`{span_days} 天`**{hrs_note}（已同步刷新云端 `.md` 与周期校准基准）。"
             )
             self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:complete_item")
             return {"reply_text": reply, "trajectory": ["shortcut:complete_item"]}

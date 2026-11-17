@@ -74,6 +74,7 @@ class Settings:
 
     mail_enabled: bool = False
     mail_user: str = "info@wissentek.com"
+    mail_allowlist: tuple[str, ...] = ("V&F", "Tera", "B&D")
     external_search_enabled: bool = False
     data_dir: str = "/opt/wechat-agent/data"
 
@@ -160,6 +161,11 @@ class Settings:
             daily_capacity_hours=float(get("DAILY_CAPACITY_HOURS", "6.0")),
             mail_enabled=_parse_bool(get("MAIL_ENABLED"), False),
             mail_user=get("MAIL_USER", "info@wissentek.com"),
+            mail_allowlist=tuple(
+                x.strip()
+                for x in get("MAIL_ALLOWLIST", "V&F,Tera,B&D").replace(";", ",").split(",")
+                if x.strip()
+            ),
             external_search_enabled=_parse_bool(get("EXTERNAL_SEARCH_ENABLED"), False),
             data_dir=get("DATA_DIR", "/opt/wechat-agent/data"),
         )

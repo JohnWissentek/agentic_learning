@@ -55,7 +55,7 @@ class ItemCreateBody(BaseModel):
     owner: str = "Chairman"
     planned_start_at: str | None = None
     planned_end_at: str | None = None
-    estimated_hours: float = Field(default=1.0, ge=0.0, le=200.0)
+    estimated_hours: float = Field(default=0.0, ge=0.0, le=200.0)
     priority: PriorityLevel = PriorityLevel.P1
 
 
@@ -156,14 +156,15 @@ async def _daily_digest_scheduler(engine: ChiefOfStaffEngine, gateway: WeComGate
                 today_info = ov["workload"]["days"].get(ov["today"], {})
                 top_todos = [i for i in ov["items"] if i["status"] != "done"][:5]
                 todo_text = "\n".join(
-                    f"- `#{i['id']}` `[{i['priority']}]` {i['title']}（{i['estimated_hours']}h）" for i in top_todos
+                    f"- `#{i['id']}` `[{i['priority']}]` {i['title']}（{i['planned_start_at'] or '-'}~{i['planned_end_at'] or '-'}）"
+                    for i in top_todos
                 ) or "- 暂无未完成待办"
                 waits = ov["waiting_items"][:3]
                 wait_text = "\n".join(f"- 等{w['owner']}：{w['title']}（已等 {w['waiting_days']} 天）" for w in waits)
                 magic_url = engine.magic_link_factory()
                 msg = (
                     f"{kind}（{ov['today']}）\n"
-                    f"🔥 今日净工时：{today_info.get('booked_hours', 0.0)}h / {ov['daily_capacity_hours']}h\n\n"
+                    f"📅 今日在途事项：{len(today_info.get('items', []))} 项 ｜ 平均完成跨度：{ov.get('avg_completion_span_days', 0)} 天\n\n"
                     f"📌 **今日优先事项**：\n{todo_text}\n"
                     + (f"\n⏳ **外部卡点**：\n{wait_text}\n" if wait_text else "")
                     + f"\n📊 点击打开驾驶舱（5 分钟直登）：{magic_url}"
