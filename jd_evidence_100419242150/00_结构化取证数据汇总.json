@@ -1,0 +1,1574 @@
+{
+  "capture_time": "2026-11-17T22:41:27.837+08:00",
+  "requested_url": "https://item.jd.com/100419242150.html?pcdk=Q1OBzQoiXkaPXnj4KOv_cQZnNcxks7z28X_bGLCCMFWANgqci3Yn6Use1cDE3k2Z.qliT.8Idm",
+  "final_url": "https://item.jd.com/100419242150.html?pcdk=Q1OBzQoiXkaPXnj4KOv_cQZnNcxks7z28X_bGLCCMFWANgqci3Yn6Use1cDE3k2Z.qliT.8Idm",
+  "page_title": "安居客【包安装】全实木桌面电动升降桌实木书桌学习桌工作台办公桌子【行情 报价 价格 评测】-京东",
+  "sku_id": "100419242150",
+  "viewport": {
+    "height": 1000,
+    "width": 1440
+  },
+  "product_title": "安居客【包安装】全实木桌面电动升降桌实木书桌学习桌工作台办公桌子",
+  "shop": {
+    "shop_name": "安居客家具京东自营旗舰店",
+    "self_operated": true,
+    "category_breadcrumb": "家具 > 桌类 > 升降桌 > 电动升降桌 > 安居客",
+    "review_count": 74,
+    "followers": "4.2万"
+  },
+  "pricing_and_promotions": {
+    "current_price": "¥2045.98",
+    "price_label": "补贴到手价",
+    "strikethrough_price": "¥2833",
+    "applied_promotions": [
+      "惊喜红包满1500减120",
+      "焕新补贴 已减¥361.06",
+      "单品立享9折"
+    ],
+    "extra_benefits": [
+      "最高返204京豆",
+      "企业会员9000元补贴，办公设备/易耗品一站式采购！"
+    ]
+  },
+  "delivery_and_service_promises": [
+    "预计11月20日前发货（送至：北京东城区交道口街道）",
+    "京东快递 / 厂商发货 / 厂商发货&京东配送",
+    "59元免基础运费 · 可配送全球 · 免费上门退换",
+    "一年质保 · 7天价保 · 破损包退换 · 供应商售后",
+    "支持7天无理由退货(安装后不支持)",
+    "居家服务选项：只换不修（6年262.00 / 5年232.00）；免费修换（6年271.00 / 4年214.00）；免费维修（6年164.00 / 5年131.00）"
+  ],
+  "key_image_claims_observed": [
+    "主图6/首屏图标注：CCTV推荐、店铺补贴立减15%、双电机 承重450斤、桌腿 正装三节、板材 30cm橡胶木（页面另写30mm加厚）、升降范围 72-117CM、质保10年 | 顺丰上门 | 破损包补",
+    "主图1标注：智能电动升降桌 Beehive仿蜂窝稳定结构、官方补贴立减15%、送货上门 | 免费安装",
+    "主图2标注：进口真实木 ENF级安全0异味、ISO亚洲品质安全认证、MA中国计量认证、CQC国际认证、CNAS国际互认检测、近0醛0异味 请放心 符合GB/T 39600-2021",
+    "主图3标注：450斤稳承泰坦刚™、30MM加厚实木、双横梁稳固加粗、50mm立柱加粗、80mm加宽地脚",
+    "主图4标注：0扰静隐级驱动 45db运行低噪 42dB安居客3.0升降桌",
+    "详情末尾标注：名称：实木升降桌 / 材质：进口AAA级橡胶木 / 包装：整装发货 / 适用：家用/商用"
+  ],
+  "sku_variants": {
+    "series": [
+      {
+        "text": "【全网热销100W+】全实木升降桌",
+        "selected": false
+      },
+      {
+        "text": "【30mm加厚】电动升降桌",
+        "selected": true
+      },
+      {
+        "text": "【弧线桌面】电动升降桌",
+        "selected": false
+      },
+      {
+        "text": "【L型加宽】电动升降桌",
+        "selected": false
+      },
+      {
+        "text": "【升降桌腿】无桌板",
+        "selected": false
+      },
+      {
+        "text": "【性价比首选】实木桌",
+        "selected": false
+      }
+    ],
+    "colors": [
+      {
+        "outOfStock": true,
+        "selected": false,
+        "text": "【专属定制】默认7天发货无货"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】白色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】黑胡桃色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】橡木色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】原木色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】白色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】黑胡桃色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】橡木色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】原木色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】白色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】黑胡桃色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】橡木色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排款】原木色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】白色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】黑胡桃色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】橡木色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】原木色【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】白色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】黑胡桃色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】橡木色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】原木色【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": true,
+        "text": "【无插排】白色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】黑胡桃色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】橡木色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【无插排】原木色【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【单抽屉】颜色备注【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【单抽屉】颜色备注【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【单抽屉】颜色备注【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【双抽屉】颜色备注【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【双抽屉】颜色备注【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【双抽屉】颜色备注【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排单抽屉】颜色备注【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排单抽屉】颜色备注【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排单抽屉】颜色备注【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排双抽屉】颜色备注【2节升降单电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排双抽屉】颜色备注【2节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【插排双抽屉】颜色备注【3节升降双电机】"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "【专属定制】默认14天发货"
+      }
+    ],
+    "sizes": [
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "100x60x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "120x60x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "120x70x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "140x60x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "140x70x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "160x60x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": false,
+        "text": "160x70x75cm"
+      },
+      {
+        "outOfStock": false,
+        "selected": true,
+        "text": "180x70x75cm"
+      }
+    ]
+  },
+  "intro_parameters": [
+    {
+      "key": "桌面材质",
+      "value": "橡胶木（商品详情底部另标注：材质：进口AAA级橡胶木）"
+    },
+    {
+      "key": "控制方式",
+      "value": "按键式"
+    },
+    {
+      "key": "桌面可调角度",
+      "value": "不可调节"
+    },
+    {
+      "key": "附加组件",
+      "value": "带杯架 带集线孔 带抽屉"
+    },
+    {
+      "key": "是否可定制",
+      "value": "可定制"
+    },
+    {
+      "key": "品牌",
+      "value": "安居客"
+    },
+    {
+      "key": "商品编号",
+      "value": "100419242150"
+    },
+    {
+      "key": "货号",
+      "value": "df-bzmdmz164"
+    },
+    {
+      "key": "桌腿节数",
+      "value": "三节腿"
+    },
+    {
+      "key": "桌面形状",
+      "value": "一字型"
+    },
+    {
+      "key": "类别",
+      "value": "落地升降桌"
+    },
+    {
+      "key": "电机数量",
+      "value": "双电机"
+    },
+    {
+      "key": "包装清单",
+      "value": "升降桌*1个"
+    }
+  ],
+  "after_sales_full_text": "售后保障\n厂家服务本商品质保期周期1年质保，在此时间范围内可提交维修申请，具体请以厂家服务为准。\n京东承诺\n京东平台卖家销售并发货的商品，由平台卖家提供发票和相应的售后服务。请您放心购买！\n注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！\n正品行货京东商城向您保证所售商品均为正品行货，京东自营商品开具机打发票或电子发票。无忧退货\n客户购买京东自营商品7日内（含7日，自客户收到商品之日起计算），在保证商品完好的前提下，可无理由退货。（部分商品除外，详情请见各商品细则）\n权利声明：\n京东上的所有商品信息、客户评价、商品咨询、网友讨论等内容，是京东重要的经营资源，未经许可，禁止非法转载使用。\n注：本站商品信息均来自于合作方，其真实性、准确性和合法性由信息拥有者（合作方）负责。本站不提供任何保证，并不承担任何法律责任。\n预估到手价/到手价：是在商品标价基础上减去各种折扣、可用优惠政策叠加金额之后的一种预估的价格，计算公式示例：预估到手价=商品标价-优惠券-满减（或折扣）-新客优惠（如有）-商家会员优惠（如有），用户在进入结算页面之后，根据满足条件可享的活动（如所购商品超出商品促销价限购数量）、优惠券组合，可能导致最终到手价与显示预估到手价有差异和变化，并且不同用户可能因为可以享受的优惠不同（造成这种不同的原因包括是否属于新客或商家会员，可用优惠券差异、购买多件商品而满减活动仅支持享受1次等）而导致最终到手价不同，并且可能出现未登录和登录状态下的到手价差异。\n京东价：京东价为商品的销售价，是您最终决定是否购买商品的依据。\n划线价：商品展示的划横线价格为参考价，并非原价，该价格可能是品牌专柜标价、商品吊牌价或由品牌供应商提供的正品零售价（如厂商指导价、建议零售价等）或其他真实有依据的价格；由于地区、时间的差异性和市场行情波动，品牌专柜标价、商品吊牌价等可能会与您购物时展示的不一致，该价格仅供您参考。\n折扣：如无特殊说明，折扣指销售商在原价、或划线价（如品牌专柜标价、商品吊牌价、厂商指导价、厂商建议零售价）等某一价格基础上计算出的优惠比例或优惠金额；如有疑问，您可在购买前联系销售商进行咨询。\n异常问题：商品促销信息以商品详情页“促销”栏中的信息为准；商品的具体售价以订单结算页价格为准；如您发现活动商品售价或促销信息有异常，建议购买前先联系销售商咨询。\n已减¥361.06\n安居客【包安装】全实木桌面电动升降桌实木书桌学习桌工作台办公桌子收藏\n¥2045.98补贴到手价\n¥2833\n累计评价 74降价通知\n已享受：\n惊喜红包满1500减120\n焕新补贴已减¥361.06\n单品立享9折\n可再享：\n最高返204京豆\n企业会员9000元补贴，办公设备/易耗品一站式采购！\n开启桌面提醒，优惠及时知道\n送至\n预计11月20日前发货\n北京东城区交道口街道\n京东快递\n厂商发货\n数量\n-+\n数量编辑器已移至此处\n系列品\n【全网热销100W+】全实木升降桌\n【30mm加厚】电动升降桌\n【弧线桌面】电动升降桌\n【L型加宽】电动升降桌\n【升降桌腿】无桌板\n【性价比首选】实木桌\n颜色\n【专属定制】默认7天发货无货\n【插排款】白色【3节升降双电机】\n【插排款】黑胡桃色【3节升降双电机】\n【插排款】橡木色【3节升降双电机】\n【插排款】原木色【3节升降双电机】\n【插排款】白色【2节升降双电机】\n【插排款】黑胡桃色【2节升降双电机】\n【插排款】橡木色【2节升降双电机】\n【插排款】原木色【2节升降双电机】\n【插排款】白色【2节升降单电机】\n【插排款】黑胡桃色【2节升降单电机】\n【插排款】橡木色【2节升降单电机】\n【插排款】原木色【2节升降单电机】\n【无插排】白色【2节升降单电机】\n【无插排】黑胡桃色【2节升降单电机】\n【无插排】橡木色【2节升降单电机】\n【无插排】原木色【2节升降单电机】\n【无插排】白色【2节升降双电机】\n【无插排】黑胡桃色【2节升降双电机】\n【无插排】橡木色【2节升降双电机】\n【无插排】原木色【2节升降双电机】\n【无插排】白色【3节升降双电机】\n【无插排】黑胡桃色【3节升降双电机】\n【无插排】橡木色【3节升降双电机】\n【无插排】原木色【3节升降双电机】\n【单抽屉】颜色备注【2节升降单电机】\n【单抽屉】颜色备注【2节升降双电机】\n【单抽屉】颜色备注【3节升降双电机】\n【双抽屉】颜色备注【2节升降单电机】\n【双抽屉】颜色备注【2节升降双电机】\n【双抽屉】颜色备注【3节升降双电机】\n【插排单抽屉】颜色备注【2节升降单电机】\n【插排单抽屉】颜色备注【2节升降双电机】\n【插排单抽屉】颜色备注【3节升降双电机】\n【插排双抽屉】颜色备注【2节升降单电机】\n【插排双抽屉】颜色备注【2节升降双电机】\n【插排双抽屉】颜色备注【3节升降双电机】\n【专属定制】默认14天发货\n尺寸\n100x60x75cm\n120x60x75cm\n120x70x75cm\n140x60x75cm\n140x70x75cm\n160x60x75cm\n160x70x75cm\n180x70x75cm\n服务\n59元免基础运费\n·\n可配送全球\n·\n免费上门退换\n一年质保\n·\n7天价保\n·\n破损包退换\n·\n供应商售后\n厂商发货&京东配送\n支持7天无理由退货(安装后不支持)\n居家服务\n只换不修\n6年全保换新262.00\n5年全保换新232.00\n免费修换\n6年免费修换271.00\n4年免费修换214.00\n免费维修\n6年上门维修164.00\n5年上门维修131.00\n白条分期\n不分期\n0服务费\n￥692.23 x 3期\n含服务费：￥10.23/期\n展开全部\n管家询价\n企业采购找管家，议价更优惠\n加入购物车\n立即购买\n",
+  "reviews_summary_text": "买家评价(74)\n好评率高达100%\n升降丝滑\n 3\n无异味\n 4\n桌面宽敞厚实\n 4\n放置稳固\n 3\n操作超方便\n 2\n适合久坐族\n 1\n支持升降\n 2\n颜值超能打\n 1\n尺寸正合适\n 1\n采用实木材质\n 3\n配色超赞\n 1\n电机性能好\n 1\nj***E\n桌子味道特别大，商家让通风两三天再用，谁买家具还自己通风两三天吗？ 不能理解，完全不能理解。环保检测报告顶多也是抽检，也不会是每个都检测。没道理，极其没道理。\nj***e\n给阳台区域安排了电动书桌，商家包安装，很方便，电子屏可按身高随意调节高度，实木桌面也没有任何异味，内嵌插座，杯架和耳机架都很方便\nj***a\n升降桌用了一段时间来评价的，确实太方便了，也很稳，桌板很厚实，我家猫天天往上蹦都不晃的，调整高度也方便\n小***走\n买的升降桌到了！白色的升降桌加上白色的洞洞板，简直太搭配了！桌子的质量很好，材质很厚实，感觉得出来是非常好的实木！！桌子基本没有任何异味，升降也很丝滑！太赞了！！\n全部评价\n问大家\n我要提问\n",
+  "main_image_urls": [
+    "https://img10.360buyimg.com/pcpubliccms/s1440x1440_jfs/t1/527283/39/365/323047/6aa376dcFc599b73f/00835a0780ea8982.jpg.avif",
+    "https://img10.360buyimg.com/pcpubliccms/s1440x1440_jfs/t1/525106/19/2602/319338/6aa375a1F2649b29b/00835a0780cf5f9d.jpg.avif",
+    "https://img10.360buyimg.com/pcpubliccms/s1440x1440_jfs/t1/523933/19/4100/442623/6aa375a0F97657903/00835a0780c60595.jpg.avif",
+    "https://img10.360buyimg.com/pcpubliccms/s1440x1440_jfs/t1/516678/32/9653/499925/6aa3759fF38f9d1dc/00835a0780bc4b61.jpg.avif",
+    "https://img10.360buyimg.com/pcpubliccms/s1440x1440_jfs/t1/523118/10/3944/351948/6aa3759eFa47ffa07/00835a07803ee491.jpg.avif",
+    "https://img10.360buyimg.com/pcpubliccms/s1440x1440_jfs/t1/523340/17/4253/189985/6aa3a070F7efd0f0b/00832ee3e8f60630.jpg.avif"
+  ],
+  "detail_resource_urls": [
+    "https://img12.360buyimg.com/img/jfs/t1/109080/21/58367/14698/675171baFb8b7a6d2/22ad515c81c73261.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/261254/24/4000/566/676e4bc1F503ba8a9/6d1a84d14e57f629.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/260409/1/4004/517/676e4b5aF4164c995/296d825f3f929a6a.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/268159/30/3998/538/676e66fcF50d57130/aa1646e03da3be5b.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/254955/16/4963/530/676e670fF0f862f1b/970f561bf58c4294.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/256984/14/11782/626/6785399aF817f840c/aab7c4fe5017e887.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/4358/34/22297/903/66bb2547F9d8acb14/b41c19cd8c82d876.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/157697/25/42621/954/66ea4c4dF44d0a62e/5f46ec36ec51d63c.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/351069/6/778/484/68be4527F22702fb5/9a5102637a712a67.png",
+    "https://img20.360buyimg.com/img/jfs/t1/299307/38/16605/490/685157eaF86ffc9a8/47e8beb09ad5eea1.png",
+    "https://img12.360buyimg.com/img/jfs/t1/299730/37/16572/452/68527a8cFb8beb73d/7a37e9d5e6b1055d.png",
+    "https://img10.360buyimg.com/ling/jfs/t1/310140/30/10063/1273/68512a5aF92f328a6/b7bad48fb6ee628a.png",
+    "https://img30.360buyimg.com/img/jfs/t1/231776/26/38640/242/6762695cF79821173/de549d472077814b.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/280097/13/27730/6017/680f5fc5F0f01e7cf/034e76522d61e5eb.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/23752/11/23175/6037/66b9c83dF27f335b9/1edb237359368521.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/266497/29/13108/630/678a184aFb9512db9/b1a22c498eb9245e.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/254761/37/15883/836/6790bac6Fd55fb496/663dff44fb9ed4d9.png",
+    "https://img14.360buyimg.com/img/jfs/t1/236315/17/29083/617/6792f315F7c555fc0/04261e0f90425037.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/254484/40/15534/705/6790bad2F44d07591/66b63b115f3b4a08.png",
+    "https://img12.360buyimg.com/img/jfs/t1/316958/17/24581/2148/689b1eddF791393f6/f35ac19742376492.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/377922/3/22794/867/6960b6c3F9279bfa9/03e60320323f151a.png",
+    "https://img30.360buyimg.com/img/jfs/t1/420236/26/21779/1604/69eb6e7fF21e1490b/02761d40a1028bc7.png",
+    "https://img12.360buyimg.com/img/jfs/t1/435238/20/6709/38583/6a056d3bF643b47da/02763821e092dd9e.png",
+    "https://img10.360buyimg.com/img/jfs/t1/429211/3/16091/4519/6a0578b4Fbd5432d8/0276398120b8d7c7.png",
+    "https://img10.360buyimg.com/img/jfs/t1/535362/12/4152/100/6aba57c1Fc22227cf/0276001065c0b17c.png",
+    "https://img10.360buyimg.com/img/jfs/t1/486738/38/5381/439/6a67044cFe39e90a4/027602001e59e469.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/487043/39/8730/4364/6a6c10feFb8c11e4e/03e6063063cba91c.png",
+    "https://img12.360buyimg.com/img/jfs/t1/497807/1/2562/341/6a719f1dF809ab685/02760200200aa9a5.png",
+    "https://img11.360buyimg.com/img/jfs/t1/501959/31/78/649/6a742757Fc94779ce/0276024024846ce4.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/267024/38/25525/7524/004eb201Fed43e0c7/70b85b3f142e42e1.gif",
+    "https://img13.360buyimg.com/img/jfs/t1/280332/12/4763/426/67da6ee9Fbe57d48f/80e0dd2e62cd157b.webp",
+    "https://img13.360buyimg.com/img/jfs/t1/330964/5/12671/523/68c4d86cFfc1bea8a/5e52bf6186bba9db.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/217403/22/44880/1174/670e0640F3236a0eb/a277335c97c54895.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/365047/35/8821/2485/692c46ffF1e7c3e13/c2610f854cd07465.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/264521/10/14668/488/6790f80cF20e9e146/07e6123c15c59d33.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/258695/37/14778/677/6790ecf2Fd68f9ba4/6bab2238d061a650.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/259360/29/14690/614/6790ecedF52e86c8e/4e94a8290a59443a.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/302010/31/25201/1205/68ff1bdaF89d88587/7edca9c66fcb526d.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/332700/32/26261/1161/68f87bcfF60167482/c6cb6016424fc171.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/262475/9/6040/21051/6773bf59F2529ff03/823d9a08ed2eb127.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/259181/16/14667/489/6790bd3aF60de783b/8ed74ff7b6ef4ed6.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/337904/11/6722/1881/68b948a6Fda055250/d73f3a67f1d3aeed.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/256217/21/11772/764/67820d15F6f744ce2/1c142ba9d43c7b7b.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/89221/9/33267/215/65815dedFc83097a3/fd9113b2cde2a758.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/268329/4/5140/307/67713025F1b4d312d/d607de0c281b0358.png",
+    "https://storage.jd.com/retail-mall/item2025-3/pc/unite/3.0.6-prod1027/components/default-soa/detail/i/quality-life.png",
+    "https://storage.jd.com/retail-mall/item2025-3/pc/unite/3.0.6-prod1027/components/default-soa/book/i/item.sprite.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/264309/16/8775/261/677b7baeF34afad1e/6590a37f7ad68def.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/231810/20/30193/1703/67ab458aFd04dc3a9/1d732249ce5875f7.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/250402/27/23471/597/6790b788F62dd9df6/45eb396738e4625a.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/301348/40/20430/108/686cc69fF6789ef61/5731666671e3290b.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/310689/30/13698/696/6864f3adF7a4db95f/3f2a11a1dcd36130.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/304461/10/16598/107/686cc35eFccf79638/35e1b504002562e6.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/233565/40/33982/984/6864e84dFd6680ffe/e5a123a12a6e671a.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/410414/40/13221/332/69ca7f93F19c0431b/03e6030018ba597a.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/413893/20/3096/1056/69ce1697Ffa263f8b/03e604804888b9dc.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/407826/5/15810/1042/69ce1697F88aaafb7/03e60480480e433e.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/410820/4/15734/2164/69cddf76Faa23a820/03e60480487d61b1.png",
+    "https://storage.jd.com/retail-mall/item2025-3/pc/unite/3.0.30-prod1220/components/default-soa/prom/i/__sprite.png",
+    "https://img10.360buyimg.com/img/jfs/t1/298459/11/27277/874/68873697F88962374/ef0f846111868d5d.png",
+    "https://img11.360buyimg.com/img/jfs/t1/296986/30/25378/910/6880dcfdFd720784b/ebc753671e19e9e5.png",
+    "https://storage.jd.com/retail-mall/item2025-3/pc/unite/3.0.44-prod0114/components/default-soa/prom/i/icon-newcomer.png",
+    "https://storage.jd.com/retail-mall/item2025-3/pc/unite/3.0.44-prod0114/components/default-soa/prom/i/enterprise.png",
+    "https://img12.360buyimg.com/imagetools/jfs/t1/266539/18/14151/476/678f5c60F3358f69f/ce4c94df51709093.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/358613/23/7078/730/69133195Fc2360bb1/d443f9af229a6ab9.png",
+    "https://storage.jd.com/retail-mall/item2025/pc/unite/1.1.42-prod1027/components/default-soa/custom/i/left-img.png",
+    "https://storage.jd.com/retail-mall/item2025/pc/unite/1.1.42-prod1027/components/default-soa/custom/i/right-img.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/362770/16/1601/227/6911957aF253fcd79/86e6247aa324f2bb.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/346747/27/25709/255/691195b6F7470abf4/cf7365ef7c67dd3c.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/250213/21/33904/454/6782705eFa70ba5a6/06bfe5ac3f82f2c6.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/276452/7/17223/329/67f37bd2F5d6b429e/cb4f837e6c161ee5.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/253639/6/4849/689/676d54e9Fb62dabdb/40c829a236acc4a0.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/257871/30/8557/350/677b6c0eFb8a553c0/3d16f1c8c7ec2fa4.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/355751/10/6513/3925/69114ce4F51846703/846e264ff3cb7c23.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/350366/8/24572/9575/69114d80Fbbc77a59/8f175058593fab20.png",
+    "https://img11.360buyimg.com/img/jfs/t1/417007/30/14001/304/69de371fF4e96e653/0276015015e30083.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/267374/32/19324/339/67adbcfaF4f49767c/f54cb4c7c6590b71.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/361075/15/511/9359/690eba2aF376f1f54/d33d461cfa653180.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/334899/32/12600/92299/68c4cd3aF974a7997/4d26213ec514539f.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/244647/29/21353/117337/6710cbb9Fd7fefbb9/e97990d9cdf57d51.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/109976/17/53465/121744/6710cb76F6d21941a/59c2c7258edb7d2d.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/98844/3/49620/9159/670d0be7F1d58eda1/05febf23e2e51b56.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/316711/14/14208/80341/686b3c02F3f12f48b/e32685d351ad85d5.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/254367/13/20406/194/67ade575Fdcd6aa1b/4d3f1e82fb1dc951.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/254016/37/15018/743/678f9ab5F71c1ea4f/fbf96b28d926b9ef.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/265713/6/12921/978/678a4853Fb877b897/479338c16704e1f8.png",
+    "https://img11.360buyimg.com/imagetools/jfs/t1/255243/36/9549/283/677bc49eF9de957f3/7a4a9cdd695c1113.png",
+    "https://storage.jd.com/retail-mall/item2025-3/pc/unite/3.0.24-prod1204/components/default-soa/custom/i/i-drop-down.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/255898/37/13478/762/678a4853F37d10aa5/3467e3bf704b3340.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/303190/2/12005/2457/683fb7a9Fc140e6c1/40acff7364cdd1c5.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/292863/1/11199/1210/683fb79dF186b0eac/f0ac427a1f2aa635.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/304182/2/7700/881/683fb795Fabfbbcab/31e0562d364a879e.png",
+    "https://img13.360buyimg.com/imagetools/jfs/t1/270202/29/11544/184/683ec2c8F0c41e641/d2a20e90de466ceb.png",
+    "https://img10.360buyimg.com/img/jfs/t1/345215/12/2218/913/68c26ee9Fa92ef150/fddf6ca2daf7b911.png",
+    "https://img30.360buyimg.com/img/jfs/t1/330667/19/11889/707/68c27059F2bc97cb7/8482279e558aa1c9.png",
+    "https://img12.360buyimg.com/img/jfs/t1/346017/11/4113/648/68ca1f09F0b92ff85/aedc324e731719a4.png",
+    "https://img10.360buyimg.com/img/jfs/t1/105931/8/48702/549/68ca222eFa55ac70e/79da917f3d19847d.png",
+    "https://img14.360buyimg.com/img/jfs/t1/287773/37/22237/631/68ca2204Fe8cdf7d9/d33a065cfe22bf65.png",
+    "https://img14.360buyimg.com/imagetools/jfs/t1/420889/4/2377/512/69df3f43F43bd95eb/03e601e0108dfee1.png",
+    "https://img10.360buyimg.com/img/jfs/t1/471135/21/10131/186/6a4b6a4eFdf7e73ae/027600e00ed95ad2.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/412232/7/4651/3436/69cb5e21Fd4f3edb8/03e606c10843ba37.png",
+    "https://img10.360buyimg.com/imagetools/jfs/t1/412930/28/5946/682/69cccd95F6faf4964/03e602402486cf10.png",
+    "https://img30.360buyimg.com/sku/jfs/t1/522152/3/4635/262170/6aa39b31F07f2b035/00d64b070c39e79e.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/515539/7/10463/75442/6aa39b3cF38074c3e/00d64b02a19cfbbe.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/513090/28/12894/283820/6aa39a90F8f6cddc0/00d64b07c5333aaf.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/524379/9/2922/287404/6aa39a90F0ce8fc37/00d64b065274b134.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/514373/28/13878/108742/6aa39a8dFbdffcccc/00d64b05d7369d20.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/521083/8/5705/125900/6aa39a8cF90fd3d71/00d64b06912585ed.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/512094/38/12574/205718/6aa39b63F1d75a725/00d64b07e9ebc846.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/525825/1/1956/107638/6aa39b72F24f9aac8/00d64b0601c8faa6.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/511816/7/13976/364940/6aa39a90F6aaa689c/00d64b08bc106ea7.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/524304/29/3238/296401/6aa39a90Fefad4d6a/00d64b06da6d9f72.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/519506/25/7169/167516/6aa39a8eF6cc383fc/00d64b07ee1b5dc2.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/526079/23/1344/384818/6aa39a90F5dd1884b/00d64b08718ddcc7.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/510386/32/15178/13217/6aa39a8aF7c2437cf/00d64b01b40de6cf.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/523457/34/3850/2048438/0050e301F19b4db69/00d631614b75afd2.gif",
+    "https://img30.360buyimg.com/sku/jfs/t1/521454/21/5089/35587/6aa39a8aF59f03906/00d64b024aa8a958.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/516915/22/8598/25091/6aa39a8aF39fd73ba/00d64b0182b88e2d.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/522420/33/4400/118755/6aa39a8bFaa32d0a3/00d64b04560c7492.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/510512/22/14665/262148/6aa39a8fF0a495d41/00d64b068ceec8e7.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/519277/34/8881/115487/6aa39a8bFc62e35ab/00d64b0621fe9e83.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/523861/38/3260/55860/6aa39a8bF6fbe46df/00d64b054a52ef52.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/523532/5/3700/232960/6aa39a90F3be75781/00d64b077d5b6fdc.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/514549/26/9814/150858/6aa39a8dF84c09384/00d64b070381640c.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/513104/3/12742/388998/6aa39a91F512528c0/00d64b089802072b.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/520054/10/6213/26713/6aa39a8aF74bad9fa/00d64b018afe6fd7.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/513122/33/11859/1900491/0050e301Faedd2bff/00d64b064279f593.gif",
+    "https://img30.360buyimg.com/sku/jfs/t1/518998/2/9255/33550/6aa39a8bFc3a2f235/00d64b03d82bfb6f.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/523574/35/3491/207805/6aa39a90Fdbc2ca1c/00d64b07c61f0312.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/523966/9/3182/134532/6aa39a8eFc56b1994/00d64b080ca5c5e5.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/518804/13/7998/342964/6aa39a90F6ca0dfd5/00d64b0878812f3f.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/512067/35/13788/277126/6aa39a8fF7de2b5d6/00d64b0698a6de9c.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/522515/11/4602/73214/6aa39a8bF29cab9a9/00d64b03ae2cbdac.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/497214/8/10036/219877/6aa39a8fF558b58cd/00d64b08531bb05a.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/515827/8/10408/24033/6aa39a8aFf1fc3c6d/00d64b018a3fa634.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/516531/33/9182/224328/6aa39a8fF07a09c78/00d64b07bdd4495e.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/515100/19/9977/172831/6aa39a8fF2a4a4c2d/00d64b08df90c6ae.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/522176/4/5716/50904/6aa39a8bFdab47695/00d64b0701ced365.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/510215/22/13401/75630/6aa39a8bFb735ebf4/00d64b056372bc79.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/521484/37/4518/106248/6aa39a8dF4f58e91b/00d64b066d58016d.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/511164/12/12175/65902/6aa39a8bFbaa5af4e/00d64b076ce5a5f3.jpg.avif",
+    "https://img30.360buyimg.com/sku/jfs/t1/527026/38/532/61715/6aa39a8bF1d832c06/00d64b03548e933d.jpg.avif"
+  ],
+  "detail_inline_base64_count": 47,
+  "evidence_files_before_summary": [
+    {
+      "filename": "01_商品首屏与价格主图_01_全景首屏.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/01_商品首屏与价格主图_01_全景首屏.png",
+      "label": "首屏全景（1440x1000双栏全貌：标题/价格/优惠/主图/店铺）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 460444,
+      "sha256": "0afa17542d7b2c90fb1cbb7df55a3790763b979eac37fe12d2ae476c75cadd84",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "01_商品首屏与价格主图_02_窄屏高清首屏.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/01_商品首屏与价格主图_02_窄屏高清首屏.png",
+      "label": "首屏高清视图（含店铺头图与价格区）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 597030,
+      "sha256": "e1b52952e429ce7015580a273b9b94f84be318d3541a0de367d213d055c78794",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "01_商品首屏与价格主图_03_首屏复位确认.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/01_商品首屏与价格主图_03_首屏复位确认.png",
+      "label": "收尾复位首屏确认图（验证页面URL及状态未跳转）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 576768,
+      "sha256": "058be97b98c477b929381413292d65dccc9ea738d4eaff5ba35cf6877d49ac5a",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_01_主图1.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_01_主图1.png",
+      "label": "商品静态主图轮播第 1/6 张（展示外观与核心宣传文案）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 501945,
+      "sha256": "0f2c9bbdc0b694ab7fbd333c9582b417c3d1a7097a9ccce5603b657baaab4c49",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_02_主图2.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_02_主图2.png",
+      "label": "商品静态主图轮播第 2/6 张（展示外观与核心宣传文案）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 501273,
+      "sha256": "6f35234b512af47853757909c13580d247eae4d1aa43bd5ae36f520d469845a9",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_03_主图3.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_03_主图3.png",
+      "label": "商品静态主图轮播第 3/6 张（展示外观与核心宣传文案）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 498948,
+      "sha256": "c3a2ff7cb356e0344a6a1d1eab914b14115121a135448a50cbcbfff9f66b60d2",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_04_主图4.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_04_主图4.png",
+      "label": "商品静态主图轮播第 4/6 张（展示外观与核心宣传文案）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 516880,
+      "sha256": "d899d689aa221885b6e6392b3817f208de642cdf43f9a8b4917e630709a3779c",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_05_主图5.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_05_主图5.png",
+      "label": "商品静态主图轮播第 5/6 张（展示外观与核心宣传文案）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 431258,
+      "sha256": "110079e43e89d6cb99a7723f1e9fd00da1849247069ad848618660f8d315def8",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_06_主图6.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_06_主图6.png",
+      "label": "商品静态主图轮播第 6/6 张（展示外观与核心宣传文案）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 471438,
+      "sha256": "4a9b47fee8407efa82b9b8f5d173622dce495bec3b04b700fd9ee71c901b6a5d",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_07_SKU选项中段.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_07_SKU选项中段.png",
+      "label": "商品系列品与颜色配置SKU选项区（中段）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 479060,
+      "sha256": "27fde0584f96bbb7da7a165ed88be308e28b56cbba9202725d860c2d5d1a2cf0",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_商品主图与SKU规格_08_SKU选项与服务下段.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/02_商品主图与SKU规格_08_SKU选项与服务下段.png",
+      "label": "商品尺寸选项、配送服务承诺及居家延保服务区（下段）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 473989,
+      "sha256": "cd7bb091737e3807b41089baf94538f5a7fe2a7581eac877e29dea68f02c1225",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "03_店铺及经营主体信息.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/03_店铺及经营主体信息.png",
+      "label": "店铺主体信息模块（安居客家具京东自营旗舰店 / 评价数 / 关注数）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 215706,
+      "sha256": "9fe16db8523b02d4d94ee3a4cb4c845219a582a70fcf20c9c348e17d8180d1e0",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_01.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_01.png",
+      "label": "商品介绍与详情分段截图 第 01/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 284336,
+      "sha256": "47fbcc1ec9e439f10a62ddcfc70c7df9e6d5318b4f860b20de97b155918329dd",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_02.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_02.png",
+      "label": "商品介绍与详情分段截图 第 02/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 755100,
+      "sha256": "f8353e7c8174cd8f93c36b6cc168176ec73672811e9bee087656ec295f10bc99",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_03.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_03.png",
+      "label": "商品介绍与详情分段截图 第 03/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 456749,
+      "sha256": "9e31c8f52df73fc3b0d0e2149719c066b638650f4ef2d1c71342bbee2d6e6d98",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_04.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_04.png",
+      "label": "商品介绍与详情分段截图 第 04/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 475144,
+      "sha256": "48d00aad00a50cffb36b4c84f0ac19f9cf6d2b2a86ce925961f09c3f8bf3b621",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_05.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_05.png",
+      "label": "商品介绍与详情分段截图 第 05/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 501172,
+      "sha256": "8fe331801621b10bb5e53aef6ee66c6eb93c9bf3696a899d359ffde0edd82dbf",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_06.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_06.png",
+      "label": "商品介绍与详情分段截图 第 06/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 394773,
+      "sha256": "547c0e83fcbcb86760901663fdc06ed28e498079803e8ff32431b6f53055a8dc",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_07.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_07.png",
+      "label": "商品介绍与详情分段截图 第 07/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 355524,
+      "sha256": "703c4a3ce6d4efee5a1d5f691bf0830d45a9971ecd64e453d11c33d629cba8a6",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_08.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_08.png",
+      "label": "商品介绍与详情分段截图 第 08/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 282726,
+      "sha256": "47fdafb31d713f61eda29da789df5673d18510eee18afbda185225358f7aed63",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_09.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_09.png",
+      "label": "商品介绍与详情分段截图 第 09/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 329677,
+      "sha256": "332b568e7c889aa60dcf2a426756f34f9be73a1950bab1df782aa82692f36fd9",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_10.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_10.png",
+      "label": "商品介绍与详情分段截图 第 10/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 375943,
+      "sha256": "3c1379b14c2ebd338687f2a43545a62d67ef1963b0d3c7fed1580345df147106",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_11.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_11.png",
+      "label": "商品介绍与详情分段截图 第 11/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 399462,
+      "sha256": "bb2d06a02fc10699f7ae86f0c6045043040cf7b9891ad561d85ddff59faf8179",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_12.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_12.png",
+      "label": "商品介绍与详情分段截图 第 12/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 722871,
+      "sha256": "a31818cc4f0f6ed5ac49fe24952d5a729204b67f7d0797d1dc0c0dd84858ffec",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_13.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_13.png",
+      "label": "商品介绍与详情分段截图 第 13/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 536604,
+      "sha256": "1476414271bac10a4b70032957c97a19f24b6c587f8e3a66042625d16fb5b13a",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_14.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_14.png",
+      "label": "商品介绍与详情分段截图 第 14/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 545160,
+      "sha256": "48a624bf34d26dba455e1d1c4c06d31a8a46e4c4f7c43065179d88bc269272b7",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_15.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_15.png",
+      "label": "商品介绍与详情分段截图 第 15/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 440161,
+      "sha256": "ee7f51906f4caa891933ca8d68a932fb647e2c57b5bd0724a82d26122fba3339",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_16.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_16.png",
+      "label": "商品介绍与详情分段截图 第 16/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 603582,
+      "sha256": "82bfbda9d6860728e344f8b135cef56c4263810f2b43dd74077c4bb16074dff2",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_17.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_17.png",
+      "label": "商品介绍与详情分段截图 第 17/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 620308,
+      "sha256": "96b5753d8c51a7c17ca83251b7032f8042efc65f8832fda1fcceb0481667c540",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_18.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_18.png",
+      "label": "商品介绍与详情分段截图 第 18/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 275272,
+      "sha256": "ce614cbbd6362a131341c839b63985c6a6e0715626eadc8ef479ea71155afc00",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_19.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_19.png",
+      "label": "商品介绍与详情分段截图 第 19/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 452543,
+      "sha256": "c49c494dfdc6645514cf407611f7d48ae734f70b52dfdc608c5f99705fed81d2",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_20.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_20.png",
+      "label": "商品介绍与详情分段截图 第 20/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 633165,
+      "sha256": "efbe0dbccdb59d0826d3af059488a82e67849572fab31e61666eb1be93853c3b",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_21.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_21.png",
+      "label": "商品介绍与详情分段截图 第 21/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 353435,
+      "sha256": "c59b396e237a470652813e481ba2f504deaa973d91a13573c518e95997f1e188",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_22.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_22.png",
+      "label": "商品介绍与详情分段截图 第 22/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 347320,
+      "sha256": "0574c160262bbf3baf6340a091bc33be1889e97fc5dcdbf5e2ff5abc794243a5",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_23.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_23.png",
+      "label": "商品介绍与详情分段截图 第 23/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 377286,
+      "sha256": "60a609df0619ff4f7dce44b721c64504b50e705ffcc275fc7dcb17a67454f673",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_24.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_24.png",
+      "label": "商品介绍与详情分段截图 第 24/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 829662,
+      "sha256": "71b66e38d9bd353c8a941e4fe9a67e73da2da4cc3adf6a226da95bd9c4d8c987",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_25.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_25.png",
+      "label": "商品介绍与详情分段截图 第 25/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 352132,
+      "sha256": "cf9e0e845c0bbfe20d2635313e1eb1779f071f94b4d334fdeeaf1ee867eda0fd",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_26.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_26.png",
+      "label": "商品介绍与详情分段截图 第 26/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 432041,
+      "sha256": "3774b16f9b0c46a5bbb7c8893930fbdfc30afcf208c783541ca0af1f37477113",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_27.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_27.png",
+      "label": "商品介绍与详情分段截图 第 27/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 833893,
+      "sha256": "b89db61379fb84bb8d74442c57a6e20c496cef1f2a764887806034ae5e16d137",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_28.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_28.png",
+      "label": "商品介绍与详情分段截图 第 28/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 642813,
+      "sha256": "46ca602ef33281a64684238f152923280e65578f95a4df68a85e5e9db4a29a8e",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_29.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_29.png",
+      "label": "商品介绍与详情分段截图 第 29/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 579317,
+      "sha256": "3f9265aba958c7a6fa21532cf73134ca1b7ba055fa1bf40a0a6b4664ca91a8dd",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_30.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_30.png",
+      "label": "商品介绍与详情分段截图 第 30/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 304801,
+      "sha256": "9b69739170427f742086c32dc338d68251d0d1423c4d9b0b39a0316c05ec1bdd",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_31.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_31.png",
+      "label": "商品介绍与详情分段截图 第 31/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 658044,
+      "sha256": "5f852929fd6b8630a3687644e4f9fe0de6b53dbf748cb686618821092ea2538c",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_32.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_32.png",
+      "label": "商品介绍与详情分段截图 第 32/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 359183,
+      "sha256": "b38b16f09071a5d0a8827cac97f60b066ec92cb30c05b05c62398535193084bf",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_33.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_33.png",
+      "label": "商品介绍与详情分段截图 第 33/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 573488,
+      "sha256": "a3ef7be4e7294906119da7efe58be35fbf55cad6c16e3fa9bb727d9489c9caa6",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_34.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_34.png",
+      "label": "商品介绍与详情分段截图 第 34/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 707567,
+      "sha256": "0cdf2dffcf6ad6723e17d912a8e926009e8487b9cd992579763b7ab67932bbd0",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_35.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_35.png",
+      "label": "商品介绍与详情分段截图 第 35/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 531955,
+      "sha256": "bef331aa2abf925929046ef8f6cd1f7ee9171cee4028ea361720a8cddc0fd1b6",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_36.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_36.png",
+      "label": "商品介绍与详情分段截图 第 36/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 711752,
+      "sha256": "a3a2b6de96d1dfbac06d08a0bda7f53181637081c5a7f8205c4a56aa2a4cdb49",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_37.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_37.png",
+      "label": "商品介绍与详情分段截图 第 37/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 510624,
+      "sha256": "9d58414747506272ebcd90adf69028e92fa906f24d5164e1a6bbae4a60c322ac",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_38.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_38.png",
+      "label": "商品介绍与详情分段截图 第 38/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 391487,
+      "sha256": "7ced13a897e4cd6c6204b7335ffb52e58adb90bb16ba1470f8601959a21a95be",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_39.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_39.png",
+      "label": "商品介绍与详情分段截图 第 39/49 屏",
+      "width": 1024,
+      "height": 711,
+      "bytes": 369912,
+      "sha256": "93383d02c0127c79acd0ca479bde1e5619171bae98819d4982f9930d46926728",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_40.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_40.png",
+      "label": "商品介绍与详情分段截图 第 40/49 屏（与前序局部重叠校验）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 758691,
+      "sha256": "f916f7ced745a36b2c939fb48d07d68c55348cf7c36ee86ed81fef1dcb75846b",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_41.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_41.png",
+      "label": "商品介绍与详情分段截图 第 41/49 屏（与前序局部重叠校验）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 904470,
+      "sha256": "5c88f8ca3a719bced4ec93b9c991891dab9a7d552f29afa5bdcde032a877596f",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_42.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_42.png",
+      "label": "商品介绍与详情分段截图 第 42/49 屏（与前序局部重叠校验）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 638995,
+      "sha256": "04602179a951d06c229af86cc056ff8a78e2dd5e0a2bbf177bb961edaadc0481",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_43.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_43.png",
+      "label": "商品介绍与详情分段截图 第 43/49 屏（与前序局部重叠校验）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 476333,
+      "sha256": "6f530bb1d97a256670f0e3658c7299496b68a956e7f0c09d392e7a86d88569a3",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_44.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_44.png",
+      "label": "商品介绍与详情分段截图 第 44/49 屏",
+      "width": 936,
+      "height": 1024,
+      "bytes": 720997,
+      "sha256": "5b1fcbf5aceb64d3a6e58b94c0f040e6519740bb66f25f27383561ec3bc88587",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_45.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_45.png",
+      "label": "商品介绍与详情分段截图 第 45/49 屏",
+      "width": 936,
+      "height": 1024,
+      "bytes": 541575,
+      "sha256": "5c557825059b03f79fd39eb58a3b309b5b640034f2da2cb1b719b42baf621c7e",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_46.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_46.png",
+      "label": "商品介绍与详情分段截图 第 46/49 屏",
+      "width": 936,
+      "height": 1024,
+      "bytes": 440548,
+      "sha256": "bd8bdc791511d7a3c225658f1277a2ae6e8bf050a351f099b49142d5fd933ec0",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_47.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_47.png",
+      "label": "商品介绍与详情分段截图 第 47/49 屏",
+      "width": 936,
+      "height": 1024,
+      "bytes": 440522,
+      "sha256": "1a8a6af717d3584a264dbfc082151165e478609ebd4087cd476d3d9cc8f67cd9",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_48.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_48.png",
+      "label": "商品介绍与详情分段截图 第 48/49 屏",
+      "width": 936,
+      "height": 1024,
+      "bytes": 422205,
+      "sha256": "85306e32b21a1faa93d2a2ad3e570e22bcd29c5778c4407c8a737c03bfa23531",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "04_商品介绍与详情分段_49.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/04_商品介绍与详情分段_49.png",
+      "label": "商品介绍与详情分段截图 第 49/49 屏",
+      "width": 936,
+      "height": 1024,
+      "bytes": 408977,
+      "sha256": "3253057f55b7bea0ef0faaeee332b1a57b92fbe49a5f94aabc24aed0e8227016",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "05_商品详情完整拼接长图_Part1.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/05_商品详情完整拼接长图_Part1.png",
+      "label": "商品详情完整无重复无缝拼接长图（第 1/2 部分）",
+      "width": 557,
+      "height": 14607,
+      "bytes": 7379025,
+      "sha256": "b0432f8d5054e26155cc2f65548b802a9877a72712b0e41506fdde80f056f07b",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "05_商品详情完整拼接长图_Part2.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/05_商品详情完整拼接长图_Part2.png",
+      "label": "商品详情完整无重复无缝拼接长图（第 2/2 部分）",
+      "width": 557,
+      "height": 14191,
+      "bytes": 7029103,
+      "sha256": "e4c055c65ecced136a4b56bf206e96771014bcd8ab75872902966903de4ed5ac",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "06_规格与包装参数.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/06_规格与包装参数.png",
+      "label": "规格参数摘要与完整参数表/包装清单汇总图",
+      "width": 530,
+      "height": 897,
+      "bytes": 125398,
+      "sha256": "64ff9a221fc25eb30720df85b9b2da7606ad6c483ef56507f7622e2ebcc9063b",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "06_规格与包装参数_01_参数表与包装清单.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/06_规格与包装参数_01_参数表与包装清单.png",
+      "label": "规格参数与包装清单全屏截图（商品详情参数表）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 480018,
+      "sha256": "9940ad09c20570c69fcc0b8d03cba0d7b0a3de32acacee2bafa6f0c031b0e51e",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "06_规格与包装参数_02_主图规格摘要.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/06_规格与包装参数_02_主图规格摘要.png",
+      "label": "主图区规格参数卡片摘要截图",
+      "width": 936,
+      "height": 1024,
+      "bytes": 429980,
+      "sha256": "bcc7f813262b5caf9cdcaf50b159b3e418bfce3e532c85cfee6473659ba437b3",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "06_规格与包装参数_03_查看全部参数跳转.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/06_规格与包装参数_03_查看全部参数跳转.png",
+      "label": "点击查看全部参数跳转定位截图",
+      "width": 936,
+      "height": 1024,
+      "bytes": 480205,
+      "sha256": "f2b1b13461da7cdb4375ce3963ff83f7b3a73e84e95d42a793cf45ceb52d9469",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "07_售后保障与正品承诺.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/07_售后保障与正品承诺.png",
+      "label": "售后保障（厂家服务/京东承诺/正品行货/无忧退货/权利声明/价格说明）拼接完整图",
+      "width": 530,
+      "height": 1076,
+      "bytes": 264234,
+      "sha256": "41b32e6aa8272251204052b1ba2154ca18f1775714744fddc3ae622f9141f8d4",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "07_售后保障与正品承诺_01.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/07_售后保障与正品承诺_01.png",
+      "label": "售后保障第 1 屏（厂家服务、京东承诺、正品行货、无忧退货、权利声明）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 435332,
+      "sha256": "b1d07b3fff72157399fbceeba6cff13ad260ac2704b12e6078408defbb50f0c8",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "07_售后保障与正品承诺_02.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/07_售后保障与正品承诺_02.png",
+      "label": "售后保障第 2 屏（预估到手价、京东价、划线价、折扣及异常问题说明）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 837851,
+      "sha256": "d1e634ebecabb34fa9396d524dafb0a60ad9902b88a91182d63365836276d831",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "08_商品评价摘要.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/08_商品评价摘要.png",
+      "label": "商品评价（买家评价74/好评率高达100%/代表评价）拼接完整图",
+      "width": 530,
+      "height": 1138,
+      "bytes": 523562,
+      "sha256": "eb1a86c3c0c1498d14aa73ccbcf4d53d02c28d9b39a3b037b1be81d8a5ec0095",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "08_商品评价摘要_01.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/08_商品评价摘要_01.png",
+      "label": "商品评价第 1 屏（买家评价统计、印象标签、首条气味投诉评价 j***E 等）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 684655,
+      "sha256": "c1625175a0d067ae35ca2570831154ebfe7168644b6bb8f56b535875b5e8cbd6",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "08_商品评价摘要_02.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/08_商品评价摘要_02.png",
+      "label": "商品评价第 2 屏（后续评价与全部评价入口）",
+      "width": 936,
+      "height": 1024,
+      "bytes": 579775,
+      "sha256": "cc9b3481b3886f18f90c9b91547830084e516fdd42845d9ad8acf148f6e2aeb4",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P1.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P1.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 1/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 391254,
+      "sha256": "0d324e9ad95d3260df5449c5edc4c74805e3b34d917844f1069b136d039741b0",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P2.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P2.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 2/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 147282,
+      "sha256": "87bd285d5cd5e0c117cbb5477fe5021d5807df7b40bd8f246a15e1a67494585b",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P3.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P3.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 3/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 300071,
+      "sha256": "62c07c752897055f432f6d298108324aa45f7e74843b25b6d87cf15a47857d4e",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P4.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P4.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 4/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 479293,
+      "sha256": "7e9d65c0302e372afa94168e119be74d430a1463bebb7318335357a7cce4760e",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P5.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P5.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 5/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 273926,
+      "sha256": "e9252d61ab264eabbfe17ae876e196391f1101a9814a0de00b9c5b30aea0ca90",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P6.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P6.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 6/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 301851,
+      "sha256": "856620f29783c8afedd29b5f87fcb1919da8719d7a4864ffe14262f09c260962",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P7.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P7.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 7/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 281745,
+      "sha256": "babbbbfede7e3326ed9637213cbd8b448b903a423582d80759bde66275aceddb",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P8.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P8.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 8/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 285113,
+      "sha256": "7a84fa32d7b6005422f18b77ef85a56ac012ef31d958adf5a246fb1ce077629c",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P9.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P9.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 9/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 283223,
+      "sha256": "ed06e52e47dd0e073a3d6c1b4f38bc0dd83ee628aebf67ff3e9282cb216bd85f",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P10.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P10.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 10/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 285222,
+      "sha256": "c106c31d6bb6b142735e86aefba18a10dcc1bd85c145b242e7eacd7b9d10f572",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P11.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P11.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 11/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 289417,
+      "sha256": "440516995d8a1320ce0d8db05e237f43f37e801c797830b7c7adfb98fa9cd11f",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P12.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P12.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 12/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 323161,
+      "sha256": "92deedc14307e5e34135a13a58bf4f9549f4934360bfda55e1ea698248573310",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P13.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P13.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 13/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 325976,
+      "sha256": "357f98c5c9dad0fab4b02aeb512f42191175626008091afbad04c01c4f1e1600",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P14.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P14.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 14/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 303903,
+      "sha256": "4d52cfa63ecb39ccf5025352d889a6e42d8c024c5b9572279bdc4f6b6bea679f",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P15.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P15.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 15/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 302699,
+      "sha256": "46f62b3a60a3954aa65acc2f1b105aa4283e7b0fe68055f1998aa8eb920cb0c8",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P16.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P16.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 16/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 483389,
+      "sha256": "d782837b413bdf45dc6a12d3ddf8075f04243aba020b723a2ede24bfdfe8cd83",
+      "embed_in_pdf": false
+    }
+  ],
+  "summary_png_files": [
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P1.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P1.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 1/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 391254,
+      "sha256": "0d324e9ad95d3260df5449c5edc4c74805e3b34d917844f1069b136d039741b0",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P2.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P2.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 2/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 147282,
+      "sha256": "87bd285d5cd5e0c117cbb5477fe5021d5807df7b40bd8f246a15e1a67494585b",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P3.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P3.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 3/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 300071,
+      "sha256": "62c07c752897055f432f6d298108324aa45f7e74843b25b6d87cf15a47857d4e",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P4.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P4.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 4/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 479293,
+      "sha256": "7e9d65c0302e372afa94168e119be74d430a1463bebb7318335357a7cce4760e",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P5.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P5.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 5/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 273926,
+      "sha256": "e9252d61ab264eabbfe17ae876e196391f1101a9814a0de00b9c5b30aea0ca90",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P6.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P6.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 6/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 301851,
+      "sha256": "856620f29783c8afedd29b5f87fcb1919da8719d7a4864ffe14262f09c260962",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P7.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P7.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 7/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 281745,
+      "sha256": "babbbbfede7e3326ed9637213cbd8b448b903a423582d80759bde66275aceddb",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P8.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P8.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 8/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 285113,
+      "sha256": "7a84fa32d7b6005422f18b77ef85a56ac012ef31d958adf5a246fb1ce077629c",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P9.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P9.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 9/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 283223,
+      "sha256": "ed06e52e47dd0e073a3d6c1b4f38bc0dd83ee628aebf67ff3e9282cb216bd85f",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P10.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P10.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 10/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 285222,
+      "sha256": "c106c31d6bb6b142735e86aefba18a10dcc1bd85c145b242e7eacd7b9d10f572",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P11.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P11.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 11/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 289417,
+      "sha256": "440516995d8a1320ce0d8db05e237f43f37e801c797830b7c7adfb98fa9cd11f",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P12.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P12.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 12/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 323161,
+      "sha256": "92deedc14307e5e34135a13a58bf4f9549f4934360bfda55e1ea698248573310",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P13.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P13.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 13/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 325976,
+      "sha256": "357f98c5c9dad0fab4b02aeb512f42191175626008091afbad04c01c4f1e1600",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P14.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P14.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 14/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 303903,
+      "sha256": "4d52cfa63ecb39ccf5025352d889a6e42d8c024c5b9572279bdc4f6b6bea679f",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P15.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P15.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 15/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 302699,
+      "sha256": "46f62b3a60a3954aa65acc2f1b105aa4283e7b0fe68055f1998aa8eb920cb0c8",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_取证信息汇总与哈希校验单_P16.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/09_取证信息汇总与哈希校验单_P16.png",
+      "label": "取证信息汇总与 SHA-256 哈希校验单 第 16/16 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 483389,
+      "sha256": "d782837b413bdf45dc6a12d3ddf8075f04243aba020b723a2ede24bfdfe8cd83",
+      "embed_in_pdf": false
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "capture_time": "2026-11-18T00:20:56+08:00",
+  "order_id": "3680476018534482",
+  "sku_id": "100419242150",
+  "shop_name": "安居客家具京东自营旗舰店",
+  "shop_id": "1020184352",
+  "seller_entity": {
+    "name": "上海圆迈贸易有限公司",
+    "credit_code": "91310114666025597Y",
+    "legal_rep": "宋美江",
+    "address": "上海市嘉定工业区叶城路925号B区3幢109室",
+    "authority": "上海市嘉定区市场监督管理局"
+  },
+  "platform_entity": {
+    "name": "北京京东叁佰陆拾度电子商务有限公司",
+    "credit_code": "9111030266052765XB",
+    "legal_rep": "张奇",
+    "address": "北京市北京经济技术开发区科创十一街18号C座2层222室",
+    "authority": "北京市北京经济技术开发区市场监督管理局"
+  },
+  "invoice": {
+    "type": "电子发票(增值税专用发票)",
+    "number": "26317000004177699855",
+    "date": "2026年11月15日",
+    "amount_with_tax": "¥2365.39",
+    "buyer_name": "北京帕莫瑞科技有限公司",
+    "buyer_tax_id": "91110108682864438T",
+    "seller_name": "上海圆迈贸易有限公司",
+    "seller_tax_id": "91310114666025597Y",
+    "pdf_sha256": "a841cc4d0165698912134e762e14476f19d8e5fc86275e3291f3cd6d45006ad4"
+  },
+  "shipment": {
+    "delivery_mode": "厂商配送（第三方卖家为您发货 / 京东指定厂家发货）",
+    "carrier": "德邦快递",
+    "waybills": [
+      "DPK365135669545",
+      "DPK381155608157",
+      "DPK381155608158"
+    ],
+    "origin": "江苏省徐州市（徐州睢宁县大道经营分部揽收，经徐州沙集转运场）"
+  },
+  "evidence_png_files": [
+    {
+      "filename": "01_店铺首页_安居客家具京东自营旗舰店.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/01_店铺首页_安居客家具京东自营旗舰店.png",
+      "label": "店铺首页（自营标识，shopId/venderId: 1020184352）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 575909,
+      "sha256": "a0896b14faec29adeaa11527c20a17b159499a7d9bac0409fa2a8335f6680db3",
+      "embed": true
+    },
+    {
+      "filename": "02_京东平台经营者营业执照_北京京东叁佰陆拾度电子商务有限公司.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/02_京东平台经营者营业执照_北京京东叁佰陆拾度电子商务有限公司.png",
+      "label": "京东平台主体营业执照公示（北京京东叁佰陆拾度电子商务有限公司）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 806105,
+      "sha256": "280e93c0c5164c69ed796c91c0d4444e60bf8c0e663e46d72ed2d4242ab0fdbd",
+      "embed": true
+    },
+    {
+      "filename": "03_京东商城自营商品经营者资质信息公示_说明页.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/03_京东商城自营商品经营者资质信息公示_说明页.png",
+      "label": "京东商城自营商品经营者资质信息公示列表总览",
+      "width": 1024,
+      "height": 711,
+      "bytes": 162589,
+      "sha256": "1e69937bc99339781332f67d4259669dabae7753b765c90155af660a4af4271e",
+      "embed": true
+    },
+    {
+      "filename": "04_京东自营资质公示_华东区域5组_上海圆迈贸易有限公司入口.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/04_京东自营资质公示_华东区域5组_上海圆迈贸易有限公司入口.png",
+      "label": "京东自营资质公示（华东区域5组：上海圆迈贸易有限公司）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 192757,
+      "sha256": "9831f1a0d22138fda5c94ddaa5b9135e19198e9bac32935996e7c3b105b38b3d",
+      "embed": true
+    },
+    {
+      "filename": "05_销售方营业执照_上海圆迈贸易有限公司.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/05_销售方营业执照_上海圆迈贸易有限公司.png",
+      "label": "上海圆迈贸易有限公司营业执照公示原图（91310114666025597Y）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 766098,
+      "sha256": "bd3d8874c576a359af529cc7453e2461ebe4bf1dd93c74ba8086168d175d23e8",
+      "embed": true
+    },
+    {
+      "filename": "06_订单列表_订单号3680476018534482.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/06_订单列表_订单号3680476018534482.png",
+      "label": "已登录京东账户订单列表（订单 3680476018534482）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 284237,
+      "sha256": "96e0b09003e1fd92d64f5ad0e6226ce534822ed3ccc56ca7e055332d198dd9d5",
+      "embed": true
+    },
+    {
+      "filename": "07_订单详情上段_物流发货与签收.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/07_订单详情上段_物流发货与签收.png",
+      "label": "订单详情上段（德邦快递徐州睢宁揽收与沙集转运记录）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 151363,
+      "sha256": "bd5c435a6730124c638f07f69b4a97c272e6dae2a148f8766d909013e8e3e27a",
+      "embed": true
+    },
+    {
+      "filename": "08_订单详情下段_厂商配送与商品编号.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/08_订单详情下段_厂商配送与商品编号.png",
+      "label": "订单详情下段（配送方式：厂商配送 / SKU 100419242150）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 103659,
+      "sha256": "f9d5d2db77962066288e6b79f510bc9163b2de564eb4368af3fe2bef52d2df99",
+      "embed": true
+    },
+    {
+      "filename": "09_发票详情上段_订单与发票状态.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/09_发票详情上段_订单与发票状态.png",
+      "label": "发票详情页上段（数电专票已开票状态）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 189631,
+      "sha256": "dbb03d72bade1b5c51949efaba08d9b6a1426f57cc50de1e7cc86e4639cb826e",
+      "embed": true
+    },
+    {
+      "filename": "10_发票详情下段_开票抬头与税号入口.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/10_发票详情下段_开票抬头与税号入口.png",
+      "label": "发票详情页下段（买方抬头与发票下载入口）",
+      "width": 1024,
+      "height": 711,
+      "bytes": 89651,
+      "sha256": "2ba538fa7b92992b9f484a75249784b05cabdb4a1a471abc046530356bbc81b8",
+      "embed": true
+    },
+    {
+      "filename": "11_电子发票原件渲染高清图_上海圆迈贸易有限公司.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/11_电子发票原件渲染高清图_上海圆迈贸易有限公司.png",
+      "label": "数电增值税专用发票原件高清渲染（销售方：上海圆迈贸易有限公司）",
+      "width": 1693,
+      "height": 1095,
+      "bytes": 187843,
+      "sha256": "957ed2efdec91dd2239fe1d78dd90f7a3dcb34b43ae79e84aaf84edb6d6d3d5c",
+      "embed": true
+    }
+  ],
+  "summary_png_files": [
+    {
+      "filename": "09_第三部分主体核查汇总单_P1.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/09_第三部分主体核查汇总单_P1.png",
+      "label": "第三部分主体核查汇总单 第 1/2 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 377991,
+      "sha256": "8e3d087c7de916156d84180cb338dc0e970f4670e4e7a82f1fb625ca039504f3",
+      "embed": false
+    },
+    {
+      "filename": "09_第三部分主体核查汇总单_P2.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part3_subject_confirmation/09_第三部分主体核查汇总单_P2.png",
+      "label": "第三部分主体核查汇总单 第 2/2 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 280477,
+      "sha256": "c150face74408b6f15b30a649430beb272b3852a4c3cd55ce0d3c8548ac2cd15",
+      "embed": false
+    }
+  ]
+}

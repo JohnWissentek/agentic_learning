@@ -1,0 +1,399 @@
+{
+  "capture_time": "2026-11-17T23:47:35+08:00",
+  "query_time_on_page": "2026/11/17 23:46:09",
+  "requested_url": "http://bgfw.atslab.cn/Report/VerifyResult?id=8aICPJpK%2f3HLIBY5fqaxPlX2Fi1oADErTcA85%2fayCAI%3d",
+  "final_url": "http://bgfw.atslab.cn/Report/VerifyResult?id=8aICPJpK%2f3HLIBY5fqaxPlX2Fi1oADErTcA85%2fayCAI%3d",
+  "visited_origin_host_verified": "http://bgfw.atslab.cn",
+  "seller_uploaded_jpg": {
+    "filename": "media_1794929843770_a16b1585.jpg",
+    "dimensions": "599x847",
+    "bytes": 84129,
+    "sha256": "19f386828492dc903e791707b4b24e90e4af4a5f15b38ac8f8c6c73ca65d2809"
+  },
+  "official_report_preview_image_url": "http://bgfw.atslab.cn/files/370ddced-c76a-4167-859f-8caa6e721a89.png",
+  "downloads_on_official_site": [],
+  "verification_fields": [
+    {
+      "key": "报告编号",
+      "value": "ATS2601GM681-1C1"
+    },
+    {
+      "key": "防伪查询防伪码",
+      "value": "4D3-191EF"
+    },
+    {
+      "key": "官网验证结果",
+      "value": "验证通过！"
+    },
+    {
+      "key": "官网查询时间",
+      "value": "2026/11/17 23:46:09"
+    },
+    {
+      "key": "验伪地址",
+      "value": "http://www.atslab.cn/report"
+    },
+    {
+      "key": "电子报告预览载体",
+      "value": "http://bgfw.atslab.cn/files/370ddced-c76a-4167-859f-8caa6e721a89.png（页内图片，无单独PDF附件）"
+    },
+    {
+      "key": "检测机构",
+      "value": "江苏亚维检测技术服务有限公司（CMA: 211020342124 / CNAS: L5155）"
+    },
+    {
+      "key": "委托单位名称",
+      "value": "霸州市阁尚家居用品有限公司"
+    },
+    {
+      "key": "委托单位地址",
+      "value": "河北省廊坊市霸州市东段乡西柳村凯旋路北侧30号"
+    },
+    {
+      "key": "客户认定信息（样品名称 / 商标 / 货号）",
+      "value": "样品名称：实木电脑桌 ｜ 样品商标：/ ｜ 样品批号/款号/货号：/"
+    },
+    {
+      "key": "检验类别 / 样品数量 / 描述",
+      "value": "委托检测 ｜ 1PC ｜ 样品状态完好，符合测试要求"
+    },
+    {
+      "key": "样品受理日期 / 检测周期 / 签发日期",
+      "value": "受理：2026年01月14日 ｜ 周期：2026年01月14日-2026年01月16日 ｜ 签发：2026年1月16日"
+    },
+    {
+      "key": "判定依据与检测项目",
+      "value": "判定依据：GB 18584-2024 ｜ 检测项目：锑,砷,钡,铬,汞,硒,铅,镉（共8项，GB 6675.4-2014）"
+    },
+    {
+      "key": "第2页备注（关键）",
+      "value": "客户提供原材料测试；测试部位为涂层；ND=未检出<方法检出限"
+    },
+    {
+      "key": "第3页送检样品实物（关键）",
+      "value": "样品图（ATS 2601GM681）为黑色长条状涂覆试样，非消费者购买的整张实木桌面或升降桌"
+    },
+    {
+      "key": "附加说明及免责备注（关键）",
+      "value": "展示客户提供的木色桌面黑色支架升降桌图片，备注明确：“以上内容由申请者提供，非测试样品。申请者对其真实性负责，本公司不作真实性核实。”"
+    }
+  ],
+  "heavy_metal_results_page2": [
+    [
+      "1",
+      "锑",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤60",
+      "ND",
+      "符合"
+    ],
+    [
+      "2",
+      "砷",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤25",
+      "ND",
+      "符合"
+    ],
+    [
+      "3",
+      "钡",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤1000",
+      "358",
+      "符合"
+    ],
+    [
+      "4",
+      "铬",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤60",
+      "14",
+      "符合"
+    ],
+    [
+      "5",
+      "汞",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤60",
+      "ND",
+      "符合"
+    ],
+    [
+      "6",
+      "硒",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤500",
+      "ND",
+      "符合"
+    ],
+    [
+      "7",
+      "铅",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤90",
+      "ND",
+      "符合"
+    ],
+    [
+      "8",
+      "镉",
+      "GB 6675.4-2014",
+      "mg/kg",
+      "<2.5",
+      "≤75",
+      "ND",
+      "符合"
+    ]
+  ],
+  "objective_comparison": [
+    {
+      "dimension": "1. 报告真伪与提供完整性",
+      "jd_or_seller_claim": "平台处理过程中，平台客服转述商家仅提供了 1 张检测报告图片（第 2 页 共 3 页），未提供第 1 页、第 3 页及附加说明页。",
+      "official_report_fact": "官方防伪系统验证结果确为“验证通过！”；但完整报告共 3 页正文 + 1 页附加说明，缺失的关键前置条件、样品实物图及免责声明均在未提供页面中。"
+    },
+    {
+      "dimension": "2. 品牌、委托主体与商品型号关联性",
+      "jd_or_seller_claim": "第一部分京东商品页（SKU 100419242150 / 货号 df-bzmdmz164）标示品牌为“安居客 / anjuke”，店铺为“安居客家具京东自营旗舰店”。",
+      "official_report_fact": "第 1 页载明委托单位为“霸州市阁尚家居用品有限公司”；样品商标标注“/”，样品批号/款号/货号标注“/”，报告未载明“安居客”品牌或涉事商品 SKU/货号。"
+    },
+    {
+      "dimension": "3. 甲醛/ENF/异味宣传 vs 实际检测项目",
+      "jd_or_seller_claim": "京东主图 2 宣称“进口真实木 ENF级安全0异味 / 近0醛0异味 请放心 符合GB/T 39600-2021”；买家评价 j***E 投诉“桌子味道特别大”。",
+      "official_report_fact": "本报告虽引用判定依据 GB 18584-2024，但仅委托检测 8 项可迁移重金属元素（GB 6675.4-2014），完全未检测甲醛释放量（ENF 级）、TVOC、苯系物等任何挥发性有机物或异味指标。"
+    },
+    {
+      "dimension": "4. 送检样品性质 vs 整桌成品真实性",
+      "jd_or_seller_claim": "京东商品宣称“全实木桌面电动升降桌 / 30cm(或30mm)橡胶木 / 进口AAA级橡胶木”。",
+      "official_report_fact": "第 2 页备注写明“客户提供原材料测试；测试部位为涂层”；第 3 页送检实物（ATS 2601GM681）仅为 1 件黑色长条状涂覆试样；附加说明中整桌图备注明确：“以上内容由申请者提供，非测试样品。申请者对其真实性负责，本公司不作真实性核实。”"
+    }
+  ],
+  "stitch_metrics": {
+    "landing_overlap_px": 363,
+    "landing_sad": 0.542,
+    "expanded_overlaps_px": [
+      354,
+      354,
+      354,
+      354,
+      354,
+      365
+    ],
+    "expanded_sads": [
+      1.99,
+      0.885,
+      1.428,
+      1.271,
+      0.108,
+      0.971
+    ]
+  },
+  "evidence_png_files": [
+    {
+      "filename": "01_商家提供检测报告原图_第2页留存.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/01_商家提供检测报告原图_第2页留存.png",
+      "label": "商家向平台客服提供之检测报告原图（仅第2页 共3页；无损转RGB PNG留存）",
+      "width": 599,
+      "height": 847,
+      "bytes": 297213,
+      "sha256": "a76d4c999b865901d19c7bd12c1b6046c2126da8b3477ba494a78be52e106c9f",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_01_落地页上段.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_01_落地页上段.png",
+      "label": "官方防伪核验落地页上段（1600x1000视口）",
+      "width": 1024,
+      "height": 640,
+      "bytes": 597585,
+      "sha256": "0e40d1f55ed1f828aab40a67fdf8dc6fb304b98e2bb1e9b9a3a3b0a3c0594229",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_02_落地页下段.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_02_落地页下段.png",
+      "label": "官方防伪核验落地页下段（含查询结果及点击预览按钮）",
+      "width": 1024,
+      "height": 640,
+      "bytes": 156173,
+      "sha256": "688736a07e9ade722815e8efa0ab5375ce9e53397e392156283ce8a802bcb986",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_03_落地页无缝拼接全貌.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_03_落地页无缝拼接全貌.png",
+      "label": "官方防伪核验落地页无缝拼接全貌",
+      "width": 1024,
+      "height": 917,
+      "bytes": 629161,
+      "sha256": "b6da1eef7650f46e4c81cf10ed71dfc94fbfb4ee5ffb80bf6796cee98e5a0395",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_01.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_01.png",
+      "label": "展开电子报告原件内置浏览器分段截图 1/7（step_10_shot_2）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 438053,
+      "sha256": "1fb1397715bff35dbb7591dd84a37ed25dee4e27e3dd5f934c07e0c7fbc829d3",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_02.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_02.png",
+      "label": "展开电子报告原件内置浏览器分段截图 2/7（step_10_shot_3）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 378797,
+      "sha256": "70e0f03ea142e5b69af94ebf493d0b53850cc293a62be947f5ec864b1eee23ff",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_03.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_03.png",
+      "label": "展开电子报告原件内置浏览器分段截图 3/7（step_10_shot_4）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 340617,
+      "sha256": "13a3826d0c30144510eaa47abaacff737ade83f5c16f00ba0c139f41607d1b76",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_04.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_04.png",
+      "label": "展开电子报告原件内置浏览器分段截图 4/7（step_10_shot_5）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 253642,
+      "sha256": "f23ce243ab43d93e5d3866f9450713c41d3048caa6cf3bbce80d486b878c1730",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_05.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_05.png",
+      "label": "展开电子报告原件内置浏览器分段截图 5/7（step_10_shot_6）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 259956,
+      "sha256": "c6aec386a8e8b9b26e5acd8beb81a20381bf0205cafeb4c3c3195094cf8b1216",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_06.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_06.png",
+      "label": "展开电子报告原件内置浏览器分段截图 6/7（step_10_shot_7）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 303925,
+      "sha256": "783a88c0773f9b8f2507c698b4d499d8c5c681904a19eb27c17317451fcf1218",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_04_展开报告分段_07.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_04_展开报告分段_07.png",
+      "label": "展开电子报告原件内置浏览器分段截图 7/7（step_10_shot_8）",
+      "width": 891,
+      "height": 1024,
+      "bytes": 222003,
+      "sha256": "18bed7eab530d2f25b1bbf35f7d14d986c0ae4bf6453b2ae751a4cfd16230df5",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "02_内置浏览器扫码防伪核验页_完整拼接长图.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/02_内置浏览器扫码防伪核验页_完整拼接长图.png",
+      "label": "官方防伪核验与电子报告全页无缝拼接长图（核验结果+正文第1~3页+附加说明）",
+      "width": 891,
+      "height": 5033,
+      "bytes": 1528641,
+      "sha256": "04e4afad0efcf577b263b9b5120f61b69bd2aa71cd59cd2e915618b586b8f785",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "03_官方防伪平台电子报告_第1页.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/03_官方防伪平台电子报告_第1页.png",
+      "label": "官方防伪平台电子报告 第1页 共3页（客户/样品/判定依据GB 18584-2024/红章签署）",
+      "width": 715,
+      "height": 1007,
+      "bytes": 361626,
+      "sha256": "15cfb7388a13604e1434098469a5276210bdd975f98e48d37e48ec9e2035b85b",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "03_官方防伪平台电子报告_第2页.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/03_官方防伪平台电子报告_第2页.png",
+      "label": "官方防伪平台电子报告 第2页 共3页（GB 6675.4-2014 8项重金属及涂层备注）",
+      "width": 715,
+      "height": 1006,
+      "bytes": 248197,
+      "sha256": "975b378cd1a001a288eca41d7b1d86d812e10cad3b677fa5c5807c23f80d166c",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "03_官方防伪平台电子报告_第3页.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/03_官方防伪平台电子报告_第3页.png",
+      "label": "官方防伪平台电子报告 第3页 共3页（送检样品实物图片 ATS 2601GM681）",
+      "width": 715,
+      "height": 1005,
+      "bytes": 247788,
+      "sha256": "e4ec96c1e9e145de5e41e457158b3ea30274e6202dea8a363bc2d760fbc221c7",
+      "embed_in_pdf": true
+    },
+    {
+      "filename": "03_官方防伪平台电子报告_附加说明第1页.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/03_官方防伪平台电子报告_附加说明第1页.png",
+      "label": "官方防伪平台对ATS2601GM681-1C1检测报告的附加说明（客户展示图及非测样品免责备注）",
+      "width": 715,
+      "height": 1007,
+      "bytes": 290197,
+      "sha256": "1f9e5706171d88dcdcbc7f242a4328025dfbcf2cd2228c73c449bcc4421d3090",
+      "embed_in_pdf": true
+    }
+  ],
+  "summary_png_files": [
+    {
+      "filename": "09_第二部分取证汇总与比对校验单_P1.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/09_第二部分取证汇总与比对校验单_P1.png",
+      "label": "第二部分取证汇总与对比校验单 第 1/3 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 400526,
+      "sha256": "19ce10c1081b18593e5b843231d1212715ca0642f20d629f62bda459b38bfbc0",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_第二部分取证汇总与比对校验单_P2.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/09_第二部分取证汇总与比对校验单_P2.png",
+      "label": "第二部分取证汇总与对比校验单 第 2/3 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 410230,
+      "sha256": "93bfb4c15e01706d0b451cac07bfdf0aa5bc3a1487a63ec52ac83711fbc8ddd1",
+      "embed_in_pdf": false
+    },
+    {
+      "filename": "09_第二部分取证汇总与比对校验单_P3.png",
+      "path": "/Users/john/Desktop/agentic_learning/jd_evidence_100419242150/part2_report_ATS2601GM681_1C1/09_第二部分取证汇总与比对校验单_P3.png",
+      "label": "第二部分取证汇总与对比校验单 第 3/3 页",
+      "width": 1653,
+      "height": 2339,
+      "bytes": 364838,
+      "sha256": "614b8f7e6786ecf506af2ab3668371018aeafe311734743b7ebb9ddc6d034278",
+      "embed_in_pdf": false
+    }
+  ]
+}
