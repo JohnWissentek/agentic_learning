@@ -1,71 +1,72 @@
-# 个人 AI 私人幕僚系统（外轻内重 · 《Agentic Design Patterns》标准内核版）
+# 个人 AI 董事长助理系统（外轻内重 · 《Agentic Design Patterns》开工基线版）
 
-> **版本**：v3.1（外轻内重 · Agentic Design Patterns 标准内核版）  
+> **版本**：v3.2（董事长助理开工基线版）  
 > **更新日期**：2026-11-17  
-> **状态**：设计基线（在 v3.0 极简独立存储之上，按工作区 [agentic_design_patterns](../agentic_design_patterns) 标准全面升级推理、工具与反思内核；历史各版均完整留存于 Git 历史）
+> **状态**：定稿开工基线（已完成企微专号策略、Wissentek 世纪互联版 OneDrive、工时排期模型与内嵌项目管理驾驶舱四大定案；历史各版完整留存于 Git 历史）
 
 ---
 
-## 一、 核心设计哲学：外轻内重
+## 一、 核心定位与「外轻内重」设计哲学
 
-本系统面向同时统筹**北京帕莫瑞、维恩科仪（北京）、维恩科仪（香港）**业务研发、项目交付、采购与客户跟进的负责人，坚持**「外围设施极简、内部大脑满配」**的工程原则：
+本系统面向同时统筹**北京帕莫瑞、维恩科仪（北京）、维恩科仪（香港）**业务研发、项目交付、采购供应链与日常运营的负责人，定位为**「董事长 / 总经理办公室主任（Chief of Staff）」级别的高智商 AI 私人幕僚**：
 
-1. **外围存储与依赖极轻（不碰重型外部系统）**：
-   - 仅运行 **1 个单进程 Python 3.12 服务 + 1 个轻量本地 SQLite（3 张核心业务表）+ 企业 Office 365 OneDrive 隔离专属目录**。
-   - **彻底与公司多人 Odoo 19 物理隔离**：不引入复杂 ERP 接口调试，也不让员工系统权限波及 CEO 私人想法与底价；不自建 OSS 与第三方同步盘。
-   - **不套 OpenClaw / Hermes 等通用裸终端外壳**：避免外部邮件触发 Shell 注入风险，也不让自由对话流破坏“先核验、后 1 卡确认”的确定性铁律。
-2. **内部智能体大脑满配（100% 对齐《Agentic Design Patterns》Level 2/3 标准）**：
-   - 复用工作区 `Boiler_FBG_Product_RD_Workflow` 验证成熟的工业级网关与状态图模式：**LangGraph 有界闭环状态图（Bounded Cyclic `StateGraph`）+ Level 2 上下文工程（Context Engineering）**。
-   - **三档异构模型配对与反思博弈（Ch.4 + Ch.16）**：`qwen3.8-flash`（极速分诊路由）→ `qwen3.8-max`（开启 Thinking 深度推理与多跳工具深潜）→ `deepseek-v4-pro`（独立异构 Critic 审计挑刺），把半成品错误拦截在发送确认卡之前。
-   - **四大受控幕僚工具箱（Ch.5 + Ch.3 + Ch.18）**：赋予智能体混合检索（BM25 + 语义向量）、PDF/Excel 逐页与逐行精算、脱敏外部情报并发调研，以及受 `before_tool_callback` 与确认令牌保护的 OneDrive 编排写入能力。
+1. **外围设施极简且物理隔离（不连 Odoo，不装重型第三方软件）**：
+   - 运行载体：**仅 1 台阿里云 ECS（`firematrix`，2 核 4G）上的单进程 Python 3.12 服务**，同进程承载微信/邮件内核与**内嵌式项目管理驾驶舱 Web App**。
+   - **彻底与公司多人 ERP（Odoo 19）物理隔离**：私人想法、商业底价、个人负荷分析不进公司多人系统，杜绝权限误配风险；项目孵化成熟需派团队执行时再单独进 Odoo 立项。
+   - **锁定 Wissentek 世纪互联版 Office 365 OneDrive**：直接走境内高速节点（`microsoftgraph.chinacloudapi.cn`）配合 **`Sites.Selected` 独立私有文档库** 写入四大清单与分类文件，自带企业级版本回溯与 Mac/手机原生自动同步，零额外对象存储与同步盘依赖。
+   - **不套 OpenClaw / Hermes 等带裸终端风险的通用外壳**：物理上彻底消除外部邮件提示词注入触发 Shell 越权的风险。
+2. **内部大脑与管理视角满配（100% 严格遵循《Agentic Design Patterns》）**：
+   - **认知内核**：LangGraph 有界闭环状态图 + Level 2 上下文工程 + **三档异构反思博弈（`qwen3.8-flash` 分诊 / `qwen3.8-max` Thinking 主推 / `deepseek-v4-pro` 独立审计）** + 四大受控幕僚工具箱。
+   - **董事长级时间与精力管控**：每件事自动分离评估**「个人净投入工时（Effort Hours）」**与**「日历跨度周期（Duration）」**，通过内嵌驾驶舱网页实时监控每日工作负荷、精力投向占比与在途项目甘特周期，真正从项目管理角度掌控全局节奏。
 
 ---
 
-## 二、 四积木闭环与内核拓扑图
+## 二、 四积木闭环与内嵌驾驶舱全景图
 
 ```mermaid
 flowchart TB
     subgraph IN["1. 三大碎片入口（零负担输入）"]
-        WX["💬 微信聊天转发 & 语音闪念<br/>（企微官方 API 长连接传声筒）"]
-        MAIL["📧 企业工作邮件与附件<br/>（Graph Mail.Read / 只读 IMAP）"]
+        WX["💬 微信聊天转发 & 语音闪念<br/>（个人微信置顶『工作助理』）"]
+        MAIL["📧 企业工作邮件与附件<br/>（世纪互联 Graph Mail.Read / 只读 IMAP）"]
     end
 
-    subgraph BRAIN["2. 阿里云 ECS 独立内核（LangGraph 有界闭环 + 《Agentic Design Patterns》）"]
-        G1["🛡️ Ch.18 输入护栏 & Ch.2 路由<br/>· 『密：』前缀物理拦截零出网<br/>· qwen3.8-flash 毫秒分诊意图"]
-        REACT["🧠 Ch.6 规划 + Ch.17 Thinking + ReAct 工具深潜<br/>qwen3.8-max 连调：混合记忆 · 算交期/报价 · 脱敏外搜"]
-        CE["📦 Level 2 上下文工程<br/>将工具原始返回清洗压缩为高信噪比证据卡"]
-        CRITIC["🔍 Ch.4 异构模型反思博弈（≤2轮）<br/>deepseek-v4-pro 审计 + 代码数字保真核验"]
+    subgraph ECS["2. 阿里云 ECS 同进程内核（LangGraph + FastAPI）"]
+        G1["🛡️ Ch.18 输入护栏 & Ch.2 路由<br/>· 『密：』前缀物理拦截零出网<br/>· qwen3.8-flash 毫秒分诊"]
+        REACT["🧠 Ch.6 规划 + Ch.17 ReAct + 排期工时评估<br/>qwen3.8-max：混合检索 · 算净工时/周期 · Excel精算 · 脱敏外搜"]
+        CE["📦 Level 2 上下文工程<br/>将工具原始返回清洗压缩为 EvidenceCard"]
+        CRITIC["🔍 Ch.4 异构反思博弈（≤2轮）<br/>deepseek-v4-pro 审计工时、冲突与数字保真"]
+        SQL["🗄️ 本地 SQLite（app.db + checkpoints.db）<br/>含起止时间/净工时/P0-P2/三层记忆"]
+        WEB["📊 内嵌式董事长项目管理驾驶舱 Web App<br/>（负荷热力图 · 精力占比 · 甘特周期 · 互动看板）"]
         G1 --> REACT --> CE --> CRITIC
-        CRITIC -->|"未达标带批注打回"| REACT
+        CRITIC -->|"未通过带批注打回"| REACT
+        SQL <--> WEB
     end
 
-    subgraph HITL["3. Ch.13 HITL 确认门禁"]
-        CARD["📱 发往个人微信的【1 张高密度幕僚决策卡】<br/>（含多跳查出的历史关联、精确算术与冲突提示）"]
+    subgraph HITL["3. 微信极简交互与打卡"]
+        CARD["📱 个人微信<br/>· 1 张幕僚决策卡（含建议起止与占您净工时）回 1 落盘<br/>· 回复『开始 N』『完成 N 1.5h』自动校准工时"]
     end
 
-    subgraph OUT["4. 极简双落盘（Ch.8 三层记忆 & Ch.20 动态优先级）"]
-        SQL["🗄️ 本地 3 表 SQLite + Checkpointer<br/>raw_sources(FTS5/向量) · projects · list_items · memory_rules"]
-        OD["☁️ 企业 Office 365 OneDrive 隔离目录<br/>00_我的四大清单(*.md) + PARA 分类文档库<br/>（Mac Finder / Obsidian 原生自动同步）"]
-        SQL --> OD
+    subgraph OD["4. Wissentek 世纪互联版 OneDrive（Sites.Selected 私有库）"]
+        FILES["☁️ microsoftgraph.chinacloudapi.cn 异步直写<br/>00_我的四大清单(*.md) + PARA 分类文档库<br/>（Mac Finder / Obsidian 原生自动同步）"]
     end
 
     WX & MAIL --> G1
     CRITIC -->|"PASS"| CARD
-    CARD -->|"回 1 确认（Ch.18 写工具令牌放行）"| SQL
+    CARD -->|"确认令牌放行"| SQL
+    SQL -->|"异步分片上传后清 ECS 临时文件"| FILES
 ```
 
 ---
 
 ## 三、 方案演进对照
 
-| 维度 | 初版 v1.x & v2.0（Git 历史归档） | v3.0 过渡版 | v3.1 外轻内重 · 设计模式标准版（当前采用） |
+| 维度 | 初版 v1.x & v2.0（Git 历史） | v3.0 / v3.1 演进版 | v3.2 董事长助理开工基线版（当前定稿） |
 | :--- | :--- | :--- | :--- |
-| **外围存储与依赖** | v1 自造 20 表 / v2 耦合 Odoo+OSS | 3 表 SQLite + 企业 OneDrive 直写 | **延续 v3.0 极简外围**（3 表 SQLite + OneDrive 直写 + 零 Odoo/OSS） |
-| **大模型推理范式** | 单次或固定多步串行填表 | 单次调用输出 JSON 草案 | **LangGraph 有界闭环**：`ReAct` 多跳工具深潜 + **Level 2 上下文工程** + **Ch.4 异构反思** |
-| **模型配对策略** | 单一 `qwen3.8-max` | 单一 `qwen3.8-max` | **Ch.16 三档异构**：`qwen3.8-flash` 分诊 / `qwen3.8-max` 主推 / `deepseek-v4-pro` 独立审计 |
-| **执行与调研工具** | 仅简单读库 | 仅基础检索与按页读 | **四大受控工具箱**：混合检索 + Excel/日期精算沙箱 + **脱敏并发外搜(Metaso/Serper)** + OneDrive 编排 |
-| **学习与进化** | 简单规则表 | 规则表 + 4 个清单 | **Ch.8 三层记忆**（短期 Checkpointer + 长期语义/情景 Few-Shot/程序性规则）+ **Ch.20 P0–P2 动态排序** |
-| **测试与可观测** | 人工抽查样例 | 基础单测 | **Ch.19 三层质量门禁**：Trajectory Eval + 硬核验单测 + LLM-as-a-Judge（可选连私有观测中心） |
+| **系统边界与载体** | v1 自造 20 表 / v2 耦合 Odoo+OSS | 去 Odoo 化，3 表 SQLite + 国际版 OneDrive 设想 | **锁定 ECS `firematrix` 单进程 + Wissentek 世纪互联版 OneDrive (`Sites.Selected`)** |
+| **智能体内核** | 单步或固定流 | v3.1 引入《Agentic Design Patterns》三档异构反思 | **严格延续 v3.1 满配内核**（LangGraph + Level 2 上下文工程 + `qwen3.8-max` × `deepseek-v4-pro`） |
+| **时间与工时管控** | 仅有单一截止日期 `due_date` | 仅有 `due_date` 与 `P0-P2` | **自动评估起止时间、日历周期与「个人净投入工时(h)」** + 微信一句话打卡校准 |
+| **可视化管理界面** | 无（只能看零散文本或 Markdown） | 仅 Markdown 清单 | **同进程内嵌「董事长项目管理驾驶舱 Web App」**（负荷热力图/精力占比/甘特图，经 Tailscale 安全访问） |
+| **实操可落地性** | 存在待定假设（如消费版 `AppFolder`） | 仍留有 3 项未定配置 | **全部拍板落定**，附企微建机器人/个人微信扫码置顶与世纪互联授权完整实操手册 |
 
 ---
 
@@ -73,10 +74,10 @@ flowchart TB
 
 | 文档 | 内容说明 |
 | :--- | :--- |
-| [01-需求定义与日常场景.md](docs/01-需求定义与日常场景.md) | 核心痛点、“空壳传声筒”通信本质、三大入口、四大轻量清单与升级版参谋长场景（含多跳追查/Excel精算/脱敏外搜/P0–P2简报） |
-| [02-整体架构与SQLite清单及OneDrive归档设计.md](docs/02-整体架构与SQLite清单及OneDrive归档设计.md) | 架构减法与不套 OpenClaw/Hermes 原因、Ch.8 三层记忆与混合检索 SQLite 设计、OneDrive 沙箱直写、及模块化代码包结构 |
-| [03-AI分拣工作流与确认机制.md](docs/03-AI分拣工作流与确认机制.md) | **核心设计规格**：与《Agentic Design Patterns》15+ 模式 1:1 映射、LangGraph 有界闭环图、四大工具箱、异构反思契约与 HITL 决策卡 |
-| [04-阿里云部署与分阶段实施路线.md](docs/04-阿里云部署与分阶段实施路线.md) | ECS `firematrix` 单机部署、企业核心信息防外泄六道硬防线（含防邮件注入与脱敏外搜护栏）、三档模型 `.env` 模板与 Ch.19 验收门禁 |
+| [01-需求定义与日常场景.md](docs/01-需求定义与日常场景.md) | 董事长助理定位、“空壳传声筒”通信本质、三大入口、四大清单、**自动工时/周期评估与项目管理驾驶舱需求**及四大场景演示 |
+| [02-整体架构与SQLite清单及OneDrive归档设计.md](docs/02-整体架构与SQLite清单及OneDrive归档设计.md) | 不接 Odoo/OpenClaw/重型开源 PM 软件的原因、Ch.8 三层记忆与排期表结构、**Wissentek 世纪互联版 `Sites.Selected` 隔离设计**、及含 `web/` 的代码结构 |
+| [03-AI分拣工作流与确认机制.md](docs/03-AI分拣工作流与确认机制.md) | 《Agentic Design Patterns》15+ 模式 1:1 映射、LangGraph 有界闭环、含 **`check_workload_and_schedule`** 的四大工具箱、异构 Critic 契约与 `开始/完成` 打卡指令 |
+| [04-阿里云部署与分阶段实施路线.md](docs/04-阿里云部署与分阶段实施路线.md) | ECS 同进程部署边界、防外泄六道硬防线（含驾驶舱 Tailscale 隐身访问）、**企微 API 长连接与个人微信扫码指南 + 世纪互联授权步骤**、`.env` 模板与 Ch.19 质量门禁 |
 
 ---
 
