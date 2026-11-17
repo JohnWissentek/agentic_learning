@@ -1,0 +1,2232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Executive Work OS</title>
+  <style>
+    :root {
+      --rail-bg: #181b34;
+      --rail-hover: #2c3159;
+      --sidebar-bg: #ffffff;
+      --canvas-bg: #f6f7fb;
+      --surface: #ffffff;
+      --surface-hover: #f5f6f8;
+      --border: #d0d4e4;
+      --border-light: #e6e9ef;
+      --text: #323338;
+      --text-secondary: #676879;
+      --text-muted: #9699a6;
+      --primary: #0073ea;
+      --primary-hover: #0060b9;
+      --primary-soft: #cce5ff;
+      --primary-text: #0052a8;
+
+      --status-done: #00c875;
+      --status-working: #fdab3d;
+      --status-stuck: #e2445c;
+      --status-todo: #c4c4c4;
+
+      --prio-critical: #333333;
+      --prio-high: #401694;
+      --prio-medium: #579bfc;
+      --prio-low: #7e5bef;
+
+      --grp-active: #579bfc;
+      --grp-waiting: #fdab3d;
+      --grp-idea: #a25ddc;
+      --grp-done: #00c875;
+
+      --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.04);
+      --shadow-pop: 0 8px 28px rgba(24, 27, 52, 0.16);
+      --radius-board: 14px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: "Avenir Next", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--canvas-bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.4;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select {
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    /* ---------- Auth Screen (monday.com Work OS style) ---------- */
+    .auth-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #f6f7fb 0%, #eef2fb 100%);
+      padding: 24px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 36px 32px;
+      box-shadow: 0 16px 40px rgba(24, 27, 52, 0.08);
+    }
+    .brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .brand-wordmark {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .brand-wordmark span { font-weight: 400; color: var(--text-secondary); }
+    .auth-title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .auth-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--surface-hover); border-color: #b7bdd2; }
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+    .btn-ghost {
+      border-color: transparent;
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover { background: #ecedf5; border-color: transparent; color: var(--text); }
+    .input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0, 115, 234, 0.14); }
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 12px;
+      margin: 18px 0;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ""; flex: 1; height: 1px; background: var(--border-light);
+    }
+    .auth-msg {
+      margin-top: 12px;
+      font-size: 13px;
+      min-height: 20px;
+      color: var(--primary);
+    }
+
+    /* ---------- Work OS Shell ---------- */
+    .os-shell {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background: var(--canvas-bg);
+    }
+    .app-rail {
+      width: 52px;
+      background: var(--rail-bg);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 0;
+      gap: 10px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 40;
+    }
+    .rail-logo {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,0.08);
+    }
+    .rail-btn {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #c5c7d0;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .rail-btn:hover, .rail-btn.active { background: var(--rail-hover); color: #ffffff; }
+    .rail-btn.active { box-shadow: inset 3px 0 0 #0073ea; }
+    .rail-spacer { flex: 1; }
+    .avatar-circle {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: #0073ea;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Workspace Left Sidebar */
+    .workspace-nav {
+      width: 240px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-light);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .ws-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 8px 16px;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 14px;
+    }
+    .ws-badge {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0073ea 0%, #579bfc 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .ws-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .ws-sub { font-size: 11px; color: var(--text-muted); }
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      padding: 10px 10px 6px;
+    }
+    .nav-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      text-decoration: none;
+      margin-bottom: 2px;
+      transition: background 0.12s;
+    }
+    .nav-item:hover { background: var(--surface-hover); }
+    .nav-item.active {
+      background: var(--primary-soft);
+      color: var(--primary-text);
+      font-weight: 600;
+    }
+    .nav-count {
+      margin-left: auto;
+      font-size: 11px;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: #eef0f6;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .nav-item.active .nav-count { background: #ffffff; color: var(--primary-text); }
+
+    .sidebar-cap-card {
+      margin-top: auto;
+      background: #f6f7fb;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .cap-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .cap-bar {
+      height: 7px;
+      background: #e1e4ee;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .cap-bar-fill {
+      height: 100%;
+      background: var(--status-done);
+      border-radius: 999px;
+      transition: width 0.25s;
+    }
+
+    /* Main Workspace Canvas */
+    .board-stage {
+      flex: 1;
+      min-width: 0;
+      padding: 16px 20px 48px;
+      display: flex;
+      flex-direction: column;
+    }
+    .board-surface {
+      background: var(--surface);
+      border-radius: var(--radius-board);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      min-height: calc(100vh - 32px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Board Header */
+    .board-header {
+      padding: 20px 26px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .board-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .board-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .board-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .board-subtitle {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+    .star-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #ffcb00;
+      font-size: 18px;
+      line-height: 1;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .star-btn:hover { background: var(--surface-hover); }
+    .board-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .live-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #ecfdf3;
+      color: #057a48;
+      font-weight: 600;
+    }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-done); }
+
+    /* View Tabs */
+    .view-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .view-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .view-tab:hover { color: var(--text); background: #f9fafc; }
+    .view-tab.active {
+      color: var(--primary);
+      font-weight: 600;
+      border-bottom-color: var(--primary);
+    }
+
+    /* Filter Toolbar */
+    .toolbar {
+      padding: 14px 26px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border-light);
+      background: #ffffff;
+    }
+    .search-wrap {
+      position: relative;
+      width: 240px;
+      max-width: 100%;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 6px 10px 6px 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--primary); }
+    .filter-select {
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #ffffff;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+    }
+    .toolbar-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+    }
+
+    /* Board Body */
+    .board-body {
+      padding: 20px 26px 36px;
+      flex: 1;
+      overflow-x: auto;
+    }
+
+    /* ---------- monday.com Group Tables ---------- */
+    .group-block { margin-bottom: 28px; }
+    .group-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .group-chevron {
+      width: 20px; height: 20px;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: transform 0.15s;
+    }
+    .group-block.collapsed .group-chevron { transform: rotate(-90deg); }
+    .group-name {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .group-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    .board-table-wrap {
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .board-grid {
+      min-width: 1060px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .grid-row {
+      display: grid;
+      grid-template-columns: 36px minmax(280px, 2.2fr) 128px 148px 140px 136px 124px 144px 96px;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border-light);
+      min-height: 38px;
+      background: #ffffff;
+      transition: background 0.1s;
+    }
+    .grid-row.header-row {
+      min-height: 34px;
+      border-top: 1px solid var(--border-light);
+      background: #ffffff;
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .grid-row.item-row:hover { background: var(--surface-hover); }
+    .grid-row.add-row { background: #ffffff; }
+    .grid-row.add-row:hover { background: #fafbfd; }
+
+    .cell {
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      position: relative;
+      font-size: 13px;
+    }
+    .cell:last-child { border-right: none; }
+    .cell-left { justify-content: flex-start; padding-left: 12px; padding-right: 8px; }
+    .cell-check { padding: 0; }
+    .row-checkbox { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+
+    /* Colored Left Accent Strip */
+    .accent-cell { border-left: 6px solid transparent; }
+
+    /* Item Title Cell */
+    .item-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      min-width: 0;
+    }
+    .item-id-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+    .inline-text-input {
+      border: 1px solid transparent;
+      background: transparent;
+      padding: 3px 6px;
+      border-radius: 4px;
+      width: 100%;
+      min-width: 0;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text);
+      text-overflow: ellipsis;
+    }
+    .inline-text-input:hover { border-color: #d6d9e6; background: #ffffff; }
+    .inline-text-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+      opacity: 0;
+      transition: opacity 0.12s;
+      flex-shrink: 0;
+    }
+    .grid-row.item-row:hover .row-actions,
+    .row-actions.always-show { opacity: 1; }
+    .mini-pill-btn {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid #d0d4e4;
+      background: #ffffff;
+      color: var(--primary);
+      cursor: pointer;
+    }
+    .mini-pill-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+    .icon-del-btn {
+      width: 22px; height: 22px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    }
+    .icon-del-btn:hover { background: #fee2e2; color: #e2445c; }
+
+    /* Owner Cell */
+    .owner-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      min-width: 0;
+    }
+    .owner-dot {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #303456;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Project Cell */
+    .project-input {
+      border: 1px solid transparent;
+      background: #f5f6fa;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+      width: 100%;
+      text-align: center;
+      color: var(--text);
+    }
+    .project-input:hover { border-color: var(--border); background: #ffffff; }
+    .project-input:focus { outline: none; border-color: var(--primary); background: #ffffff; }
+
+    /* Edge-to-Edge Full-Bleed Status / Priority / Domain Cells */
+    .bleed-cell {
+      padding: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .bleed-btn {
+      width: 100%;
+      height: 100%;
+      min-height: 37px;
+      border: none;
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: filter 0.12s;
+      padding: 0 8px;
+      text-align: center;
+    }
+    .bleed-btn:hover { filter: brightness(0.95); }
+    .bleed-btn::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 0 0 0 0;
+      border-color: transparent rgba(255,255,255,0.45) transparent transparent;
+      transition: border-width 0.12s;
+    }
+    .bleed-btn:hover::after { border-width: 0 8px 8px 0; }
+
+    /* Timeline Capsule */
+    .timeline-capsule {
+      width: 100%;
+      height: 24px;
+      border-radius: 999px;
+      background: #c4c7d0;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      padding: 0 8px;
+      transition: transform 0.1s;
+    }
+    .timeline-capsule:hover { opacity: 0.92; }
+
+    /* Effort Input */
+    .effort-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      width: 100%;
+    }
+    .effort-input {
+      width: 48px;
+      text-align: center;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 3px 2px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      background: transparent;
+    }
+    .effort-input:hover { border-color: var(--border); background: #ffffff; }
+    .effort-input:focus { outline: none; border-color: var(--primary); background: #ffffff; }
+    .effort-unit { font-size: 11px; color: var(--text-muted); }
+
+    /* Add Item Inline Input */
+    .quick-add-input {
+      width: 100%;
+      border: 1px solid transparent;
+      padding: 5px 8px;
+      border-radius: 4px;
+      background: transparent;
+      font-size: 13px;
+    }
+    .quick-add-input::placeholder { color: var(--text-muted); }
+    .quick-add-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    /* Group Summary Footer Row */
+    .summary-row {
+      min-height: 34px;
+      border-bottom: none;
+      background: #ffffff;
+      padding-top: 2px;
+    }
+    .summary-row .cell {
+      border-right: none;
+      padding: 4px 6px;
+    }
+    .battery-bar {
+      width: 100%;
+      height: 18px;
+      border-radius: 3px;
+      overflow: hidden;
+      display: flex;
+      background: #eef0f6;
+    }
+    .battery-seg { height: 100%; transition: width 0.25s; }
+    .summary-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: #f0f2f8;
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* ---------- Popovers & Modals ---------- */
+    .popover {
+      position: fixed;
+      z-index: 90;
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      box-shadow: var(--shadow-pop);
+      padding: 12px;
+      min-width: 184px;
+    }
+    .pop-option {
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 12.5px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+    }
+    .pop-option:last-child { margin-bottom: 0; }
+    .pop-option:hover { filter: brightness(0.94); }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 27, 52, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-card {
+      width: 100%;
+      max-width: 480px;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: var(--shadow-pop);
+    }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .form-grid { display: grid; gap: 12px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+    /* ---------- View 2: Gantt & Timeline ---------- */
+    .gantt-wrap {
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      overflow-x: auto;
+      background: #ffffff;
+    }
+    .gantt-inner { min-width: 960px; position: relative; }
+    .gantt-head {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      border-bottom: 1px solid var(--border-light);
+      background: #f9fafd;
+    }
+    .gantt-days {
+      display: grid;
+      grid-template-columns: repeat(21, 1fr);
+    }
+    .gantt-day-cell {
+      text-align: center;
+      padding: 8px 2px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      border-left: 1px solid #f0f2f8;
+    }
+    .gantt-day-cell.today { background: #e8f2ff; color: var(--primary); font-weight: 700; }
+    .gantt-day-cell.wknd { background: #f6f7fb; }
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      border-bottom: 1px solid var(--border-light);
+      min-height: 44px;
+      align-items: center;
+    }
+    .gantt-row:last-child { border-bottom: none; }
+    .gantt-label {
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: 1px solid var(--border-light);
+      min-width: 0;
+    }
+    .gantt-track {
+      position: relative;
+      height: 44px;
+      display: grid;
+      grid-template-columns: repeat(21, 1fr);
+      align-items: center;
+    }
+    .gantt-bg-col { height: 100%; border-left: 1px solid #f3f4f9; }
+    .gantt-bg-col.wknd { background: #fafbfd; }
+    .gantt-bg-col.today { border-left: 2px solid var(--primary); background: rgba(0,115,234,0.03); }
+    .gantt-bar {
+      position: absolute;
+      height: 26px;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+      z-index: 2;
+    }
+    .gantt-bar:active { cursor: grabbing; box-shadow: 0 6px 16px rgba(0,0,0,0.2); z-index: 5; }
+
+    /* ---------- View 3: Workload Capacity Matrix ---------- */
+    .workload-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(110px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .wl-card {
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+      cursor: pointer;
+      background: #ffffff;
+      transition: border-color 0.15s, transform 0.12s;
+    }
+    .wl-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+    .wl-card.selected { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0,115,234,0.15); }
+    .wl-date { font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 10px; }
+    .wl-bubble {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 8px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .wl-sub { font-size: 11.5px; color: var(--text-muted); }
+
+    /* ---------- View 4: Analytics Dashboard Widgets ---------- */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .widget-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .widget-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kpi-number {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .kpi-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .analytics-2col {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .donut-wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .legend-list { flex: 1; min-width: 180px; }
+    .legend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+    /* Toast */
+    .toast-stack {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      background: #181b34;
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-pop);
+    }
+
+    /* Mobile Bar */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #ffffff;
+      border-top: 1px solid var(--border-light);
+      z-index: 50;
+      padding: 4px 0;
+    }
+    .mobile-bottom-nav button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 8px 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .mobile-bottom-nav button.active { color: var(--primary); }
+
+    @media (max-width: 960px) {
+      .app-rail, .workspace-nav { display: none; }
+      .board-stage { padding: 10px 10px 72px; }
+      .board-header, .toolbar, .board-body { padding-left: 14px; padding-right: 14px; }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .analytics-2col { grid-template-columns: 1fr; }
+      .workload-grid { grid-template-columns: repeat(2, 1fr); }
+      .mobile-bottom-nav { display: flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIGN-IN VIEW -->
+  <div id="auth-view" class="auth-shell" style="display:none;">
+    <div class="auth-card">
+      <div class="brand-lockup">
+        <svg width="32" height="28" viewBox="0 0 36 30" aria-hidden="true">
+          <rect x="2" y="13" width="8.5" height="16" rx="4.25" transform="rotate(-24 6 21)" fill="#ff3d57"/>
+          <rect x="13" y="8" width="8.5" height="20" rx="4.25" transform="rotate(-24 17 18)" fill="#ffcb00"/>
+          <circle cx="29" cy="23" r="4.5" fill="#00ca72"/>
+        </svg>
+        <div class="brand-wordmark">Executive <span>Work OS</span></div>
+      </div>
+
+      <h1 class="auth-title">Sign in to your workspace</h1>
+      <p class="auth-sub">
+        Send <b>看板</b> in WeChat (<code>AI工作助理</code>) for instant one-click mobile access, or verify with a 6-digit WeChat code on desktop.
+      </p>
+
+      <button class="btn btn-primary" style="width:100%;padding:10px 16px;font-size:14px;" onclick="requestCode()">
+        Send 6-Digit Code to WeChat
+      </button>
+
+      <div class="auth-divider">OR ENTER CODE</div>
+
+      <div style="display:flex;gap:8px;">
+        <input id="login-code" class="input" placeholder="6-digit code" maxlength="6" style="font-size:15px;letter-spacing:0.18em;text-align:center;" onkeydown="if(event.key==='Enter') verifyCode();" />
+        <button class="btn btn-primary" onclick="verifyCode()" style="padding:0 20px;">Sign In</button>
+      </div>
+      <div id="login-msg" class="auth-msg"></div>
+    </div>
+  </div>
+
+  <!-- WORKSPACE APP SHELL -->
+  <div id="app-shell" class="os-shell" style="display:none;">
+    <!-- Far Left Navy Icon Rail -->
+    <aside class="app-rail" aria-label="Global Navigation">
+      <div class="rail-logo" title="Executive Work OS">
+        <svg width="24" height="20" viewBox="0 0 36 30" aria-hidden="true">
+          <rect x="2" y="13" width="8.5" height="16" rx="4.25" transform="rotate(-24 6 21)" fill="#ff3d57"/>
+          <rect x="13" y="8" width="8.5" height="20" rx="4.25" transform="rotate(-24 17 18)" fill="#ffcb00"/>
+          <circle cx="29" cy="23" r="4.5" fill="#00ca72"/>
+        </svg>
+      </div>
+      <button class="rail-btn active" id="rail-table" title="Main Table" onclick="switchView('table')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>
+      </button>
+      <button class="rail-btn" id="rail-gantt" title="Gantt & Timeline" onclick="switchView('gantt')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h10M8 12h12M5 18h9"/></svg>
+      </button>
+      <button class="rail-btn" id="rail-workload" title="Capacity Workload" onclick="switchView('workload')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+      </button>
+      <button class="rail-btn" id="rail-analytics" title="Executive Analytics" onclick="switchView('analytics')">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19V5M9 19v-8M14 19v-12M19 19v-5"/></svg>
+      </button>
+      <div class="rail-spacer"></div>
+      <button class="rail-btn" title="Sign Out" onclick="logout()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+      <div class="avatar-circle" title="Chairman">CH</div>
+    </aside>
+
+    <!-- Workspace Navigation Drawer -->
+    <aside class="workspace-nav" aria-label="Workspace Boards">
+      <div class="ws-header">
+        <div class="ws-badge">W</div>
+        <div>
+          <div class="ws-title">Wissentek Executive</div>
+          <div class="ws-sub">Work OS · 21Vianet Cloud</div>
+        </div>
+      </div>
+
+      <div class="nav-section-label">Boards &amp; Views</div>
+      <button class="nav-item active" id="side-table" onclick="switchView('table')">
+        <span>Master Action Board</span>
+        <span class="nav-count" id="cnt-open">0</span>
+      </button>
+      <button class="nav-item" id="side-gantt" onclick="switchView('gantt')">
+        <span>Gantt &amp; Timeline</span>
+        <span class="nav-count" id="cnt-proj">0</span>
+      </button>
+      <button class="nav-item" id="side-workload" onclick="switchView('workload')">
+        <span>Capacity Workload</span>
+        <span class="nav-count" id="cnt-today-badge">0h</span>
+      </button>
+      <button class="nav-item" id="side-analytics" onclick="switchView('analytics')">
+        <span>Executive Analytics</span>
+        <span class="nav-count" id="cnt-wait">0</span>
+      </button>
+
+      <div class="nav-section-label" style="margin-top:12px;">Cloud Storage</div>
+      <a class="nav-item" id="side-vault-link" target="_blank" rel="noopener">
+        <span>SharePoint Vault</span>
+        <span style="margin-left:auto;color:var(--text-muted);font-size:12px;">↗</span>
+      </a>
+      <a class="nav-item" id="side-lists-link" target="_blank" rel="noopener">
+        <span>OneDrive 4 Lists</span>
+        <span style="margin-left:auto;color:var(--text-muted);font-size:12px;">↗</span>
+      </a>
+
+      <div class="sidebar-cap-card">
+        <div class="cap-row">
+          <span style="font-weight:600;color:var(--text);">Today Net Effort</span>
+          <span id="side-cap-text" style="font-weight:700;color:var(--text);">0h / 6h</span>
+        </div>
+        <div class="cap-bar"><div class="cap-bar-fill" id="side-cap-fill" style="width:0%;"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Synced with 21Vianet Markdown boards</div>
+      </div>
+    </aside>
+
+    <!-- Main Rounded Board Stage -->
+    <main class="board-stage">
+      <div class="board-surface">
+        <header class="board-header">
+          <div class="board-top-row">
+            <div>
+              <div class="board-title-wrap">
+                <h1 class="board-title">Executive Master Board</h1>
+                <button class="star-btn" title="Favorite board">★</button>
+                <span class="live-pill"><span class="live-dot"></span>21Vianet Live Sync</span>
+              </div>
+              <p class="board-subtitle">Separate net personal hours from external wait days · Changes sync automatically to cloud Markdown boards</p>
+            </div>
+            <div class="board-actions">
+              <a class="btn" id="hdr-vault-link" target="_blank" rel="noopener">Cloud Vault ↗</a>
+              <button class="btn" onclick="syncOneDrive(this)">Sync Markdown</button>
+              <button class="btn btn-primary" onclick="openNewItemModal()">+ New Item</button>
+            </div>
+          </div>
+
+          <div class="view-tabs" role="tablist">
+            <button class="view-tab active" id="tab-table" onclick="switchView('table')">Main Table</button>
+            <button class="view-tab" id="tab-gantt" onclick="switchView('gantt')">Gantt &amp; Timeline</button>
+            <button class="view-tab" id="tab-workload" onclick="switchView('workload')">Workload</button>
+            <button class="view-tab" id="tab-analytics" onclick="switchView('analytics')">Analytics</button>
+          </div>
+        </header>
+
+        <div class="toolbar" id="board-toolbar">
+          <div class="search-wrap">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="filter-search" class="search-input" placeholder="Search items, projects, owners..." oninput="renderActiveView()" />
+          </div>
+          <select id="filter-domain" class="filter-select" onchange="renderActiveView()">
+            <option value="">All Domains</option>
+          </select>
+          <select id="filter-prio" class="filter-select" onchange="renderActiveView()">
+            <option value="">All Priorities</option>
+            <option value="P0">Critical (P0)</option>
+            <option value="P1">High (P1)</option>
+            <option value="P2">Normal (P2)</option>
+          </select>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
+            <input type="checkbox" id="toggle-done" checked onchange="renderActiveView()" /> Show Completed
+          </label>
+          <div class="toolbar-right" id="toolbar-stats">0 pulses · 0.0h total</div>
+        </div>
+
+        <div class="board-body" id="board-body"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-bottom-nav" id="mobile-nav" style="display:none;">
+    <button class="active" id="mob-table" onclick="switchView('table')">Board</button>
+    <button id="mob-gantt" onclick="switchView('gantt')">Timeline</button>
+    <button id="mob-workload" onclick="switchView('workload')">Workload</button>
+    <button id="mob-analytics" onclick="switchView('analytics')">Analytics</button>
+  </nav>
+
+  <!-- Floating Popover Container -->
+  <div id="popover-root"></div>
+  <!-- Modal Container -->
+  <div id="modal-root"></div>
+  <!-- Toast Notifications -->
+  <div id="toast-stack" class="toast-stack"></div>
+
+  <script>
+    const DOMAIN_MAP = {
+      "产品研发": { label: "R&D & Product", color: "#0086c0" },
+      "客户销售": { label: "Sales & GTM", color: "#ff642e" },
+      "项目交付": { label: "Project Delivery", color: "#00c875" },
+      "采购供应链": { label: "Supply Chain", color: "#a25ddc" },
+      "公司治理与人事": { label: "Governance & HR", color: "#cab641" },
+      "个人思考": { label: "Strategy & Notes", color: "#579bfc" }
+    };
+
+    const STATUS_DEF = {
+      done: { label: "Done", color: "#00c875" },
+      working: { label: "Working on it", color: "#fdab3d" },
+      stuck: { label: "Stuck / Waiting", color: "#e2445c" },
+      todo: { label: "To Do", color: "#c4c4c4" }
+    };
+
+    const PRIO_DEF = {
+      P0: { label: "Critical", color: "#333333" },
+      P1: { label: "High", color: "#401694" },
+      P2: { label: "Normal", color: "#579bfc" }
+    };
+
+    const GROUPS = [
+      { key: "active", listTypeDefault: "next_action", title: "Active Actions", color: "#579bfc" },
+      { key: "waiting", listTypeDefault: "waiting_for", title: "Waiting on Others", color: "#fdab3d" },
+      { key: "idea", listTypeDefault: "idea", title: "Idea Incubator", color: "#a25ddc" },
+      { key: "done", listTypeDefault: "project_action", title: "Completed", color: "#00c875" }
+    ];
+
+    let STATE = null;
+    let ACTIVE_VIEW = "table";
+    let SELECTED_WL_DATE = null;
+    const COLLAPSED_GROUPS = {};
+
+    function escHtml(v) {
+      return String(v == null ? "" : v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById("toast-stack");
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => el.remove(), 3200);
+    }
+
+    function domainMeta(raw) {
+      return DOMAIN_MAP[raw] || { label: raw || "General", color: "#579bfc" };
+    }
+
+    function displayOwner(owner) {
+      if (!owner || owner === "本人") return "Chairman";
+      return owner;
+    }
+
+    function displayProject(proj) {
+      if (!proj || proj === "日常事务") return "General Ops";
+      return proj;
+    }
+
+    function initials(name) {
+      const s = (name || "CH").trim();
+      if (/^[A-Za-z0-9]/.test(s)) return s.slice(0, 2).toUpperCase();
+      return s.slice(0, 1);
+    }
+
+    function statusMeta(item) {
+      if (item.status === "done") return { key: "done", ...STATUS_DEF.done };
+      if (item.status === "in_progress") return { key: "working", ...STATUS_DEF.working };
+      if (item.list_type === "waiting_for") return { key: "stuck", ...STATUS_DEF.stuck };
+      return { key: "todo", ...STATUS_DEF.todo };
+    }
+
+    function prioMeta(p) {
+      return PRIO_DEF[p] || PRIO_DEF.P1;
+    }
+
+    function fmtShortDate(iso) {
+      if (!iso) return "";
+      const parts = iso.split("-");
+      if (parts.length !== 3) return iso;
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+
+    function fmtRange(s, e) {
+      const a = fmtShortDate(s);
+      const b = fmtShortDate(e);
+      if (a && b && a !== b) return `${a} - ${b}`;
+      return a || b || "Set dates";
+    }
+
+    function addDaysIso(iso, delta) {
+      const base = iso ? new Date(iso + "T00:00:00") : new Date();
+      base.setDate(base.getDate() + delta);
+      const y = base.getFullYear();
+      const m = String(base.getMonth() + 1).padStart(2, "0");
+      const d = String(base.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    async function api(url, opts = {}) {
+      const res = await fetch(url, {
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
+        ...opts
+      });
+      if (res.status === 401) {
+        showLogin();
+        throw new Error("Unauthorized");
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        showToast(err.detail || "Action failed");
+        throw new Error(err.detail || "API Error");
+      }
+      return res.json();
+    }
+
+    function showLogin() {
+      document.getElementById("auth-view").style.display = "flex";
+      document.getElementById("app-shell").style.display = "none";
+      document.getElementById("mobile-nav").style.display = "none";
+    }
+
+    async function requestCode() {
+      const msgEl = document.getElementById("login-msg");
+      msgEl.textContent = "Sending verification code...";
+      const r = await fetch("/api/auth/request-code", { method: "POST" });
+      const j = await r.json().catch(() => ({}));
+      msgEl.textContent = j.message || j.detail || "Code requested.";
+    }
+
+    async function verifyCode() {
+      const code = document.getElementById("login-code").value.trim();
+      const msgEl = document.getElementById("login-msg");
+      if (code.length !== 6) {
+        msgEl.textContent = "Please enter the 6-digit code from WeChat.";
+        return;
+      }
+      const r = await fetch("/api/auth/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+      if (r.ok) {
+        await boot();
+      } else {
+        const j = await r.json().catch(() => ({}));
+        msgEl.textContent = j.detail || "Invalid or expired code.";
+      }
+    }
+
+    async function logout() {
+      await fetch("/api/auth/logout", { method: "POST" });
+      showLogin();
+    }
+
+    async function syncOneDrive(btn) {
+      const old = btn ? btn.textContent : "";
+      if (btn) btn.textContent = "Syncing...";
+      try {
+        await api("/api/sync/onedrive", { method: "POST" });
+        showToast("Synced all 5 Markdown boards to 21Vianet OneDrive");
+      } finally {
+        if (btn) btn.textContent = old;
+      }
+    }
+
+    function switchView(view) {
+      ACTIVE_VIEW = view;
+      closePopovers();
+      for (const v of ["table", "gantt", "workload", "analytics"]) {
+        document.getElementById("tab-" + v)?.classList.toggle("active", v === view);
+        document.getElementById("side-" + v)?.classList.toggle("active", v === view);
+        document.getElementById("rail-" + v)?.classList.toggle("active", v === view);
+        document.getElementById("mob-" + v)?.classList.toggle("active", v === view);
+      }
+      renderActiveView();
+    }
+
+    function populateDomainFilter() {
+      const sel = document.getElementById("filter-domain");
+      if (sel.options.length > 1) return;
+      for (const [k, meta] of Object.entries(DOMAIN_MAP)) {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = meta.label;
+        sel.appendChild(opt);
+      }
+    }
+
+    function getFilteredItems() {
+      const all = STATE?.items || [];
+      const q = (document.getElementById("filter-search")?.value || "").trim().toLowerCase();
+      const dom = document.getElementById("filter-domain")?.value || "";
+      const prio = document.getElementById("filter-prio")?.value || "";
+      const showDone = document.getElementById("toggle-done")?.checked ?? true;
+      return all.filter(i => {
+        if (!showDone && i.status === "done") return false;
+        if (dom && i.work_domain !== dom) return false;
+        if (prio && i.priority !== prio) return false;
+        if (q) {
+          const hay = `${i.title} ${i.project_name} ${i.owner} ${domainMeta(i.work_domain).label}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function updateShellCounters() {
+      const ov = STATE;
+      if (!ov) return;
+      document.getElementById("hdr-vault-link").href = ov.onedrive_vault_url || "#";
+      document.getElementById("side-vault-link").href = ov.onedrive_vault_url || "#";
+      document.getElementById("side-lists-link").href = ov.onedrive_lists_url || "#";
+
+      const items = ov.items || [];
+      const openCount = items.filter(i => i.status !== "done").length;
+      const cap = ov.daily_capacity_hours || 6.0;
+      const todayBooked = ((ov.workload?.days || {})[ov.today] || { booked_hours: 0 }).booked_hours || 0;
+      const capPct = Math.min(100, Math.round((todayBooked / Math.max(cap, 1)) * 100));
+
+      document.getElementById("cnt-open").textContent = openCount;
+      document.getElementById("cnt-proj").textContent = (ov.projects || []).length;
+      document.getElementById("cnt-today-badge").textContent = `${todayBooked}h`;
+      document.getElementById("cnt-wait").textContent = (ov.waiting_items || []).length;
+      document.getElementById("side-cap-text").textContent = `${todayBooked}h / ${cap}h`;
+      const fill = document.getElementById("side-cap-fill");
+      fill.style.width = `${capPct}%`;
+      fill.style.background = todayBooked > cap ? "var(--status-stuck)" : (capPct > 75 ? "var(--status-working)" : "var(--status-done)");
+
+      const filtered = getFilteredItems();
+      const hrs = filtered.reduce((acc, x) => acc + Number(x.estimated_hours || 0), 0);
+      document.getElementById("toolbar-stats").textContent = `${filtered.length} items · ${hrs.toFixed(1)}h est.`;
+    }
+
+    function renderActiveView() {
+      if (!STATE) return;
+      updateShellCounters();
+      const body = document.getElementById("board-body");
+      if (ACTIVE_VIEW === "table") renderMainTable(body);
+      else if (ACTIVE_VIEW === "gantt") renderGanttView(body);
+      else if (ACTIVE_VIEW === "workload") renderWorkloadView(body);
+      else renderAnalyticsView(body);
+    }
+
+    function classifyGroup(item) {
+      if (item.status === "done") return "done";
+      if (item.list_type === "waiting_for") return "waiting";
+      if (item.list_type === "idea") return "idea";
+      return "active";
+    }
+
+    function buildBatteryHtml(counts) {
+      const total = counts.reduce((a, b) => a + b.n, 0);
+      if (!total) return '<div class="battery-bar"></div>';
+      return '<div class="battery-bar">' + counts.filter(c => c.n > 0).map(c =>
+        `<div class="battery-seg" style="width:${(c.n / total) * 100}%;background:${c.color};" title="${escHtml(c.label)}: ${c.n}"></div>`
+      ).join("") + "</div>";
+    }
+
+    function renderMainTable(root) {
+      const items = getFilteredItems();
+      const showDone = document.getElementById("toggle-done")?.checked ?? true;
+      const visibleGroups = GROUPS.filter(g => g.key !== "done" || showDone);
+
+      root.innerHTML = visibleGroups.map(g => {
+        const rows = items.filter(i => classifyGroup(i) === g.key);
+        const collapsed = !!COLLAPSED_GROUPS[g.key];
+        const totalHrs = rows.reduce((a, b) => a + Number(b.estimated_hours || 0), 0);
+        const minDate = rows.map(r => r.planned_start_at).filter(Boolean).sort()[0] || "";
+        const maxDate = rows.map(r => r.planned_end_at).filter(Boolean).sort().slice(-1)[0] || "";
+
+        const statusBattery = buildBatteryHtml([
+          { label: "Done", color: STATUS_DEF.done.color, n: rows.filter(r => statusMeta(r).key === "done").length },
+          { label: "Working", color: STATUS_DEF.working.color, n: rows.filter(r => statusMeta(r).key === "working").length },
+          { label: "Stuck", color: STATUS_DEF.stuck.color, n: rows.filter(r => statusMeta(r).key === "stuck").length },
+          { label: "To Do", color: STATUS_DEF.todo.color, n: rows.filter(r => statusMeta(r).key === "todo").length }
+        ]);
+        const prioBattery = buildBatteryHtml([
+          { label: "Critical", color: PRIO_DEF.P0.color, n: rows.filter(r => r.priority === "P0").length },
+          { label: "High", color: PRIO_DEF.P1.color, n: rows.filter(r => r.priority === "P1").length },
+          { label: "Normal", color: PRIO_DEF.P2.color, n: rows.filter(r => r.priority === "P2").length }
+        ]);
+
+        const rowsHtml = rows.map(item => {
+          const st = statusMeta(item);
+          const pr = prioMeta(item.priority);
+          const dm = domainMeta(item.work_domain);
+          const own = displayOwner(item.owner);
+          const proj = displayProject(item.project_name);
+          const isIdea = item.list_type === "idea" && item.status !== "done";
+
+          return `
+            <div class="grid-row item-row">
+              <div class="cell cell-check accent-cell" style="border-left-color:${g.color};">
+                <input type="checkbox" class="row-checkbox" ${item.status === "done" ? "checked" : ""} onchange="toggleItemDone(${item.id}, this.checked)" title="Mark Done" />
+              </div>
+              <div class="cell cell-left">
+                <div class="item-title-wrap">
+                  <span class="item-id-badge">#${item.id}</span>
+                  <input class="inline-text-input" value="${escHtml(item.title)}" onchange="patchField(${item.id}, 'title', this.value)" />
+                  <div class="row-actions ${isIdea ? "always-show" : ""}">
+                    ${isIdea ? `<button class="mini-pill-btn" onclick="openPromoteModal(${item.id})">Promote</button>` : ""}
+                    <button class="icon-del-btn" title="Delete item" onclick="deleteItem(${item.id})">&times;</button>
+                  </div>
+                </div>
+              </div>
+              <div class="cell">
+                <div class="owner-chip">
+                  <span class="owner-dot" style="background:${dm.color};">${escHtml(initials(own))}</span>
+                  <input class="inline-text-input" style="font-size:12.5px;padding:2px 4px;" value="${escHtml(own)}" onchange="patchField(${item.id}, 'owner', this.value)" />
+                </div>
+              </div>
+              <div class="cell bleed-cell">
+                <button class="bleed-btn" style="background:${dm.color};" onclick="openDomainPopover(event, ${item.id})">${escHtml(dm.label)}</button>
+              </div>
+              <div class="cell">
+                <input class="project-input" value="${escHtml(proj)}" onchange="patchField(${item.id}, 'project_name', this.value)" />
+              </div>
+              <div class="cell bleed-cell">
+                <button class="bleed-btn" style="background:${st.color};" onclick="openStatusPopover(event, ${item.id}, '${item.list_type}')">${escHtml(st.label)}</button>
+              </div>
+              <div class="cell bleed-cell">
+                <button class="bleed-btn" style="background:${pr.color};" onclick="openPriorityPopover(event, ${item.id})">${escHtml(pr.label)}</button>
+              </div>
+              <div class="cell">
+                <button class="timeline-capsule" style="background:${st.key === "done" ? "#00c875" : g.color};" onclick="openTimelinePopover(event, ${item.id}, '${escHtml(item.planned_start_at || "")}', '${escHtml(item.planned_end_at || "")}')">
+                  ${escHtml(fmtRange(item.planned_start_at, item.planned_end_at))}
+                </button>
+              </div>
+              <div class="cell">
+                <div class="effort-wrap">
+                  <input type="number" step="0.5" min="0" max="200" class="effort-input" value="${item.estimated_hours}" onchange="patchField(${item.id}, 'estimated_hours', parseFloat(this.value || '0.5'))" />
+                  <span class="effort-unit">h</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        return `
+          <section class="group-block ${collapsed ? "collapsed" : ""}">
+            <div class="group-header" onclick="toggleGroup('${g.key}')">
+              <span class="group-chevron" style="color:${g.color};">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 5.646a.5.5 0 0 1 .708 0L8 8.293l2.646-2.647a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 0 1 0-.708z"/></svg>
+              </span>
+              <span class="group-name" style="color:${g.color};">${g.title}</span>
+              <span class="group-meta">${rows.length} ${rows.length === 1 ? "item" : "items"}</span>
+            </div>
+
+            ${collapsed ? "" : `
+              <div class="board-table-wrap">
+                <div class="board-grid">
+                  <div class="grid-row header-row">
+                    <div class="cell cell-check accent-cell" style="border-left-color:${g.color};"></div>
+                    <div class="cell cell-left">Item</div>
+                    <div class="cell">Owner</div>
+                    <div class="cell">Domain</div>
+                    <div class="cell">Project</div>
+                    <div class="cell">Status</div>
+                    <div class="cell">Priority</div>
+                    <div class="cell">Timeline</div>
+                    <div class="cell">Est. Effort</div>
+                  </div>
+                  ${rowsHtml}
+                  <div class="grid-row add-row">
+                    <div class="cell cell-check accent-cell" style="border-left-color:${g.color};opacity:0.45;"></div>
+                    <div class="cell cell-left" style="grid-column: 2 / span 8;">
+                      <input class="quick-add-input" placeholder="+ Add item to ${g.title} (press Enter)" onkeydown="if(event.key==='Enter') quickAddItem(this, '${g.listTypeDefault}', ${g.key === 'done'})" />
+                    </div>
+                  </div>
+                  <div class="grid-row summary-row">
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell"></div>
+                    <div class="cell">${statusBattery}</div>
+                    <div class="cell">${prioBattery}</div>
+                    <div class="cell"><span class="summary-pill">${minDate || maxDate ? escHtml(fmtRange(minDate, maxDate)) : "—"}</span></div>
+                    <div class="cell"><span class="summary-pill">&Sigma; ${totalHrs.toFixed(1)}h</span></div>
+                  </div>
+                </div>
+              </div>
+            `}
+          </section>
+        `;
+      }).join("");
+    }
+
+    function toggleGroup(k) {
+      COLLAPSED_GROUPS[k] = !COLLAPSED_GROUPS[k];
+      renderActiveView();
+    }
+
+    async function patchField(id, field, val) {
+      if (field === "estimated_hours" && (Number.isNaN(val) || val < 0)) return;
+      await api(`/api/items/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ [field]: val })
+      });
+      showToast(`Updated item #${id}`);
+      await loadOverview();
+    }
+
+    async function toggleItemDone(id, checked) {
+      if (checked) {
+        await api(`/api/items/${id}/complete`, { method: "POST", body: JSON.stringify({}) });
+        showToast(`Item #${id} marked Done`);
+      } else {
+        await api(`/api/items/${id}`, { method: "PATCH", body: JSON.stringify({ status: "todo" }) });
+        showToast(`Item #${id} reopened`);
+      }
+      await loadOverview();
+    }
+
+    async function quickAddItem(inputEl, listType, markDone) {
+      const title = inputEl.value.trim();
+      if (!title) return;
+      inputEl.disabled = true;
+      try {
+        const res = await api("/api/items", {
+          method: "POST",
+          body: JSON.stringify({
+            title,
+            list_type: listType,
+            work_domain: "产品研发",
+            project_name: "General Ops",
+            owner: "Chairman",
+            estimated_hours: 1.0,
+            priority: "P1"
+          })
+        });
+        if (markDone && res.created_ids?.length) {
+          await api(`/api/items/${res.created_ids[0]}/complete`, { method: "POST", body: JSON.stringify({}) });
+        }
+        showToast(`Added "${title}"`);
+        await loadOverview();
+      } finally {
+        inputEl.disabled = false;
+      }
+    }
+
+    async function deleteItem(id) {
+      await api(`/api/items/${id}`, { method: "DELETE" });
+      showToast(`Removed item #${id}`);
+      await loadOverview();
+    }
+
+    /* ---------- Popovers (Status / Priority / Domain / Timeline) ---------- */
+    function closePopovers() {
+      document.getElementById("popover-root").innerHTML = "";
+    }
+
+    function placePopover(evt, html) {
+      evt.stopPropagation();
+      const root = document.getElementById("popover-root");
+      root.innerHTML = `<div class="popover" onclick="event.stopPropagation()">${html}</div>`;
+      const pop = root.firstElementChild;
+      const rect = evt.currentTarget.getBoundingClientRect();
+      const top = Math.min(window.innerHeight - pop.offsetHeight - 12, rect.bottom + 6);
+      const left = Math.min(window.innerWidth - pop.offsetWidth - 12, Math.max(8, rect.left));
+      pop.style.top = `${top}px`;
+      pop.style.left = `${left}px`;
+    }
+
+    document.addEventListener("click", closePopovers);
+
+    function openStatusPopover(evt, id, curListType) {
+      const html = [
+        { k: "working", label: STATUS_DEF.working.label, color: STATUS_DEF.working.color },
+        { k: "done", label: STATUS_DEF.done.label, color: STATUS_DEF.done.color },
+        { k: "stuck", label: STATUS_DEF.stuck.label, color: STATUS_DEF.stuck.color },
+        { k: "todo", label: STATUS_DEF.todo.label, color: STATUS_DEF.todo.color }
+      ].map(o => `<button class="pop-option" style="background:${o.color};" onclick="applyStatus(${id}, '${o.k}', '${curListType}')">${o.label}</button>`).join("");
+      placePopover(evt, html);
+    }
+
+    async function applyStatus(id, key, curListType) {
+      closePopovers();
+      if (key === "done") {
+        await api(`/api/items/${id}/complete`, { method: "POST", body: JSON.stringify({}) });
+      } else if (key === "working") {
+        await api(`/api/items/${id}/start`, { method: "POST" });
+      } else if (key === "stuck") {
+        await api(`/api/items/${id}`, { method: "PATCH", body: JSON.stringify({ status: "todo", list_type: "waiting_for" }) });
+      } else {
+        const nextType = curListType === "waiting_for" ? "next_action" : curListType;
+        await api(`/api/items/${id}`, { method: "PATCH", body: JSON.stringify({ status: "todo", list_type: nextType }) });
+      }
+      showToast("Status updated & queued for cloud sync");
+      await loadOverview();
+    }
+
+    function openPriorityPopover(evt, id) {
+      const html = Object.entries(PRIO_DEF).map(([k, v]) =>
+        `<button class="pop-option" style="background:${v.color};" onclick="applyPriority(${id}, '${k}')">${v.label} (${k})</button>`
+      ).join("");
+      placePopover(evt, html);
+    }
+
+    async function applyPriority(id, p) {
+      closePopovers();
+      await patchField(id, "priority", p);
+    }
+
+    function openDomainPopover(evt, id) {
+      const html = Object.entries(DOMAIN_MAP).map(([k, v]) =>
+        `<button class="pop-option" style="background:${v.color};" onclick="applyDomain(${id}, '${k}')">${v.label}</button>`
+      ).join("");
+      placePopover(evt, html);
+    }
+
+    async function applyDomain(id, rawDomain) {
+      closePopovers();
+      await patchField(id, "work_domain", rawDomain);
+    }
+
+    function openTimelinePopover(evt, id, startVal, endVal) {
+      const html = `
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--text);">Schedule Range</div>
+        <div style="margin-bottom:8px;">
+          <label class="form-label">Start Date</label>
+          <input type="date" id="pop-start" class="input" value="${escHtml(startVal)}" />
+        </div>
+        <div style="margin-bottom:10px;">
+          <label class="form-label">End Date</label>
+          <input type="date" id="pop-end" class="input" value="${escHtml(endVal)}" />
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="saveTimeline(${id})">Apply Timeline</button>
+      `;
+      placePopover(evt, html);
+    }
+
+    async function saveTimeline(id) {
+      const s = document.getElementById("pop-start").value;
+      const e = document.getElementById("pop-end").value || s;
+      closePopovers();
+      await api(`/api/items/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ planned_start_at: s, planned_end_at: e })
+      });
+      showToast("Timeline saved");
+      await loadOverview();
+    }
+
+    /* ---------- Modals (New Item / Promote Idea) ---------- */
+    function closeModal() {
+      document.getElementById("modal-root").innerHTML = "";
+    }
+
+    function openNewItemModal() {
+      const domainOpts = Object.entries(DOMAIN_MAP).map(([k, v]) =>
+        `<option value="${k}">${v.label}</option>`
+      ).join("");
+      document.getElementById("modal-root").innerHTML = `
+        <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+          <div class="modal-card">
+            <div class="modal-title">Create New Board Item</div>
+            <div class="form-grid">
+              <div>
+                <label class="form-label">Item Title</label>
+                <input id="ni-title" class="input" placeholder="e.g. Finalize 2U chassis thermal spec" autofocus />
+              </div>
+              <div class="form-row-2">
+                <div>
+                  <label class="form-label">Group / List</label>
+                  <select id="ni-list" class="input">
+                    <option value="next_action">Active Actions</option>
+                    <option value="project_action">Project Milestone</option>
+                    <option value="waiting_for">Waiting on Others</option>
+                    <option value="idea">Idea Incubator</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Business Domain</label>
+                  <select id="ni-domain" class="input">${domainOpts}</select>
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div>
+                  <label class="form-label">Project Name</label>
+                  <input id="ni-project" class="input" value="General Ops" />
+                </div>
+                <div>
+                  <label class="form-label">Owner</label>
+                  <input id="ni-owner" class="input" value="Chairman" />
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div>
+                  <label class="form-label">Start Date</label>
+                  <input type="date" id="ni-start" class="input" value="${STATE.today}" />
+                </div>
+                <div>
+                  <label class="form-label">Target End Date</label>
+                  <input type="date" id="ni-end" class="input" value="${addDaysIso(STATE.today, 2)}" />
+                </div>
+              </div>
+              <div class="form-row-2">
+                <div>
+                  <label class="form-label">Priority</label>
+                  <select id="ni-prio" class="input">
+                    <option value="P0">Critical (P0)</option>
+                    <option value="P1" selected>High (P1)</option>
+                    <option value="P2">Normal (P2)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Estimated Net Effort (hrs)</label>
+                  <input type="number" step="0.5" id="ni-hrs" class="input" value="1.5" />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn" onclick="closeModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="submitNewItem()">Create Item</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function submitNewItem() {
+      const title = document.getElementById("ni-title").value.trim();
+      if (!title) return;
+      await api("/api/items", {
+        method: "POST",
+        body: JSON.stringify({
+          title,
+          list_type: document.getElementById("ni-list").value,
+          work_domain: document.getElementById("ni-domain").value,
+          project_name: document.getElementById("ni-project").value.trim() || "General Ops",
+          owner: document.getElementById("ni-owner").value.trim() || "Chairman",
+          planned_start_at: document.getElementById("ni-start").value || STATE.today,
+          planned_end_at: document.getElementById("ni-end").value || STATE.today,
+          priority: document.getElementById("ni-prio").value,
+          estimated_hours: parseFloat(document.getElementById("ni-hrs").value || "1.0")
+        })
+      });
+      closeModal();
+      showToast("Item created & syncing to OneDrive");
+      await loadOverview();
+    }
+
+    function openPromoteModal(id) {
+      const item = (STATE.items || []).find(x => x.id === id);
+      if (!item) return;
+      document.getElementById("modal-root").innerHTML = `
+        <div class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+          <div class="modal-card">
+            <div class="modal-title">Promote Idea #${id} to Active Project</div>
+            <div class="form-grid">
+              <div>
+                <label class="form-label">Project Name</label>
+                <input id="pm-proj" class="input" value="${escHtml(displayProject(item.project_name))}" />
+              </div>
+              <div class="form-row-2">
+                <div>
+                  <label class="form-label">Kickoff Date</label>
+                  <input type="date" id="pm-start" class="input" value="${escHtml(item.planned_start_at || STATE.today)}" />
+                </div>
+                <div>
+                  <label class="form-label">Target End Date</label>
+                  <input type="date" id="pm-end" class="input" value="${escHtml(item.planned_end_at || addDaysIso(STATE.today, 7))}" />
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Estimated Net Effort (hrs)</label>
+                <input type="number" step="0.5" id="pm-hrs" class="input" value="${item.estimated_hours || 2.0}" />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn" onclick="closeModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="submitPromote(${id})">Promote Now</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function submitPromote(id) {
+      await api(`/api/items/${id}/promote`, {
+        method: "POST",
+        body: JSON.stringify({
+          project_name: document.getElementById("pm-proj").value.trim() || "New Project",
+          planned_start_at: document.getElementById("pm-start").value || STATE.today,
+          planned_end_at: document.getElementById("pm-end").value || STATE.today,
+          estimated_hours: parseFloat(document.getElementById("pm-hrs").value || "2.0")
+        })
+      });
+      closeModal();
+      showToast(`Idea #${id} promoted to Project Action`);
+      await loadOverview();
+    }
+
+    /* ---------- View 2: Gantt & Timeline (with Drag-to-Shift) ---------- */
+    function renderGanttView(root) {
+      const items = getFilteredItems().filter(i => i.list_type !== "idea");
+      const startWin = addDaysIso(STATE.today, -3);
+      const days = Array.from({ length: 21 }, (_, idx) => {
+        const iso = addDaysIso(startWin, idx);
+        const dt = new Date(iso + "T00:00:00");
+        const dow = dt.getDay();
+        return {
+          iso,
+          label: `${dt.getMonth() + 1}/${dt.getDate()}`,
+          isToday: iso === STATE.today,
+          isWknd: dow === 0 || dow === 6
+        };
+      });
+
+      const dayIdx = iso => {
+        if (!iso) return 3;
+        const diff = Math.round((new Date(iso + "T00:00:00") - new Date(startWin + "T00:00:00")) / 86400000);
+        return diff;
+      };
+
+      const rowsHtml = items.map(item => {
+        const sRaw = item.planned_start_at || STATE.today;
+        const eRaw = item.planned_end_at || sRaw;
+        const sIdx = Math.max(0, Math.min(20, dayIdx(sRaw)));
+        const eIdx = Math.max(sIdx, Math.min(20, dayIdx(eRaw)));
+        const leftPct = (sIdx / 21) * 100;
+        const widthPct = Math.max(100 / 21, ((eIdx - sIdx + 1) / 21) * 100);
+        const st = statusMeta(item);
+
+        return `
+          <div class="gantt-row">
+            <div class="gantt-label">
+              <span class="owner-dot" style="width:20px;height:20px;font-size:9px;background:${domainMeta(item.work_domain).color};">${escHtml(initials(displayOwner(item.owner)))}</span>
+              <div style="min-width:0;flex:1;">
+                <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(item.title)}</div>
+                <div style="font-size:11px;color:var(--text-muted);">${escHtml(displayProject(item.project_name))} · ${item.estimated_hours}h</div>
+              </div>
+            </div>
+            <div class="gantt-track" data-track>
+              ${days.map(d => `<div class="gantt-bg-col ${d.isWknd ? "wknd" : ""} ${d.isToday ? "today" : ""}"></div>`).join("")}
+              <div class="gantt-bar" style="left:${leftPct}%;width:${widthPct}%;background:${st.color};"
+                   data-id="${item.id}" data-start="${escHtml(sRaw)}" data-end="${escHtml(eRaw)}"
+                   onmousedown="startGanttDrag(event, this)">
+                <span style="overflow:hidden;text-overflow:ellipsis;">${escHtml(fmtRange(sRaw, eRaw))}</span>
+                <span>${item.estimated_hours}h</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("") || '<div style="padding:32px;text-align:center;color:var(--text-muted);">No scheduled items yet. Add items in Main Table to see their timeline here.</div>';
+
+      root.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:13px;color:var(--text-secondary);">Drag any timeline bar horizontally to reschedule start &amp; target dates automatically.</div>
+          <span class="summary-pill">21-Day Rolling Window</span>
+        </div>
+        <div class="gantt-wrap">
+          <div class="gantt-inner">
+            <div class="gantt-head">
+              <div class="gantt-label" style="font-weight:600;font-size:12.5px;color:var(--text-secondary);">Scheduled Pulses</div>
+              <div class="gantt-days">
+                ${days.map(d => `<div class="gantt-day-cell ${d.isWknd ? "wknd" : ""} ${d.isToday ? "today" : ""}">${d.label}</div>`).join("")}
+              </div>
+            </div>
+            ${rowsHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function startGanttDrag(evt, barEl) {
+      evt.preventDefault();
+      const track = barEl.closest("[data-track]");
+      const colW = track.getBoundingClientRect().width / 21;
+      const startX = evt.clientX;
+      const origLeft = parseFloat(barEl.style.left);
+      const id = Number(barEl.dataset.id);
+      const origStart = barEl.dataset.start;
+      const origEnd = barEl.dataset.end;
+      let deltaDays = 0;
+
+      function onMove(mv) {
+        const dx = mv.clientX - startX;
+        deltaDays = Math.round(dx / colW);
+        barEl.style.left = `${Math.max(0, Math.min(95, origLeft + (deltaDays / 21) * 100))}%`;
+      }
+
+      async function onUp() {
+        document.removeEventListener("mousemove", onMove);
+        document.removeEventListener("mouseup", onUp);
+        if (deltaDays !== 0) {
+          await api(`/api/items/${id}`, {
+            method: "PATCH",
+            body: JSON.stringify({
+              planned_start_at: addDaysIso(origStart, deltaDays),
+              planned_end_at: addDaysIso(origEnd, deltaDays)
+            })
+          });
+          showToast(`Rescheduled item #${id} by ${deltaDays > 0 ? "+" : ""}${deltaDays}d`);
+          await loadOverview();
+        } else {
+          barEl.style.left = `${origLeft}%`;
+        }
+      }
+
+      document.addEventListener("mousemove", onMove);
+      document.addEventListener("mouseup", onUp);
+    }
+
+    /* ---------- View 3: Workload Capacity Matrix ---------- */
+    function renderWorkloadView(root) {
+      const days = Object.values(STATE.workload?.days || {});
+      const cap = STATE.daily_capacity_hours || 6.0;
+      if (!SELECTED_WL_DATE && days.length) SELECTED_WL_DATE = days[0].date;
+
+      const cardsHtml = days.map(d => {
+        const pct = Math.round((d.booked_hours / Math.max(cap, 1)) * 100);
+        const color = d.overloaded ? "var(--status-stuck)" : (pct >= 75 ? "var(--status-working)" : "var(--status-done)");
+        const selClass = d.date === SELECTED_WL_DATE ? "selected" : "";
+        return `
+          <div class="wl-card ${selClass}" onclick="SELECTED_WL_DATE='${d.date}';renderActiveView();">
+            <div class="wl-date">${escHtml(fmtShortDate(d.date))} ${d.date === STATE.today ? "· Today" : ""}</div>
+            <div class="wl-bubble" style="background:${color};">${d.booked_hours}h</div>
+            <div class="wl-sub">${d.overloaded ? "Over Capacity" : `${d.remaining_hours}h free`}</div>
+          </div>
+        `;
+      }).join("");
+
+      const activeDay = days.find(x => x.date === SELECTED_WL_DATE) || days[0];
+      const dayItemsHtml = (activeDay?.items || []).map(it => `
+        <div class="grid-row" style="grid-template-columns:60px 1fr 110px 90px;border-left:4px solid var(--primary);">
+          <div class="cell" style="color:var(--text-muted);">#${it.id}</div>
+          <div class="cell cell-left" style="font-weight:600;">${escHtml(it.title)}</div>
+          <div class="cell bleed-cell"><span class="bleed-btn" style="background:${prioMeta(it.priority).color};">${prioMeta(it.priority).label}</span></div>
+          <div class="cell" style="font-weight:700;">${it.hours}h</div>
+        </div>
+      `).join("") || '<div style="padding:24px;text-align:center;color:var(--text-muted);">No net hours booked on this day.</div>';
+
+      root.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:13px;color:var(--text-secondary);">Daily executive net capacity threshold: <b>${cap}h / day</b> (wait days excluded)</div>
+          <div style="display:flex;gap:12px;font-size:12px;">
+            <span><b style="color:var(--status-done);">●</b> Healthy (&lt;75%)</span>
+            <span><b style="color:var(--status-working);">●</b> High Load</span>
+            <span><b style="color:var(--status-stuck);">●</b> Overloaded (&gt;${cap}h)</span>
+          </div>
+        </div>
+        <div class="workload-grid">${cardsHtml}</div>
+        <div class="widget-card" style="padding:0;overflow:hidden;">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--border-light);font-weight:600;">
+            Scheduled Effort Breakdown — ${activeDay ? escHtml(fmtShortDate(activeDay.date)) : ""} (${activeDay ? activeDay.booked_hours : 0}h / ${cap}h)
+          </div>
+          ${dayItemsHtml}
+        </div>
+      `;
+    }
+
+    /* ---------- View 4: Executive Analytics ---------- */
+    function renderAnalyticsView(root) {
+      const items = STATE.items || [];
+      const projects = STATE.projects || [];
+      const domains = STATE.domains || [];
+      const cap = STATE.daily_capacity_hours || 6.0;
+      const todayBooked = ((STATE.workload?.days || {})[STATE.today] || { booked_hours: 0 }).booked_hours || 0;
+      const doneN = items.filter(i => i.status === "done").length;
+      const openN = items.filter(i => i.status !== "done").length;
+      const waitN = (STATE.waiting_items || []).length;
+
+      // SVG Donut geometry
+      const totalDomHrs = domains.reduce((a, d) => a + Number(d.estimated_hours || 0), 0);
+      const radius = 56;
+      const circ = 2 * Math.PI * radius;
+      let offset = 0;
+      const donutSlices = domains.map(d => {
+        const meta = domainMeta(d.work_domain);
+        const val = Number(d.estimated_hours || 0);
+        const len = totalDomHrs > 0 ? (val / totalDomHrs) * circ : 0;
+        const dash = `${len} ${circ - len}`;
+        const seg = `<circle cx="75" cy="75" r="${radius}" fill="transparent" stroke="${meta.color}" stroke-width="22" stroke-dasharray="${dash}" stroke-dashoffset="${-offset}"></circle>`;
+        offset += len;
+        return { ...d, meta, seg, pct: totalDomHrs > 0 ? Math.round((val / totalDomHrs) * 100) : 0 };
+      });
+
+      const projRows = projects.map(p => {
+        const dm = domainMeta(p.work_domain);
+        return `
+          <div class="grid-row" style="grid-template-columns:1.6fr 140px 140px 110px 120px;">
+            <div class="cell cell-left" style="font-weight:600;">${escHtml(displayProject(p.name))}</div>
+            <div class="cell bleed-cell"><span class="bleed-btn" style="background:${dm.color};">${escHtml(dm.label)}</span></div>
+            <div class="cell">${escHtml(fmtRange(p.planned_start_date, p.target_end_date))}</div>
+            <div class="cell" style="font-weight:600;">${p.total_estimated_hours}h / ${p.total_actual_hours}h</div>
+            <div class="cell">${p.onedrive_web_url ? `<a href="${escHtml(p.onedrive_web_url)}" target="_blank" rel="noopener" style="color:var(--primary);font-weight:600;text-decoration:none;">Open Vault ↗</a>` : `<span style="color:var(--text-muted);">Synced</span>`}</div>
+          </div>
+        `;
+      }).join("") || '<div style="padding:24px;text-align:center;color:var(--text-muted);">No active projects recorded yet.</div>';
+
+      root.innerHTML = `
+        <div class="kpi-row">
+          <div class="widget-card" style="border-top:4px solid var(--primary);">
+            <div class="widget-title">Today Booked Effort</div>
+            <div class="kpi-number">${todayBooked}h</div>
+            <div class="kpi-hint">Daily cap: ${cap}h net work</div>
+          </div>
+          <div class="widget-card" style="border-top:4px solid var(--status-done);">
+            <div class="widget-title">Completion Rate</div>
+            <div class="kpi-number">${items.length ? Math.round((doneN / items.length) * 100) : 0}%</div>
+            <div class="kpi-hint">${doneN} done · ${openN} open</div>
+          </div>
+          <div class="widget-card" style="border-top:4px solid var(--status-stuck);">
+            <div class="widget-title">Waiting Bottlenecks</div>
+            <div class="kpi-number">${waitN}</div>
+            <div class="kpi-hint">External dependencies</div>
+          </div>
+          <div class="widget-card" style="border-top:4px solid var(--grp-idea);">
+            <div class="widget-title">Active Projects</div>
+            <div class="kpi-number">${projects.length}</div>
+            <div class="kpi-hint">21Vianet synced</div>
+          </div>
+        </div>
+
+        <div class="analytics-2col">
+          <div class="widget-card">
+            <div class="widget-title">Effort Share by Business Domain</div>
+            ${totalDomHrs > 0 ? `
+              <div class="donut-wrap">
+                <svg width="150" height="150" viewBox="0 0 150 150" style="transform:rotate(-90deg);flex-shrink:0;">
+                  <circle cx="75" cy="75" r="${radius}" fill="transparent" stroke="#eef0f6" stroke-width="22"></circle>
+                  ${donutSlices.map(s => s.seg).join("")}
+                </svg>
+                <div class="legend-list">
+                  ${donutSlices.map(s => `
+                    <div class="legend-row">
+                      <span class="legend-swatch" style="background:${s.meta.color};"></span>
+                      <span style="flex:1;font-weight:500;">${escHtml(s.meta.label)}</span>
+                      <span style="font-weight:700;">${s.estimated_hours}h (${s.pct}%)</span>
+                    </div>
+                  `).join("")}
+                </div>
+              </div>
+            ` : '<p style="color:var(--text-muted);padding:16px 0;">No domain effort metrics logged yet.</p>'}
+          </div>
+
+          <div class="widget-card">
+            <div class="widget-title">Estimated vs Actual Effort Breakdown</div>
+            ${domains.map(d => {
+              const meta = domainMeta(d.work_domain);
+              const maxV = Math.max(1, ...domains.map(x => Number(x.estimated_hours || 0)));
+              const estW = Math.round((Number(d.estimated_hours || 0) / maxV) * 100);
+              return `
+                <div style="margin-bottom:12px;">
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px;">
+                    <span style="font-weight:600;">${escHtml(meta.label)}</span>
+                    <span style="color:var(--text-secondary);">Est ${d.estimated_hours}h / Act ${d.actual_hours}h</span>
+                  </div>
+                  <div class="cap-bar"><div class="cap-bar-fill" style="width:${estW}%;background:${meta.color};"></div></div>
+                </div>
+              `;
+            }).join("") || '<p style="color:var(--text-muted);padding:16px 0;">Add tasks to analyze effort balance.</p>'}
+          </div>
+        </div>
+
+        <div class="widget-card" style="padding:0;overflow:hidden;">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--border-light);font-weight:600;">Active Projects Directory</div>
+          <div class="board-table-wrap">
+            <div class="grid-row header-row" style="grid-template-columns:1.6fr 140px 140px 110px 120px;min-width:680px;">
+              <div class="cell cell-left">Project</div>
+              <div class="cell">Domain</div>
+              <div class="cell">Schedule</div>
+              <div class="cell">Est / Act</div>
+              <div class="cell">OneDrive Folder</div>
+            </div>
+            ${projRows}
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadOverview() {
+      STATE = await api("/api/dashboard/overview");
+      renderActiveView();
+    }
+
+    async function boot() {
+      const me = await (await fetch("/api/auth/me", { credentials: "same-origin" })).json();
+      if (!me.authenticated) {
+        showLogin();
+        return;
+      }
+      document.getElementById("auth-view").style.display = "none";
+      document.getElementById("app-shell").style.display = "flex";
+      if (window.innerWidth <= 960) document.getElementById("mobile-nav").style.display = "flex";
+      populateDomainFilter();
+      await loadOverview();
+    }
+
+    boot();
+  </script>
+</body>
+</html>

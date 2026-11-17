@@ -15,11 +15,11 @@
 ### 1.1 为什么彻底砍掉 Odoo 19 MCP 对接？
 1. **省掉脆弱联调**：通过 MCP 驱动 Odoo 需要维护多公司 `company_id`、必填字段校验、沙箱与生产库切换；管理“四大清单”本身很轻，绑定重型 ERP 属于过度设计。
 2. **CEO 私人台账与公司多人系统物理隔离**：微信碎片、邮件摘要、未成熟想法和商业底价不进公司员工共享的 ERP，从根上消除权限误配泄密风险；待想法成熟后再单独进 Odoo 立项。
-3. **真实文件夹可读性极强**：相比 Odoo 底层把附件转成哈希黑盒，直接存入世纪互联 OneDrive 标准分类文件夹，在 Mac Finder / Obsidian 里永远直接可读。
+3. **纯云端文件夹可读性极强（零本地占盘）**：相比 Odoo 底层把附件转成哈希黑盒，直接存入世纪互联 OneDrive 标准分类文件夹，在浏览器网页端（SharePoint / OneDrive / Office Online）与驾驶舱直链里随时清晰可读。
 
-### 1.2 为什么直接写入 Wissentek 世纪互联版 Office 365 OneDrive？
+### 1.2 为什么直接写入 Wissentek 世纪互联版 Office 365 OneDrive（纯云端不落本地）？
 1. **纯国内高速链路 + 数据不出境**：世纪互联运营版（21Vianet）的认证（`login.chinacloudapi.cn`）与 Graph API（`microsoftgraph.chinacloudapi.cn`）均部署在中国大陆境内，呼和浩特阿里云 ECS 访问它稳定高速，核心商业文档完全留在国内合规环境。
-2. **原生跨端同步 + 版本兜底**：省掉自建阿里云 OSS 与 Syncthing；办公室和家里的 Mac（Finder / Obsidian）、手机 OneDrive App 原生同步，且自带文件历史版本（Version History）和 93 天双层回收站。
+2. **纯云端集中存储（零本机硬盘占用）+ 版本兜底**：省掉自建阿里云 OSS 与 Syncthing，**也不在本地 Mac 安装或同步 OneDrive 占用有限硬盘空间**；通过网页端 `chairman-vault`、OneDrive 网页版（Office Online 直接在线看 PDF/Excel/Word/Markdown）以及驾驶舱链接随时随地多端查阅，自带文件历史版本（Version History）和 93 天双层回收站。
 3. **一套应用打通“收邮件 + 写网盘”**：若主力工作邮箱同在 Wissentek 世纪互联 Office 365 下，微软 Entra 后台注册 1 个内部应用即可兼顾只读收信（`Mail.Read`）与私有文档库归档。
 
 ### 1.3 为什么不套 OpenClaw / Hermes，而用自研《Agentic Design Patterns》专用内核？
@@ -39,7 +39,7 @@
 ```mermaid
 flowchart TB
     subgraph L1["1. 接入与输入护栏层（阿里云 ECS 常驻进程）"]
-        WX["企业微信智能机器人长连接<br/>（纯 Python websockets，官方空壳通道）"]
+        WX["企业微信双口 HTTPS 回调（FastAPI 同进程）<br/>（微信客服 API 接合并转发 + 自建应用推简报）"]
         MAIL["企业邮件只读增量器<br/>（世纪互联 Graph Mail.Read / 只读 IMAP）"]
         BUF["去重 · 60s 静默合并 · Ch.18 护栏<br/>（识别『密：』前缀物理拦截零出网）"]
         WX & MAIL --> BUF
@@ -66,13 +66,13 @@ flowchart TB
         SQL --> OD
     end
 
-    subgraph L4["4. 多端消费"]
-        MAC["💻 Mac / 手机 OneDrive（Finder / Obsidian）& 电脑大屏浏览器"]
-        WX_R["📱 个人微信（早晚简报 · 打卡 · 魔法链接直开驾驶舱 · Agentic RAG 问答）"]
+    subgraph L4["4. 纯云端与多端消费（零 Mac 本地磁盘占用）"]
+        MAC["🌐 浏览器 / 手机 OneDrive（SharePoint 网页在线预览）& 电脑大屏驾驶舱"]
+        WX_R["📱 绿色个人微信（微信插件每日简报 · 打卡 · 魔法链接直开 · Agentic RAG）"]
     end
 
-    OD <-->|"系统原生自动同步"| MAC
-    WEB <-->|"已备案 HTTPS + 验证码鉴权"| MAC
+    OD <-->|"纯云端 Office Online 在线预览"| MAC
+    WEB <-->|"https://assistant.fire-matrix.com + 验证码"| MAC
     WEB <-->|"微信内直开（单次魔法链接）"| WX_R
     SQL --> WX_R
 ```
@@ -107,7 +107,7 @@ flowchart TB
   1. 在 Wissentek 世纪互联 M365 中新建 **1 个仅你本人可见的私有 SharePoint 站点/文档库**（如 `董事长幕僚归档库`）；
   2. 在世纪互联 Entra 门户注册内部应用，赋予 Graph Application 权限 **`Sites.Selected`**（**绝不申请全租户的 `Sites.ReadWrite.All` 或 `Files.ReadWrite.All`**）；
   3. 由管理员通过 Graph API 仅把这 **1 个私有库（`MS_SITE_ID`）** 的 `write` 权限授予该应用；
-  4. **效果**：程序在微软底层完全碰不到 Wissentek 组织里任何其他部门或同事的文件；服务端用 Client Credentials 7×24 自动换取令牌免人工登录；你在网页端对该库点一次 **“添加到我的 OneDrive 快捷方式”**（或点“同步”），整个分类库与四大 `.md` 清单就会原生出现在你办公室和家里 Mac 的 **Finder** 里！
+  4. **效果**：程序在微软底层完全碰不到 Wissentek 组织里任何其他部门或同事的文件；服务端用 Client Credentials 7×24 自动换取令牌免人工登录；通过网页端 `Add shortcut to OneDrive -> My files` 绑定后，整个分类库与四大 `.md` 清单随时在浏览器（SharePoint / OneDrive 网页版）和驾驶舱直链里在线打开，**不在本地 Mac 占磁盘**！
 
 ### 4.2 世纪互联中国区端点与 2Mbps 带宽异步分片上传
 - **世纪互联专属端点**：
@@ -115,7 +115,7 @@ flowchart TB
   - Microsoft Graph 端点：`https://microsoftgraph.chinacloudapi.cn/v1.0`
 - **本地秒收 + 异步分片上传**：收到附件先落 ECS `/opt/wechat-agent/tmp_cache/` 秒级提取文本写入 SQLite FTS5，并在 2～3 秒内返回决策卡；确认写入后后台队列将 `< 4 MB` 文件直传、将 `>= 4 MB` 大文件调用 `createUploadSession` 分片断点上传至 `/sites/{MS_SITE_ID}/drive/root:/...`，核对云端 `eTag`/`size` 后立即删除 ECS 本地大文件缓存，确保 60G 系统盘永不写满。
 
-### 4.3 私有库下的统一文件夹结构（Obsidian 原生友好）
+### 4.3 私有库下的统一文件夹结构（纯云端 Markdown / Office Online 原生可读）
 
 ```text
 Wissentek 私有库 (董事长幕僚归档库)/
@@ -155,7 +155,7 @@ wechat_assistant/
 │   │   ├── search_tools.py   # 脱敏前置拦截器 + Metaso/Serper/Jina 异步并发外搜
 │   │   └── onedrive_tools.py # 世纪互联 Graph Sites.Selected 读写、分片上传与四大清单渲染
 │   ├── web/                  # 同进程内嵌 FastAPI 董事长项目管理驾驶舱（响应式移动端卡片+桌面端甘特图，及微信魔法链接/6位验证码鉴权）
-│   ├── intake/               # 企微长连接 websockets 接收器、60s 静默合并器、Graph Mail/IMAP 只读拉取器
+│   ├── intake/               # 微信客服 API（sync_msg 合并转发）与自建应用 HTTPS 回调接收器、60s 静默合并器、Graph Mail/IMAP 只读拉取器
 │   ├── storage/              # SQLite 3+1 表、FTS5 索引、PDF/Office 按页提取
 │   └── prompts/              # 节点提示词版本包（严禁含真实密钥、私有 URL 或商业底数）
 └── tests/

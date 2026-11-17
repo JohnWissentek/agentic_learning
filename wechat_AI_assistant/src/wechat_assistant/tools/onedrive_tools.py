@@ -1,0 +1,251 @@
+"""Group 4 21Vianet OneDrive Graph Client and pure Markdown 4-list board renderer."""
+
+from __future__ import annotations
+
+import os
+import threading
+import time
+import urllib.parse
+from pathlib import Path
+from typing import Any
+
+import httpx
+import msal
+
+from wechat_assistant.config import Settings
+from wechat_assistant.schemas import ListType
+from wechat_assistant.storage.db import Database
+
+
+def render_lists_markdown(db: Database) -> dict[str, str]:
+    """Render the 5 Markdown executive boards purely from SQLite state."""
+    items = db.list_items(include_done=True)
+    projects = db.list_projects()
+    rules = db.list_memory_rules()
+    workload = db.get_daily_workload(days=7)
+
+    # 1. 01_今日与行动待办.md
+    action_types = {ListType.PROJECT_ACTION.value, ListType.NEXT_ACTION.value}
+    actions = [i for i in items if i["list_type"] in action_types]
+    today_str = next(iter(workload["days"]), "")
+    today_hrs = workload["days"].get(today_str, {}).get("booked_hours", 0.0)
+    lines_01 = [
+        "# 01｜今日与行动待办（自动重绘）\n",
+        f"> 今日已排个人净工时：**{today_hrs}h / {workload['capacity_hours']}h**\n",
+        "| ID | 优先级 | 状态 | 事项 | 项目/板块 | 日历起止周期 | 预计/实际净工时 |",
+        "| :---: | :---: | :---: | :--- | :--- | :--- | :---: |",
+    ]
+    for it in actions:
+        status_icon = "✅ 已完成" if it["status"] == "done" else ("🔄 进行中" if it["status"] == "in_progress" else "⬜ 待办")
+        span = f"{it['planned_start_at'] or '-'} ~ {it['planned_end_at'] or '-'}"
+        hrs = f"{it['estimated_hours']}h" + (f" / 实{it['actual_hours']}h" if it["actual_hours"] is not None else "")
+        lines_01.append(
+            f"| {it['id']} | **{it['priority']}** | {status_icon} | {it['title']} | {it['project_name']}（{it['work_domain']}） | {span} | {hrs} |"
+        )
+    if not actions:
+        lines_01.append("| - | - | - | 暂无行动待办 | - | - | - |")
+
+    # 2. 02_在途项目总览.md
+    lines_02 = [
+        "# 02｜在途项目总览（自动重绘）\n",
+        "| 项目名称 | 板块 | 状态 | 计划周期 | 累计预计 / 实耗工时 | 最新进展 | 云端文件夹 |",
+        "| :--- | :--- | :---: | :--- | :---: | :--- | :--- |",
+    ]
+    for p in projects:
+        span = f"{p['planned_start_date'] or '-'} ~ {p['target_end_date'] or '-'}"
+        hrs = f"{p['total_estimated_hours']}h / {p['total_actual_hours']}h"
+        link = f"[打开云端目录]({p['onedrive_web_url']})" if p.get("onedrive_web_url") else p.get("onedrive_folder", "-")
+        lines_02.append(
+            f"| **{p['name']}** | {p['work_domain']} | {p['status']} | {span} | {hrs} | {p['latest_brief'] or '-'} | {link} |"
+        )
+    if not projects:
+        lines_02.append("| 暂无在途项目 | - | - | - | - | - | - |")
+
+    # 3. 03_想法与孵化池.md
+    ideas = [i for i in items if i["list_type"] == ListType.IDEA.value]
+    lines_03 = ["# 03｜想法与孵化池（自动重绘）\n"]
+    for stage_name in ("闪念收集", "调研评估", "准备立项", "留存参考"):
+        lines_03.append(f"## {stage_name}")
+        matched = [i for i in ideas if i.get("stage", "闪念收集") == stage_name]
+        if not matched:
+            lines_03.append("- （暂无）\n")
+        else:
+            for it in matched:
+                lines_03.append(
+                    f"- `#{it['id']}` **[{it['project_name']}]** {it['title']}（预估净工时 `{it['estimated_hours']}h`）"
+                )
+            lines_03.append("")
+
+    # 4. 04_等待他人清单.md
+    waits = [i for i in items if i["list_type"] == ListType.WAITING_FOR.value and i["status"] != "done"]
+    lines_04 = [
+        "# 04｜等待他人清单（自动重绘）\n",
+        "| ID | 优先级 | 对方/责任人 | 等待事项 | 所属项目 | 启动~承诺日 | 个人跟进净工时 |",
+        "| :---: | :---: | :--- | :--- | :--- | :--- | :---: |",
+    ]
+    for it in waits:
+        span = f"{it['planned_start_at'] or '-'} ~ {it['planned_end_at'] or '-'}"
+        lines_04.append(
+            f"| {it['id']} | **{it['priority']}** | {it['owner']} | {it['title']} | {it['project_name']} | {span} | {it['estimated_hours']}h |"
+        )
+    if not waits:
+        lines_04.append("| - | - | - | 暂无外部卡点等待 | - | - | - |")
+
+    # 5. 00_我的个人规则库.md
+    lines_00 = ["# 00｜我的个人规则与工时校准库（自动重绘）\n"]
+    if not rules:
+        lines_00.append("- 暂无规则沉淀，完成打卡或纠偏后会自动累积。")
+    else:
+        for r in rules[:40]:
+            lines_00.append(f"- `[{r['memory_kind']}]` {r['rule_text']}（{r['updated_at']}）")
+
+    return {
+        "00_我的个人规则库.md": "\n".join(lines_00) + "\n",
+        "01_今日与行动待办.md": "\n".join(lines_01) + "\n",
+        "02_在途项目总览.md": "\n".join(lines_02) + "\n",
+        "03_想法与孵化池.md": "\n".join(lines_03) + "\n",
+        "04_等待他人清单.md": "\n".join(lines_04) + "\n",
+    }
+
+
+class OneDrive21VianetClient:
+    """Client for 21Vianet SharePoint/OneDrive (`Sites.Selected` scoped to `chairman-vault`)."""
+
+    CHUNK_THRESHOLD = 4 * 1024 * 1024
+    CHUNK_SIZE = 2 * 1024 * 1024
+
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self.graph = settings.ms_graph_url.rstrip("/")
+        self._lock = threading.Lock()
+        self._token = ""
+        self._token_exp = 0.0
+        self._msal_app: msal.ConfidentialClientApplication | None = None
+
+    def _get_token(self) -> str:
+        with self._lock:
+            now = time.time()
+            if self._token and now < self._token_exp - 60:
+                return self._token
+            if self._msal_app is None:
+                self._msal_app = msal.ConfidentialClientApplication(
+                    self.settings.ms_client_id,
+                    authority=f"{self.settings.ms_auth_url.rstrip('/')}/{self.settings.ms_tenant_id}",
+                    client_credential=self.settings.ms_client_secret,
+                )
+            res = self._msal_app.acquire_token_for_client(
+                scopes=["https://microsoftgraph.chinacloudapi.cn/.default"]
+            )
+            if "access_token" not in res:
+                raise RuntimeError(f"MSAL error: {res.get('error')} - {res.get('error_description')}")
+            self._token = res["access_token"]
+            self._token_exp = now + int(res.get("expires_in", 3600))
+            return self._token
+
+    def _headers(self, extra: dict[str, str] | None = None) -> dict[str, str]:
+        hdr = {"Authorization": f"Bearer {self._get_token()}"}
+        if extra:
+            hdr.update(extra)
+        return hdr
+
+    @staticmethod
+    def _encode_path(remote_path: str) -> str:
+        parts = [urllib.parse.quote(p.strip("/")) for p in remote_path.strip("/").split("/") if p]
+        return "/".join(parts)
+
+    def upload_bytes(
+        self,
+        remote_path: str,
+        data: bytes,
+        *,
+        content_type: str = "application/octet-stream",
+    ) -> dict[str, Any]:
+        """Upload bytes cleanly using PUT (<4MB) or resumable createUploadSession (>=4MB)."""
+        encoded = self._encode_path(remote_path)
+        site_id = self.settings.ms_site_id
+
+        with httpx.Client(timeout=60.0) as client:
+            if len(data) < self.CHUNK_THRESHOLD:
+                url = f"{self.graph}/sites/{site_id}/drive/root:/{encoded}:/content"
+                r = client.put(url, headers=self._headers({"Content-Type": content_type}), content=data)
+                r.raise_for_status()
+                return r.json()
+
+            sess_url = f"{self.graph}/sites/{site_id}/drive/root:/{encoded}:/createUploadSession"
+            sr = client.post(
+                sess_url,
+                headers=self._headers(),
+                json={"item": {"@microsoft.graph.conflictBehavior": "replace"}},
+            )
+            sr.raise_for_status()
+            upload_url = sr.json()["uploadUrl"]
+
+            total = len(data)
+            item: dict[str, Any] = {}
+            for start in range(0, total, self.CHUNK_SIZE):
+                end = min(start + self.CHUNK_SIZE, total) - 1
+                cr = client.put(
+                    upload_url,
+                    headers={
+                        "Content-Length": str(end - start + 1),
+                        "Content-Range": f"bytes {start}-{end}/{total}",
+                    },
+                    content=data[start : end + 1],
+                )
+                cr.raise_for_status()
+                if cr.status_code in (200, 201):
+                    item = cr.json()
+
+            if item.get("size") != total:
+                raise RuntimeError(f"Uploaded size mismatch for {remote_path}: expected={total}, got={item.get('size')}")
+            return item
+
+    def upload_and_cleanup_local(self, remote_path: str, local_path: str | Path) -> dict[str, Any]:
+        """Upload local temporary attachment to 21Vianet OneDrive, then delete local cache."""
+        p = Path(local_path)
+        data = p.read_bytes()
+        item = self.upload_bytes(remote_path, data)
+        if p.exists():
+            os.remove(p)
+        return item
+
+    def list_onedrive_tree(self, folder_path: str = "") -> list[dict[str, Any]]:
+        site_id = self.settings.ms_site_id
+        encoded = self._encode_path(folder_path)
+        if encoded:
+            url = f"{self.graph}/sites/{site_id}/drive/root:/{encoded}:/children"
+        else:
+            url = f"{self.graph}/sites/{site_id}/drive/root/children"
+        with httpx.Client(timeout=30.0) as client:
+            r = client.get(url, headers=self._headers())
+            if r.status_code == 404:
+                return []
+            r.raise_for_status()
+            return r.json().get("value", [])
+
+    def sync_all_lists(self, db: Database) -> dict[str, str]:
+        """Render all 5 Markdown boards and upload them into `00_我的四大清单/`."""
+        rendered = render_lists_markdown(db)
+        urls: dict[str, str] = {}
+        for filename, md_text in rendered.items():
+            item = self.upload_bytes(
+                f"00_我的四大清单/{filename}",
+                md_text.encode("utf-8"),
+                content_type="text/markdown; charset=utf-8",
+            )
+            urls[filename] = item.get("webUrl", "")
+        return urls
+
+    def append_project_note(self, project_name: str, entry_md: str) -> dict[str, Any]:
+        """Prepend or append a timestamped note to `01_项目归档/{project}/00_项目沟通与纪要.md`."""
+        safe_proj = project_name.replace("/", "_").strip() or "日常事务"
+        remote_path = f"01_项目归档/{safe_proj}/00_项目沟通与纪要.md"
+        encoded = self._encode_path(remote_path)
+        existing = ""
+        with httpx.Client(timeout=30.0) as client:
+            r = client.get(f"{self.graph}/sites/{self.settings.ms_site_id}/drive/root:/{encoded}:/content", headers=self._headers())
+            if r.status_code == 200:
+                existing = r.text
+        header = f"# {safe_proj}｜项目沟通与纪要\n\n" if not existing else ""
+        updated = (header + existing).rstrip() + "\n\n" + entry_md.strip() + "\n"
+        return self.upload_bytes(remote_path, updated.encode("utf-8"), content_type="text/markdown; charset=utf-8")
