@@ -78,6 +78,7 @@ flowchart TB
 | [02-整体架构与SQLite清单及OneDrive归档设计.md](docs/02-整体架构与SQLite清单及OneDrive归档设计.md) | 不接 Odoo/OpenClaw/重型开源 PM 软件的原因、Ch.8 三层记忆与排期表结构、**Wissentek 世纪互联版 `Sites.Selected` 隔离设计**、及含 `web/` 的代码结构 |
 | [03-AI分拣工作流与确认机制.md](docs/03-AI分拣工作流与确认机制.md) | 《Agentic Design Patterns》15+ 模式 1:1 映射、LangGraph 有界闭环、含 **`check_workload_and_schedule`** 的四大工具箱、异构 Critic 契约与 `开始/完成` 打卡指令 |
 | [04-阿里云部署与分阶段实施路线.md](docs/04-阿里云部署与分阶段实施路线.md) | ECS 同进程部署边界、防外泄六道硬防线（含驾驶舱 Tailscale 隐身访问）、**企微 API 长连接与个人微信扫码指南 + 世纪互联授权步骤**、`.env` 模板与 Ch.19 质量门禁 |
+| [05-全流程实操SOP与验收Checklist.md](docs/05-全流程实操SOP与验收Checklist.md) | **开工执行手册**：区分「👤 本人 vs 🤖 AI」的 Stage 0–6 分步 SOP、四路连通性探针、F1–F8 真人验收用例及总控打勾表 |
 
 ---
 
