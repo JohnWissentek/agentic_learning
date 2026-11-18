@@ -84,6 +84,7 @@ flowchart TB
 | [07-世纪互联SharePoint私有库与OneDrive实操手册.md](docs/07-世纪互联SharePoint私有库与OneDrive实操手册.md) | **实机实测手册**：记录 Wissentek 世纪互联 SharePoint 新版界面差异、创建 `chairman-vault` 私有库及 `Add shortcut to OneDrive` 的真实每一步操作 |
 | [08-企业微信机器人设置核查与个人微信接入实操手册.md](docs/08-企业微信机器人设置核查与个人微信接入实操手册.md) | **实机体检手册**：核查 `智能专区 → 智能机器人` 现状与 `微信插件` 官方限制，并锁定绿色个人微信「微信客服 API + 自建应用」方案 B 接入步骤 |
 | [09-路由器意图规范与异常处理机制.md](docs/09-路由器意图规范与异常处理机制.md) | **路由与异常兜底手册**：详解 `FAST_ROUTER_PROMPT` 装配、`IntentRoute` 11 类意图及全链路 10 种异常与超边界兜底机制 |
+| [10-代码阅读顺序与流程图对照审核指南.md](docs/10-代码阅读顺序与流程图对照审核指南.md) | **代码走读与框图审核手册**：给出 `src/wechat_assistant` 四步阅读顺序、六阶段框图 × 代码行号 1:1 对照表与 10 项人工核对清单 |
 
 ---
 

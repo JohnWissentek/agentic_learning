@@ -28,6 +28,7 @@ S_CARD = S_IO.replace("#f5f5f5", "#ffe6cc").replace("#555555", "#dd6b20")
 S_NOTE = "rounded=0;dashed=1;fillColor=#fffbe6;strokeColor=#b7950b;strokeWidth=1.5;" + _TEXT.replace("fontSize=14", "fontSize=13")
 S_ZONE = "rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#adb5bd;strokeWidth=2;dashed=1;fontSize=18;fontStyle=1;align=left;verticalAlign=top;spacingTop=12;spacingLeft=16;"
 S_TERM = "rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#2d3748;strokeColor=#1a202c;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#ffffff;align=center;verticalAlign=middle;"
+S_CONN = "ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#dd6b20;strokeWidth=3;fontSize=18;fontStyle=1;fontColor=#dd6b20;align=center;verticalAlign=middle;"
 S_TITLE = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;"
 
 C_MAIN, C_ROUTE, C_EXEC, C_LOOP, C_READ, C_REPLY = "#2b6cb0", "#6b46c1", "#dd6b20", "#c53030", "#2f855a", "#777777"
@@ -87,7 +88,7 @@ def edge(
 # ------------------------------------------------------------------ title & legend
 text("title", 40, 22, 2300, 50, "董事长 AI 工作助理 — 六阶段工作流全景图", S_TITLE)
 text("subtitle", 40, 70, 2300, 30,
-     "每次处理从「开始」单向走到「本次结束」；外圈灰色虚线是靠数据库串起来的外层循环；阶段五只在你确认后（下一条消息）才发生",
+     "每次处理从「开始」单向走到「本次结束」，每条路径都会记录对话；只有阶段五能改待办和看板（必须经你确认）；底部灰色虚线是外层循环",
      "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;fontColor=#555555;")
 lg_y = 18
 node("lg_term", 2360, lg_y + 8, 140, 56, S_TERM, "开始")
@@ -97,7 +98,7 @@ node("lg_dec", 3120, lg_y - 4, 190, 78, S_DECISION, "判断")
 node("lg_db", 3330, lg_y, 190, 72, S_DB, "数据存储")
 node("lg_io", 3540, lg_y, 230, 70, S_IO, "微信 / 邮件 收发")
 text("lg_lines", 3790, lg_y, 1270, 72,
-     "连线：蓝=主流程　紫=按意图分流　橙=执行落盘　红虚线=审核不通过重写　绿虚线=读取数据　灰虚线=回到微信 / 外层循环（下一条消息回到开始）",
+     "连线：蓝=主流程　紫=按意图分流　橙=执行落盘　红虚线=审核不通过重写　绿虚线=读取数据　灰虚线=回到微信 / 外层循环　橙色圆圈Ⓐ=同一条线的两端（跨区连接）",
      "rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=13;align=left;verticalAlign=middle;spacingLeft=12;")
 
 ZONE_TOP, ZONE_BOTTOM = 130, 2190
@@ -166,7 +167,7 @@ node("p2", BX, 535, BW, BH, S_LLM, "② 参谋回复（qwen3.8-flash）", "每�
 node("p3", BX, 825, BW, BH, S_LLM, "③ 查档问答（代码检索 + qwen3.8-flash）", "先查文档和旧对话，再只依据查到的内容回答\n必须带出处页码；查不到就说查不到")
 node("p5", BX, 1115, BW, BH, S_CODE, "⑤ 请你澄清（代码）", "说明能力边界，或追问一个关键细节\n不建待办")
 for pid, y in (("p2", 535), ("p3", 825), ("p5", 1115)):
-    node(f"{pid}_out", OX, y + (BH - OH) // 2, OW, OH, S_IO, "回复发到微信", "本次结束")
+    node(f"{pid}_out", OX, y + (BH - OH) // 2, OW, OH, S_IO, "回复发到微信")
     edge(f"e_{pid}_out", pid, f"{pid}_out", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 
 edge("e_r1", "which", "p1", "确认/作废卡片 · 打卡 · 撤销", C_ROUTE, exit_xy=(0.5, 0), entry_xy=(0, 0.5), points=[(1840, 330)])
@@ -175,8 +176,19 @@ edge("e_r3", "which", "p3", "查文档 · 查进度", C_ROUTE, exit_xy=(1, 0.5),
 edge("e_r5", "which", "p5", "太模糊 · 做不了", C_ROUTE, exit_xy=(0.75, 0.75), entry_xy=(0, 0.5), points=[(2020, 960), (2020, 1200)])
 edge("e_r4", "which", "t1", "交办工作 · 转发 · 附件 · 改卡片", C_ROUTE, exit_xy=(0.5, 1), entry_xy=(0, 0.5), points=[(1840, 1590)], width=3)
 
-node("hb_note", 3220, 560, 1240, 120, S_NOTE, "进度心跳",
+node("hb_note", 3600, 560, 860, 140, S_NOTE, "进度心跳",
      "任何一条路径处理超过 12 秒，就向微信推送当前在做哪一步，此后每 25 秒一次，直到出结果")
+
+node("record", 3150, 535, 330, 750, S_CODE, "记录本次对话（代码）",
+     "把你这句话和回复写入对话记录\n\n"
+     "下次处理时，阶段二从这里读取，所以对话能接上\n\n"
+     "每满 8 轮，后台刷新一次滚动摘要\n\n"
+     "路径①和④同样会记录\n（分别在执行完、出卡后）\n\n"
+     "只记对话，不改待办和看板")
+for pid, frac in (("p2", 0.113), ("p3", 0.5), ("p5", 0.887)):
+    edge(f"e_{pid}_rec", f"{pid}_out", "record", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, frac))
+node("end_main", 3560, 875, 220, 70, S_TERM, "本次结束")
+edge("e_rec_end", "record", "end_main", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 
 # path ④ pipeline
 TY, TH = 1490, 200
@@ -187,7 +199,7 @@ node("t2", 2590, TY, 330, TH, S_CODE, "2 压缩（代码）", "把查到的长�
 node("t3", 2990, TY, 420, TH, S_LLM, "3 起草方案（qwen3.8-max）", "拆出做什么、谁负责、起止日期、所属项目\n可自己调用排期和工作日推算工具\n不估工时，不代做外部调研")
 node("t4", 3480, TY, 400, TH, S_LLM, "4 审核（代码 + deepseek-v4-pro）", "代码核对数字是否都有出处\n另一个模型挑漏项和逻辑错误")
 node("t4_ok", 3940, 1500, 200, 180, S_DECISION, "通过？")
-node("card", 4200, 1540, 300, 100, S_CARD, "5 出卡：存待确认卡，发到微信")
+node("card", 4180, 1520, 340, 140, S_CARD, "5 出卡", "待确认卡存入数据库（原件已备份）\n记录本次对话，发卡到微信")
 node("card_next", 4200, 1800, 300, 150, S_IO, "本次结束：等你回复",
      "回「1 / 好的」→ 路径① 执行\n回「改：…」→ 回到本路径重新起草")
 edge("e_t12", "t1", "t2", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
@@ -197,17 +209,19 @@ edge("e_t4ok", "t4", "t4_ok", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 edge("e_fail", "t4_ok", "t3", "否：带修改意见重写（最多 2 次）", C_LOOP, exit_xy=(0.5, 1), entry_xy=(0.5, 1),
      points=[(4040, 1780), (3200, 1780)], dashed=True)
 edge("e_pass", "t4_ok", "card", "是", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+edge("e_card_exec", "card", "exec", "你确认后（回复「1」，经路径①）", C_EXEC, exit_xy=(1, 0.5), entry_xy=(0, 0.7),
+     points=[(4565, 1590), (4565, 481)], dashed=True)
 edge("e_card_next", "card", "card_next", "", C_REPLY, exit_xy=(0.5, 1), entry_xy=(0.5, 0), dashed=True)
 
 # ------------------------------------------------------------------ stage 5: execute after confirmation
 Z5_X = 4590
-text("z5", Z5_X, ZONE_TOP, 470, ZONE_BOTTOM - ZONE_TOP, "阶段五｜你确认后执行落盘", S_ZONE)
-node("exec", 4630, 250, 400, 330, S_CODE, "执行落盘（代码）",
-     "• 先校验确认令牌，没有令牌拒绝写入\n"
+text("z5", Z5_X, ZONE_TOP, 470, ZONE_BOTTOM - ZONE_TOP, "阶段五｜你确认后修改待办与看板", S_ZONE)
+node("exec", 4630, 250, 400, 330, S_CODE, "修改待办与看板（代码）",
+     "唯一能改正式数据的地方：\n• 先校验确认令牌，没有令牌拒绝写入\n"
      "• 一次性写入待办与项目，留 24 小时撤销快照\n"
      "• 附件归档到 OneDrive 对应项目目录\n"
      "• 重绘 5 份 .md 看板\n"
-     "• 回复执行结果到微信（本次结束）")
+     "• 回复结果到微信，记录对话（本次结束）")
 node("db", 4630, 680, 180, 170, S_DB, "SQLite", "待办 · 项目 · 对话")
 node("od", 4850, 680, 180, 170, S_DB, "OneDrive", "原件 · 归档 · 5 份看板")
 node("web", 4630, 950, 400, 230, S_CODE, "Web 驾驶舱",
@@ -216,12 +230,16 @@ edge("e_p1_exec", "p1", "exec", "执行", C_EXEC, exit_xy=(1, 0.5), entry_xy=(0,
 edge("e_exec_db", "exec", "db", "", C_EXEC, exit_xy=(0.225, 1), entry_xy=(0.5, 0))
 edge("e_exec_od", "exec", "od", "", C_EXEC, exit_xy=(0.775, 1), entry_xy=(0.5, 0))
 edge("e_db_web", "db", "web", "读取", C_READ, exit_xy=(0.5, 1), entry_xy=(0.225, 0), dashed=True)
-edge("e_sc_exec", "shortcut", "exec", "快捷指令：1/2、开始、完成、撤销", C_EXEC,
-     exit_xy=(0.5, 1), entry_xy=(0, 0.85), points=[(385, 2250), (4610, 2250), (4610, 530)])
+node("conn_a1", 360, 1500, 50, 50, S_CONN, "A")
+text("conn_a1_lbl", 420, 1500, 270, 50, "接阶段五（Ⓐ）", "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#dd6b20;")
+edge("e_sc_conn", "shortcut", "conn_a1", "1/2、开始、完成、撤销", C_EXEC, exit_xy=(0.5, 1), entry_xy=(0.5, 0))
+node("conn_a2", 4980, 182, 50, 50, S_CONN, "A")
+text("conn_a2_lbl", 4640, 182, 330, 50, "Ⓐ 来自阶段一快捷指令", "text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#dd6b20;")
+edge("e_conn_exec", "conn_a2", "exec", "", C_EXEC, exit_xy=(0.5, 1), entry_xy=(0.875, 0))
 
 edge("e_outer_loop", "card_next", "start",
      "外层循环：你的下一条消息 / 下一次触发 → 回到开始（阶段二会读取上次存下的状态）",
-     C_REPLY, exit_xy=(1, 0.5), entry_xy=(0.5, 0), points=[(5080, 1875), (5080, 112), (385, 112)], dashed=True, width=3)
+     C_REPLY, exit_xy=(0.5, 1), entry_xy=(0, 0.5), points=[(4350, 2280), (18, 2280), (18, 230)], dashed=True, width=3)
 
 # ------------------------------------------------------------------ stage 6: scheduled jobs (independent lane)
 text("z6", 40, 2330, 5020, 450, "阶段六｜每日定时任务（独立运行，到点或拉到邮件后从「开始」进入）", S_ZONE)
