@@ -1,0 +1,1030 @@
+{
+  "report_id": "REPORT-run-20261115-173615-92b744f4",
+  "generated_at": "2026-11-15T17:36:15.118641",
+  "mode": "simulation",
+  "run_mode_detail": "DETERMINISTIC",
+  "mode_disclaimer": "⚠️ DETERMINISTIC模式(非真实智能体)：本报告由确定性模拟生成，所有角色输出为预定义固定字符串模板，不存在真实LLM API调用。LLM provider未配置。这不代表真正的多智能体协作结果。",
+  "llm_execution_status": {
+    "run_mode": "DETERMINISTIC",
+    "is_real_agent_execution": false,
+    "provider_configured": false,
+    "provider_name": "",
+    "model_id": "",
+    "total_llm_calls": 0,
+    "successful_calls": 0,
+    "failed_calls": 0,
+    "offline_simulation_boundary": "当前运行为DETERMINISTIC模式：所有角色输出为预定义固定字符串模板，非真实LLM智能体调用。LLM provider未配置(OPENAI_API_KEY/ANTHROPIC_API_KEY未设置)。工作流逻辑执行但智能体决策为脚本化模板。"
+  },
+  "executive_summary": {
+    "project": "燃煤锅炉水冷壁光纤测温产品研发",
+    "tech_route": "飞秒Type II/PbP高温FBG",
+    "stages_completed": 6,
+    "qa_reviews_count": 4,
+    "hitl_decisions_count": 4,
+    "overall_status": "BLOCKED - 2个阻塞性问题未解决 (阶段: stage_2_detailed_design)"
+  },
+  "stage_outputs": {
+    "stage_0_requirements": {
+      "market_segments": [
+        {
+          "segment_id": "SEG-PILOT-001",
+          "name": "300-660MW调峰煤粉直流炉",
+          "description": "参与深度调峰的现役超/超超临界煤粉直流炉，背火侧可达水冷壁管屏",
+          "estimated_boiler_count": "[市场数据待注入-不编造]",
+          "notes": "目标画像非已找到客户；调峰负荷/给水变动对应温差可解释",
+          "evidence_ids": [
+            "[EV-DESIGN-SCEN-001]"
+          ]
+        }
+      ],
+      "market_sizing": [
+        {
+          "calc_tag": "[MKT-CALC]",
+          "segment_id": "SEG-PILOT-001",
+          "horizon": "2026-2028",
+          "tam_units": "[市场数据待注入]",
+          "tam_cny_wan": "[市场数据待注入]",
+          "sam_units": "[市场数据待注入]",
+          "sam_cny_wan": "[市场数据待注入]",
+          "som_units": "[市场数据待注入]",
+          "som_cny_wan": "[市场数据待注入]",
+          "assumptions": "火电≠煤电、机组数≠锅炉数，不能据装机容量编算TAM金额",
+          "evidence_ids": [
+            "[EV-LIT-NEA-001]"
+          ],
+          "data_injection_required": true
+        }
+      ],
+      "competitors": [
+        {
+          "vendor_name": "南京大得",
+          "origin": "domestic",
+          "tech_route": "FBG/DTS(混杂表述)",
+          "key_products": [
+            "锅炉壁温光纤监测系统"
+          ],
+          "strengths": "已有锅炉壁温光纤方案对外提供",
+          "weaknesses": "原理表述混杂(拉曼/OTDR与FBG/WDM同页)",
+          "china_presence": "已有",
+          "evidence_ids": [
+            "[EV-COMP-DADE-001]"
+          ],
+          "confidence": "B",
+          "limitation": "仅能证实其对外提供该类方案，不能借其混杂说明判断技术细节或价格"
+        },
+        {
+          "vendor_name": "国家能源集团电科院锅检公司",
+          "origin": "domestic",
+          "tech_route": "飞秒/双栅FBG",
+          "key_products": [
+            "自研系统-非商品化"
+          ],
+          "strengths": "报道称投运两年多、±1°C、700°C、双光栅",
+          "weaknesses": "研发/使用方自述，未附原始校准、样本量、失效率",
+          "evidence_ids": [
+            "[EV-COMP-CEIC-001]"
+          ],
+          "confidence": "B",
+          "limitation": "不把宣传精度、寿命和适用对象作为本产品保证"
+        }
+      ],
+      "requirements": [
+        {
+          "req_id": "R01",
+          "category": "measurement",
+          "description": "32-64个局部水冷壁接触测点",
+          "target_value": "64点(8串×8点)",
+          "priority": "must",
+          "verification_method": "λ预算与原厂定制能力确认",
+          "status": "draft",
+          "evidence_ids": [
+            "[EV-REQ-R01]"
+          ]
+        },
+        {
+          "req_id": "R02",
+          "category": "temperature",
+          "description": "拟验证连续测量温度范围",
+          "target_value": "25-600",
+          "unit": "°C",
+          "priority": "must",
+          "notes": "700°C短时能力仅候选，须规定时间/循环/漂移；不是锅炉运行许可温度",
+          "verification_method": "高温炉标定+现场比对",
+          "status": "draft",
+          "evidence_ids": [
+            "[EV-REQ-R02]"
+          ]
+        },
+        {
+          "req_id": "R04",
+          "category": "accuracy",
+          "description": "现场试点匹配参考工况差值目标",
+          "target_value": "±5",
+          "unit": "°C",
+          "priority": "must",
+          "current_status": "NOT_MET",
+          "current_value": "5.73°C (k=2)",
+          "notes": "⚠️ 当前工程计算不确定度5.73°C超过目标±5°C - 需改进或重定目标",
+          "verification_method": "现场参考比对(参考/位置/不确定度足够时)",
+          "status": "BLOCKED",
+          "evidence_ids": [
+            "[EV-CALC-ENG-001]"
+          ]
+        },
+        {
+          "req_id": "R05",
+          "category": "power",
+          "description": "场侧无供电光纤传感，冷端电气系统独立供电、UPS",
+          "target_value": "≥150Wh UPS可用量",
+          "priority": "must",
+          "verification_method": "电源配置验证",
+          "status": "draft",
+          "evidence_ids": [
+            "[EV-REQ-R05]"
+          ]
+        },
+        {
+          "req_id": "R10",
+          "category": "safety",
+          "description": "AI仅解释趋势、给建议与证据，不替代运行规程与保护",
+          "target_value": "人工决策确认/无DCS写权限",
+          "priority": "must",
+          "verification_method": "架构审查 + 功能测试 + 代码审计",
+          "status": "draft",
+          "evidence_ids": [
+            "[EV-REQ-R10]"
+          ]
+        }
+      ],
+      "recommended_scenario": {
+        "target_boiler": "300-660MW调峰煤粉直流炉背火侧可达水冷壁管屏",
+        "points": "32-64点(4-8串×8点/串)",
+        "temp_range_normal_C": "25-600",
+        "temp_range_stress_C": "700 (OPTIONAL_STRESS_SCENARIO)",
+        "tech_route": "飞秒Type II/PbP高温FBG",
+        "demodulator_primary": "Luna si255-EV-08 (HOLD)",
+        "demodulator_lab": "HBK FS22SI 4CH (HOLD)",
+        "sensor_lab_rfq_priority": "FiSens 1550 STD narrow + AC (RFQ_PRIORITY)",
+        "sensor_second_rfq": "CALSENS High Temp FBG (RFQ_CANDIDATE)",
+        "sensor_field_array": "NOT_SELECTED",
+        "independent_contrast": "OSENSA PRB1000HT (non-FBG)",
+        "technica_status": "REVOKED_FROM_SELECTION_v0.2",
+        "evidence_ids": [
+          "[EV-DESIGN-SCEN-001]"
+        ]
+      }
+    },
+    "stage_1_concept": {
+      "tech_route_analysis": {
+        "recommended_route": "飞秒Type II/PbP高温FBG",
+        "alternatives_considered": [
+          {
+            "route": "再生FBG (RFBG)",
+            "status": "可行备选",
+            "condition": "必须比较同温同寿命同封装数据"
+          },
+          {
+            "route": "Raman DTS",
+            "status": "备选(米级热点)",
+            "condition": "当重点为长距离覆盖可接受米级热点定位时",
+            "ref_vendor": "Sensornet Sentinel系列"
+          }
+        ],
+        "selection_rationale": "主路线：采购完整封装/校准探头，避免自研裸纤封装拖延。多点WDM、窄光栅区域；engionic原厂标到1000°C但'存活'不等'准确多年'。",
+        "pending_verification": [
+          "高温漂移（参考MDPI论文Grobnic等900-1000°C试验）",
+          "峰形/双折射",
+          "封装摩擦应变",
+          "反射率/带宽取决订货规格"
+        ],
+        "evidence_ids": [
+          "[EV-LIT-MDPI-001]",
+          "[EV-SPEC-ENGIONIC-001]"
+        ],
+        "drift_reference": {
+          "source": "Sensors 2021,21,1454 (Grobnic et al.)",
+          "finding": "初期红移、后期蓝移，预退火不能保证消除长期漂移",
+          "limitation": "不能用900°C漂移数值线性外推600°C寿命"
+        }
+      },
+      "sensor_specs": [
+        {
+          "spec_id": "DEMOD-LUNA-001",
+          "vendor": "Luna Innovations",
+          "model": "si255-EV-08-1460-1620-0010-DP",
+          "source_status": "PDF_VERIFIED",
+          "specs": {
+            "wavelength_range_nm": "1460-1620",
+            "channels": 8,
+            "scan_rate_hz": 10,
+            "connector": "LC/APC",
+            "interface": "Ethernet API"
+          },
+          "hold_items": [
+            "SDK协议端口和时戳格式",
+            "Linux/ARM支持",
+            "商业分发许可",
+            "宽峰精度验证",
+            "当前供货状态或EOL",
+            "Ptx最小/Pdetect/Psat门限"
+          ],
+          "evidence_ids": [
+            "[E05]"
+          ]
+        },
+        {
+          "spec_id": "DEMOD-HBK-001",
+          "vendor": "HBK",
+          "model": "FS22SI",
+          "source_status": "PDF_VERIFIED",
+          "specs": {
+            "wavelength_range_nm": "1500-1600",
+            "channels": 4,
+            "scan_rate_hz": 1,
+            "connector": "FC/APC",
+            "interface": "SCPI TCP ports 3500/3365"
+          },
+          "hold_items": [
+            "SDK实际获取和版本",
+            "操作系统支持",
+            "真实固件帧/终止符",
+            "Ptx最小/Pdetect/Psat门限"
+          ],
+          "evidence_ids": [
+            "[E06]"
+          ]
+        },
+        {
+          "spec_id": "PROBE-FISENS-001",
+          "vendor": "FiSens",
+          "model": "1550 STD narrow + AC",
+          "source_status": "PDF_VERIFIED",
+          "v0_2_status": "LAB_RFQ_PRIORITY",
+          "specs": {
+            "FWHM_nm": "0.25-0.35 (STD narrow)",
+            "wavelength_lower_limit_nm": 1480,
+            "AC_max_length_m": 0.6,
+            "complete_assembly": true
+          },
+          "hold_items": [
+            "600°C完整成品的全部订货配置",
+            "引纤/过渡/应变自由度/热限",
+            "漂移/寿命数据",
+            "温区材料处理"
+          ],
+          "evidence_ids": [
+            "[E17]"
+          ]
+        },
+        {
+          "spec_id": "PROBE-CALSENS-001",
+          "vendor": "CALSENS",
+          "model": "High Temperature FBG Sensor",
+          "source_status": "PDF_VERIFIED",
+          "v0_2_status": "SECOND_RFQ_SOURCE",
+          "specs": {
+            "FWHM_nm": "0.1-2",
+            "max_temp_partial_protection_C": 1200,
+            "note": "2nm FWHM does NOT fit 16.5nm slot budget"
+          },
+          "hold_items": [
+            "完整保护图",
+            "1200°C可用保护类型",
+            "尺寸和封装解耦",
+            "漂移/校准"
+          ],
+          "evidence_ids": [
+            "[E18]"
+          ]
+        },
+        {
+          "spec_id": "PROBE-T890-REVOKED",
+          "vendor": "Technica",
+          "model": "T890",
+          "source_status": "REVOKED_UNVERIFIED_SEARCH_ONLY",
+          "v0_2_status": "REVOKED_FROM_MAIN_SELECTION",
+          "revocation_reason": "v0.2撤销：PDF未取得，HTML挑战失败，参数UNVERIFIED",
+          "evidence_ids": [
+            "[E08]"
+          ],
+          "limitation": "⚠️ 仅作RFI线索，不作选型依据"
+        }
+      ],
+      "system_architecture": {
+        "topology": "8独立串×8点/串，星型光纤网络 + 集中解调",
+        "data_chain": "管壁→可拆金属热接触夹具→松套高温FBG封装→陶瓷/金属高温转接段→冷端装甲单模传输纤→接线盒/熔接盘→APC跳线→解调仪→隔离采集LAN→工业PC→HMI→单向/隔离接口至获准目的系统",
+        "components": [
+          "Luna si255-EV 8CH解调仪 (商用HOLD) / HBK FS22SI (实验HOLD)",
+          "FiSens 1550 STD+AC 高温FBG探头 (LAB_RFQ_PRIORITY)",
+          "CALSENS高温FBG (SECOND_RFQ)",
+          "OSENSA PRB1000HT 非FBG对照 (CONTRAST_SYSTEM)",
+          "⚠️ Technica T890/T885 v0.2撤销 (REVOKED)",
+          "现场高温阵列 NOT_SELECTED",
+          "Advantech UNO-2484G V2 工业计算机",
+          "隔离网络/UPS/机柜"
+        ],
+        "interfaces": {
+          "to_dcs": "OPC-UA/Modbus TCP（只读获取标签，不写）",
+          "network_isolation": "依27号令由电厂网安确定分区和单向隔离"
+        },
+        "safety_isolation": "无DCS写权限；TCP只读不等于物理单向隔离",
+        "evidence_ids": [
+          "[EV-ARCH-001]",
+          "[EV-LIT-ORDER27-001]"
+        ]
+      },
+      "software_architecture": {
+        "modules": [
+          "驱动采集→规范化→质量检验（ICD-05）",
+          "规则与时序报警（硬规则+统计模型）",
+          "HMI可视化",
+          "AI解释建议（非关键路径）",
+          "审计日志"
+        ],
+        "deployment": "Advantech UNO-2484G V2 / 等效工业平台",
+        "ai_constraints": "LLM不在采集/报警关键路径；原始波长/报警不可由LLM改写；AI建议另表保存引用标签、时间窗、模型版本与不确定度；发现输入缺失、工况越界或参考不一致则拒绝给操作指令",
+        "fallback": "无论模型离线/失效，采集与确定性报警继续",
+        "evidence_ids": [
+          "[EV-ARCH-SW-001]"
+        ]
+      }
+    },
+    "stage_2_detailed_design": {
+      "detailed_optical_design": {
+        "sensor_layout": "8独立串×8点/串=64点，纵向间隔0.5-1m覆盖3.5-7m",
+        "channel_count": 64,
+        "fiber_routing": "背火侧可达管屏，8条串不在同一支承/单一路径集中",
+        "point_selection": "横向选哪8根管必须由历史偏差、燃烧器/吹灰/边墙效应、可达性与热工分析决定，不默认连续8根即可代表全炉",
+        "wavelength_budget": {
+          "Tmin_C": 25,
+          "Tmax_C": 700,
+          "normal_Tmax_C": 600,
+          "max_ST_nm_per_C": 0.018,
+          "lambda_tolerance_nm_each_side": 1,
+          "residual_strain_microstrain_each_side": 100,
+          "strain_coefficient_nm_per_microstrain": 0.0012,
+          "aging_nm_each_side": 0.15,
+          "FWHM_nm": 0.8,
+          "slot_nm": 16.5,
+          "guard_nm": 1,
+          "band_edge_nm_each_side": 4,
+          "lambda_start_nm": 1485,
+          "centers_nm": [
+            1485.0,
+            1501.5,
+            1518.0,
+            1534.5,
+            1551.0,
+            1567.5,
+            1584.0,
+            1600.5
+          ],
+          "first_peak_worst_low_nm": 1483.33,
+          "last_peak_worst_high_nm": 1614.32,
+          "normal600_thermal_shift_nm": 10.35,
+          "normal600_envelope_nm": 13.69,
+          "CALSENS_2nm_stress700_envelope_nm": 16.69,
+          "CALSENS_2nm_fits_16_5_slot": false,
+          "scope": "700°C is OPTIONAL_STRESS_SCENARIO_NOT_APPROVED_PROBE_RATING; normal lab design 25-600°C",
+          "evidence_ids": [
+            "[EV-CALC-ENG-001]",
+            "[E11]"
+          ]
+        },
+        "optical_power_budget": {
+          "one_way_loss_dB": 6.64,
+          "return_loss_at20percent_dB": 20.27,
+          "link_margin_dB": null,
+          "link_margin_status": "UNKNOWN",
+          "margin_note": "35dB动态范围不能直接减去20.27dB假设回波损耗得出余量。Ptx保证最小值/Pdetect门限/Psat饱和/谱形SNR条件均未知，真实链路余量UNKNOWN。",
+          "evidence_ids": [
+            "[EV-CALC-ENG-001]",
+            "[E22]"
+          ]
+        },
+        "evidence_ids": [
+          "[EV-DESIGN-OPT-001]"
+        ],
+        "notes": "此间隔是勘查起始假设，不是对0.5m以下热点不会漏检的保证"
+      },
+      "detailed_hw_design": {
+        "primary_demodulator": {
+          "tier": "商用试点",
+          "model": "Luna si255-EV-08-1460-1620-0010-DP",
+          "channels": 8,
+          "wavelength_nm": "1460-1620",
+          "speed_hz": 10,
+          "source_status": "PDF_VERIFIED",
+          "release_status": "HOLD",
+          "hold_reason": "SDK/供货/许可与校准待确认"
+        },
+        "lab_demodulator": {
+          "tier": "实验室",
+          "model": "HBK FS22SI 4CH",
+          "channels": 4,
+          "wavelength_nm": "1500-1600",
+          "speed_hz": 1,
+          "source_status": "PDF_VERIFIED",
+          "release_status": "HOLD",
+          "hold_reason": "租借可用性未确认"
+        },
+        "sensors": {
+          "lab_rfq_priority": "FiSens 1550 STD narrow + AC (PDF_VERIFIED, RFQ_PRIORITY)",
+          "lab_rfq_second": "CALSENS High Temp FBG (PDF_VERIFIED, RFQ_CANDIDATE)",
+          "field_array": "NOT_SELECTED",
+          "independent_contrast": "OSENSA PRB1000HT (非FBG, CONTRAST_SYSTEM)",
+          "v0_2_revoked": "⚠️ Technica T890/T885 已撤销 (REVOKED_UNVERIFIED)",
+          "release_status": "NOT_PROCUREMENT_READY",
+          "hold_reason": "待FiSens/CALSENS询价完成和原厂确认"
+        },
+        "ipc": "Advantech UNO-2484G V2 (PDF_VERIFIED)",
+        "power_budget_w": 160,
+        "ups_requirement_wh": 100.0,
+        "evidence_ids": [
+          "[EV-DESIGN-HW-001]"
+        ]
+      },
+      "bom_items": [
+        {
+          "item_id": "A01",
+          "tier": "LAB",
+          "category": "demodulator",
+          "description": "解调仪(实验4CH)",
+          "vendor": "HBK",
+          "part_number": "FS22SI-系列",
+          "quantity": 1,
+          "unit_price_low_cny": 40000,
+          "unit_price_high_cny": 80000,
+          "price_evidence": "ENGINEERING_SCENARIO_NO_QUOTE",
+          "status": "HOLD",
+          "evidence_ids": [
+            "[E06]"
+          ]
+        },
+        {
+          "item_id": "A02",
+          "tier": "LAB",
+          "category": "sensor",
+          "description": "高温FBG探头4点实验样件",
+          "vendor": "FiSens (RFQ优先) / CALSENS (备选)",
+          "part_number": "TBD-RFQ_REQUIRED",
+          "quantity": 4,
+          "unit_price_low_cny": 3000,
+          "unit_price_high_cny": 18000,
+          "price_evidence": "ENGINEERING_SCENARIO_NO_QUOTE",
+          "status": "RFQ_PRIORITY_NOT_PROCUREMENT_READY",
+          "v0_2_note": "Technica已撤销，改为FiSens/CALSENS询价",
+          "evidence_ids": [
+            "[E17]",
+            "[E18]"
+          ]
+        },
+        {
+          "item_id": "A03",
+          "tier": "LAB",
+          "category": "contrast_system",
+          "description": "独立非FBG对照探头系统",
+          "vendor": "OSENSA",
+          "part_number": "PRB1000HT + FTX300-LUX-HT",
+          "quantity": 1,
+          "unit_price_low_cny": 15000,
+          "unit_price_high_cny": 50000,
+          "price_evidence": "ENGINEERING_SCENARIO_NO_QUOTE",
+          "status": "RFQ_CANDIDATE",
+          "v0_2_note": "新增独立非FBG对照系统",
+          "evidence_ids": [
+            "[E19]"
+          ]
+        },
+        {
+          "item_id": "B01",
+          "tier": "PILOT",
+          "category": "demodulator",
+          "description": "解调仪(商用8CH)",
+          "vendor": "Luna",
+          "part_number": "si255-EV-08-1460-1620-0010-DP",
+          "quantity": 1,
+          "unit_price_low_cny": 200000,
+          "unit_price_high_cny": 500000,
+          "price_evidence": "ENGINEERING_SCENARIO_NO_QUOTE",
+          "status": "HOLD",
+          "evidence_ids": [
+            "[E05]"
+          ]
+        },
+        {
+          "item_id": "B02",
+          "tier": "PILOT",
+          "category": "sensor",
+          "description": "现场高温FBG阵列探头",
+          "vendor": "TBD",
+          "part_number": "NOT_SELECTED",
+          "quantity": 8,
+          "unit_price_low_cny": 20000,
+          "unit_price_high_cny": 80000,
+          "price_evidence": "ENGINEERING_SCENARIO_NO_QUOTE",
+          "status": "NOT_SELECTED",
+          "v0_2_note": "现场阵列传感器NOT_SELECTED，待实验室验证后决策",
+          "evidence_ids": []
+        }
+      ],
+      "cost_breakdown": {
+        "lab_tier": {
+          "subtotal_low_cny": 75000,
+          "subtotal_high_cny": 218000,
+          "contingency_pct": 25,
+          "total_low_wan": 9.375,
+          "total_high_wan": 27.25
+        },
+        "pilot_tier": {
+          "subtotal_low_cny": 553400,
+          "subtotal_high_cny": 1590000,
+          "contingency_pct": 30,
+          "total_low_wan": 71.942,
+          "total_high_wan": 206.7
+        },
+        "disclaimer": "⚠️ 全部价格为ENGINEERING_SCENARIO_NO_QUOTE - 预算情景占位，没有核实原厂售价或正式报价。禁止据此采购或宣称成本竞争力已证实。不含完整长时DVT等范围，不承诺足够覆盖。",
+        "evidence_ids": [
+          "[EV-BUDGET-001]"
+        ]
+      }
+    },
+    "stage_3_development": {
+      "hardware": {
+        "status": "[SIMULATION] 硬件集成待采购完成",
+        "blockers": [
+          "BOM待确认",
+          "供应商待选定"
+        ]
+      },
+      "software": {
+        "status": "[SIMULATION] 软件框架已搭建",
+        "modules_completed": [
+          "数据采集适配器接口",
+          "合成数据生成器"
+        ],
+        "modules_pending": [
+          "实际硬件联调",
+          "算法调优"
+        ]
+      }
+    },
+    "stage_4_testing": {
+      "test_results": [
+        {
+          "test_id": "TEST-UNIT-001",
+          "type": "unit_test",
+          "name": "数据模型单元测试",
+          "status": "passed",
+          "evidence_ids": [
+            "[EV-TEST-001]"
+          ]
+        },
+        {
+          "test_id": "TEST-SYNTH-001",
+          "type": "synthetic_data_test",
+          "name": "合成数据风险检测测试",
+          "status": "passed",
+          "data_source": "synthetic",
+          "evidence_ids": [
+            "[EV-SYNTH-TEST-001]"
+          ]
+        },
+        {
+          "test_id": "TEST-HW-001",
+          "type": "hardware_integration",
+          "name": "实际硬件联调测试",
+          "status": "pending",
+          "reason": "待硬件采购完成",
+          "evidence_ids": []
+        }
+      ]
+    },
+    "stage_5_production": {
+      "production_readiness": {
+        "status": "[SIMULATION] 生产准备待硬件验证完成",
+        "dfm_review": "pending",
+        "pilot_plan": "待定义"
+      },
+      "training_materials": {
+        "installation_guide": "[SIMULATION] 安装指南模板已创建",
+        "operator_manual": "[SIMULATION] 操作手册模板已创建",
+        "maintenance_guide": "[SIMULATION] 维护指南模板已创建"
+      },
+      "sales_toolkit": {
+        "product_brochure": "[SIMULATION] 产品手册模板",
+        "demo_script": "[SIMULATION] 演示脚本模板",
+        "battlecard": "[SIMULATION] 竞品对比卡模板"
+      },
+      "marketing_strategy": {
+        "positioning": "[SIMULATION] 定位策略待市场调研完善",
+        "channels": [
+          "直销",
+          "系统集成商"
+        ],
+        "launch_plan": "[SIMULATION] 上市计划待确定"
+      }
+    }
+  },
+  "quality_assurance": {
+    "qa_reviews": [
+      {
+        "review_id": "QA-stage_0_requirements-run-2026",
+        "stage": "stage_0_requirements",
+        "reviewer_role": "qa",
+        "overall_assessment": "条件通过 - 基于真实研究数据审查。已识别待验证项和HOLD项，需跟踪解决。",
+        "issues": [
+          {
+            "issue_id": "ISS-stage_0_requirements-001",
+            "stage": "stage_0_requirements",
+            "role_source": "qa",
+            "severity": "major",
+            "title": "市场数据待外部注入",
+            "description": "火电≠煤电、机组数≠锅炉数，不能据装机容量编算TAM",
+            "required_action": "从父级任务获取具体市场调研数据",
+            "assigned_to": "mkt",
+            "status": "open",
+            "evidence_ids": [
+              "[EV-LIT-NEA-001]"
+            ]
+          },
+          {
+            "issue_id": "ISS-stage_0_requirements-002",
+            "stage": "stage_0_requirements",
+            "role_source": "qa",
+            "severity": "major",
+            "title": "供应商规格待原厂确认",
+            "description": "Technica T885/T890 PDF下载失败，仅网页索引",
+            "required_action": "获取原厂正式数据表和报价",
+            "assigned_to": "scm",
+            "status": "open",
+            "evidence_ids": [
+              "[EV-SPEC-T890-001]"
+            ]
+          }
+        ],
+        "gate_status": "CONDITIONAL_PASS",
+        "requires_hitl": false,
+        "artifacts_reviewed": [
+          "stage_0_requirements_outputs"
+        ],
+        "evidence_ids": [
+          "[EV-REVIEW-QA-002]"
+        ]
+      },
+      {
+        "review_id": "QA-stage_1_concept-run-2026",
+        "stage": "stage_1_concept",
+        "reviewer_role": "qa",
+        "overall_assessment": "条件通过 - 基于真实研究数据审查。已识别待验证项和HOLD项，需跟踪解决。",
+        "issues": [
+          {
+            "issue_id": "ISS-stage_1_concept-001",
+            "stage": "stage_1_concept",
+            "role_source": "qa",
+            "severity": "major",
+            "title": "市场数据待外部注入",
+            "description": "火电≠煤电、机组数≠锅炉数，不能据装机容量编算TAM",
+            "required_action": "从父级任务获取具体市场调研数据",
+            "assigned_to": "mkt",
+            "status": "open",
+            "evidence_ids": [
+              "[EV-LIT-NEA-001]"
+            ]
+          },
+          {
+            "issue_id": "ISS-stage_1_concept-002",
+            "stage": "stage_1_concept",
+            "role_source": "qa",
+            "severity": "major",
+            "title": "供应商规格待原厂确认",
+            "description": "Technica T885/T890 PDF下载失败，仅网页索引",
+            "required_action": "获取原厂正式数据表和报价",
+            "assigned_to": "scm",
+            "status": "open",
+            "evidence_ids": [
+              "[EV-SPEC-T890-001]"
+            ]
+          }
+        ],
+        "gate_status": "CONDITIONAL_PASS",
+        "requires_hitl": false,
+        "artifacts_reviewed": [
+          "stage_1_concept_outputs"
+        ],
+        "evidence_ids": [
+          "[EV-REVIEW-QA-002]"
+        ]
+      },
+      {
+        "review_id": "QA-stage_2_detailed_design-run-2026",
+        "stage": "stage_2_detailed_design",
+        "reviewer_role": "qa",
+        "overall_assessment": "❌ QA审查未通过 - 存在阻塞性问题。现场不确定度5.728°C 超过目标±5°C。全部BOM价格为预算情景无实际报价。Technica规格仅为网页索引待原厂确认。",
+        "issues": [
+          {
+            "issue_id": "ISS-002-001",
+            "severity": "critical",
+            "title": "不确定度预算不支持保护带验收",
+            "description": "U(k=2)=5.728°C，按|e|+U≤5°C判据，即使e=0也无法接受。需降低U分量或协商MPE。",
+            "evidence_ids": [
+              "[E12]"
+            ]
+          },
+          {
+            "issue_id": "ISS-002-002",
+            "severity": "critical",
+            "title": "Technica选型已撤销",
+            "description": "T885/T890参数UNVERIFIED，PDF未取得，v0.2撤销主备选型。现场阵列传感器NOT_SELECTED。",
+            "evidence_ids": [
+              "[E08]"
+            ]
+          },
+          {
+            "issue_id": "ISS-002-003",
+            "severity": "major",
+            "title": "链路余量未知",
+            "description": "35dB动态范围不能直接减去20.27dB假设损耗。Ptx/Pdetect/Psat未知，真实余量UNKNOWN。",
+            "evidence_ids": [
+              "[E22]"
+            ]
+          },
+          {
+            "issue_id": "ISS-002-004",
+            "severity": "major",
+            "title": "全部价格为预算占位",
+            "description": "ENGINEERING_SCENARIO_NO_QUOTE，禁止据此采购",
+            "evidence_ids": [
+              "[E13]"
+            ]
+          }
+        ],
+        "gate_status": "BLOCKED",
+        "requires_hitl": true,
+        "hitl_reason": "存在阻塞性技术问题，需人工决策是否调整目标或进行实验验证",
+        "artifacts_reviewed": [
+          "detailed_optical_design",
+          "detailed_hw_design",
+          "bom_items",
+          "cost_breakdown",
+          "supplier_analysis"
+        ],
+        "evidence_ids": [
+          "[EV-REVIEW-QA-001]"
+        ],
+        "hold_count": 7
+      },
+      {
+        "review_id": "QA-stage_2_detailed_design-run-2026",
+        "stage": "stage_2_detailed_design",
+        "reviewer_role": "qa",
+        "overall_assessment": "❌ QA审查未通过 - 存在阻塞性问题。现场不确定度5.728°C 超过目标±5°C。全部BOM价格为预算情景无实际报价。Technica规格仅为网页索引待原厂确认。",
+        "issues": [
+          {
+            "issue_id": "ISS-002-001",
+            "severity": "critical",
+            "title": "不确定度预算不支持保护带验收",
+            "description": "U(k=2)=5.728°C，按|e|+U≤5°C判据，即使e=0也无法接受。需降低U分量或协商MPE。",
+            "evidence_ids": [
+              "[E12]"
+            ]
+          },
+          {
+            "issue_id": "ISS-002-002",
+            "severity": "critical",
+            "title": "Technica选型已撤销",
+            "description": "T885/T890参数UNVERIFIED，PDF未取得，v0.2撤销主备选型。现场阵列传感器NOT_SELECTED。",
+            "evidence_ids": [
+              "[E08]"
+            ]
+          },
+          {
+            "issue_id": "ISS-002-003",
+            "severity": "major",
+            "title": "链路余量未知",
+            "description": "35dB动态范围不能直接减去20.27dB假设损耗。Ptx/Pdetect/Psat未知，真实余量UNKNOWN。",
+            "evidence_ids": [
+              "[E22]"
+            ]
+          },
+          {
+            "issue_id": "ISS-002-004",
+            "severity": "major",
+            "title": "全部价格为预算占位",
+            "description": "ENGINEERING_SCENARIO_NO_QUOTE，禁止据此采购",
+            "evidence_ids": [
+              "[E13]"
+            ]
+          }
+        ],
+        "gate_status": "BLOCKED",
+        "requires_hitl": true,
+        "hitl_reason": "存在阻塞性技术问题，需人工决策是否调整目标或进行实验验证",
+        "artifacts_reviewed": [
+          "detailed_optical_design",
+          "detailed_hw_design",
+          "bom_items",
+          "cost_breakdown",
+          "supplier_analysis"
+        ],
+        "evidence_ids": [
+          "[EV-REVIEW-QA-001]"
+        ],
+        "hold_count": 7
+      }
+    ],
+    "hitl_decisions": [
+      {
+        "decision_id": "HITL-requirement_approval-run-2026",
+        "stage": "requirement",
+        "gate_type": "requirement_approval",
+        "request_summary": "[SIMULATION] requirement_approval 需人工审批",
+        "options_presented": [
+          "approve",
+          "reject",
+          "defer"
+        ],
+        "decision": "approve",
+        "decision_rationale": "[SIMULATION] 模拟自动批准，实际需人工决策",
+        "decided_by": "[SIMULATION_AUTO]",
+        "conditions": [
+          "实际运行时需人工确认"
+        ],
+        "evidence_ids": [
+          "[EV-SYNTH-HITL-001]"
+        ]
+      },
+      {
+        "decision_id": "HITL-design_approval-run-2026",
+        "stage": "design",
+        "gate_type": "design_approval",
+        "request_summary": "[SIMULATION] design_approval 需人工审批",
+        "options_presented": [
+          "approve",
+          "reject",
+          "defer"
+        ],
+        "decision": "approve",
+        "decision_rationale": "[SIMULATION] 模拟自动批准，实际需人工决策",
+        "decided_by": "[SIMULATION_AUTO]",
+        "conditions": [
+          "实际运行时需人工确认"
+        ],
+        "evidence_ids": [
+          "[EV-SYNTH-HITL-001]"
+        ]
+      },
+      {
+        "decision_id": "HITL-procurement_approval-run-2026",
+        "stage": "procurement",
+        "gate_type": "procurement_approval",
+        "request_summary": "[SIMULATION] procurement_approval 需人工审批",
+        "options_presented": [
+          "approve",
+          "reject",
+          "defer"
+        ],
+        "decision": "approve",
+        "decision_rationale": "[SIMULATION] 模拟自动批准，实际需人工决策",
+        "decided_by": "[SIMULATION_AUTO]",
+        "conditions": [
+          "实际运行时需人工确认"
+        ],
+        "evidence_ids": [
+          "[EV-SYNTH-HITL-001]"
+        ]
+      },
+      {
+        "decision_id": "HITL-test_approval-run-2026",
+        "stage": "test",
+        "gate_type": "test_approval",
+        "request_summary": "[SIMULATION] test_approval 需人工审批",
+        "options_presented": [
+          "approve",
+          "reject",
+          "defer"
+        ],
+        "decision": "approve",
+        "decision_rationale": "[SIMULATION] 模拟自动批准，实际需人工决策",
+        "decided_by": "[SIMULATION_AUTO]",
+        "conditions": [
+          "实际运行时需人工确认"
+        ],
+        "evidence_ids": [
+          "[EV-SYNTH-HITL-001]"
+        ]
+      }
+    ],
+    "stage_gate_results": {}
+  },
+  "evidence_summary": {
+    "total_evidence_count": 30,
+    "verified_count": 28,
+    "pending_verification_count": 0,
+    "synthetic_count": 2,
+    "verified_evidence_ids": [
+      "[E05]",
+      "[E06]",
+      "[E08]",
+      "[E17]",
+      "[E18]",
+      "[E19]",
+      "[EV-ARCH-001]",
+      "[EV-ARCH-SW-001]",
+      "[EV-BUDGET-001]",
+      "[EV-CALC-ENG-001]",
+      "[EV-COMP-CEIC-001]",
+      "[EV-COMP-DADE-001]",
+      "[EV-DESIGN-HW-001]",
+      "[EV-DESIGN-OPT-001]",
+      "[EV-DESIGN-SCEN-001]",
+      "[EV-LIT-MDPI-001]",
+      "[EV-LIT-NEA-001]",
+      "[EV-LIT-ORDER27-001]",
+      "[EV-REQ-R01]",
+      "[EV-REQ-R02]",
+      "[EV-REQ-R05]",
+      "[EV-REQ-R10]",
+      "[EV-REVIEW-QA-001]",
+      "[EV-REVIEW-QA-002]",
+      "[EV-SPEC-ENGIONIC-001]",
+      "[EV-SUP-HBK-001]",
+      "[EV-SUP-LUNA-001]",
+      "[EV-TEST-001]"
+    ],
+    "pending_evidence_ids": [],
+    "synthetic_evidence_ids": [
+      "[EV-SYNTH-HITL-001]",
+      "[EV-SYNTH-TEST-001]"
+    ]
+  },
+  "risks_and_limitations": {
+    "risks": [],
+    "known_limitations": [
+      "硬件适配器为契约定义，需实际硬件联调",
+      "合成数据带SYNTHETIC标记，不声称电厂实测",
+      "高温FBG规格需原厂确认",
+      "市场数据待外部注入"
+    ],
+    "pending_items": []
+  },
+  "cost_summary": {
+    "total_api_calls": 0,
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "total_cost_usd": 0.0,
+    "events_count": 0
+  },
+  "telemetry": {
+    "events": [
+      {
+        "event": "stage_0_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation_with_real_research_data",
+        "data_source": "engineering_research_package_v0.1",
+        "tag": "[RESEARCH_DATA]"
+      },
+      {
+        "event": "stage_1_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation_with_real_research_data",
+        "data_source": "engineering_research_package_v0.2",
+        "v0_2_changes": [
+          "Technica_REVOKED",
+          "FiSens_LAB_RFQ_PRIORITY",
+          "CALSENS_SECOND_RFQ"
+        ]
+      },
+      {
+        "event": "stage_2_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation_with_real_research_data",
+        "data_source": "engineering_research_package_v0.1",
+        "critical_note": "Field uncertainty 5.73°C > ±5°C target - QA MUST REJECT"
+      },
+      {
+        "event": "stage_2_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation_with_real_research_data",
+        "data_source": "engineering_research_package_v0.1",
+        "critical_note": "Field uncertainty 5.73°C > ±5°C target - QA MUST REJECT"
+      },
+      {
+        "event": "stage_3_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation"
+      },
+      {
+        "event": "stage_4_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation"
+      },
+      {
+        "event": "stage_5_completed",
+        "run_id": "run-20261115-173615-92b744f4",
+        "mode": "simulation"
+      }
+    ],
+    "written_files": []
+  }
+}

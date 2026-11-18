@@ -1,0 +1,85 @@
+{
+  "run_type": "v031_final_structural_fixes",
+  "created_utc": "2026-11-15T19:00:00Z",
+  
+  "input": {
+    "version": "v0.3.1",
+    "sha256": "aecc9c4a5a87f9597628cacce3fab088abd0d4d34f0a02417bad1946d74e6f6a",
+    "independent_review_status": "ACCEPTED",
+    "independent_review_count": 10,
+    "engineering_validation_status": "OPEN",
+    "engineering_validation_count": 10,
+    "physical_test_status": "NOT_RUN",
+    "procurement_status": "NOT_READY"
+  },
+  
+  "model": {
+    "id": "Qwen/Qwen2.5-1.5B-Instruct",
+    "size": "1.5B",
+    "license": "Apache-2.0",
+    "revision": "to_be_resolved_from_hf_cache"
+  },
+  
+  "fixes_applied": [
+    {
+      "id": "Fix1",
+      "name": "NoTruncation",
+      "description": "to_full_handoff() and get_full_handoffs_for_qa() return complete content",
+      "test_count": 3
+    },
+    {
+      "id": "Fix2",
+      "name": "ReferenceValidation",
+      "description": "validate_reference() detects REFERENCE_INVALID for non-existent artifact_ids",
+      "test_count": 3
+    },
+    {
+      "id": "Fix3",
+      "name": "RevisionLoop",
+      "description": "register_revision() tracks derived_from, implements REVISE + QA_REVIEW",
+      "test_count": 3
+    },
+    {
+      "id": "Fix4",
+      "name": "TrustLevelRename",
+      "description": "FORMAT_VALID_RULES_NOT_TRIGGERED replaces misleading VERIFIED",
+      "test_count": 4
+    },
+    {
+      "id": "Fix5",
+      "name": "ModelRevisionSHA",
+      "description": "resolve_model_revision() gets actual HF commit SHA from cache",
+      "test_count": 1
+    }
+  ],
+  
+  "test_results": {
+    "total": 185,
+    "passed": 185,
+    "failed": 0,
+    "errors": 0,
+    "test_files": [
+      "tests/test_final_fixes.py",
+      "tests/test_run_defects.py",
+      "tests/test_v031_strict.py",
+      "tests/test_v02_regression.py",
+      "tests/test_temperature_app.py"
+    ]
+  },
+  
+  "trust_levels": {
+    "FORMAT_VALID_RULES_NOT_TRIGGERED": "JSON parse success, schema valid, no semantic rules triggered. NOT professional verification.",
+    "SCHEMA_FAILED": "JSON parsed but missing required fields or wrong types",
+    "RULE_TRIGGERED": "Semantic anomaly detected (fabricated price/company/PASS claim)",
+    "UNREVIEWED": "Default state for outputs awaiting review",
+    "PARSE_FAILED": "JSON parse failed",
+    "CONTEXT_LIMIT": "Context exceeded model limit",
+    "REFERENCE_INVALID": "Referenced artifact_id does not exist"
+  },
+  
+  "gate_status": "BLOCKED",
+  "gate_reason": "10 engineering validations OPEN, physical tests NOT_RUN, procurement NOT_READY",
+  "gate_is_deterministic": true,
+  
+  "disclaimer": "小模型产物标FORMAT_VALID_RULES_NOT_TRIGGERED仅表示格式正确且规则未触发，不代表专业核验通过。语义误报漏报如实保留供人工审阅。"
+}

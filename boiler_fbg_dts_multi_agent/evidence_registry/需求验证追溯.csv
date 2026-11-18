@@ -1,0 +1,11 @@
+﻿requirement_id,requirement,design_reference,test_reference,acceptance_target,evidence_status
+R01,64点局部阵列,02 §2/5,OPT01/F02,8x8按波长/损耗验证；不可宣传满40点,NOT_RUN
+R02,25–600℃正常范围,02 §1/2,CAL02/CAL03,温区全覆盖+长期漂移,NOT_RUN
+R03,10Hz/≤3s趋势,02 §1/4,SW01/F05,P95≤3s；HBK1Hz另配,NOT_RUN
+R04,整链温度误差,02 §7,CAL02/MECH01/SAT,实验室拟±3℃现场拟±5℃；不确定度保护带,NOT_RUN
+R05,原始数据与供电,02 §4,F04/F07,原始λ保存与UPS恢复,NOT_RUN
+R06,DCS只读,02 §4/8,F06/INST01,无写账户/接口；电厂批准,NOT_RUN
+R07,坏点不静默,02 §4,OPT01/SW01,缺失/陈旧/出界均标质量位,NOT_RUN
+R08,不影响承压边界,02 §4,MECH01/INST01,OEM/锅监安装批准,NOT_RUN
+R09,全过程追溯,04 §4,F01/F09,序列号/证书/图纸/软件/记录齐套,NOT_RUN
+R10,AI人工决策,02 §8,SW01/F06/SAT,不写DCS；失效不影响规则,NOT_RUN
