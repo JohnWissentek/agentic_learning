@@ -211,11 +211,12 @@ add_box(
     STYLE_HARDCODE,
 )
 add_box(
-    "n_chat", 2360, 1080, 860, 310,
-    "3B. conversational_responder（多轮参谋对话，LLM #2）",
+    "n_chat", 2360, 1080, 860, 340,
+    "3B. conversational_responder（跨轮参谋对话：每条消息单次 LLM 回复，LLM #2）",
     "• 【调用 LLM（qwen3.8-flash，Prompt: CONVERSATIONAL_ADVISOR_PROMPT）干什么】：\n"
-    "  接收跨天摘要、相关项目卡、近期对话流、待确认卡与工作区快照，围绕董事长当前思路做参谋分析或澄清讨论（不建新待办）\n"
-    "• 【输出什么（ConversationalReply）】：连贯的中文参谋回复 reply；若还有悬而未决的待确认卡片，结尾顺带轻声提醒确认",
+    "  每收到一条消息只调用 1 次模型，不自主循环；带上跨天摘要、项目卡、最近 30 轮对话、待确认卡与在途快照，接着前文做参谋分析或澄清\n"
+    "• 【输出什么（ConversationalReply）】：1 条中文参谋回复 reply（不建待办）；若有待确认卡片，结尾提醒确认\n"
+    "• 【轮数与终止】：轮数由董事长决定（发一条回一条，无上限）；下一条被路由器判为交办/查询/确认/打卡等意图即切换分支，不再发消息即结束",
     STYLE_LLM,
 )
 add_box(
@@ -350,7 +351,7 @@ add_edge("e_ctx4", "ctx_l4", "ctx_render", "FTS5 检索证据", "#2f855a", dashe
 
 # 阶段二 -> 阶段三 & 阶段四（走阶段二/三之间走廊 x=2130..2190，以及底部专属走廊 y=3180）
 add_edge("e_ctx_r", "ctx_render", "n_router", "喂给路由器", "#2f855a", dashed=True, exit_xy=(1.0, 0.2), entry_xy=(0.0, 0.65), points=[(2130, 1828), (2130, 434)])
-add_edge("e_ctx_c", "ctx_render", "n_chat", "喂给多轮对话", "#2f855a", dashed=True, exit_xy=(1.0, 0.5), entry_xy=(0.0, 0.5), points=[(2160, 1960), (2160, 1230)])
+add_edge("e_ctx_c", "ctx_render", "n_chat", "喂给参谋对话", "#2f855a", dashed=True, exit_xy=(1.0, 0.5), entry_xy=(0.0, 0.5), points=[(2160, 1960), (2160, 1230)])
 add_edge("e_ctx_p", "ctx_render", "n_prod", "喂给提案起草（底部安全走廊）", "#2f855a", dashed=True, exit_xy=(0.5, 1.0), entry_xy=(0.0, 0.6), points=[(1590, 3180), (3445, 3180), (3445, 1134)])
 
 # 阶段三内部：n_router -> 3A / 3B / 3C（分别走中线、右侧内部走廊 x=3300、左侧内部走廊 x=2280，绝不互相穿过！）
