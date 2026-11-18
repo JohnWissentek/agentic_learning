@@ -180,6 +180,15 @@ class Database:
                     created_at TEXT NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS idx_conv_turns_thread ON conversation_turns(thread_id, id DESC);
+
+                CREATE TABLE IF NOT EXISTS episode_summaries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    thread_id TEXT NOT NULL DEFAULT 'owner',
+                    summary_text TEXT NOT NULL,
+                    last_turn_id INTEGER DEFAULT 0,
+                    updated_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_episode_thread ON episode_summaries(thread_id, id DESC);
                 """
             )
             try:
@@ -187,13 +196,53 @@ class Database:
                     "CREATE VIRTUAL TABLE IF NOT EXISTS sources_fts "
                     "USING fts5(source_id UNINDEXED, title, content, tokenize='trigram');"
                 )
+                conn.execute(
+                    "CREATE VIRTUAL TABLE IF NOT EXISTS conversation_turns_fts "
+                    "USING fts5(turn_id UNINDEXED, content, tags, tokenize='trigram');"
+                )
                 self.fts_tokenizer = "trigram"
             except sqlite3.OperationalError:
                 conn.execute(
                     "CREATE VIRTUAL TABLE IF NOT EXISTS sources_fts "
                     "USING fts5(source_id UNINDEXED, title, content, tokenize='unicode61');"
                 )
+                conn.execute(
+                    "CREATE VIRTUAL TABLE IF NOT EXISTS conversation_turns_fts "
+                    "USING fts5(turn_id UNINDEXED, content, tags, tokenize='unicode61');"
+                )
                 self.fts_tokenizer = "unicode61"
+
+            # Deduplicate FTS rows left by the legacy text-vs-integer backfill bug, then backfill missing rows.
+            conn.execute(
+                """
+                DELETE FROM conversation_turns_fts
+                WHERE rowid NOT IN (
+                    SELECT MIN(rowid) FROM conversation_turns_fts GROUP BY CAST(turn_id AS INTEGER)
+                )
+                """
+            )
+            conn.execute(
+                """
+                INSERT INTO conversation_turns_fts (turn_id, content, tags)
+                SELECT CAST(id AS TEXT), content, topic_tags_json FROM conversation_turns
+                WHERE is_confidential = 0
+                  AND id NOT IN (SELECT CAST(turn_id AS INTEGER) FROM conversation_turns_fts)
+                """
+            )
+            conn.execute(
+                "CREATE TABLE IF NOT EXISTS seen_external_ids (ext_id TEXT PRIMARY KEY, seen_at TEXT NOT NULL)"
+            )
+
+    def mark_external_seen(self, ext_id: str) -> bool:
+        """Atomically mark an external message id as processed. Returns True only the first time."""
+        if not ext_id:
+            return True
+        with self._lock, self._connect() as conn:
+            cur = conn.execute(
+                "INSERT OR IGNORE INTO seen_external_ids (ext_id, seen_at) VALUES (?, ?)",
+                (ext_id, _now_str()),
+            )
+            return cur.rowcount > 0
 
     # --- Raw sources & hybrid search ---
 
@@ -624,6 +673,7 @@ class Database:
     ) -> int:
         ts = created_at or _now_str()
         tags_json = json.dumps(topic_tags or [], ensure_ascii=False)
+        tags_text = " ".join(topic_tags or [])
         with self._lock, self._connect() as conn:
             cur = conn.execute(
                 """
@@ -633,7 +683,46 @@ class Database:
                 """,
                 (thread_id, role, content, intent, tags_json, proposal_id, 1 if is_confidential else 0, ts),
             )
-            return int(cur.lastrowid)
+            turn_id = int(cur.lastrowid)
+            if not is_confidential:
+                conn.execute(
+                    "INSERT INTO conversation_turns_fts (turn_id, content, tags) VALUES (?, ?, ?)",
+                    (str(turn_id), content, tags_text),
+                )
+            return turn_id
+
+    def get_latest_episode_summary(self, thread_id: str = "owner") -> dict[str, Any] | None:
+        with self._lock, self._connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM episode_summaries WHERE thread_id = ? ORDER BY id DESC LIMIT 1",
+                (thread_id,),
+            ).fetchone()
+            return dict(row) if row else None
+
+    def upsert_episode_summary(self, thread_id: str, summary_text: str, last_turn_id: int) -> None:
+        now = _now_str()
+        with self._lock, self._connect() as conn:
+            conn.execute(
+                "INSERT INTO episode_summaries (thread_id, summary_text, last_turn_id, updated_at) VALUES (?, ?, ?, ?)",
+                (thread_id, summary_text.strip()[:1200], int(last_turn_id), now),
+            )
+
+    def get_turns_since(self, thread_id: str = "owner", after_id: int = 0, limit: int = 30) -> list[dict[str, Any]]:
+        with self._lock, self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT * FROM conversation_turns
+                WHERE thread_id = ? AND is_confidential = 0 AND id > ?
+                ORDER BY id ASC LIMIT ?
+                """,
+                (thread_id, after_id, limit),
+            ).fetchall()
+            out = []
+            for r in rows:
+                item = dict(r)
+                item["topic_tags"] = json.loads(item.get("topic_tags_json") or "[]")
+                out.append(item)
+            return out
 
     def get_recent_conversation_turns(self, thread_id: str = "owner", limit: int = 10) -> list[dict[str, Any]]:
         with self._lock, self._connect() as conn:
@@ -667,17 +756,36 @@ class Database:
         scored: dict[int, tuple[float, dict[str, Any]]] = {}
         with self._lock, self._connect() as conn:
             for kw in clean_kws[:8]:
-                pat = f"%{kw}%"
-                rows = conn.execute(
-                    """
-                    SELECT * FROM conversation_turns
-                    WHERE thread_id = ? AND is_confidential = 0
-                      AND (content LIKE ? OR topic_tags_json LIKE ?)
-                    ORDER BY id DESC LIMIT ?
-                    """,
-                    (thread_id, pat, pat, limit * 2),
-                ).fetchall()
-                for r in rows:
+                matched_rows: list[sqlite3.Row] = []
+                # 1) Try FTS5 trigram/unicode61 first (fast & handles longer phrases cleanly)
+                if len(kw) >= 3 or self.fts_tokenizer == "unicode61":
+                    safe_kw = kw.replace('"', "")
+                    try:
+                        matched_rows = conn.execute(
+                            """
+                            SELECT c.* FROM conversation_turns_fts f
+                            JOIN conversation_turns c ON c.id = CAST(f.turn_id AS INTEGER)
+                            WHERE f.conversation_turns_fts MATCH ?
+                              AND c.thread_id = ? AND c.is_confidential = 0
+                            ORDER BY c.id DESC LIMIT ?
+                            """,
+                            (f'"{safe_kw}"', thread_id, limit * 2),
+                        ).fetchall()
+                    except sqlite3.OperationalError:
+                        matched_rows = []
+                # 2) Fallback to LIKE for short 2-char Chinese tokens or zero FTS hits
+                if not matched_rows:
+                    pat = f"%{kw}%"
+                    matched_rows = conn.execute(
+                        """
+                        SELECT * FROM conversation_turns
+                        WHERE thread_id = ? AND is_confidential = 0
+                          AND (content LIKE ? OR topic_tags_json LIKE ?)
+                        ORDER BY id DESC LIMIT ?
+                        """,
+                        (thread_id, pat, pat, limit * 2),
+                    ).fetchall()
+                for r in matched_rows:
                     tid = int(r["id"])
                     if tid in excl:
                         continue

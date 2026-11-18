@@ -20,6 +20,7 @@ from wechat_assistant.nodes.critic_rules import deterministic_critic_check
 from wechat_assistant.prompts.system_prompts import (
     CONVERSATIONAL_ADVISOR_PROMPT,
     CRITIC_AUDIT_PROMPT,
+    EPISODE_SUMMARY_PROMPT,
     FAST_ROUTER_PROMPT,
     PRODUCER_TRIAGE_PROMPT,
     QA_GROUNDED_PROMPT,
@@ -43,6 +44,12 @@ class QAGroundedAnswer(BaseModel):
     citations: list[str] = Field(default_factory=list)
 
 
+class EpisodeSummary(BaseModel):
+    """Semantic rolling cross-day summary produced by the fast model."""
+
+    summary: str = Field(min_length=10, max_length=1200)
+
+
 class ConversationalReply(BaseModel):
     """Structured executive conversational response preserving continuous context."""
 
@@ -62,6 +69,9 @@ class WorkflowState(TypedDict, total=False):
     search_queries: list[str]
     target_item_id: int | None
     actual_hours: float | None
+    clarify_question: str
+    rolling_summary_text: str
+    project_context_text: str
     dialogue_context_text: str
     workspace_context_text: str
     pending_context_text: str
@@ -82,15 +92,6 @@ class WorkflowState(TypedDict, total=False):
     trajectory: list[str]
 
 
-def is_confidential_input(text: str, attachments: list[dict[str, Any]] | None = None) -> bool:
-    stripped = (text or "").lstrip()
-    if stripped.startswith(("密：", "密:")):
-        return True
-    for att in attachments or []:
-        name = Path(att.get("filename") or att.get("path") or "").name
-        if name.startswith(("密：", "密:")):
-            return True
-    return False
 
 
 def format_decision_card(proposal_id: int, proposal: TriageProposal, cockpit_url: str = "") -> str:
@@ -126,6 +127,10 @@ def format_decision_card(proposal_id: int, proposal: TriageProposal, cockpit_url
 class ChiefOfStaffEngine:
     """End-to-end bounded workflow orchestrator binding DB, tools, OneDrive, and LangGraph."""
 
+    # Rolling-summary switches (class-level so tests can disable them globally).
+    semantic_summaries: bool = True
+    background_summaries: bool = True
+
     def __init__(
         self,
         *,
@@ -146,9 +151,18 @@ class ChiefOfStaffEngine:
         ckpt_file = Path(checkpoints_path or Path(db.db_path).parent / "checkpoints.db")
         ckpt_file.parent.mkdir(parents=True, exist_ok=True)
         self._ckpt_conn = sqlite3.connect(str(ckpt_file), check_same_thread=False)
-        self._turn_lock = threading.Lock()
+        self._turn_lock = threading.RLock()
+        self._progress_cb: Callable[[str], None] | None = None
         self.checkpointer = SqliteSaver(self._ckpt_conn)
         self.graph = self._build_graph()
+
+    def _emit_progress(self, stage_label: str) -> None:
+        cb = self._progress_cb
+        if cb is not None:
+            try:
+                cb(stage_label)
+            except Exception:
+                pass
 
     def close(self) -> None:
         self._ckpt_conn.close()
@@ -179,6 +193,70 @@ class ChiefOfStaffEngine:
             topic_tags=extract_topic_tags(reply_text, proj_names),
             proposal_id=proposal_id,
         )
+        # Rolling cross-day episode summary every 8 new turns:
+        # 1) write a cheap extractive fallback synchronously (advances last_turn_id, never blocks reply);
+        # 2) upgrade it to a semantic LLM summary in a background thread when possible.
+        last_ep = self.db.get_latest_episode_summary(thread_id)
+        after_id = int(last_ep["last_turn_id"]) if last_ep else 0
+        new_turns = self.db.get_turns_since(thread_id, after_id=after_id, limit=20)
+        if len(new_turns) >= 8:
+            user_snippets = [
+                f"[{(t.get('created_at') or '')[5:16]}] {(t.get('content') or '').replace(chr(10), ' ')[:60]}"
+                for t in new_turns
+                if t.get("role") == "user"
+            ][-5:]
+            tags_seen: list[str] = []
+            for t in new_turns:
+                for tg in t.get("topic_tags") or []:
+                    if tg not in tags_seen:
+                        tags_seen.append(tg)
+            prev_summary = last_ep["summary_text"] if last_ep else ""
+            prev_txt = (prev_summary[:220] + " ｜ ") if prev_summary else ""
+            fallback_txt = (
+                f"{prev_txt}近期关注主题：{'、'.join(tags_seen[:8]) or '日常事务'}；"
+                f"关键交办：{'；'.join(user_snippets)}"
+            )
+            last_id = int(new_turns[-1]["id"])
+            self.db.upsert_episode_summary(thread_id, fallback_txt, last_turn_id=last_id)
+            if self.semantic_summaries:
+                args = (thread_id, prev_summary, new_turns, last_id)
+                if self.background_summaries:
+                    threading.Thread(target=self._refresh_semantic_summary, args=args, daemon=True).start()
+                else:
+                    self._refresh_semantic_summary(*args)
+
+    def _refresh_semantic_summary(
+        self,
+        thread_id: str,
+        prev_summary: str,
+        new_turns: list[dict[str, Any]],
+        last_turn_id: int,
+    ) -> None:
+        """Ask the fast model to merge the previous summary with new turns into one semantic summary."""
+        try:
+            transcript = "\n".join(
+                f"[{(t.get('created_at') or '')[5:16]}] {'董事长' if t.get('role') == 'user' else 'AI助理'}："
+                f"{(t.get('content') or '').replace(chr(10), ' ')[:300]}"
+                for t in new_turns
+            )
+            res, rec = self.gateway.generate_structured(
+                "fast",
+                [
+                    {"role": "system", "content": EPISODE_SUMMARY_PROMPT},
+                    {
+                        "role": "user",
+                        "content": f"【上一版滚动摘要】\n{prev_summary or '（无）'}\n\n【新增对话】\n{transcript}",
+                    },
+                ],
+                EpisodeSummary,
+                max_tokens=800,
+            )
+            self._record_latest_call(rec)
+            latest = self.db.get_latest_episode_summary(thread_id)
+            if latest and int(latest["last_turn_id"]) == last_turn_id:
+                self.db.upsert_episode_summary(thread_id, res.summary, last_turn_id=last_turn_id)
+        except Exception:
+            pass  # keep the extractive fallback summary
 
     def _record_latest_call(self, rec) -> None:
         self.db.record_model_call(
@@ -257,11 +335,14 @@ class ChiefOfStaffEngine:
     # --- LangGraph nodes ---
 
     def _node_guardrail_router(self, state: WorkflowState) -> WorkflowState:
+        self._emit_progress("1/5 正在装配上下文并识别意图")
         traj = list(state.get("trajectory") or []) + ["node:guardrail_router"]
         raw_text = state.get("raw_text", "")
         thread_id = state.get("thread_id", "owner")
         ctx = self.context_assembler.assemble(thread_id, raw_text)
         ctx_fields: dict[str, Any] = {
+            "rolling_summary_text": ctx.rolling_summary_text,
+            "project_context_text": ctx.project_context_text,
             "dialogue_context_text": ctx.recent_dialogue_text,
             "workspace_context_text": ctx.workspace_snapshot_text,
             "pending_context_text": ctx.pending_proposal_text,
@@ -313,7 +394,11 @@ class ChiefOfStaffEngine:
             "search_queries": list(route.search_queries or []),
             "target_item_id": route.target_item_id,
             "actual_hours": route.actual_hours,
+            "clarify_question": route.clarify_question or "",
         }
+        # Low confidence only blocks new work assignment; short queries / check-ins keep flowing.
+        if route.confidence < 0.55 and route.intent == "work_triage":
+            effective_intent = "clarify_or_unsupported"
 
         if route.intent == "ideas_only_pending":
             if ctx.pending_proposal:
@@ -374,6 +459,36 @@ class ChiefOfStaffEngine:
             return {"reply_text": ("↩️ " if ok else "ℹ️ ") + msg, "trajectory": traj}
 
         if intent in {"mutate_existing_item", "checkin"}:
+            res_text = state.get("resolved_text") or raw_text
+            multi_hash_ids = [int(x) for x in re.findall(r"#(\d+)", raw_text)]
+            if len(multi_hash_ids) >= 2:
+                results: list[str] = []
+                for clause in re.split(r"[，,；;。\n]+", raw_text):
+                    c_ids = [int(x) for x in re.findall(r"#(\d+)", clause)]
+                    if not c_ids:
+                        continue
+                    c_start = any(k in clause for k in ("开始", "启动", "正在做", "开工")) and not any(
+                        k in clause for k in ("完成", "做完", "搞定", "结束", "闭环")
+                    )
+                    for cid in c_ids:
+                        if c_start:
+                            it = self.db.start_item(cid)
+                            if it:
+                                results.append(f"▶️ **#{it['id']}** 已开始：`{it['title']}`（{it['actual_start_at']}）")
+                        else:
+                            it = self.db.complete_item(cid, actual_hours=state.get("actual_hours"))
+                            if it:
+                                results.append(
+                                    f"✅ **#{it['id']}** 已完成：`{it['title']}`（跨度 `{it.get('actual_span_days', 1)} 天`）"
+                                )
+                if results:
+                    if self.onedrive is not None:
+                        self.onedrive.sync_all_lists(self.db)
+                    return {
+                        "reply_text": "已批量刷新进度（已同步云端 `.md`）：\n" + "\n".join(results),
+                        "trajectory": traj,
+                    }
+
             target_id = state.get("target_item_id")
             if target_id is None:
                 m_id = re.search(r"#?(\d+)", raw_text)
@@ -423,7 +538,9 @@ class ChiefOfStaffEngine:
         raw_text = state.get("raw_text", "")
         resolved = state.get("resolved_text") or raw_text
         prompt = (
-            f"【近期对话流与时间间隔】\n{state.get('dialogue_context_text', '')}\n\n"
+            f"【跨天滚动会话摘要】\n{state.get('rolling_summary_text', '')}\n\n"
+            + (f"【相关项目上下文卡】\n{state.get('project_context_text')}\n\n" if state.get("project_context_text") else "")
+            + f"【近期对话流与时间间隔】\n{state.get('dialogue_context_text', '')}\n\n"
             f"【当前待确认卡片】\n{state.get('pending_context_text', '')}\n\n"
             f"【在途项目与待办快照】\n{state.get('workspace_context_text', '')}\n\n"
             f"【用户当前表达】\n{raw_text}\n（结合语境理解：{resolved}）"
@@ -441,6 +558,7 @@ class ChiefOfStaffEngine:
         return {"reply_text": ans.reply, "trajectory": traj}
 
     def _node_quick_qa_responder(self, state: WorkflowState) -> WorkflowState:
+        self._emit_progress("2/2 正在检索历史档案与对话记录并核对页码")
         traj = list(state.get("trajectory") or []) + ["node:quick_qa_responder", "tool:hybrid_search"]
         query = state.get("raw_text", "")
         resolved = state.get("resolved_text") or query
@@ -454,26 +572,35 @@ class ChiefOfStaffEngine:
         )
 
         ev_blocks: list[str] = []
-        for h in ev_pack["doc_hits"][:3]:
+        for h in ev_pack["doc_hits"][:6]:
             pages = read_doc_pages(self.db, h["source_id"], [h["page"]] if h["page"] else None)
             if pages:
-                for p in pages[:2]:
-                    ev_blocks.append(f"来源《{p['title']}》第 {p['page']} 页：\n{p['text'][:1200]}")
+                for p in pages[:3]:
+                    ev_blocks.append(f"来源《{p['title']}》第 {p['page']} 页：\n{p['text'][:1500]}")
             else:
                 ev_blocks.append(f"来源《{h['title']}》：{h['snippet']}")
 
-        for ep in ev_pack["episodic_hits"][:4]:
+        for ep in ev_pack["episodic_hits"][:8]:
             r_lbl = "董事长" if ep.get("role") == "user" else "AI助理"
-            ev_blocks.append(f"[历史对话 {ep.get('created_at')}] {r_lbl}：{ep.get('content', '')[:500]}")
+            ev_blocks.append(f"[历史对话 {ep.get('created_at')}] {r_lbl}：{ep.get('content', '')[:600]}")
 
-        for it in ev_pack["matched_items"][:5]:
+        # Also check matching turns inside the 30-turn recent dialogue window
+        q_tokens = [t.lower() for t in (state.get("search_queries") or []) + extract_topic_tags(resolved) if len(t) >= 2]
+        if q_tokens:
+            for rt in ctx.recent_turns:
+                rt_hay = f"{rt.get('content', '')} {' '.join(rt.get('topic_tags') or [])}".lower()
+                if any(tok in rt_hay for tok in q_tokens):
+                    r_lbl = "董事长" if rt.get("role") == "user" else "AI助理"
+                    ev_blocks.append(f"[近期对话 {rt.get('created_at')}] {r_lbl}：{rt.get('content', '')[:600]}")
+
+        for it in ev_pack["matched_items"][:10]:
             ev_blocks.append(
                 f"[待办记录 #{it['id']}] [{it['status']}][{it['priority']}][{it['list_type']}] "
-                f"{it['project_name']}: {it['title']} (责任人:{it['owner']}, 周期:{it['planned_start_at']}~{it['planned_end_at']}, {it['estimated_hours']}h)"
+                f"{it['project_name']}: {it['title']} (责任人:{it['owner']}, 周期:{it['planned_start_at']}~{it['planned_end_at']})"
             )
-        for pj in ev_pack["matched_projects"][:3]:
+        for pj in ev_pack["matched_projects"][:5]:
             ev_blocks.append(
-                f"[在途项目] {pj['name']} ({pj['work_domain']}) 周期:{pj['planned_start_date']}~{pj['target_end_date']} 累计预估:{pj['total_estimated_hours']}h"
+                f"[在途项目] {pj['name']} ({pj['work_domain']}) 周期:{pj['planned_start_date']}~{pj['target_end_date']} 近况:{pj.get('latest_brief') or '-'}"
             )
 
         asks_about_pending = bool(
@@ -513,6 +640,7 @@ class ChiefOfStaffEngine:
         return {"reply_text": reply, "trajectory": traj}
 
     def _node_react_investigator(self, state: WorkflowState) -> WorkflowState:
+        self._emit_progress("2/5 正在提取附件文本并检索历史档案与排期")
         traj = list(state.get("trajectory") or []) + ["node:react_investigator"]
         source_ids, excel_tables, att_text = self._ingest_attachments_and_source(state)
         query_text = state.get("raw_text", "")
@@ -530,9 +658,7 @@ class ChiefOfStaffEngine:
         schedule = check_workload_and_schedule(
             self.db,
             start_date=date.today().isoformat(),
-            needed_hours=1.0,
             days=14,
-            daily_capacity=self.settings.daily_capacity_hours,
         )
         traj.append("tool:check_workload_and_schedule")
 
@@ -553,17 +679,17 @@ class ChiefOfStaffEngine:
                     "source_id": str(h["source_id"]),
                     "title": h["title"],
                     "page_ref": f"第{h['page']}页",
-                    "snippet": h["snippet"][:300],
+                    "snippet": h["snippet"][:1000],
                 })
-        for ep in ev_pack["episodic_hits"][:3]:
+        for ep in ev_pack["episodic_hits"][:8]:
             cards.append({
                 "source_id": f"conv_{ep['id']}",
                 "title": f"跨时段历史对话 ({ep.get('created_at', '')[:16]})",
                 "page_ref": ep.get("role", "user"),
-                "snippet": (ep.get("content") or "")[:300],
+                "snippet": (ep.get("content") or "")[:600],
             })
         if att_text:
-            cards.append({"source_id": "incoming_att", "title": "本次附件", "page_ref": "全文提取", "snippet": att_text[:1500]})
+            cards.append({"source_id": "incoming_att", "title": "本次附件", "page_ref": "全文提取", "snippet": att_text[:6000]})
 
         return {
             "source_ids": source_ids,
@@ -579,20 +705,21 @@ class ChiefOfStaffEngine:
         cards = state.get("evidence_cards") or []
         ev_lines = [
             f"[{c.get('title')} | {c.get('page_ref')}] {c.get('snippet')}"
-            for c in cards[:6]
+            for c in cards[:12]
         ]
         ev_text = "\n".join(ev_lines) if ev_lines else "无匹配历史文档证据。"
 
         tool_parts: list[str] = []
         sched = state.get("schedule_snapshot")
         if sched:
+            density = sched.get("density", {})
             days_summary = {
-                d: f"已排{v['booked_hours']}h/上限{v['capacity']}h"
-                for d, v in list(sched.get("days", {}).items())[:7]
+                d: f"已排{v['item_count']}项" + (f"（含P0 {v['p0_count']}项）" if v.get("p0_count") else "") + ("·拥挤" if v.get("crowded") else "")
+                for d, v in list(density.items())[:7]
             }
             tool_parts.append(
-                f"未来7天净工时负荷：{json.dumps(days_summary, ensure_ascii=False)}；"
-                f"推荐不超载起始日：{sched.get('recommended_start_date')}"
+                f"未来7天每日排期密度（每日超过{sched.get('max_items_per_day', 5)}项视为拥挤）：{json.dumps(days_summary, ensure_ascii=False)}；"
+                f"推荐不拥挤起始日：{sched.get('recommended_start_date')}"
             )
         if state.get("excel_diff"):
             tool_parts.append(f"Excel精确Diff计算：{json.dumps(state['excel_diff'], ensure_ascii=False)}")
@@ -606,6 +733,8 @@ class ChiefOfStaffEngine:
         }
 
     def _node_producer_drafter(self, state: WorkflowState) -> WorkflowState:
+        loop_n = int(state.get("loop_count", 0)) + 1
+        self._emit_progress(f"3/5 正在由主推模型起草方案与排期（第 {loop_n} 轮）")
         traj = list(state.get("trajectory") or []) + ["node:producer_drafter"]
         raw_input = state.get("raw_text", "")
         correction = state.get("user_correction", "")
@@ -622,11 +751,15 @@ class ChiefOfStaffEngine:
                 res = check_workload_and_schedule(
                     self.db,
                     start_date=args.get("start_date") or today_str,
-                    needed_hours=float(args.get("needed_hours", 1.0)),
-                    daily_capacity=self.settings.daily_capacity_hours,
                 )
-                return json.dumps(res, ensure_ascii=False)
+                compact = {
+                    "density": res["density"],
+                    "max_items_per_day": res["max_items_per_day"],
+                    "recommended_start_date": res["recommended_start_date"],
+                }
+                return json.dumps(compact, ensure_ascii=False)
             if name == "calc_business_date":
+                traj.append("tool:calc_business_date_in_loop")
                 return calc_business_date(args.get("base_date", today_str), int(args.get("offset_days", 1)))
             return "{}"
 
@@ -635,21 +768,37 @@ class ChiefOfStaffEngine:
                 "type": "function",
                 "function": {
                     "name": "check_workload_and_schedule",
-                    "description": "查询每日已排净工时负荷与推荐可用日期",
+                    "description": "查询从 start_date 起每日已排期事项数量、P0 数量与是否拥挤，并返回推荐的不拥挤起始日（不涉及工时估算）",
                     "parameters": {
                         "type": "object",
                         "properties": {
-                            "start_date": {"type": "string"},
-                            "needed_hours": {"type": "number"},
+                            "start_date": {"type": "string", "description": "YYYY-MM-DD"},
                         },
                     },
                 },
-            }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "calc_business_date",
+                    "description": "从 base_date 起按工作日（周一至周五）推算 offset_days 个工作日后的日期，用于计算截止日",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "base_date": {"type": "string", "description": "YYYY-MM-DD"},
+                            "offset_days": {"type": "integer"},
+                        },
+                        "required": ["base_date", "offset_days"],
+                    },
+                },
+            },
         ]
 
         user_prompt = (
             f"今天日期：{today_str}（下一工作日 {next_biz}）\n"
-            f"近期对话上下文：\n{state.get('dialogue_context_text', '')}\n\n"
+            f"跨天滚动会话摘要：\n{state.get('rolling_summary_text', '')}\n\n"
+            + (f"相关项目上下文卡：\n{state.get('project_context_text')}\n\n" if state.get("project_context_text") else "")
+            + f"近期对话上下文：\n{state.get('dialogue_context_text', '')}\n\n"
             f"在途项目与待办快照：\n{state.get('workspace_context_text', '')}\n\n"
             f"用户输入：\n{raw_input}\n"
             + (f"（结合语境补全：{state.get('resolved_text')}）\n\n" if state.get("resolved_text") and state.get("resolved_text") != raw_input else "\n")
@@ -676,6 +825,7 @@ class ChiefOfStaffEngine:
         return {"proposal": proposal.model_dump(mode="json"), "trajectory": traj}
 
     def _node_heterogeneous_critic(self, state: WorkflowState) -> WorkflowState:
+        self._emit_progress("4/5 正在由独立审计模型核验数字与逻辑")
         traj = list(state.get("trajectory") or []) + ["node:heterogeneous_critic"]
         loop_count = int(state.get("loop_count", 0))
         proposal = TriageProposal.model_validate(state["proposal"])
@@ -739,9 +889,22 @@ class ChiefOfStaffEngine:
         assert_no_secrets_leaked(card_text, self.settings)
         return {"proposal_id": pid, "reply_text": card_text, "trajectory": traj}
 
+    def _node_clarify_or_unsupported(self, state: WorkflowState) -> WorkflowState:
+        traj = list(state.get("trajectory") or []) + ["node:clarify_or_unsupported"]
+        q = (state.get("clarify_question") or "").strip()
+        if not q:
+            q = (
+                "这句话我暂时没法直接归类处理，也没有擅自建待办。\n"
+                "我目前主要帮你管：**待办/项目拆解、进度打卡、内部档案检索、日程跨度追踪与 OneDrive 归档**（不支持代发外部微信/邮件或外部消费预订）。\n"
+                "如果是工作交办或查资料，请补充一句**项目名或想确认的具体事项**。"
+            )
+        return {"reply_text": q, "trajectory": traj}
+
     @staticmethod
     def _route_after_router(state: WorkflowState) -> str:
         intent = state.get("intent", "work_triage")
+        if intent == "clarify_or_unsupported":
+            return "clarify_or_unsupported"
         if intent == "chitchat":
             return "chitchat"
         if intent == "quick_query":
@@ -762,6 +925,7 @@ class ChiefOfStaffEngine:
     def _build_graph(self):
         builder = StateGraph(WorkflowState)
         builder.add_node("guardrail_router", self._node_guardrail_router)
+        builder.add_node("clarify_or_unsupported", self._node_clarify_or_unsupported)
         builder.add_node("quick_qa_responder", self._node_quick_qa_responder)
         builder.add_node("conversational_responder", self._node_conversational_responder)
         builder.add_node("action_shortcut", self._node_action_shortcut)
@@ -776,13 +940,15 @@ class ChiefOfStaffEngine:
             "guardrail_router",
             self._route_after_router,
             {
-                "chitchat": END,
+                "clarify_or_unsupported": "clarify_or_unsupported",
+                "chitchat": "conversational_responder",
                 "quick_qa": "quick_qa_responder",
                 "conversational": "conversational_responder",
                 "action_shortcut": "action_shortcut",
                 "work_triage": "react_investigator",
             },
         )
+        builder.add_edge("clarify_or_unsupported", END)
         builder.add_edge("quick_qa_responder", END)
         builder.add_edge("conversational_responder", END)
         builder.add_edge("action_shortcut", END)
@@ -885,57 +1051,43 @@ class ChiefOfStaffEngine:
         external_msg_id: str | None = None,
         attachments: list[dict[str, Any]] | None = None,
         thread_id: str = "owner",
+        progress_callback: Callable[[str], None] | None = None,
     ) -> dict[str, Any]:
-        """Unified entry point enforcing `密:` hard guard, instant commands, and LangGraph orchestration."""
+        """Unified entry point enforcing instant commands and LangGraph orchestration."""
         text = (raw_text or "").strip()
         atts = attachments or []
+        # Hold the (re-entrant) turn lock for the whole turn so the progress callback
+        # can never be overwritten by a concurrent turn (e.g. WeChat + mail poller).
+        with self._turn_lock:
+            prev_cb = self._progress_cb
+            self._progress_cb = progress_callback
+            try:
+                return self._handle_incoming_turn_inner(
+                    text=text,
+                    sender=sender,
+                    external_msg_id=external_msg_id,
+                    atts=atts,
+                    thread_id=thread_id,
+                )
+            finally:
+                self._progress_cb = prev_cb
 
-        # 1. `密:` physical zero-cloud-model hard interception (F6)
-        if is_confidential_input(text, atts):
-            clean_note = text.lstrip()[2:].strip() if text.lstrip().startswith(("密：", "密:")) else text
-            ym = date.today().strftime("%Y%m")
-            ymd = date.today().strftime("%Y%m%d")
-            web_url = ""
-            remote_path = ""
-            sid, _ = self.db.insert_raw_source(
-                source_type="confidential",
-                external_msg_id=external_msg_id,
-                sender=sender,
-                title=f"密件_{ymd}",
-                raw_text=clean_note,
-                is_confidential=True,
-            )
-            if self.onedrive is not None:
-                for att in atts:
-                    fpath = Path(att.get("path", ""))
-                    fname = att.get("filename") or fpath.name
-                    if fpath.exists():
-                        remote_path = f"04_想法与行业参考/{ymd}_密_{fname}"
-                        res = self.onedrive.upload_and_cleanup_local(remote_path, fpath)
-                        web_url = res.get("webUrl", "")
-                if clean_note:
-                    remote_path = remote_path or f"04_想法与行业参考/{ymd}_密件备忘_{sid}.md"
-                    res = self.onedrive.upload_bytes(
-                        f"04_想法与行业参考/{ym}_绝密直存_{sid}.md",
-                        f"# 绝密直存记录 #{sid}\n\n{clean_note}\n".encode("utf-8"),
-                        content_type="text/markdown; charset=utf-8",
-                    )
-                    web_url = web_url or res.get("webUrl", "")
-                self.db.update_source_onedrive_paths(sid, archive_path=remote_path, web_url=web_url)
+    def _handle_incoming_turn_inner(
+        self,
+        *,
+        text: str,
+        sender: str,
+        external_msg_id: str | None,
+        atts: list[dict[str, Any]],
+        thread_id: str,
+    ) -> dict[str, Any]:
 
-            msg = (
-                f"🔒 **绝密直存已完成**（0 次云端大模型与外搜调用）。\n"
-                f"已安全落盘本地加密库（#{sid}）与世纪互联 OneDrive 私有库。"
-                + (f"\n☁️ 直达链接：{web_url}" if web_url else "")
-            )
-            return {"reply_text": msg, "trajectory": ["guard:confidential_zero_llm"], "confidential": True}
-
-        # 2. Instant shortcut commands (0 LLM calls)
+        # 1. Instant shortcut commands (0 LLM calls)
         if text in {"看板", "驾驶舱", "页面", "dashboard"}:
             url = self.magic_link_factory()
-            reply = f"📊 **董事长项目管理驾驶舱**（5 分钟单次直开有效，微信内点击免输密码）：\n{url}"
-            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:cockpit_magic_link")
-            return {"reply_text": reply, "trajectory": ["shortcut:cockpit_magic_link"]}
+            reply = f"📊 **董事长项目管理驾驶舱**（固定访问链接，首次用微信 6 位验证码登录后本机长期免密直开）：\n{url}"
+            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:cockpit_link")
+            return {"reply_text": reply, "trajectory": ["shortcut:cockpit_link"]}
 
         if text in {"负荷", "待办", "今日待办", "todo"}:
             w = self.db.get_daily_workload(days=3, daily_capacity=self.settings.daily_capacity_hours)
@@ -1041,7 +1193,32 @@ class ChiefOfStaffEngine:
             "trajectory": [],
         }
         with self._turn_lock:
-            out = self.graph.invoke(init_state, config={"configurable": {"thread_id": f"{thread_id}:{external_msg_id or date.today().isoformat()}"}})
+            try:
+                out = self.graph.invoke(
+                    init_state,
+                    config={"configurable": {"thread_id": f"{thread_id}:{external_msg_id or date.today().isoformat()}"}},
+                )
+            except Exception as exc:
+                user_line = text or f"[附件: {', '.join(a.get('filename', 'file') for a in atts)}]"
+                fallback = (
+                    f"⚠️ 刚才处理这条消息时遇到临时异常（{type(exc).__name__}），本次没有生成待办或改动任何数据。\n"
+                    "你的原话已记入对话记录，稍后发「继续」或重新发送即可接着处理。"
+                )
+                try:
+                    self._record_turn_pair(
+                        thread_id=thread_id,
+                        user_text=user_line,
+                        reply_text=fallback,
+                        intent=f"error:{type(exc).__name__}",
+                    )
+                except Exception:
+                    pass
+                return {
+                    "reply_text": fallback,
+                    "proposal_id": None,
+                    "source_ids": [],
+                    "trajectory": [f"error:{type(exc).__name__}"],
+                }
         self._record_turn_pair(
             thread_id=thread_id,
             user_text=text or f"[附件: {', '.join(a.get('filename', 'file') for a in atts)}]",

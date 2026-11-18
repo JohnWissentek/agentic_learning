@@ -5,7 +5,7 @@
 | 文档版本 | v3.2（Wissentek 世纪互联真实界面实测版） |
 | 更新日期 | 2026-11-17 |
 | 适用范围 | https://wissentek.sharepoint.cn（由世纪互联运营的 Microsoft 365 企业版） |
-| 关联文档 | [总览 README](../README.md) · [02-技术栈与存储架构设计](02-技术栈与存储架构设计.md) · [04-阿里云部署与实施路线](04-阿里云部署与分阶段实施路线.md) · [05-全流程实操SOP与验收Checklist](05-全流程实操SOP与验收Checklist.md) |
+| 关联文档 | [总览 README](../README.md) · [02-技术栈与存储架构设计](02-技术栈与存储架构设计.md) · [04-阿里云部署与实施路线](05-阿里云部署与分阶段实施路线.md) · [05-全流程实操SOP与验收Checklist](06-全流程实操SOP与验收Checklist.md) |
 
 ---
 
@@ -108,7 +108,7 @@
 3. 将 Time Zone 从 (UTC-08:00) Pacific Time (US and Canada) 改为 (UTC+08:00) Beijing, Chongqing, Hong Kong, Urumqi，下拉到页面底部点击 OK 保存即可。
 
 ### 4.4 与下一步 S0.3 Entra 授权（Sites.Selected）的直接衔接
-完成本手册后，在执行 [05-全流程实操SOP与验收Checklist.md](05-全流程实操SOP与验收Checklist.md) 中 S0.3 第 2–3 步（Entra 应用注册与一次性站点赋权）时，你的站点查询接口路径已经完全确定：
+完成本手册后，在执行 [06-全流程实操SOP与验收Checklist.md](06-全流程实操SOP与验收Checklist.md) 中 S0.3 第 2–3 步（Entra 应用注册与一次性站点赋权）时，你的站点查询接口路径已经完全确定：
 - 查询目标站点 MS_SITE_ID 的 Graph 请求路径为：
   ```text
   GET https://microsoftgraph.chinacloudapi.cn/v1.0/sites/wissentek.sharepoint.cn:/sites/chairman-vault

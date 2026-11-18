@@ -75,9 +75,9 @@ class VerifyCodeBody(BaseModel):
 
 
 class AuthManager:
-    """Single-use Magic Link + rate-limited 6-digit WeChat login code + signed 30d Cookie."""
+    """Rate-limited 6-digit WeChat login code + signed 180d Cookie + optional magic link."""
 
-    def __init__(self, secret: str, session_days: int = 30) -> None:
+    def __init__(self, secret: str, session_days: int = 180) -> None:
         self.secret = secret or secrets.token_hex(32)
         self.session_days = session_days
         self._magic_tokens: dict[str, float] = {}
@@ -140,6 +140,52 @@ class AuthManager:
             return False
 
 
+def build_daily_digest_message(ov: dict[str, Any], kind: str, magic_url: str) -> str:
+    """Build morning or evening WeChat digest; evening digest prompts active progress check-in."""
+    today = ov["today"]
+    today_info = ov["workload"]["days"].get(today, {})
+    open_items = [i for i in ov["items"] if i["status"] != "done"]
+    top_todos = open_items[:5]
+    todo_text = "\n".join(
+        f"- `#{i['id']}` `[{i['priority']}]` {i['title']}（{i['planned_start_at'] or '-'}~{i['planned_end_at'] or '-'}）"
+        for i in top_todos
+    ) or "- 暂无未完成待办"
+    waits = ov["waiting_items"][:3]
+    wait_text = "\n".join(f"- 等{w['owner']}：{w['title']}（已等 {w['waiting_days']} 天）" for w in waits)
+
+    checkin_block = ""
+    if "晚间" in kind:
+        due_or_active = [
+            i for i in open_items
+            if i["status"] == "in_progress" or (i.get("planned_end_at") and i["planned_end_at"][:10] <= today)
+        ][:6]
+        if due_or_active:
+            lines: list[str] = []
+            for it in due_or_active:
+                pe = (it.get("planned_end_at") or "")[:10]
+                if pe and pe < today:
+                    tag = "已超期"
+                elif pe == today:
+                    tag = "今日到期"
+                else:
+                    tag = "进行中"
+                lines.append(f"- `#{it['id']}` [{tag}] {it['title']}")
+            checkin_block = (
+                "\n📝 **今日进度盘点（请一句话确认，方便自动闭合周期）**：\n"
+                + "\n".join(lines)
+                + "\n👉 可直接回复：`#3 做完了，#5 开始了`（未完事项也可说明新截止日）\n"
+            )
+
+    return (
+        f"{kind}（{today}）\n"
+        f"📅 今日在途事项：{len(today_info.get('items', []))} 项 ｜ 平均完成跨度：{ov.get('avg_completion_span_days', 0)} 天\n\n"
+        f"📌 **今日优先事项**：\n{todo_text}\n"
+        + (f"\n⏳ **外部卡点**：\n{wait_text}\n" if wait_text else "")
+        + checkin_block
+        + f"\n📊 点击打开驾驶舱：{magic_url}"
+    )
+
+
 async def _daily_digest_scheduler(engine: ChiefOfStaffEngine, gateway: WeComGateway) -> None:
     sent_marks: set[str] = set()
     morning = os.environ.get("DAILY_MORNING_DIGEST", "08:30").strip()
@@ -153,26 +199,70 @@ async def _daily_digest_scheduler(engine: ChiefOfStaffEngine, gateway: WeComGate
                 sent_marks.add(day_key)
                 kind = "🌅 早间工作简报" if hm == morning else "🌆 晚间复盘简报"
                 ov = engine.db.dashboard_overview(engine.settings.daily_capacity_hours)
-                today_info = ov["workload"]["days"].get(ov["today"], {})
-                top_todos = [i for i in ov["items"] if i["status"] != "done"][:5]
-                todo_text = "\n".join(
-                    f"- `#{i['id']}` `[{i['priority']}]` {i['title']}（{i['planned_start_at'] or '-'}~{i['planned_end_at'] or '-'}）"
-                    for i in top_todos
-                ) or "- 暂无未完成待办"
-                waits = ov["waiting_items"][:3]
-                wait_text = "\n".join(f"- 等{w['owner']}：{w['title']}（已等 {w['waiting_days']} 天）" for w in waits)
                 magic_url = engine.magic_link_factory()
-                msg = (
-                    f"{kind}（{ov['today']}）\n"
-                    f"📅 今日在途事项：{len(today_info.get('items', []))} 项 ｜ 平均完成跨度：{ov.get('avg_completion_span_days', 0)} 天\n\n"
-                    f"📌 **今日优先事项**：\n{todo_text}\n"
-                    + (f"\n⏳ **外部卡点**：\n{wait_text}\n" if wait_text else "")
-                    + f"\n📊 点击打开驾驶舱（5 分钟直登）：{magic_url}"
-                )
+                msg = build_daily_digest_message(ov, kind, magic_url)
                 await gateway.send_app_push(msg)
+                # Persist digest into dialogue history so follow-up replies ("#3做完了") resolve cleanly
+                engine.db.append_conversation_turn(
+                    thread_id="owner",
+                    role="assistant",
+                    content=msg,
+                    intent="digest:evening_checkin",
+                )
         except Exception:
             pass
         await asyncio.sleep(30)
+
+
+async def run_turn_with_heartbeat(
+    engine: ChiefOfStaffEngine,
+    gateway: WeComGateway,
+    *,
+    text: str,
+    sender: str,
+    msg_id: str,
+    attachments: list[dict[str, Any]],
+    first_delay_seconds: float = 12.0,
+    interval_seconds: float = 25.0,
+) -> str:
+    """Execute one turn in a worker thread while pushing periodic WeChat heartbeats if slow."""
+    stage = {"label": "正在启动分析", "t0": time.monotonic()}
+    done_evt = asyncio.Event()
+
+    async def _watcher() -> None:
+        wait_s = first_delay_seconds
+        while not done_evt.is_set():
+            try:
+                await asyncio.wait_for(done_evt.wait(), timeout=wait_s)
+                return
+            except asyncio.TimeoutError:
+                elapsed = max(1, int(time.monotonic() - stage["t0"]))
+                try:
+                    await gateway.send_app_push(
+                        f"⏳ 仍在处理中（已用时 {elapsed}s）：当前正在【{stage['label']}】"
+                    )
+                except Exception:
+                    pass
+                wait_s = interval_seconds
+
+    watcher = asyncio.create_task(_watcher())
+    try:
+        res = await asyncio.to_thread(
+            engine.handle_incoming_turn,
+            text,
+            sender=sender,
+            external_msg_id=msg_id,
+            attachments=attachments,
+            thread_id="owner",
+            progress_callback=lambda lbl: stage.update(label=lbl),
+        )
+        return res["reply_text"]
+    finally:
+        done_evt.set()
+        try:
+            await watcher
+        except Exception:
+            pass
 
 
 def create_app(
@@ -192,8 +282,7 @@ def create_app(
     auth = AuthManager(cfg.web_access_secret or cfg.dashscope_api_key)
 
     def make_magic_link() -> str:
-        tok = auth.mint_magic_token(300)
-        return f"{cfg.web_public_base_url.rstrip('/')}/auth/magic?token={tok}"
+        return f"{cfg.web_public_base_url.rstrip('/')}/"
 
     llm_gw = DashScopeLLMGateway(cfg)
     eng = engine or ChiefOfStaffEngine(
@@ -205,16 +294,18 @@ def create_app(
         magic_link_factory=make_magic_link,
     )
 
+    wc_gw: WeComGateway | None = None
+
     async def process_turn(text: str, sender: str, attachments: list[dict[str, Any]], msg_id: str) -> str:
-        res = await asyncio.to_thread(
-            eng.handle_incoming_turn,
-            text,
+        assert wc_gw is not None
+        return await run_turn_with_heartbeat(
+            eng,
+            wc_gw,
+            text=text,
             sender=sender,
-            external_msg_id=msg_id,
+            msg_id=msg_id,
             attachments=attachments,
-            thread_id="owner",
         )
-        return res["reply_text"]
 
     wc_gw = gateway or WeComGateway(cfg, turn_processor=process_turn)
     bg_tasks: list[asyncio.Task[Any]] = []
@@ -239,7 +330,9 @@ def create_app(
                     )
                     if reply.get("proposal_id"):
                         await wc_gw.send_app_push(f"📧 新邮件幕僚分析：\n{reply['reply_text']}")
-                bg_tasks.append(asyncio.create_task(mail_poller_loop(cfg, od_client, on_email)))
+                bg_tasks.append(
+                    asyncio.create_task(mail_poller_loop(cfg, od_client, on_email, mark_seen=store.mark_external_seen))
+                )
         try:
             yield
         finally:

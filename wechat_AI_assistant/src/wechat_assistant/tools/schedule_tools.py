@@ -1,4 +1,4 @@
-"""Group 2 Scheduling & Workload Tools: deterministic dates and CEO daily capacity check."""
+"""Group 2 Scheduling Tools: deterministic business dates and daily schedule-density check."""
 
 from __future__ import annotations
 
@@ -20,23 +20,37 @@ def calc_business_date(base_date_str: str, offset_business_days: int) -> str:
     return cur.isoformat()
 
 
+DEFAULT_MAX_ITEMS_PER_DAY = 5
+
+
 def check_workload_and_schedule(
     db: Database,
     *,
     start_date: str | None = None,
-    needed_hours: float = 1.0,
     days: int = 14,
-    daily_capacity: float = 6.0,
+    max_items_per_day: int = DEFAULT_MAX_ITEMS_PER_DAY,
+    **_legacy_ignored: Any,
 ) -> dict[str, Any]:
-    """Return booked net hours per day and suggest the earliest non-overloaded date."""
-    report = db.get_daily_workload(start_date=start_date, days=days, daily_capacity=daily_capacity)
+    """Return scheduled item counts per day and suggest the earliest non-crowded date.
+
+    Span-only model: no personal net-hour estimation. A day is "crowded" when it already
+    has >= `max_items_per_day` open items starting on it. Legacy `needed_hours` /
+    `daily_capacity` kwargs are accepted and ignored for backward compatibility.
+    """
+    report = db.get_daily_workload(start_date=start_date, days=days)
+    density: dict[str, dict[str, Any]] = {}
     recommended_date = None
     for d_str, info in report["days"].items():
-        if info["booked_hours"] + needed_hours <= daily_capacity + 1e-6:
+        items = info.get("items", [])
+        cnt = len(items)
+        p0 = sum(1 for it in items if it.get("priority") == "P0")
+        crowded = cnt >= max_items_per_day
+        density[d_str] = {"item_count": cnt, "p0_count": p0, "crowded": crowded}
+        if recommended_date is None and not crowded:
             recommended_date = d_str
-            break
     return {
-        **report,
-        "needed_hours": needed_hours,
+        "days": report["days"],
+        "density": density,
+        "max_items_per_day": max_items_per_day,
         "recommended_start_date": recommended_date or next(iter(report["days"])),
     }

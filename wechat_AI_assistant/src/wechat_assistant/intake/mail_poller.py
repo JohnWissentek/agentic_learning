@@ -1,4 +1,4 @@
-"""Phase 2 optional read-only 21Vianet Graph Mail poller with company allowlist & prompt-injection fencing."""
+"""Phase 2 read-only Global/HK M365 Outlook Graph Mail poller with company allowlist & prompt-injection fencing."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import asyncio
 from typing import Any, Awaitable, Callable
 
 import httpx
+import msal
 
 from wechat_assistant.config import Settings
 from wechat_assistant.tools.onedrive_tools import OneDrive21VianetClient
@@ -42,16 +43,46 @@ def matches_mail_allowlist(msg: dict[str, Any], allowlist: tuple[str, ...]) -> b
     return any(tok.lower() in haystack for tok in allowlist if tok.strip())
 
 
+_MAIL_APPS: dict[str, msal.ConfidentialClientApplication] = {}
+
+
+def _acquire_mail_token(settings: Settings, od_client: OneDrive21VianetClient) -> tuple[str, str]:
+    """Return (bearer_token, graph_base_url) using dedicated Global M365 mail creds if configured.
+
+    The MSAL client is cached per client_id so its internal token cache is reused across polls.
+    """
+    if settings.mail_tenant_id and settings.mail_client_id and settings.mail_client_secret:
+        app = _MAIL_APPS.get(settings.mail_client_id)
+        if app is None:
+            app = msal.ConfidentialClientApplication(
+                settings.mail_client_id,
+                authority=f"{settings.mail_auth_url.rstrip('/')}/{settings.mail_tenant_id}",
+                client_credential=settings.mail_client_secret,
+            )
+            _MAIL_APPS[settings.mail_client_id] = app
+        res = app.acquire_token_for_client(scopes=["https://graph.microsoft.com/.default"])
+        if "access_token" not in res:
+            raise RuntimeError(f"Global M365 mail token error: {res.get('error', 'unknown')}")
+        return str(res["access_token"]), settings.mail_graph_url.rstrip("/")
+    return od_client._get_token(), settings.ms_graph_url.rstrip("/")
+
+
 async def poll_mailbox_once(
     settings: Settings,
     od_client: OneDrive21VianetClient,
     on_email: Callable[[str, str, str], Awaitable[None]],
+    *,
+    mark_seen: Callable[[str], bool] | None = None,
 ) -> int:
-    """Poll recent messages via read-only Mail.Read with company allowlist & internetMessageId dedup."""
+    """Poll recent messages via read-only Mail.Read with company allowlist & persistent dedup.
+
+    `mark_seen(ext_id)` must return True only the first time an id is seen, so the same
+    email is never re-analysed on later polls.
+    """
     if not settings.mail_enabled:
         return 0
-    token = od_client._get_token()
-    url = f"{settings.ms_graph_url.rstrip('/')}/users/{settings.mail_user}/messages"
+    token, graph_base = await asyncio.to_thread(_acquire_mail_token, settings, od_client)
+    url = f"{graph_base}/users/{settings.mail_user}/messages"
     async with httpx.AsyncClient(timeout=25.0) as client:
         r = await client.get(
             url,
@@ -75,6 +106,8 @@ async def poll_mailbox_once(
         if not matches_mail_allowlist(m, settings.mail_allowlist):
             continue
         ext_id = m.get("internetMessageId") or m.get("id", "")
+        if mark_seen is not None and not mark_seen(ext_id):
+            continue
         wrapped = wrap_untrusted_email(subj, sender, preview)
         await on_email(wrapped, sender, ext_id)
         processed += 1
@@ -86,10 +119,12 @@ async def mail_poller_loop(
     od_client: OneDrive21VianetClient,
     on_email: Callable[[str, str, str], Awaitable[None]],
     interval_seconds: int = 120,
+    *,
+    mark_seen: Callable[[str], bool] | None = None,
 ) -> None:
     while True:
         try:
-            await poll_mailbox_once(settings, od_client, on_email)
+            await poll_mailbox_once(settings, od_client, on_email, mark_seen=mark_seen)
         except Exception:
             pass
         await asyncio.sleep(interval_seconds)

@@ -124,6 +124,8 @@ class AssembledContext:
     recent_turn_ids: set[int] = field(default_factory=set)
     pending_proposal: dict[str, Any] | None = None
     pending_is_fresh: bool = False
+    rolling_summary_text: str = "（暂无跨天滚动摘要）"
+    project_context_text: str = ""
     recent_dialogue_text: str = "（暂无近期对话记录）"
     pending_proposal_text: str = "（当前无待确认卡片）"
     workspace_snapshot_text: str = "（当前无在途项目或待办）"
@@ -140,7 +142,7 @@ class ContextAssembler:
         self.db = db
 
     def assemble(self, thread_id: str = "owner", current_text: str = "") -> AssembledContext:
-        recent_turns = self.db.get_recent_conversation_turns(thread_id=thread_id, limit=10)
+        recent_turns = self.db.get_recent_conversation_turns(thread_id=thread_id, limit=30)
         recent_ids = {int(t["id"]) for t in recent_turns}
 
         now_dt = datetime.now()
@@ -153,7 +155,7 @@ class ContextAssembler:
                 if gap_sec > self.CONTINUOUS_GAP_MINUTES * 60:
                     dialogue_lines.append(f"--- [时间间隔 {_format_gap_label(gap_sec)} · 跨时段对话] ---")
             role_label = "董事长" if turn.get("role") == "user" else "AI助理"
-            snippet = (turn.get("content") or "").replace("\n", " ").strip()[:280]
+            snippet = (turn.get("content") or "").replace("\n", " ").strip()[:600]
             ts_short = (turn.get("created_at") or "")[5:16]
             dialogue_lines.append(f"[{ts_short}] {role_label}: {snippet}")
             prev_dt = cur_dt
@@ -200,30 +202,57 @@ class ContextAssembler:
             )
 
         projects = self.db.list_projects()
-        open_items = self.db.list_items(include_done=False)[:15]
-        rules = self.db.list_memory_rules()[:8]
+        all_open_items = self.db.list_items(include_done=False)
+        open_items = all_open_items[:60]
+        rules = self.db.list_memory_rules()[:20]
+
+        latest_ep = self.db.get_latest_episode_summary(thread_id)
+        rolling_summary_text = (
+            f"（更新于 {latest_ep['updated_at']}）{latest_ep['summary_text']}"
+            if latest_ep
+            else "（暂无跨天滚动摘要）"
+        )
+
+        # Cross-project auto-mount: attach project brief & open items whenever current input or recent anchors mention a project
+        match_hay = (current_text or "") + " " + " ".join(anchor_entities)
+        proj_cards: list[str] = []
+        for p in projects:
+            aliases = json.loads(p.get("aliases_json") or "[]")
+            names = [p["name"], *[str(a) for a in aliases if a]]
+            if any(n and n in match_hay for n in names):
+                p_items = [it for it in all_open_items if it.get("project_name") == p["name"]][:5]
+                p_item_lines = "; ".join(f"#{it['id']}({it['status']}): {it['title']}" for it in p_items) or "暂无未完成待办"
+                proj_cards.append(
+                    f"- 项目【{p['name']}】（{p['work_domain']}｜周期 {p['planned_start_date'] or '-'}~{p['target_end_date'] or '-'}）："
+                    f"进展={p.get('latest_brief') or '无'}｜待办=[{p_item_lines}]"
+                )
+                if len(proj_cards) >= 3:
+                    break
+        project_context_text = "\n".join(proj_cards)
 
         ws_parts: list[str] = []
         if projects:
-            proj_strs = [f"{p['name']}({p['work_domain']}, {p['total_estimated_hours']}h)" for p in projects[:10]]
+            proj_strs = [f"{p['name']}({p['work_domain']})" for p in projects[:30]]
             ws_parts.append("在途项目：" + "；".join(proj_strs))
         if open_items:
             ws_parts.append(
                 "未完成待办/等待项：\n"
                 + "\n".join(
                     f"  - #{it['id']} [{it['priority']}][{it['list_type']}][{it['status']}] "
-                    f"{it['project_name']}: {it['title']} (责任人:{it['owner']}, 周期:{it['planned_start_at']}~{it['planned_end_at']}, {it['estimated_hours']}h)"
+                    f"{it['project_name']}: {it['title']} (责任人:{it['owner']}, 周期:{it['planned_start_at']}~{it['planned_end_at']})"
                     for it in open_items
                 )
             )
         if rules:
-            ws_parts.append("个人习惯与工时规则：" + "；".join(r["rule_text"][:60] for r in rules[:5]))
+            ws_parts.append("个人习惯与周期基线：" + "；".join(r["rule_text"][:60] for r in rules[:5]))
 
         return AssembledContext(
             recent_turns=recent_turns,
             recent_turn_ids=recent_ids,
             pending_proposal=pending,
             pending_is_fresh=pending_fresh,
+            rolling_summary_text=rolling_summary_text,
+            project_context_text=project_context_text,
             recent_dialogue_text="\n".join(dialogue_lines) if dialogue_lines else "（暂无近期对话记录）",
             pending_proposal_text=pending_text,
             workspace_snapshot_text="\n".join(ws_parts) if ws_parts else "（当前无在途项目或待办）",
@@ -231,8 +260,11 @@ class ContextAssembler:
         )
 
     def render_for_router(self, ctx: AssembledContext, current_text: str) -> str:
+        proj_block = f"【相关项目上下文卡】\n{ctx.project_context_text}\n\n" if ctx.project_context_text else ""
         return (
             f"【当前时间戳】{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            f"【跨天滚动会话摘要】\n{ctx.rolling_summary_text}\n\n"
+            f"{proj_block}"
             f"【近期对话流与时间间隔】\n{ctx.recent_dialogue_text}\n\n"
             f"【当前待确认卡片】\n{ctx.pending_proposal_text}\n\n"
             f"【在途项目与待办快照】\n{ctx.workspace_snapshot_text}\n\n"
@@ -296,7 +328,7 @@ class ContextAssembler:
         episodic_hits = self.db.search_conversation_turns(
             search_tokens,
             exclude_ids=ctx.recent_turn_ids,
-            limit=5,
+            limit=8,
         )
 
         # Match active/all items and projects by tokens
@@ -312,11 +344,11 @@ class ContextAssembler:
                 hay = f"#{it['id']} {it['title']} {it['project_name']} {it['owner']} {it['work_domain']}".lower()
                 if any(t in hay for t in tok_lowers):
                     matched_items.append(it)
-                    if len(matched_items) >= 8:
+                    if len(matched_items) >= 15:
                         break
 
         return {
-            "doc_hits": doc_hits[:5],
+            "doc_hits": doc_hits[:10],
             "episodic_hits": episodic_hits,
             "matched_items": matched_items,
             "matched_projects": matched_projects,

@@ -22,7 +22,7 @@ import httpx
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from wechat_assistant.config import Settings, redact_secrets
-from wechat_assistant.graph import is_confidential_input
+
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -77,8 +77,6 @@ class QuietAggregator:
 
     def _is_instant(self, text: str, attachments: list[dict[str, Any]]) -> bool:
         t = (text or "").strip()
-        if is_confidential_input(t, attachments):
-            return True
         if t in self._INSTANT_EXACT or t.startswith(self._INSTANT_PREFIXES):
             return True
         if re.match(r"^(?:开始|完成)\s*#?\d+", t):

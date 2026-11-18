@@ -57,8 +57,8 @@ class _RouteAwareCompletions:
 @pytest.mark.parametrize(
     "case_id,user_input,expected_step",
     [
-        (1, "密：不可外发的补偿参数", "guard:confidential_zero_llm"),
-        (2, "看板", "shortcut:cockpit_magic_link"),
+        (1, "看板", "shortcut:cockpit_link"),
+        (2, "dashboard", "shortcut:cockpit_link"),
         (3, "负荷", "shortcut:workload"),
         (4, "撤销", "shortcut:undo"),
         (5, "开始 999", "shortcut:start_not_found"),

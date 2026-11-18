@@ -74,6 +74,11 @@ class Settings:
 
     mail_enabled: bool = False
     mail_user: str = "info@wissentek.com"
+    mail_auth_url: str = "https://login.microsoftonline.com"
+    mail_graph_url: str = "https://graph.microsoft.com/v1.0"
+    mail_tenant_id: str = ""
+    mail_client_id: str = ""
+    mail_client_secret: str = ""
     mail_allowlist: tuple[str, ...] = ("V&F", "Tera", "B&D")
     external_search_enabled: bool = False
     data_dir: str = "/opt/wechat-agent/data"
@@ -161,6 +166,11 @@ class Settings:
             daily_capacity_hours=float(get("DAILY_CAPACITY_HOURS", "6.0")),
             mail_enabled=_parse_bool(get("MAIL_ENABLED"), False),
             mail_user=get("MAIL_USER", "info@wissentek.com"),
+            mail_auth_url=get("MAIL_AUTH_URL", "https://login.microsoftonline.com"),
+            mail_graph_url=get("MAIL_GRAPH_URL", "https://graph.microsoft.com/v1.0"),
+            mail_tenant_id=get("MAIL_TENANT_ID"),
+            mail_client_id=get("MAIL_CLIENT_ID"),
+            mail_client_secret=get("MAIL_CLIENT_SECRET"),
             mail_allowlist=tuple(
                 x.strip()
                 for x in get("MAIL_ALLOWLIST", "V&F,Tera,B&D").replace(";", ",").split(",")
@@ -179,6 +189,7 @@ class Settings:
             self.wecom_app_aes_key,
             self.wecom_app_token,
             self.ms_client_secret,
+            self.mail_client_secret,
             self.web_access_secret,
         ]
         return [val for val in raw if val and len(val) >= 8]

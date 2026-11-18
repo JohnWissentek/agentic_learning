@@ -77,26 +77,21 @@ def _make_settings(tmp_path: Path) -> Settings:
     )
 
 
-def test_confidential_zero_llm_calls(tmp_path):
+def test_cockpit_permanent_url_shortcut(tmp_path):
     settings = _make_settings(tmp_path)
     db = Database(tmp_path / "app.db")
     completions = _ScriptedCompletions(lambda *_: "{}")
     gw = DashScopeLLMGateway(settings, client=SimpleNamespace(chat=SimpleNamespace(completions=completions)))
-    od = _DummyOneDrive()
-    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=gw, onedrive=od)
-
-    secret_file = tmp_path / "secret_param.txt"
-    secret_file.write_text("Optical offset = 0.0042", encoding="utf-8")
-
-    res = eng.handle_incoming_turn(
-        "密：核心光学算法补偿参数备忘",
-        attachments=[{"filename": "secret_param.txt", "path": str(secret_file)}],
+    eng = ChiefOfStaffEngine(
+        settings=settings,
+        db=db,
+        gateway=gw,
+        magic_link_factory=lambda: "https://assistant.fire-matrix.com/",
     )
-    assert res["confidential"] is True
+    res = eng.handle_incoming_turn("看板")
+    assert res["trajectory"] == ["shortcut:cockpit_link"]
+    assert "https://assistant.fire-matrix.com/" in res["reply_text"]
     assert db.count_model_calls() == 0
-    assert len(completions.calls) == 0
-    assert any(p.startswith("04_想法与行业参考/") for p in od.uploads)
-    assert not secret_file.exists()  # cleaned up after mock OneDrive upload
     eng.close()
 
 
@@ -811,3 +806,420 @@ def test_market_research_task_does_not_auto_search(tmp_path):
     )
     assert "tool:search_public_tech_intel" not in res["trajectory"]
     assert "node:hitl_preview_gate" in res["trajectory"]
+
+
+def test_evening_digest_checkin_and_batch_progress_update(tmp_path):
+    """Evening digest prompts check-in for due/in-progress items; batch reply updates multiple items."""
+    from datetime import date, timedelta
+    from wechat_assistant.web.app import build_daily_digest_message
+
+    class _BatchMutateGateway:
+        def generate_structured(self, tier, messages, schema_cls, **kwargs):
+            obj = schema_cls(
+                intent="mutate_existing_item",
+                confidence=0.95,
+                summary="批量刷新进度",
+                resolved_intent_text="#1 做完了，#2 开始了",
+            )
+            rec = SimpleNamespace(
+                tier=tier,
+                model=tier,
+                prompt_tokens=10,
+                completion_tokens=10,
+                reasoning_tokens=0,
+                latency_ms=1,
+                success=True,
+            )
+            return obj, rec
+
+    settings = Settings(dashscope_api_key="sk-fakeunit1234567890abcdef", data_dir=str(tmp_path / "data"))
+    db = Database(tmp_path / "app.db")
+    today = date.today().isoformat()
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+    from wechat_assistant.schemas import ActionMutation
+    db.apply_proposal_atomic(
+        proposal_id=None,
+        actions=[
+            ActionMutation(
+                list_type="project_action",
+                title="华东市场调研碰头会",
+                project_name="华东市场调研",
+                work_domain="客户销售",
+                planned_start_at=yesterday,
+                planned_end_at=today,
+                priority="P1",
+            ),
+            ActionMutation(
+                list_type="next_action",
+                title="联系苏州张总确认需求",
+                project_name="华东市场调研",
+                work_domain="客户销售",
+                planned_start_at=today,
+                planned_end_at=today,
+                priority="P0",
+            ),
+        ],
+        source_ids=[],
+        doc_paths=[],
+    )
+    ov = db.dashboard_overview(6.0)
+    evening_msg = build_daily_digest_message(ov, "🌆 晚间复盘简报", "https://assistant.fire-matrix.com/auth/magic?token=x")
+    assert "今日进度盘点" in evening_msg
+    assert "#1" in evening_msg and "#2" in evening_msg
+
+    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_BatchMutateGateway())
+    res = eng.handle_incoming_turn("#1 做完了，#2 开始了", external_msg_id="batch_checkin_1")
+    assert "#1" in res["reply_text"] and "已完成" in res["reply_text"]
+    assert "#2" in res["reply_text"] and "已开始" in res["reply_text"]
+    items = {i["id"]: i for i in db.list_items(include_done=True)}
+    assert items[1]["status"] == "done"
+    assert items[2]["status"] == "in_progress"
+
+
+def test_extractors_zip_csv_and_unknown_binary_fallback(tmp_path):
+    """ZIP archives are safely extracted recursively; unknown binary files never pollute FTS with garbage."""
+    import zipfile
+    from wechat_assistant.storage.extractors import extract_document_pages
+
+    csv_file = tmp_path / "quote.csv"
+    csv_file.write_text("item,price\nSensorA,1200\n", encoding="utf-8")
+    zip_path = tmp_path / "bundle.zip"
+    with zipfile.ZipFile(zip_path, "w") as zf:
+        zf.write(csv_file, arcname="sub/quote.csv")
+        zf.writestr("notes.txt", "苏州热电锅炉测温确认")
+
+    pages = extract_document_pages(zip_path)
+    joined = "\n".join(p["text"] for p in pages)
+    assert "ZIP内文件: sub/quote.csv" in joined
+    assert "SensorA | 1200" in joined
+    assert "苏州热电锅炉测温确认" in joined
+
+    dwg_path = tmp_path / "boiler_layout.dwg"
+    dwg_path.write_bytes(b"AC1032\x00\x00\xff\xfe\x01\x02BINARY_CAD_DATA")
+    dwg_pages = extract_document_pages(dwg_path)
+    assert len(dwg_pages) == 1
+    assert "未解析二进制附件" in dwg_pages[0]["text"]
+    assert "boiler_layout.dwg" in dwg_pages[0]["text"]
+    assert "\x00" not in dwg_pages[0]["text"]
+
+
+def test_ide_grade_context_assembler_rolling_summary_fts_and_project_mount(tmp_path):
+    """ContextAssembler mounts rolling episode summaries, FTS5-indexed history, and matched project cards."""
+    from wechat_assistant.context_assembler import ContextAssembler
+
+    db = Database(tmp_path / "app.db")
+    db.apply_proposal_atomic(
+        proposal_id=None,
+        actions=[
+            ActionMutation(
+                list_type=ListType.PROJECT_ACTION,
+                work_domain=WorkDomain.DELIVERY,
+                project_name="华东热电测温项目",
+                title="核对高温探头法兰尺寸",
+                planned_start_at="2026-11-18",
+                planned_end_at="2026-11-22",
+                priority="P1",
+            )
+        ],
+        source_ids=[],
+        doc_paths=[],
+        brief_summary="供应商交期确认中，下周厂内联调",
+    )
+    t1 = db.append_conversation_turn(
+        role="user",
+        content="华东热电测温项目报价V4含税总价为28.5万元",
+        topic_tags=["华东热电测温项目", "报价V4"],
+        created_at="2026-11-15 09:00:00",
+    )
+    db.upsert_episode_summary("owner", "重点推进华东热电测温项目，已确认报价V4含税28.5万", t1)
+    # Push 30 newer unrelated turns so t1 is outside the 30-turn recent window
+    for idx in range(30):
+        db.append_conversation_turn(role="user", content=f"日常打卡消息 {idx}", created_at="2026-11-18 10:00:00")
+
+    ca = ContextAssembler(db)
+    ctx = ca.assemble("owner", "华东热电测温项目怎么样了")
+    rendered = ca.render_for_router(ctx, "华东热电测温项目怎么样了")
+    assert "跨天滚动会话摘要" in rendered
+    assert "28.5万" in rendered
+    assert "相关项目上下文卡" in rendered
+    assert "核对高温探头法兰尺寸" in rendered
+
+    ev = ca.retrieve_long_horizon_evidence(ctx, raw_text="华东热电测温项目报价")
+    assert any("28.5万元" in h["content"] for h in ev["episodic_hits"])
+
+
+def test_turn_heartbeat_reports_progress_for_slow_turn():
+    """Slow turns emit periodic WeChat heartbeat reports showing the active stage."""
+    import asyncio
+    import time
+    from wechat_assistant.web.app import run_turn_with_heartbeat
+
+    pushes: list[str] = []
+
+    class _DummyEngine:
+        def handle_incoming_turn(self, text, **kwargs):
+            cb = kwargs.get("progress_callback")
+            if cb:
+                cb("3/5 正在由主推模型起草方案与排期（第 1 轮）")
+            time.sleep(0.18)
+            return {"reply_text": "完成"}
+
+    class _DummyGateway:
+        async def send_app_push(self, content: str):
+            pushes.append(content)
+            return {"errcode": 0}
+
+    reply = asyncio.run(
+        run_turn_with_heartbeat(
+            _DummyEngine(),
+            _DummyGateway(),
+            text="测试长任务",
+            sender="owner",
+            msg_id="hb_1",
+            attachments=[],
+            first_delay_seconds=0.05,
+            interval_seconds=0.05,
+        )
+    )
+    assert reply == "完成"
+    assert len(pushes) >= 1
+    assert "仍在处理中" in pushes[0]
+    assert "主推模型起草方案" in pushes[0]
+
+
+def test_clarify_or_unsupported_and_graceful_error_recovery(tmp_path):
+    """Low-confidence/out-of-scope inputs clarify cleanly; unexpected invoke errors return safe fallback."""
+    class _LowConfGateway:
+        def generate_structured(self, tier, messages, schema_cls, **kwargs):
+            obj = schema_cls(
+                intent="work_triage",
+                confidence=0.40,
+                summary="意图模糊",
+                resolved_intent_text="帮我订张明天去上海的机票",
+                clarify_question="我主要负责待办、项目与档案管理，暂不支持代订机票。",
+            )
+            rec = SimpleNamespace(
+                tier=tier,
+                model=tier,
+                prompt_tokens=10,
+                completion_tokens=10,
+                reasoning_tokens=0,
+                latency_ms=1,
+                success=True,
+            )
+            return obj, rec
+
+    settings = Settings(dashscope_api_key="sk-fakeunit1234567890abcdef", data_dir=str(tmp_path / "data"))
+    db = Database(tmp_path / "app.db")
+    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_LowConfGateway())
+    res = eng.handle_incoming_turn("帮我订张明天去上海的机票", external_msg_id="clarify_1")
+    assert "node:clarify_or_unsupported" in res["trajectory"]
+    assert "暂不支持代订机票" in res["reply_text"]
+    assert len(db.list_items(include_done=True)) == 0
+
+    class _CrashGateway:
+        def generate_structured(self, *a, **kw):
+            raise RuntimeError("upstream_timeout")
+
+    eng2 = ChiefOfStaffEngine(settings=settings, db=db, gateway=_CrashGateway())
+    res2 = eng2.handle_incoming_turn("整理一下今天的会议", external_msg_id="err_1")
+    assert "临时异常" in res2["reply_text"]
+    assert res2["trajectory"] == ["error:RuntimeError"]
+
+
+# ---------------- Audit 2026-11-18 regression tests ----------------
+
+
+def test_audit_fts_backfill_never_duplicates_across_restarts(tmp_path):
+    """Defect 1: restarting must not re-insert FTS rows; legacy duplicates are cleaned up."""
+    import sqlite3
+
+    dbp = tmp_path / "app.db"
+    db = Database(dbp)
+    db.append_conversation_turn(role="user", content="华东热电测温报价确认")
+    conn = sqlite3.connect(dbp)
+    conn.execute(
+        "INSERT INTO conversation_turns(thread_id,role,content,created_at) "
+        "VALUES('owner','user','旧数据苏州精工陈总','2026-11-10 09:00:00')"
+    )
+    # simulate legacy duplicates produced by the old integer-vs-text bug
+    conn.execute("INSERT INTO conversation_turns_fts(turn_id,content,tags) VALUES(1,'华东热电测温报价确认','')")
+    conn.execute("INSERT INTO conversation_turns_fts(turn_id,content,tags) VALUES(1,'华东热电测温报价确认','')")
+    conn.commit()
+    for _ in range(3):
+        Database(dbp)
+        total, distinct = conn.execute(
+            "SELECT COUNT(*), COUNT(DISTINCT CAST(turn_id AS INTEGER)) FROM conversation_turns_fts"
+        ).fetchone()
+        assert (total, distinct) == (2, 2)
+    hits = Database(dbp).search_conversation_turns(["苏州精工陈总"])
+    assert len(hits) == 1
+
+
+def test_audit_mail_poller_processes_each_email_once(tmp_path, monkeypatch):
+    """Defect 2: the same email must not be re-analysed on every 120s poll."""
+    import asyncio
+    from wechat_assistant.intake.mail_poller import poll_mailbox_once
+
+    settings = Settings(
+        dashscope_api_key="sk-fakeunit1234567890abcdef",
+        data_dir=str(tmp_path / "data"),
+        mail_enabled=True,
+        mail_allowlist=("V&F",),
+    )
+    db = Database(tmp_path / "app.db")
+    sample = [
+        {
+            "id": "a1",
+            "internetMessageId": "<vf-dup-1>",
+            "subject": "V&F quotation update",
+            "from": {"emailAddress": {"address": "sales@vf.at", "name": "V&F"}},
+            "bodyPreview": "Please find the revised offer.",
+        }
+    ]
+
+    class _Resp:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"value": sample}
+
+    class _Client:
+        def __init__(self, *a, **kw):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *a):
+            return False
+
+        async def get(self, *a, **kw):
+            return _Resp()
+
+    monkeypatch.setattr("wechat_assistant.intake.mail_poller.httpx.AsyncClient", _Client)
+    od = SimpleNamespace(_get_token=lambda: "tok")
+    seen: list[str] = []
+
+    async def on_email(body, sender, ext_id):
+        seen.append(ext_id)
+
+    for _ in range(3):
+        asyncio.run(poll_mailbox_once(settings, od, on_email, mark_seen=db.mark_external_seen))
+    assert seen == ["<vf-dup-1>"]
+
+
+def test_audit_error_fallback_really_records_user_message(tmp_path):
+    """Defect 3: on crash the user's words must actually be persisted, as the reply claims."""
+
+    class _CrashGateway:
+        def generate_structured(self, *a, **kw):
+            raise RuntimeError("upstream_timeout")
+
+    settings = Settings(dashscope_api_key="sk-fakeunit1234567890abcdef", data_dir=str(tmp_path / "data"))
+    db = Database(tmp_path / "app.db")
+    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_CrashGateway())
+    res = eng.handle_incoming_turn("把下周帕莫瑞评审会排上", external_msg_id="crash_rec_1")
+    assert "已记入对话记录" in res["reply_text"]
+    assert "没有生成待办" in res["reply_text"]
+    turns = db.get_recent_conversation_turns(limit=5)
+    assert any(t["role"] == "user" and "帕莫瑞评审会" in t["content"] for t in turns)
+    assert len(db.list_items(include_done=True)) == 0
+
+
+def test_audit_progress_callbacks_never_cross_between_concurrent_turns(tmp_path):
+    """Defect 4: concurrent turns must not overwrite each other's heartbeat stage labels."""
+    import threading
+    import time as _t
+
+    class _SlowGateway:
+        def generate_structured(self, tier, messages, schema_cls, **kwargs):
+            _t.sleep(0.15)
+            obj = schema_cls(intent="chitchat", confidence=0.95, summary="寒暄")
+            rec = SimpleNamespace(
+                tier=tier, model=tier, prompt_tokens=1, completion_tokens=1,
+                reasoning_tokens=0, latency_ms=1, success=True,
+            )
+            return obj, rec
+
+    settings = Settings(dashscope_api_key="sk-fakeunit1234567890abcdef", data_dir=str(tmp_path / "data"))
+    db = Database(tmp_path / "app.db")
+    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_SlowGateway())
+    events: list[str] = []
+
+    def run(tag: str) -> None:
+        eng.handle_incoming_turn(
+            f"你好{tag}",
+            external_msg_id=f"cc_{tag}",
+            progress_callback=lambda lbl, tag=tag: events.append(tag),
+        )
+
+    ta = threading.Thread(target=run, args=("A",))
+    tb = threading.Thread(target=run, args=("B",))
+    ta.start()
+    _t.sleep(0.03)
+    tb.start()
+    ta.join()
+    tb.join()
+    assert events.count("A") >= 1 and events.count("B") >= 1
+    # every A label must be emitted before any B label (turns are serialised, callbacks isolated)
+    assert events == sorted(events)
+
+
+def test_audit_semantic_rolling_summary_uses_llm_with_fallback(tmp_path):
+    """Rolling summary is a real LLM summary when available, extractive text otherwise."""
+    from wechat_assistant.graph import EpisodeSummary
+
+    class _SummaryGateway:
+        def generate_structured(self, tier, messages, schema_cls, **kwargs):
+            rec = SimpleNamespace(
+                tier=tier, model=tier, prompt_tokens=1, completion_tokens=1,
+                reasoning_tokens=0, latency_ms=1, success=True,
+            )
+            if schema_cls is EpisodeSummary:
+                return schema_cls(summary="正在推进华东热电测温项目；待苏州精工陈总确认交期。"), rec
+            return schema_cls(intent="chitchat", confidence=0.95, summary="寒暄"), rec
+
+    settings = Settings(dashscope_api_key="sk-fakeunit1234567890abcdef", data_dir=str(tmp_path / "data"))
+    db = Database(tmp_path / "app.db")
+    eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_SummaryGateway())
+    eng.semantic_summaries = True
+    eng.background_summaries = False
+    for idx in range(4):  # 4 turn pairs = 8 turns -> triggers summary
+        eng.handle_incoming_turn(f"你好 {idx}", external_msg_id=f"sum_{idx}")
+    ep = db.get_latest_episode_summary("owner")
+    assert ep is not None
+    assert "苏州精工陈总" in ep["summary_text"]
+
+
+def test_audit_schedule_density_replaces_hour_capacity(tmp_path):
+    """Scheduling is based on item density, not guessed net hours."""
+    from datetime import date as _date, timedelta as _td
+    from wechat_assistant.tools.schedule_tools import check_workload_and_schedule
+
+    db = Database(tmp_path / "app.db")
+    today = _date.today().isoformat()
+    db.apply_proposal_atomic(
+        proposal_id=None,
+        actions=[
+            ActionMutation(
+                list_type=ListType.NEXT_ACTION,
+                work_domain=WorkDomain.DELIVERY,
+                project_name="密集日",
+                title=f"今日事项 {i}",
+                planned_start_at=today,
+                planned_end_at=today,
+                priority="P1",
+                estimated_hours=0.0,
+            )
+            for i in range(5)
+        ],
+        source_ids=[],
+        doc_paths=[],
+    )
+    res = check_workload_and_schedule(db, start_date=today, days=7, needed_hours=9.9)
+    assert res["density"][today]["item_count"] == 5
+    assert res["density"][today]["crowded"] is True
+    assert res["recommended_start_date"] == (_date.today() + _td(days=1)).isoformat()
+    assert "needed_hours" not in res
