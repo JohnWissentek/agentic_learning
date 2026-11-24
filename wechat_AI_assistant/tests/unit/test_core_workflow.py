@@ -80,7 +80,9 @@ def _make_settings(tmp_path: Path) -> Settings:
 def test_cockpit_permanent_url_shortcut(tmp_path):
     settings = _make_settings(tmp_path)
     db = Database(tmp_path / "app.db")
-    completions = _ScriptedCompletions(lambda *_: "{}")
+    completions = _ScriptedCompletions(
+        lambda *_: json.dumps({"intent": "chitchat", "confidence": 0.9, "summary": "看板"})
+    )
     gw = DashScopeLLMGateway(settings, client=SimpleNamespace(chat=SimpleNamespace(completions=completions)))
     eng = ChiefOfStaffEngine(
         settings=settings,
@@ -89,9 +91,11 @@ def test_cockpit_permanent_url_shortcut(tmp_path):
         magic_link_factory=lambda: "https://assistant.fire-matrix.com/",
     )
     res = eng.handle_incoming_turn("看板")
-    assert res["trajectory"] == ["shortcut:cockpit_link"]
+    assert "node:guardrail_router" in res["trajectory"]
+    assert "node:direct_reply" in res["trajectory"]
+    assert "tool:operational_override=open_cockpit" in res["trajectory"]
     assert "https://assistant.fire-matrix.com/" in res["reply_text"]
-    assert db.count_model_calls() == 0
+    assert db.count_model_calls() == 1
     eng.close()
 
 
@@ -245,7 +249,7 @@ def test_hitl_restart_recovery_checkin_and_undo(tmp_path):
     eng2 = ChiefOfStaffEngine(settings=settings, db=db2, gateway=gw, onedrive=od, checkpoints_path=tmp_path / "ckpt.db")
     commit_res = eng2.handle_incoming_turn("1")
     assert "已确认落盘" in commit_res["reply_text"]
-    assert db2.count_model_calls() == calls_before  # zero extra LLM calls on restart confirm!
+    assert db2.count_model_calls() == calls_before + 1  # confirm now passes through the router once
     assert "审阅帕莫瑞技术合同" in od.synced_boards["01_今日与行动待办.md"]
 
     # Check-in start & complete

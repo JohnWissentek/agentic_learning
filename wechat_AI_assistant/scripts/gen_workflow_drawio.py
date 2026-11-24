@@ -98,63 +98,87 @@ node("lg_dec", 3120, lg_y - 4, 190, 78, S_DECISION, "判断")
 node("lg_db", 3330, lg_y, 190, 72, S_DB, "数据存储")
 node("lg_io", 3540, lg_y, 230, 70, S_IO, "微信 / 邮件 收发")
 text("lg_lines", 3790, lg_y, 1270, 72,
-     "连线：蓝=主流程　紫=按意图分流　橙=执行落盘　红虚线=审核不通过重写　绿虚线=读取数据　灰虚线=回到微信 / 外层循环　橙色圆圈Ⓐ=同一条线的两端（跨区连接）",
+     "连线：蓝=主流程　紫=按意图分流　橙=执行落盘　红虚线=审核不通过重写　绿虚线=读取数据　灰虚线=回到微信 / 外层循环",
      "rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=13;align=left;verticalAlign=middle;spacingLeft=12;")
 
 ZONE_TOP, ZONE_BOTTOM = 130, 2190
 
 # ------------------------------------------------------------------ stage 1: receive & pre-process
-text("z1", 40, ZONE_TOP, 690, ZONE_BOTTOM - ZONE_TOP, "阶段一｜接收与预处理", S_ZONE)
+text("z1", 40, ZONE_TOP, 690, ZONE_BOTTOM - ZONE_TOP, "阶段一｜接收与预处理（硬编码；仅语音调用模型）", S_ZONE)
 node("start", 205, 195, 360, 70, S_TERM, "开始：收到消息 / 到点触发")
-node("in_wx", 80, 320, 290, 100, S_IO, "微信消息", "主入口 / 备用客服通道（含你对确认卡的回复）")
-node("in_mail", 400, 320, 290, 100, S_IO, "邮件", "国际版 O365，每 2 分钟拉取")
-node("intake", 80, 480, 610, 330, S_CODE, "接入与预处理（代码）",
-     "• 验签解密，0.5 秒内回「已收到」\n"
-     "• 连续转发停手 2 秒自动合并成一件事\n"
-     "• 语音转文字（qwen3-asr-flash）\n"
-     "• 邮件只放行 V&F / Tera / B&D，同一封只处理一次，正文加不可信标记\n"
-     "• 附件按页提取文字；原件先备份到 OneDrive；无法解析的格式只记文件名，不丢原件\n"
+node("in_wx", 70, 300, 300, 130, S_IO, "微信消息", "主入口 / 备用客服通道\n（含你对确认卡的回复）")
+node("in_mail", 390, 300, 300, 130, S_IO, "邮件", "工作日 08:30 补夜间与周末\n09:00–21:00 每小时一次\n夜间与周末不拉")
+node("intake", 70, 460, 620, 360, S_CODE, "接入与预处理",
+     "硬编码（不调用模型）：\n"
+     "• 微信：验签、解密，0.5 秒回「已收到」\n"
+     "• 连续转发停手 2 秒，合并成一件事\n"
+     "• 邮件不回「已收到」；按 JSON 域名去重，正文加不可信标记\n"
+     "• 收件合成一张确认卡；发出的信只记在同一条里\n"
+     "• 附件按页提取文字；原件先备份到 OneDrive\n"
+     "调用模型（只有这一处）：\n"
+     "• 语音转文字：qwen3-asr-flash\n"
      "输出：一段统一的文本 + 附件")
-node("is_shortcut", 235, 880, 300, 190, S_DECISION, "是快捷指令吗？")
-node("shortcut", 80, 1160, 610, 270, S_CODE, "快捷指令直接处理（代码，0 次模型）",
-     "不需要上下文，立即处理：\n"
-     "• 看板 / 负荷 → 直接回复（本次结束）\n"
-     "• 1 / 2、开始 #N、完成 #N、撤销 → 交阶段五执行\n"
-     "• 改：<意见> → 带着修改意见进入路径④重新起草")
 edge("e_start_wx", "start", "in_wx", "", C_MAIN, exit_xy=(0.25, 1), entry_xy=(0.5, 0))
 edge("e_start_mail", "start", "in_mail", "", C_MAIN, exit_xy=(0.75, 1), entry_xy=(0.5, 0))
 edge("e_wx", "in_wx", "intake", "", C_MAIN, exit_xy=(0.5, 1), entry_xy=(0.24, 0))
 edge("e_mail", "in_mail", "intake", "", C_MAIN, exit_xy=(0.5, 1), entry_xy=(0.76, 0))
-edge("e_intake", "intake", "is_shortcut", "", C_MAIN, exit_xy=(0.5, 1), entry_xy=(0.5, 0))
-edge("e_sc_yes", "is_shortcut", "shortcut", "是", C_MAIN, exit_xy=(0.5, 1), entry_xy=(0.5, 0))
+edge("e_intake_ctx", "intake", "ctx", "", C_MAIN, exit_xy=(1, 0.45), entry_xy=(0, 0.12))
 
 # ------------------------------------------------------------------ stage 2: assemble context
-text("z2", 790, ZONE_TOP, 540, ZONE_BOTTOM - ZONE_TOP, "阶段二｜装配上下文", S_ZONE)
+text("z2", 790, ZONE_TOP, 540, ZONE_BOTTOM - ZONE_TOP, "阶段二｜装配上下文（全部硬编码）", S_ZONE)
 node("ctx_db", 900, 330, 320, 150, S_DB, "SQLite 数据库", "对话记录 · 待确认卡 · 项目待办 · 文档索引")
-node("ctx", 820, 600, 480, 620, S_CODE, "装配 4 层上下文（代码）",
-     "按固定顺序读取真实数据，拼成提示词：\n\n"
+node("ctx", 820, 600, 480, 620, S_CODE, "装配 4 层上下文（全部硬编码）",
+     "不调用模型。只读取数据库里已经写好的内容。\n"
+     "滚动摘要是以前生成的，这里不重新生成。\n\n"
+     "按固定顺序拼成提示词：\n\n"
      "1. 跨天滚动摘要 + 最近 30 轮对话\n"
      "　（间隔超 30 分钟会标注，防止串话题）\n\n"
      "2. 待确认卡片\n"
      "　（你还没回复确认的方案）\n\n"
      "3. 在途项目、待办快照\n"
      "　（提到项目名时自动附上项目卡）\n\n"
-     "4. 历史文档与旧对话检索\n"
+     "4. 历史文档与旧对话检索（数据库检索）\n"
      "　（查资料和工作交办时才检索）\n\n"
      "输出：一份完整的上下文提示词")
 edge("e_ctx_read", "ctx_db", "ctx", "读取", C_READ, exit_xy=(0.5, 1), entry_xy=(0.5, 0), dashed=True)
-edge("e_sc_no", "is_shortcut", "ctx", "否", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.605))
 
 # ------------------------------------------------------------------ stage 3: decide & dispatch
-text("z3", 1390, ZONE_TOP, 600, ZONE_BOTTOM - ZONE_TOP, "阶段三｜判断意图并分流", S_ZONE)
-node("router", 1410, 830, 270, 160, S_LLM, "路由模型判断意图", "qwen3.8-flash\n读上下文，判断你想做什么，补全「这个/刚才那事」")
-node("which", 1720, 810, 240, 200, S_DECISION, "走哪条路？")
+text("z3", 1390, ZONE_TOP, 600, ZONE_BOTTOM - ZONE_TOP, "阶段三｜判断意图（模型前、模型后都有硬编码）", S_ZONE)
+node("pre_router", 1410, 190, 400, 250, S_CODE, "模型之前：两处硬编码",
+     "不调用路由模型。\n"
+     "• 整句是「你好 / 在吗 / hi / hello」\n"
+     "　且没有历史、没有待确认卡\n"
+     "　→ 直接回复问候\n"
+     "• 状态里已经写好修改意见\n"
+     "　→ 直接走路径④\n"
+     "　你新发的「改：…」不走这里")
+node("router", 1410, 800, 280, 190, S_LLM, "调用模型：判断意图", "qwen3.8-flash\n读阶段二拼好的上下文\n判断走哪条路\n补全「这个 / 刚才那事」")
+node("which", 1720, 800, 240, 200, S_DECISION, "走哪条路？")
 edge("e_ctx_router", "ctx", "router", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 edge("e_router_which", "router", "which", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-node("router_note", 1410, 1110, 390, 250, S_NOTE, "代码兜底规则",
-     "• 没有待确认卡却说「确认」\n　→ 当闲聊处理\n"
-     "• 交办内容太模糊（置信度 < 0.55）\n　→ 路径⑤\n"
-     "• 没明确说「查一下/上网查」\n　→ 不联网搜索")
+node("brake_note", 1410, 1020, 400, 280, S_NOTE, "模型之后①：三条刹车",
+     "与整句词表无关。提示词写了同样的话，\n"
+     "这里用代码拦住，不再调用模型。\n"
+     "• 没有待确认卡，却要确认、\n"
+     "　只存想法或作废 → 改成闲聊，不写库\n"
+     "• 判成工作交办，置信度 < 0.55\n"
+     "　→ 路径⑤，先问清楚，不建卡\n"
+     "• 想联网，原话没有\n"
+     "　「查一下 / 上网查 / 联网搜」→ 不联网")
+node("lexicon_note", 1410, 1320, 400, 520, S_NOTE, "模型之后②：整句词表（最后执行）",
+     "只锁整句完全一致的话，表不再加长。\n"
+     "命中后改掉模型（以及刹车）的判断。\n"
+     "「好的」「做完了」「改成下周五」\n"
+     "不在表里，仍只听模型。\n"
+     "会改数据，认错就改回：\n"
+     "• 撤销\n"
+     "• 开始 3 / 完成 3 / 完成 #3 2h\n"
+     "• 有待确认卡时：1 / 确认\n"
+     "• 2 / 仅存想法\n"
+     "• 改：…\n"
+     "只改回复，不改数据：\n"
+     "• 看板 / 驾驶舱 / 页面 / dashboard\n"
+     "• 负荷 / 待办 / 今日待办 / todo")
 
 # ------------------------------------------------------------------ stage 4: five paths
 Z4_X = 2050
@@ -162,7 +186,7 @@ text("z4", Z4_X, ZONE_TOP, 2480, ZONE_BOTTOM - ZONE_TOP, "阶段四｜五条处�
 BX, BW, BH = 2120, 600, 170
 OX, OW, OH = 2800, 250, 100
 
-node("p1", BX, 245, BW, BH, S_CODE, "① 直接执行（代码）", "确认或作废卡片、开始/完成打卡（可一句话多条）、撤销\n→ 交阶段五执行")
+node("p1", BX, 245, BW, BH, S_CODE, "① 直接执行（代码）", "阶段三认定之后才执行：\n确认、作废、开始/完成、撤销 → 阶段五\n看板、负荷 → 只回复，不改待办")
 node("p2", BX, 535, BW, BH, S_LLM, "② 参谋回复（qwen3.8-flash）", "每条消息回复一次，不建待办\n聊几轮由你决定")
 node("p3", BX, 825, BW, BH, S_LLM, "③ 查档问答（代码检索 + qwen3.8-flash）", "先查文档和旧对话，再只依据查到的内容回答\n必须带出处页码；查不到就说查不到")
 node("p5", BX, 1115, BW, BH, S_CODE, "⑤ 请你澄清（代码）", "说明能力边界，或追问一个关键细节\n不建待办")
@@ -230,19 +254,12 @@ edge("e_p1_exec", "p1", "exec", "执行", C_EXEC, exit_xy=(1, 0.5), entry_xy=(0,
 edge("e_exec_db", "exec", "db", "", C_EXEC, exit_xy=(0.225, 1), entry_xy=(0.5, 0))
 edge("e_exec_od", "exec", "od", "", C_EXEC, exit_xy=(0.775, 1), entry_xy=(0.5, 0))
 edge("e_db_web", "db", "web", "读取", C_READ, exit_xy=(0.5, 1), entry_xy=(0.225, 0), dashed=True)
-node("conn_a1", 360, 1500, 50, 50, S_CONN, "A")
-text("conn_a1_lbl", 420, 1500, 270, 50, "接阶段五（Ⓐ）", "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#dd6b20;")
-edge("e_sc_conn", "shortcut", "conn_a1", "1/2、开始、完成、撤销", C_EXEC, exit_xy=(0.5, 1), entry_xy=(0.5, 0))
-node("conn_a2", 4980, 182, 50, 50, S_CONN, "A")
-text("conn_a2_lbl", 4640, 182, 330, 50, "Ⓐ 来自阶段一快捷指令", "text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#dd6b20;")
-edge("e_conn_exec", "conn_a2", "exec", "", C_EXEC, exit_xy=(0.5, 1), entry_xy=(0.875, 0))
-
 edge("e_outer_loop", "card_next", "start",
      "外层循环：你的下一条消息 / 下一次触发 → 回到开始（阶段二会读取上次存下的状态）",
      C_REPLY, exit_xy=(0.5, 1), entry_xy=(0, 0.5), points=[(4350, 2280), (18, 2280), (18, 230)], dashed=True, width=3)
 
 # ------------------------------------------------------------------ stage 6: scheduled jobs (independent lane)
-text("z6", 40, 2330, 5020, 450, "阶段六｜每日定时任务（独立运行，到点或拉到邮件后从「开始」进入）", S_ZONE)
+text("z6", 40, 2330, 5020, 450, "阶段六｜每日定时任务（独立运行，到点后从「开始」进入）", S_ZONE)
 node("timer", 120, 2420, 380, 140, S_CODE, "定时器", "工作日 08:30 早报\n工作日 18:00 晚间复盘")
 node("digest", 600, 2400, 900, 180, S_CODE, "生成简报（代码）",
      "早报：今日在途事项、平均完成跨度、优先待办、外部卡点、驾驶舱链接\n"
@@ -250,9 +267,13 @@ node("digest", 600, 2400, 900, 180, S_CODE, "生成简报（代码）",
      "简报同时写入对话记录，方便你直接回复")
 node("digest_out", 1600, 2430, 560, 120, S_IO, "推送到微信",
      "你回复「#3 做完了，#5 开始了」→ 作为下一条消息走路径①")
-node("mail_job", 2400, 2420, 900, 140, S_CODE, "邮件拉取（每 2 分钟）",
-     "只拉白名单公司邮件，同一封只处理一次\n拉到后从「开始」进入，走一遍阶段一到五")
-node("sum_job", 3420, 2420, 1550, 140, S_LLM, "滚动摘要（每 8 轮对话，后台运行，qwen3.8-flash）",
+node("mail_job", 2280, 2388, 1080, 200, S_CODE, "邮件汇总（工作日）",
+     "08:30 推出夜间与周末积压\n"
+     "09:00–21:00 有新邮件才推一条\n"
+     "夜间与周末不拉取、不推送\n"
+     "收件合成一张确认卡；发出的信只记在同一条里\n"
+     "域名：config/mail_domains.json；有邮件才从「开始」进入")
+node("sum_job", 3420, 2418, 1550, 140, S_LLM, "滚动摘要（每 8 轮对话，后台运行，qwen3.8-flash）",
      "把上一版摘要与新对话合并成语义摘要：进行中项目、已定事项、待跟进人和日期\n失败时保留关键词摘要，不影响回复速度")
 edge("e_timer", "timer", "digest", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 edge("e_digest", "digest", "digest_out", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, 0.5))

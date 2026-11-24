@@ -50,6 +50,8 @@ class IntentRoute(BaseModel):
         "mutate_existing_item",
         "checkin",
         "undo",
+        "open_cockpit",
+        "show_workload",
         "chitchat",
         "clarify_or_unsupported",
     ]

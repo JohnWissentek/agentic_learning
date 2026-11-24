@@ -124,6 +124,59 @@ def format_decision_card(proposal_id: int, proposal: TriageProposal, cockpit_url
     return "\n".join(lines)
 
 
+_COCKPIT_EXACT = {"看板", "驾驶舱", "页面", "dashboard"}
+_WORKLOAD_EXACT = {"负荷", "待办", "今日待办", "todo"}
+
+
+def _operational_override(raw_text: str, pending: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Map an exact operational sentence onto a route after context is loaded.
+
+    The router model still runs first. This only corrects the intent when the
+    whole sentence is one of the known operational forms, so a misclassification
+    cannot skip a confirm, check-in, undo, or cockpit reply.
+    """
+    text = (raw_text or "").strip()
+    lowered = text.lower()
+    if text in _COCKPIT_EXACT or lowered == "dashboard":
+        return {"intent": "open_cockpit"}
+    if text in _WORKLOAD_EXACT or lowered == "todo":
+        return {"intent": "show_workload"}
+    if text == "撤销":
+        return {"intent": "undo"}
+    m_start = re.match(r"^开始\s*#?(\d+)$", text)
+    if m_start:
+        return {"intent": "checkin", "target_item_id": int(m_start.group(1)), "resolved_text": text}
+    m_done = re.match(r"^完成\s*#?(\d+)(?:\s+(\d+(?:\.\d+)?)\s*(?:[hH]|小时)?)?$", text)
+    if m_done:
+        parsed: dict[str, Any] = {
+            "intent": "checkin",
+            "target_item_id": int(m_done.group(1)),
+            "resolved_text": text,
+        }
+        if m_done.group(2):
+            parsed["actual_hours"] = float(m_done.group(2))
+        return parsed
+    if pending and text in {"1", "确认"}:
+        return {"intent": "confirm_pending"}
+    if pending and text in {"2", "仅存想法"}:
+        return {"intent": "confirm_pending", "pending_ideas_only": True}
+    if pending and text.startswith(("改：", "改:")):
+        corr = text[2:].strip()
+        return {
+            "intent": "work_triage",
+            "user_correction": corr,
+            "resolved_text": corr,
+            "raw_text": (
+                f"对确认卡 #{pending['id']} 原提案的调整：\n"
+                f"原方案：{json.dumps(pending.get('proposal') or {}, ensure_ascii=False)}\n"
+                f"修改意见：{corr}"
+            ),
+            "source_ids": list(pending.get("source_ids") or []),
+            "attachments": list(pending.get("pending_files") or []),
+        }
+    return None
+
+
 class ChiefOfStaffEngine:
     """End-to-end bounded workflow orchestrator binding DB, tools, OneDrive, and LangGraph."""
 
@@ -373,15 +426,28 @@ class ChiefOfStaffEngine:
             }
 
         router_input = self.context_assembler.render_for_router(ctx, raw_text)
-        route, rec = self.gateway.generate_structured(
-            "fast",
-            [
-                {"role": "system", "content": FAST_ROUTER_PROMPT},
-                {"role": "user", "content": router_input},
-            ],
-            IntentRoute,
-            max_tokens=1024,
-        )
+        try:
+            route, rec = self.gateway.generate_structured(
+                "fast",
+                [
+                    {"role": "system", "content": FAST_ROUTER_PROMPT},
+                    {"role": "user", "content": router_input},
+                ],
+                IntentRoute,
+                max_tokens=1024,
+            )
+        except Exception as exc:
+            forced_on_error = _operational_override(raw_text, ctx.pending_proposal)
+            if not forced_on_error:
+                raise
+            intent = str(forced_on_error.pop("intent"))
+            return {
+                **ctx_fields,
+                **forced_on_error,
+                "needs_deep_research": False,
+                "intent": intent,
+                "trajectory": traj + [f"tool:operational_override={intent}", f"tool:router_error={type(exc).__name__}"],
+            }
         self._record_latest_call(rec)
 
         effective_intent = route.intent
@@ -425,11 +491,18 @@ class ChiefOfStaffEngine:
         elif route.intent == "chitchat" and (ctx.recent_turns or ctx.pending_proposal):
             effective_intent = "conversational_chat"
 
+        forced = _operational_override(raw_text, ctx.pending_proposal)
+        trajectory = traj + [f"tool:fast_route={route.intent}"]
+        if forced:
+            effective_intent = str(forced.pop("intent"))
+            extra_updates.update(forced)
+            trajectory.append(f"tool:operational_override={effective_intent}")
+
         return {
             **ctx_fields,
             **extra_updates,
             "intent": effective_intent,
-            "trajectory": traj + [f"tool:fast_route={route.intent}"],
+            "trajectory": trajectory,
         }
 
     def _node_action_shortcut(self, state: WorkflowState) -> WorkflowState:
@@ -532,6 +605,27 @@ class ChiefOfStaffEngine:
             }
 
         return {"reply_text": "收到，请继续指示。", "trajectory": traj}
+
+    def _node_direct_reply(self, state: WorkflowState) -> WorkflowState:
+        """Reply with a cockpit link or workload list after the router has classified the turn."""
+        intent = state.get("intent", "")
+        traj = list(state.get("trajectory") or []) + ["node:direct_reply"]
+        if intent == "open_cockpit":
+            url = self.magic_link_factory()
+            reply = (
+                "📊 **董事长项目管理驾驶舱**（固定访问链接，首次用微信 6 位验证码登录后本机长期免密直开）：\n"
+                f"{url}"
+            )
+            return {"reply_text": reply, "trajectory": traj}
+        w = self.db.get_daily_workload(days=3, daily_capacity=self.settings.daily_capacity_hours)
+        items = self.db.list_items(include_done=False)[:6]
+        day_lines = [f"- {d}: 排期 **{len(v['items'])} 项**" for d, v in w["days"].items()]
+        item_lines = [
+            f"- `#{it['id']}` `[{it['priority']}]` {it['title']}（{it['planned_start_at'] or '-'}~{it['planned_end_at'] or '-'}）"
+            for it in items
+        ]
+        reply = "📅 **近3日日程分布**：\n" + "\n".join(day_lines) + "\n\n📌 **Top 待办**：\n" + ("\n".join(item_lines) or "- 暂无")
+        return {"reply_text": reply, "trajectory": traj}
 
     def _node_conversational_responder(self, state: WorkflowState) -> WorkflowState:
         traj = list(state.get("trajectory") or []) + ["node:conversational_responder"]
@@ -913,6 +1007,8 @@ class ChiefOfStaffEngine:
             return "conversational"
         if intent in {"confirm_pending", "discard_pending", "mutate_existing_item", "undo", "checkin"}:
             return "action_shortcut"
+        if intent in {"open_cockpit", "show_workload"}:
+            return "direct_reply"
         return "work_triage"
 
     @staticmethod
@@ -929,6 +1025,7 @@ class ChiefOfStaffEngine:
         builder.add_node("quick_qa_responder", self._node_quick_qa_responder)
         builder.add_node("conversational_responder", self._node_conversational_responder)
         builder.add_node("action_shortcut", self._node_action_shortcut)
+        builder.add_node("direct_reply", self._node_direct_reply)
         builder.add_node("react_investigator", self._node_react_investigator)
         builder.add_node("context_compactor", self._node_context_compactor)
         builder.add_node("producer_drafter", self._node_producer_drafter)
@@ -945,9 +1042,11 @@ class ChiefOfStaffEngine:
                 "quick_qa": "quick_qa_responder",
                 "conversational": "conversational_responder",
                 "action_shortcut": "action_shortcut",
+                "direct_reply": "direct_reply",
                 "work_triage": "react_investigator",
             },
         )
+        builder.add_edge("direct_reply", END)
         builder.add_edge("clarify_or_unsupported", END)
         builder.add_edge("quick_qa_responder", END)
         builder.add_edge("conversational_responder", END)
@@ -1056,8 +1155,6 @@ class ChiefOfStaffEngine:
         """Unified entry point enforcing instant commands and LangGraph orchestration."""
         text = (raw_text or "").strip()
         atts = attachments or []
-        # Hold the (re-entrant) turn lock for the whole turn so the progress callback
-        # can never be overwritten by a concurrent turn (e.g. WeChat + mail poller).
         with self._turn_lock:
             prev_cb = self._progress_cb
             self._progress_cb = progress_callback
@@ -1081,108 +1178,6 @@ class ChiefOfStaffEngine:
         atts: list[dict[str, Any]],
         thread_id: str,
     ) -> dict[str, Any]:
-
-        # 1. Instant shortcut commands (0 LLM calls)
-        if text in {"看板", "驾驶舱", "页面", "dashboard"}:
-            url = self.magic_link_factory()
-            reply = f"📊 **董事长项目管理驾驶舱**（固定访问链接，首次用微信 6 位验证码登录后本机长期免密直开）：\n{url}"
-            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:cockpit_link")
-            return {"reply_text": reply, "trajectory": ["shortcut:cockpit_link"]}
-
-        if text in {"负荷", "待办", "今日待办", "todo"}:
-            w = self.db.get_daily_workload(days=3, daily_capacity=self.settings.daily_capacity_hours)
-            items = self.db.list_items(include_done=False)[:6]
-            day_lines = [
-                f"- {d}: 排期 **{len(v['items'])} 项**"
-                for d, v in w["days"].items()
-            ]
-            item_lines = [
-                f"- `#{it['id']}` `[{it['priority']}]` {it['title']}（{it['planned_start_at'] or '-'}~{it['planned_end_at'] or '-'}）"
-                for it in items
-            ]
-            reply = "📅 **近3日日程分布**：\n" + "\n".join(day_lines) + "\n\n📌 **Top 待办**：\n" + ("\n".join(item_lines) or "- 暂无")
-            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:workload")
-            return {"reply_text": reply, "trajectory": ["shortcut:workload"]}
-
-        if text == "撤销":
-            ok, msg = self.db.undo_last_commit()
-            if ok and self.onedrive is not None:
-                self.onedrive.sync_all_lists(self.db)
-            reply = ("↩️ " if ok else "ℹ️ ") + msg
-            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:undo")
-            return {"reply_text": reply, "trajectory": ["shortcut:undo"]}
-
-        m_start = re.match(r"^开始\s*#?(\d+)$", text)
-        if m_start:
-            item = self.db.start_item(int(m_start.group(1)))
-            if not item:
-                reply = f"未找到待办编号 #{m_start.group(1)}。"
-                self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:start_not_found")
-                return {"reply_text": reply, "trajectory": ["shortcut:start_not_found"]}
-            if self.onedrive is not None:
-                self.onedrive.sync_all_lists(self.db)
-            reply = f"▶️ 已记录 **#{item['id']}** 开始执行：`{item['title']}`（{item['actual_start_at']}）。"
-            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:start_item")
-            return {"reply_text": reply, "trajectory": ["shortcut:start_item"]}
-
-        m_done = re.match(r"^完成\s*#?(\d+)(?:\s+(\d+(?:\.\d+)?)\s*[hH小时]?)?$", text)
-        if m_done:
-            hrs = float(m_done.group(2)) if m_done.group(2) else None
-            item = self.db.complete_item(int(m_done.group(1)), actual_hours=hrs)
-            if not item:
-                reply = f"未找到待办编号 #{m_done.group(1)}。"
-                self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:done_not_found")
-                return {"reply_text": reply, "trajectory": ["shortcut:done_not_found"]}
-            if self.onedrive is not None:
-                self.onedrive.sync_all_lists(self.db)
-            span_days = item.get("actual_span_days", 1)
-            hrs_note = f"（指定实耗 {item['actual_hours']}h）" if (hrs is not None or (item.get("actual_hours") or 0) > 0) else ""
-            reply = (
-                f"✅ 已标记 **#{item['id']}** 完成：`{item['title']}`\n"
-                f"实际完成跨度：**`{span_days} 天`**{hrs_note}（已同步刷新云端 `.md` 与周期校准基准）。"
-            )
-            self._record_turn_pair(thread_id=thread_id, user_text=text, reply_text=reply, intent="shortcut:complete_item")
-            return {"reply_text": reply, "trajectory": ["shortcut:complete_item"]}
-
-        # 3. HITL Pending Proposal response (`1`, `2`, `改：...`) - survives restarts via SQLite!
-        pending = self.db.get_latest_pending_proposal(thread_id)
-        if pending and text in {"1", "确认", "2", "仅存想法"}:
-            msg = self.commit_pending_proposal(pending, ideas_only=(text in {"2", "仅存想法"}))
-            self._record_turn_pair(
-                thread_id=thread_id,
-                user_text=text,
-                reply_text=msg,
-                intent="hitl:commit_confirmed",
-                proposal_id=int(pending["id"]),
-            )
-            return {"reply_text": msg, "trajectory": ["hitl:commit_confirmed"]}
-
-        if pending and text.startswith(("改：", "改:")):
-            corr = text[2:].strip()
-            rev_state: WorkflowState = {
-                "thread_id": f"{thread_id}:rev:{pending['id']}",
-                "raw_text": f"对确认卡 #{pending['id']} 原提案的调整：\n原方案：{json.dumps(pending['proposal'], ensure_ascii=False)}",
-                "source_ids": pending["source_ids"],
-                "attachments": pending["pending_files"],
-                "user_correction": corr,
-                "loop_count": 0,
-            }
-            with self._turn_lock:
-                out = self.graph.invoke(rev_state, config={"configurable": {"thread_id": rev_state["thread_id"]}})
-            self._record_turn_pair(
-                thread_id=thread_id,
-                user_text=text,
-                reply_text=out["reply_text"],
-                intent="hitl:revise",
-                proposal_id=out.get("proposal_id"),
-            )
-            return {
-                "reply_text": out["reply_text"],
-                "proposal_id": out.get("proposal_id"),
-                "trajectory": out.get("trajectory", []),
-            }
-
-        # 4. Run full LangGraph cognitive workflow
         init_state: WorkflowState = {
             "thread_id": thread_id,
             "raw_text": text,

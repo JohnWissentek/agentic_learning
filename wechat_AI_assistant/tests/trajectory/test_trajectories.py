@@ -57,12 +57,12 @@ class _RouteAwareCompletions:
 @pytest.mark.parametrize(
     "case_id,user_input,expected_step",
     [
-        (1, "看板", "shortcut:cockpit_link"),
-        (2, "dashboard", "shortcut:cockpit_link"),
-        (3, "负荷", "shortcut:workload"),
-        (4, "撤销", "shortcut:undo"),
-        (5, "开始 999", "shortcut:start_not_found"),
-        (6, "完成 999 1.5h", "shortcut:done_not_found"),
+        (1, "看板", "node:direct_reply"),
+        (2, "dashboard", "node:direct_reply"),
+        (3, "负荷", "node:direct_reply"),
+        (4, "撤销", "node:action_shortcut=undo"),
+        (5, "开始 999", "node:action_shortcut=checkin"),
+        (6, "完成 999 1.5h", "node:action_shortcut=checkin"),
         (7, "Spec.pdf 第几页写了补偿系数是多少", "tool:hybrid_search"),
         (8, "某个从未存在过的太空项目预算是多少", "node:quick_qa_responder"),
         (9, "我刚有个新想法，查一下2U工业机箱抗干扰标准", "tool:search_public_tech_intel"),

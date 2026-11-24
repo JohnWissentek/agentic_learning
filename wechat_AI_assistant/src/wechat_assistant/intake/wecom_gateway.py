@@ -61,9 +61,6 @@ class _BufferedBatch:
 class QuietAggregator:
     """Async buffer grouping rapid single-item forwards within `quiet_seconds`."""
 
-    _INSTANT_PREFIXES = ("密：", "密:", "改：", "改:")
-    _INSTANT_EXACT = {"1", "2", "确认", "仅存想法", "看板", "驾驶舱", "页面", "负荷", "待办", "今日待办", "撤销"}
-
     def __init__(
         self,
         *,
@@ -74,14 +71,6 @@ class QuietAggregator:
         self.on_flush = on_flush
         self._batches: dict[str, _BufferedBatch] = {}
         self._lock = asyncio.Lock()
-
-    def _is_instant(self, text: str, attachments: list[dict[str, Any]]) -> bool:
-        t = (text or "").strip()
-        if t in self._INSTANT_EXACT or t.startswith(self._INSTANT_PREFIXES):
-            return True
-        if re.match(r"^(?:开始|完成)\s*#?\d+", t):
-            return True
-        return False
 
     async def push(
         self,
@@ -96,10 +85,6 @@ class QuietAggregator:
 
         if t == "好了":
             await self.flush_now(sender_key)
-            return
-
-        if self._is_instant(t, atts) and sender_key not in self._batches:
-            await self.on_flush(sender_key, t, atts, msg_id)
             return
 
         async with self._lock:
@@ -450,7 +435,7 @@ class WeComGateway:
         mtype = (msg_type or "").lower()
         t = (text_content or "").strip()
         if mtype == "text":
-            if not t or t == "好了" or self.aggregator._is_instant(t, []):
+            if not t or t == "好了":
                 return None
             return "⚡ 已收到，正在为您分析处理（约 5~8 秒）…"
         if mtype == "voice":
