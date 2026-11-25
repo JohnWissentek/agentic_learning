@@ -14,20 +14,24 @@
 ├── rules/                                             # 自动注入的工程约束规则
 │   ├── git_push_automation.md                         # Git 单主干提交与 github_push 推送红线
 │   ├── solo_production_guardrails.md                  # [always_on] 生产级五大铁律（薄切片/红区隔离/禁改测试/防御基线/实证完工）
+│   ├── uml25_state_machine_diagrams.md                # [always_on] LangGraph / 状态机架构图严格遵循 UML 2.5 状态机图标准
 │   └── anti_collusion_testing.md                      # [glob: tests] 触碰测试文件自动激活：测试奖杯配比与防假测试准则
 ├── agents/                                            # 物理隔离上下文的专用子智能体系统提示词
 │   ├── blind-test-author.md                           # 独立黑盒测试编写官（只看红区契约与中文矩阵写红灯测试）
 │   └── adversarial-code-auditor.md                    # 独立挑刺审计官（只读权限，零客套对比需求与源码找细节漏洞）
-└── skills/                                            # 按需渐进式激活的三大标准工作流技能
+└── skills/                                            # 按需渐进式激活的四大标准工作流技能
     ├── spec-thin-slice/                               # 技能 1：立项反问排雷 + 红区契约先行 + 垂直薄切片拆解
     │   ├── SKILL.md
     │   └── references/slice-spec-template.md
     ├── red-green-tdd/                                 # 技能 2：免手写读写隔离 TDD（Red → Green → Refactor → 实证）
     │   ├── SKILL.md
     │   └── references/anti-rationalization-checklist.md
-    └── blind-audit-and-trace/                         # 技能 3：红黄绿三区分拣 + 独立盲审对账 + 黄金样本实弹轨迹表
+    ├── blind-audit-and-trace/                         # 技能 3：红黄绿三区分拣 + 独立盲审对账 + 黄金样本实弹轨迹表
+    │   ├── SKILL.md
+    │   └── references/golden-trace-template.md
+    └── uml25-state-machine-diagram/                   # 技能 4：严格按 OMG UML 2.5 绘制 LangGraph / 状态机架构图
         ├── SKILL.md
-        └── references/golden-trace-template.md
+        └── references/uml25-langgraph-mapping.md
 ```
 
 ---
