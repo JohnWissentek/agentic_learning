@@ -1028,7 +1028,8 @@ class ChiefOfStaffEngine:
                     results.append(f"⚠️ 未找到任务编号 #{note.task_id}")
                 else:
                     mutated = True
-                    results.append(f"📝 已为 #{note.task_id}《{item['title']}》追加补充备注：{clean_content}")
+                    cnt = len(item.get("comments") or [])
+                    results.append(f"📝 已为 #{note.task_id}《{item['title']}》追加备注日志（共 {cnt} 条）：{clean_content}")
             else:
                 entry = self.db.append_task_timeline(
                     int(note.task_id),
@@ -1066,16 +1067,36 @@ class ChiefOfStaffEngine:
                 results.append(f"未找到任务编号 #{tid}（当前不存在该任务）。")
                 continue
             tl = existing.get("timeline") or []
-            if not tl:
-                results.append(f"任务 #{tid}《{existing['title']}》暂无沟通与进展记录。")
+            cmts = existing.get("comments") or []
+            evals = existing.get("ceo_evaluation") or []
+            if not tl and not cmts and not evals:
+                results.append(f"任务 #{tid}《{existing['title']}》暂无备注日志或沟通进展记录。")
                 continue
-            tl_lines = [f"🗂️ 任务 #{tid}《{existing['title']}》完整沟通与进展时间轴（共 {len(tl)} 条）："]
-            ch_map = {"wechat": "微信", "mail_in": "收件", "mail_out": "发件", "web": "驾驶舱"}
-            for e in tl:
-                ch_lbl = ch_map.get(e.get("channel", "wechat"), e.get("channel", ""))
-                who = _format_party_flow(e.get("from_party", ""), e.get("to_party", ""), e.get("cc_parties"))
-                who_part = f"｜{who}" if who else ""
-                tl_lines.append(f"- [{_short_ts(e.get('timestamp', ''))}｜{ch_lbl}{who_part}] {e.get('summary', '')}")
+            tl_lines = [f"🗂️ 任务 #{tid}《{existing['title']}》完整日志与进展（备注 {len(cmts)} · 进展 {len(tl)} · 评价 {len(evals)}）："]
+            if cmts:
+                tl_lines.append("【补充备注 / 日志】")
+                for c in cmts:
+                    if isinstance(c, dict):
+                        ts_lbl = _short_ts(c.get("timestamp") or c.get("date") or "")
+                        tl_lines.append(f"- [{ts_lbl}] {c.get('content', '')}")
+                    else:
+                        tl_lines.append(f"- {c}")
+            if tl:
+                tl_lines.append("【往来沟通与进展】")
+                ch_map = {"wechat": "微信", "mail_in": "收件", "mail_out": "发件", "web": "驾驶舱"}
+                for e in tl:
+                    ch_lbl = ch_map.get(e.get("channel", "wechat"), e.get("channel", ""))
+                    who = _format_party_flow(e.get("from_party", ""), e.get("to_party", ""), e.get("cc_parties"))
+                    who_part = f"｜{who}" if who else ""
+                    tl_lines.append(f"- [{_short_ts(e.get('timestamp', ''))}｜{ch_lbl}{who_part}] {e.get('summary', '')}")
+            if evals:
+                tl_lines.append("【CEO 评价】")
+                for ev in evals:
+                    if isinstance(ev, dict):
+                        ts_lbl = _short_ts(ev.get("timestamp") or ev.get("date") or "")
+                        tl_lines.append(f"- [{ts_lbl}] {ev.get('content', '')}")
+                    else:
+                        tl_lines.append(f"- {ev}")
             results.append("\n".join(tl_lines))
 
         if mutated:

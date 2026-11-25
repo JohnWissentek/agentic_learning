@@ -4,15 +4,15 @@
 
 ---
 
-## 总成绩单（2026-11-25 v3.0 Model-First 方法论盲审修订与真模型 E2E 最终核验）
+## 总成绩单（2026-11-25 v3.0 生产版 + 邮件原子分页 / 方案 A 并行队列 / 默认三工作日 / 任务日志抽屉最终核验）
 
 | 维度 | 指标 | 实测结果 |
 | :--- | :--- | :--- |
-| **全仓自动化测试套件** | `uv run pytest -v --tb=short` | ✅ **125 passed, 0 failed**（Exit Code `0`，含 v3.0 单脑契约 7 条 + **Model-First 盲审 P0/P1 防回归契约 9 条**） |
+| **全仓自动化测试套件** | `uv run pytest -q --tb=short` | ✅ **139 passed, 0 failed**（Exit Code `0`，含邮件六要素原子分页、方案 A 多卡并行队列、默认 3 工作日截止与任务日志抽屉黑盒契约） |
 | **三轮独立盲审隐患清零** | `adversarial-code-auditor` 三轮累计 | ✅ 首轮 6 P0 + 6 P1 + 3 P2 + 二轮 v2.0 5 P0 + 8 P1 + **三轮 Model-First 方法论盲审 5 P0 + 6 P1**，**100% 闭环修复** |
 | **离线黄金样本轨迹体检** | `scripts/replay_golden_traces.py`（`-W error::ResourceWarning`） | ✅ **14/14 全部通过**，0 未关闭数据库连接警告 |
 | **真实百炼大模型 E2E 实弹** | `scripts/e2e_live_flagship_brain.py`（真实 `qwen3.8-max`） | ✅ **8/8 全部通过**（五彩湾 2 轮、否定句防误改、复合 3 操作 2.68s、相对日期 1.59s、闭卷查档、Outlook 边界注入防御，0 次路由/0 次二审/0 失败） |
-| **阿里云 `firematrix` 生产探针** | `scripts/probe_04_mail_readonly.py`（此前已验） | ✅ `mail_read` = **`200 OK`**，`sendMail` = **`403 Forbidden`**（本次最新修订待同步部署至 `firematrix`） |
+| **阿里云 `firematrix` 生产验收** | `https://assistant.fire-matrix.com/healthz` + 16:26 实弹邮件推卡 | ✅ `version: "3.0.0"`、`openTaskDrawer` 公网上线、5 封邮件 8 段原子分页并行出卡 `#3` 全部 `errcode=0` |
 
 ---
 
@@ -30,3 +30,4 @@
 | `07` | [07-全仓盲审P0P1修复与清库冷启动TDD验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/07-全仓盲审P0P1修复与清库冷启动TDD验收记录.md) | `/goal` 二轮全仓盲审 5 P0 + 8 P1 闭环修复、10 组冷启动与防注入红灯测试（10 红 → 105 绿）及阿里云备份清库冷启动验收 |
 | `08` | [08-v3.0单脑旗舰Agent架构重构TDD验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/08-v3.0单脑旗舰Agent架构重构TDD验收记录.md) | v3.0 单脑旗舰 Agent（Model-First 方案 A）黑盒契约测试（7 红 → 116 绿）、14/14 黄金轨迹与阿里云生产验收 |
 | `09` | [09-v3.0方法论全仓盲审P0P1修复与真模型E2E实弹验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/09-v3.0方法论全仓盲审P0P1修复与真模型E2E实弹验收记录.md) | 对照《大模型优先 + 确定性底盘》方法论全仓独立盲审（5 P0 + 6 P1 闭环修复）、9 红 → 125 绿 TDD 及 8/8 真实百炼 `qwen3.8-max` 端到端 E2E 实弹验收 |
+| `10` | [10-邮件原子分页_多卡并行队列与任务日志抽屉实现及TDD验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/10-邮件原子分页_多卡并行队列与任务日志抽屉实现及TDD验收记录.md) | 邮件逐封六要素整封原子分页防丢包、方案 A 多确认卡并行队列、新任务默认建立后 3 个工作日截止、Dashboard 右侧任务日志抽屉与微信对话追记/回查备注全链路实证（139 绿 + 14/14 黄金 + 生产实弹） |

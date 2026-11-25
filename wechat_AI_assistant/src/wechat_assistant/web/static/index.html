@@ -1018,6 +1018,255 @@
     }
     .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
 
+    /* Task Updates / Comments Trigger & Slide-Over Drawer */
+    .updates-trigger-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      height: 24px;
+      padding: 0 7px;
+      border-radius: 999px;
+      border: 1px solid #d9deea;
+      background: #f8f9fc;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.14s;
+    }
+    .updates-trigger-btn:hover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      color: var(--primary-text);
+    }
+    .updates-trigger-btn.has-notes {
+      border-color: #99caff;
+      background: #e8f3ff;
+      color: var(--primary-text);
+    }
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 27, 52, 0.36);
+      backdrop-filter: blur(2px);
+      z-index: 105;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .task-drawer {
+      width: 540px;
+      max-width: 100vw;
+      height: 100vh;
+      background: #ffffff;
+      box-shadow: -10px 0 36px rgba(24, 27, 52, 0.18);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .drawer-head {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: #fafbfe;
+    }
+    .drawer-head-main { flex: 1; min-width: 0; }
+    .drawer-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .drawer-title-input {
+      width: 100%;
+      border: 1px solid transparent;
+      background: transparent;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 3px 6px;
+      margin-left: -6px;
+      border-radius: 6px;
+    }
+    .drawer-title-input:hover { border-color: var(--border); background: #ffffff; }
+    .drawer-title-input:focus { outline: none; border-color: var(--primary); background: #ffffff; }
+    .drawer-close-btn {
+      width: 30px; height: 30px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text-secondary);
+      font-size: 18px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .drawer-close-btn:hover { background: #f0f2f7; color: var(--text); }
+    .drawer-details-bar {
+      padding: 8px 20px;
+      border-bottom: 1px solid var(--border-light);
+      background: #ffffff;
+    }
+    .drawer-details-toggle {
+      background: transparent;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px 0;
+    }
+    .drawer-details-toggle:hover { color: var(--primary); }
+    .drawer-details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+      margin-top: 10px;
+      padding-bottom: 6px;
+    }
+    .drawer-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+    .drawer-field input {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 12.5px;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
+      color: var(--text);
+      background: #fafbfe;
+    }
+    .drawer-field input:focus { outline: none; border-color: var(--primary); background: #ffffff; }
+    .drawer-composer {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-light);
+      background: #f8faff;
+    }
+    .drawer-kind-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .drawer-kind-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .drawer-kind-pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+    .drawer-textarea {
+      width: 100%;
+      min-height: 74px;
+      max-height: 180px;
+      resize: vertical;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text);
+      background: #ffffff;
+    }
+    .drawer-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 115, 234, 0.12); }
+    .drawer-composer-foot {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .drawer-hint { font-size: 11.5px; color: var(--text-muted); }
+    .drawer-filter-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 10px 20px 0;
+      border-bottom: 1px solid var(--border-light);
+      background: #ffffff;
+    }
+    .drawer-filter-tab {
+      border: none;
+      background: transparent;
+      padding: 7px 10px 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .drawer-filter-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .drawer-feed {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 20px 24px;
+      background: #f6f7fb;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .log-card {
+      background: #ffffff;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .log-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .log-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .log-tag-comment { background: #e8f3ff; color: #0052a8; }
+    .log-tag-progress { background: #e6f9f0; color: #007a47; }
+    .log-tag-mail { background: #f3e8ff; color: #6b21a8; }
+    .log-tag-eval { background: #fff4db; color: #9a5b00; }
+    .log-time { font-size: 11.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+    .log-party { font-size: 11.5px; color: var(--text-secondary); margin-bottom: 4px; }
+    .log-body {
+      font-size: 13.5px;
+      line-height: 1.58;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
     /* Toast */
     .toast-stack {
       position: fixed;
@@ -1253,6 +1502,8 @@
   <div id="popover-root"></div>
   <!-- Modal Container -->
   <div id="modal-root"></div>
+  <!-- Task Updates & Comments Drawer -->
+  <div id="drawer-root"></div>
   <!-- Toast Notifications -->
   <div id="toast-stack" class="toast-stack"></div>
 
@@ -1299,7 +1550,16 @@
     let STATE = null;
     let ACTIVE_VIEW = "table";
     let SELECTED_WL_DATE = null;
+    let DRAWER_ITEM_ID = null;
+    let DRAWER_NOTE_KIND = "comment";
+    let DRAWER_FILTER = "all";
+    let DRAWER_SHOW_DETAILS = false;
     const COLLAPSED_GROUPS = {};
+
+    function itemTotalNotes(item) {
+      if (!item) return 0;
+      return (item.comments || []).length + (item.ceo_evaluation || []).length + (item.timeline || []).length;
+    }
 
     function escHtml(v) {
       return String(v == null ? "" : v)
@@ -1575,6 +1835,7 @@
           const own = displayOwner(item.owner);
           const proj = displayProject(item.project_name);
           const isIdea = item.list_type === "idea" && item.status !== "done";
+          const noteCnt = itemTotalNotes(item);
 
           return `
             <div class="grid-row item-row">
@@ -1586,6 +1847,10 @@
                   <span class="item-id-badge">#${item.id}</span>
                   <span class="source-badge ${src.cls}" title="${escHtml(src.title)}">${escHtml(src.label)}</span>
                   <input class="inline-text-input" value="${escHtml(item.title)}" onchange="patchField(${item.id}, 'title', this.value)" />
+                  <button class="updates-trigger-btn ${noteCnt > 0 ? "has-notes" : ""}" onclick="openTaskDrawer(${item.id})" title="查看与添加任务备注/日志（共 ${noteCnt} 条）">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    <span>${noteCnt > 0 ? noteCnt : "日志"}</span>
+                  </button>
                   <div class="row-actions ${isIdea ? "always-show" : ""}">
                     ${isIdea ? `<button class="mini-pill-btn" onclick="openPromoteModal(${item.id})">Promote</button>` : ""}
                     <button class="icon-del-btn" title="Delete item" onclick="deleteItem(${item.id})">&times;</button>
@@ -2104,10 +2369,14 @@
       const dayItemsHtml = (activeDay?.items || []).map(it => {
         const full = allById[it.id] || {};
         const spanD = full.planned_span_days || 1;
+        const nCnt = itemTotalNotes(full);
         return `
-          <div class="grid-row" style="grid-template-columns:60px 1fr 110px 100px;border-left:4px solid var(--primary);">
+          <div class="grid-row" style="grid-template-columns:60px 1fr 110px 100px;border-left:4px solid var(--primary);cursor:pointer;" onclick="openTaskDrawer(${it.id})">
             <div class="cell" style="color:var(--text-muted);">#${it.id}</div>
-            <div class="cell cell-left" style="font-weight:600;">${escHtml(it.title)}</div>
+            <div class="cell cell-left" style="font-weight:600;gap:8px;">
+              <span>${escHtml(it.title)}</span>
+              ${nCnt > 0 ? `<span class="updates-trigger-btn has-notes" style="height:20px;font-size:11px;">💬 ${nCnt}</span>` : ""}
+            </div>
             <div class="cell bleed-cell"><span class="bleed-btn" style="background:${prioMeta(it.priority).color};">${prioMeta(it.priority).label}</span></div>
             <div class="cell" style="font-weight:700;">${spanD}d span</div>
           </div>
@@ -2256,9 +2525,263 @@
       `;
     }
 
+    /* ---------- Task Updates & Chronological Notes Drawer ---------- */
+    function openTaskDrawer(itemId) {
+      DRAWER_ITEM_ID = Number(itemId);
+      DRAWER_FILTER = "all";
+      renderTaskDrawer();
+      setTimeout(() => {
+        const ta = document.getElementById("drawer-note-input");
+        if (ta) ta.focus();
+      }, 40);
+    }
+
+    function closeTaskDrawer() {
+      DRAWER_ITEM_ID = null;
+      const root = document.getElementById("drawer-root");
+      if (root) root.innerHTML = "";
+    }
+
+    function setDrawerKind(kind) {
+      DRAWER_NOTE_KIND = kind;
+      renderTaskDrawer();
+      const ta = document.getElementById("drawer-note-input");
+      if (ta) ta.focus();
+    }
+
+    function setDrawerFilter(filterKey) {
+      DRAWER_FILTER = filterKey;
+      renderTaskDrawer();
+    }
+
+    function toggleDrawerDetails() {
+      DRAWER_SHOW_DETAILS = !DRAWER_SHOW_DETAILS;
+      renderTaskDrawer();
+    }
+
+    function collectUnifiedLogs(item) {
+      const entries = [];
+      (item.comments || []).forEach((c, idx) => {
+        const isObj = c && typeof c === "object";
+        const ts = isObj ? (c.timestamp || c.date || "") : "";
+        const body = isObj ? (c.content || "") : String(c || "");
+        if (body) {
+          entries.push({
+            kind: "comment",
+            tagLabel: "📝 备注日志",
+            tagCls: "log-tag-comment",
+            time: ts,
+            sortKey: `${ts || "0000-00-00"}_${String(idx).padStart(4, "0")}`,
+            party: "",
+            body
+          });
+        }
+      });
+      (item.ceo_evaluation || []).forEach((ev, idx) => {
+        const isObj = ev && typeof ev === "object";
+        const ts = isObj ? (ev.timestamp || ev.date || "") : "";
+        const body = isObj ? (ev.content || "") : String(ev || "");
+        if (body) {
+          entries.push({
+            kind: "ceo_evaluation",
+            tagLabel: "⭐ CEO 评价",
+            tagCls: "log-tag-eval",
+            time: ts,
+            sortKey: `${ts || "0000-00-00"}_${String(idx).padStart(4, "0")}`,
+            party: "",
+            body
+          });
+        }
+      });
+      const chMap = {
+        wechat: { label: "💬 微信进展", cls: "log-tag-progress" },
+        web: { label: "📌 驾驶舱进展", cls: "log-tag-progress" },
+        mail_in: { label: "📧 邮件收件", cls: "log-tag-mail" },
+        mail_out: { label: "📤 邮件发件", cls: "log-tag-mail" }
+      };
+      (item.timeline || []).forEach((t, idx) => {
+        const chInfo = chMap[(t.channel || "wechat").toLowerCase()] || chMap.wechat;
+        const ts = t.timestamp || "";
+        const who = t.from_party
+          ? (t.to_party ? `${t.from_party} → ${t.to_party}` : t.from_party)
+          : "";
+        if (t.summary) {
+          entries.push({
+            kind: "progress",
+            tagLabel: chInfo.label,
+            tagCls: chInfo.cls,
+            time: ts,
+            sortKey: `${ts || "0000-00-00"}_${String(idx).padStart(4, "0")}`,
+            party: who,
+            body: t.summary
+          });
+        }
+      });
+      entries.sort((a, b) => (b.sortKey > a.sortKey ? 1 : (b.sortKey < a.sortKey ? -1 : 0)));
+      return entries;
+    }
+
+    function renderTaskDrawer() {
+      const root = document.getElementById("drawer-root");
+      if (!root || DRAWER_ITEM_ID === null || !STATE) {
+        if (root) root.innerHTML = "";
+        return;
+      }
+      const item = (STATE.items || []).find(x => Number(x.id) === Number(DRAWER_ITEM_ID));
+      if (!item) {
+        closeTaskDrawer();
+        return;
+      }
+      const prevDraft = (document.getElementById("drawer-note-input") || {}).value || "";
+      const st = statusMeta(item);
+      const src = sourceMeta(item.source_channel);
+      const dm = domainMeta(item.work_domain);
+      const allLogs = collectUnifiedLogs(item);
+      const cCnt = allLogs.filter(x => x.kind === "comment").length;
+      const pCnt = allLogs.filter(x => x.kind === "progress").length;
+      const eCnt = allLogs.filter(x => x.kind === "ceo_evaluation").length;
+      const filteredLogs = DRAWER_FILTER === "all" ? allLogs : allLogs.filter(x => x.kind === DRAWER_FILTER);
+
+      const placeholders = {
+        comment: "记录今天关于此任务的想法、沟通要点、技术约束或提醒…（Cmd+Enter 快速保存）",
+        progress: "记录此任务的阶段进展、最新沟通结果或交付动态…（Cmd+Enter 快速保存）",
+        ceo_evaluation: "写下对此任务的 CEO 评价、管理批示或重点要求…（Cmd+Enter 快速保存）"
+      };
+
+      const feedHtml = filteredLogs.length
+        ? filteredLogs.map(log => `
+            <article class="log-card">
+              <div class="log-card-head">
+                <span class="log-tag ${log.tagCls}">${escHtml(log.tagLabel)}</span>
+                <span class="log-time">${escHtml(log.time || "—")}</span>
+              </div>
+              ${log.party ? `<div class="log-party">${escHtml(log.party)}</div>` : ""}
+              <div class="log-body">${escHtml(log.body)}</div>
+            </article>
+          `).join("")
+        : `<div style="text-align:center;color:var(--text-muted);padding:32px 12px;font-size:13px;">
+             还没有相关记录。在上方输入今天想到的事，点击「添加日志」即可按日期逐条留档。
+           </div>`;
+
+      root.innerHTML = `
+        <div class="drawer-backdrop" onclick="if(event.target===this) closeTaskDrawer()">
+          <aside class="task-drawer" role="dialog" aria-label="Task Updates & Logs">
+            <div class="drawer-head">
+              <div class="drawer-head-main">
+                <div class="drawer-meta-row">
+                  <span class="item-id-badge">#${item.id}</span>
+                  <span class="source-badge ${src.cls}">${escHtml(src.label)}</span>
+                  <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:${st.color};color:#fff;">${escHtml(st.label)}</span>
+                  <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:#eef1f8;color:var(--text-secondary);">${escHtml(displayProject(item.project_name))} · ${escHtml(dm.label)}</span>
+                </div>
+                <input class="drawer-title-input" value="${escHtml(item.title)}" onchange="patchField(${item.id}, 'title', this.value)" />
+              </div>
+              <button class="drawer-close-btn" onclick="closeTaskDrawer()" title="关闭 (Esc)">&times;</button>
+            </div>
+
+            <div class="drawer-details-bar">
+              <button class="drawer-details-toggle" onclick="toggleDrawerDetails()">
+                <span>${DRAWER_SHOW_DETAILS ? "▾ 收起任务详情字段" : "▸ 展开任务详情（交付成果 / 实施人 / 外部协作 / 卡点）"}</span>
+                <span style="color:var(--text-muted);font-weight:500;">${escHtml(fmtRange(item.planned_start_at, item.planned_end_at))}</span>
+              </button>
+              ${DRAWER_SHOW_DETAILS ? `
+                <div class="drawer-details-grid">
+                  <div class="drawer-field" style="grid-column:1 / span 2;">
+                    <label>目标与交付成果 (Deliverable)</label>
+                    <input value="${escHtml(item.deliverable || "")}" placeholder="可验收的交付成果" onchange="patchField(${item.id}, 'deliverable', this.value)" />
+                  </div>
+                  <div class="drawer-field">
+                    <label>实施人 (Assignee)</label>
+                    <input value="${escHtml(item.assignee || "")}" placeholder="实际执行同事" onchange="patchField(${item.id}, 'assignee', this.value)" />
+                  </div>
+                  <div class="drawer-field">
+                    <label>外部协作 (External Partner)</label>
+                    <input value="${escHtml(item.external_partner || "")}" placeholder="客户/供应商" onchange="patchField(${item.id}, 'external_partner', this.value)" />
+                  </div>
+                  <div class="drawer-field">
+                    <label>当前阶段 (Stage)</label>
+                    <input value="${escHtml(item.milestone_stage || "")}" placeholder="例如：原理图评审中" onchange="patchField(${item.id}, 'milestone_stage', this.value)" />
+                  </div>
+                  <div class="drawer-field">
+                    <label>当前卡点 (Blocker)</label>
+                    <input value="${escHtml(item.blocker_note || "")}" placeholder="无" onchange="patchField(${item.id}, 'blocker_note', this.value)" />
+                  </div>
+                </div>
+              ` : ""}
+            </div>
+
+            <div class="drawer-composer">
+              <div class="drawer-kind-bar">
+                <button class="drawer-kind-pill ${DRAWER_NOTE_KIND === "comment" ? "active" : ""}" onclick="setDrawerKind('comment')">📝 备注 / 日志</button>
+                <button class="drawer-kind-pill ${DRAWER_NOTE_KIND === "progress" ? "active" : ""}" onclick="setDrawerKind('progress')">📌 阶段进展</button>
+                <button class="drawer-kind-pill ${DRAWER_NOTE_KIND === "ceo_evaluation" ? "active" : ""}" onclick="setDrawerKind('ceo_evaluation')">⭐ CEO 评价</button>
+              </div>
+              <textarea
+                id="drawer-note-input"
+                class="drawer-textarea"
+                placeholder="${escHtml(placeholders[DRAWER_NOTE_KIND] || placeholders.comment)}"
+                onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();submitDrawerNote(${item.id});}"
+              >${escHtml(prevDraft)}</textarea>
+              <div class="drawer-composer-foot">
+                <span class="drawer-hint">自动按当前日期时间追加留档 · 微信对话也可随时给 #${item.id} 记备注</span>
+                <button id="drawer-submit-btn" class="btn btn-primary" onclick="submitDrawerNote(${item.id})">添加日志</button>
+              </div>
+            </div>
+
+            <div class="drawer-filter-tabs">
+              <button class="drawer-filter-tab ${DRAWER_FILTER === "all" ? "active" : ""}" onclick="setDrawerFilter('all')">全部 (${allLogs.length})</button>
+              <button class="drawer-filter-tab ${DRAWER_FILTER === "comment" ? "active" : ""}" onclick="setDrawerFilter('comment')">备注日志 (${cCnt})</button>
+              <button class="drawer-filter-tab ${DRAWER_FILTER === "progress" ? "active" : ""}" onclick="setDrawerFilter('progress')">进展/往来 (${pCnt})</button>
+              <button class="drawer-filter-tab ${DRAWER_FILTER === "ceo_evaluation" ? "active" : ""}" onclick="setDrawerFilter('ceo_evaluation')">CEO 评价 (${eCnt})</button>
+            </div>
+
+            <div class="drawer-feed">${feedHtml}</div>
+          </aside>
+        </div>
+      `;
+    }
+
+    async function submitDrawerNote(itemId) {
+      const ta = document.getElementById("drawer-note-input");
+      const btn = document.getElementById("drawer-submit-btn");
+      const content = (ta ? ta.value : "").trim();
+      if (!content) {
+        showToast("请先输入要记录的内容");
+        if (ta) ta.focus();
+        return;
+      }
+      if (btn) btn.disabled = true;
+      try {
+        await api(`/api/items/${itemId}/note`, {
+          method: "POST",
+          body: JSON.stringify({ kind: DRAWER_NOTE_KIND, content })
+        });
+        if (ta) ta.value = "";
+        showToast(`已记录到任务 #${itemId}`);
+        await loadOverview();
+        const freshTa = document.getElementById("drawer-note-input");
+        if (freshTa) {
+          freshTa.value = "";
+          freshTa.focus();
+        }
+      } catch (e) {
+        showToast("保存失败：" + (e.message || e));
+      } finally {
+        const freshBtn = document.getElementById("drawer-submit-btn");
+        if (freshBtn) freshBtn.disabled = false;
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && DRAWER_ITEM_ID !== null) {
+        closeTaskDrawer();
+      }
+    });
+
     async function loadOverview() {
       STATE = await api("/api/dashboard/overview");
       renderActiveView();
+      if (DRAWER_ITEM_ID !== null) renderTaskDrawer();
     }
 
     async function boot() {

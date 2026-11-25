@@ -758,7 +758,7 @@ class Database:
             if not row:
                 return None
             notes = _safe_json_list(row["comments"])
-            notes.append({"date": d_str, "content": clean[:500]})
+            notes.append({"date": d_str, "timestamp": now[:16], "content": clean[:500]})
             conn.execute(
                 "UPDATE list_items SET comments = ?, updated_at = ? WHERE id = ?",
                 (json.dumps(notes, ensure_ascii=False), now, int(item_id)),
@@ -784,7 +784,7 @@ class Database:
             if not row:
                 return None
             notes = _safe_json_list(row["ceo_evaluation"])
-            notes.append({"date": d_str, "content": clean[:500]})
+            notes.append({"date": d_str, "timestamp": now[:16], "content": clean[:500]})
             conn.execute(
                 "UPDATE list_items SET ceo_evaluation = ?, updated_at = ? WHERE id = ?",
                 (json.dumps(notes, ensure_ascii=False), now, int(item_id)),
