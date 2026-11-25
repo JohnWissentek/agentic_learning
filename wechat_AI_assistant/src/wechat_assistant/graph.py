@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import sqlite3
 import threading
+import uuid
+import weakref
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any, Callable, TypedDict
@@ -14,7 +17,7 @@ from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import END, StateGraph
 from pydantic import BaseModel, Field
 
-from wechat_assistant.config import DashScopeLLMGateway, Settings, assert_no_secrets_leaked
+from wechat_assistant.config import DashScopeLLMGateway, Settings, assert_no_secrets_leaked, redact_secrets
 from wechat_assistant.context_assembler import ContextAssembler, extract_topic_tags
 from wechat_assistant.nodes.critic_rules import deterministic_critic_check
 from wechat_assistant.prompts.system_prompts import (
@@ -27,13 +30,13 @@ from wechat_assistant.prompts.system_prompts import (
 )
 from wechat_assistant.schemas import ActionMutation, CriticVerdict, IntentRoute, ListType, TriageProposal
 from wechat_assistant.storage.db import Database
-from wechat_assistant.storage.extractors import extract_document_pages, parse_excel_quote_rows
-from wechat_assistant.tools.calc_tools import analyze_excel_quote
+from wechat_assistant.storage.extractors import extract_document_pages
 from wechat_assistant.tools.guard import ApprovalToken, before_tool_callback
 from wechat_assistant.tools.memory_tools import hybrid_search, read_doc_pages
 from wechat_assistant.tools.onedrive_tools import OneDrive21VianetClient
 from wechat_assistant.tools.schedule_tools import calc_business_date, check_workload_and_schedule
-from wechat_assistant.tools.search_tools import search_public_tech_intel
+
+logger = logging.getLogger("uvicorn.error")
 
 
 class QAGroundedAnswer(BaseModel):
@@ -63,12 +66,16 @@ class WorkflowState(TypedDict, total=False):
     external_msg_id: str
     attachments: list[dict[str, Any]]
     source_ids: list[int]
+    ingested_att_text: str
     intent: str
-    needs_deep_research: bool
     resolved_text: str
     search_queries: list[str]
     target_item_id: int | None
     actual_hours: float | None
+    note_kind: str
+    note_content: str
+    update_field: str
+    update_value: str
     clarify_question: str
     rolling_summary_text: str
     project_context_text: str
@@ -80,8 +87,6 @@ class WorkflowState(TypedDict, total=False):
     evidence_cards: list[dict[str, Any]]
     evidence_text: str
     schedule_snapshot: dict[str, Any]
-    excel_diff: dict[str, Any] | None
-    search_brief: dict[str, Any] | None
     tool_outputs_text: str
     user_correction: str
     proposal: dict[str, Any]
@@ -89,36 +94,158 @@ class WorkflowState(TypedDict, total=False):
     loop_count: int
     reply_text: str
     proposal_id: int | None
+    force_work_triage: bool
     trajectory: list[str]
 
 
 
 
-def format_decision_card(proposal_id: int, proposal: TriageProposal, cockpit_url: str = "") -> str:
-    """Format a compact high-density Chief-of-Staff HITL preview card for WeChat."""
-    lines = [f"📋 **确认 #{proposal_id}｜{proposal.headline}**", proposal.executive_summary]
+_MISSING_FIELD_LABELS: dict[str, str] = {
+    "project_name": "归属项目",
+    "deliverable": "目标与交付成果",
+    "owner": "负责人",
+    "assignee": "实施人",
+    "planned_end_at": "目标截止时间",
+}
+
+_CHANNEL_LABELS: dict[str, str] = {
+    "mail_in": "邮件",
+    "mail_out": "邮件",
+    "wechat": "微信",
+    "web": "驾驶舱",
+}
+
+
+def _short_ts(ts: str) -> str:
+    clean = (ts or "").strip()
+    if len(clean) >= 16 and clean[4:5] == "-" and clean[7:8] == "-":
+        return clean[5:16]
+    return clean
+
+
+def _format_party_flow(from_party: str, to_party: str, cc_parties: list[str] | None = None) -> str:
+    base = f"{from_party}→{to_party}" if (from_party and to_party) else (from_party or to_party or "")
+    cc = [c.strip() for c in (cc_parties or []) if c and c.strip()]
+    if cc and base:
+        return f"{base}(抄送:{','.join(cc)})"
+    if cc:
+        return f"抄送:{','.join(cc)}"
+    return base
+
+
+def format_decision_card(
+    proposal_id: int,
+    proposal: TriageProposal,
+    cockpit_url: str = "",
+    critic_issues: list[str] | None = None,
+) -> str:
+    """Format a v2.0 flat independent task-card HITL preview aligned strictly with report_templates."""
+    clean_headline = re.sub(
+        r"^(?:确认\s*#?\d*\s*[｜|:\-：]\s*)+",
+        "",
+        (proposal.headline or "").strip(),
+    ).strip() or (proposal.headline or "").strip()
+
+    lines = [f"📋 确认 #{proposal_id}｜{clean_headline}"]
+    if proposal.executive_summary:
+        lines.append(proposal.executive_summary)
+
+    missing_summary: list[str] = []
     if proposal.actions:
-        lines.append("\n**拟入库动作与日程跨度：**")
+        lines.append("\n【一、拟新建独立任务卡】")
         for idx, act in enumerate(proposal.actions, 1):
-            span = (
-                act.planned_start_at
-                if act.planned_start_at == act.planned_end_at
-                else f"{act.planned_start_at} ~ {act.planned_end_at}"
-            )
-            try:
-                span_days = max(1, (date.fromisoformat(act.planned_end_at[:10]) - date.fromisoformat(act.planned_start_at[:10])).days + 1)
-            except ValueError:
-                span_days = 1
-            hr_note = f"｜指定工时 `{act.estimated_hours}h`" if act.estimated_hours and act.estimated_hours > 0 else ""
+            owner_str = (act.owner or "本人").strip() or "本人"
+            raw_assignee = (act.assignee or "").strip()
+            if raw_assignee:
+                assignee_str = raw_assignee
+            elif "assignee" in (act.missing_required_fields or []) or act.chairman_role == "cc_observer":
+                assignee_str = "【待补齐】"
+            else:
+                assignee_str = owner_str
+            ext_str = (act.external_partner or "").strip() or "无"
+            deliverable_str = (act.deliverable or "").strip() or act.title
+            stage_str = (act.milestone_stage or "已启动").strip()
+            start_str = (act.planned_start_at or "").strip() or "-"
+            end_str = (act.planned_end_at or "").strip()
+            if end_str:
+                try:
+                    span_days = max(1, (date.fromisoformat(end_str[:10]) - date.fromisoformat(start_str[:10])).days + 1)
+                    sched_str = f"开始 {start_str} → 目标截止：{end_str}（{span_days}天）"
+                except ValueError:
+                    sched_str = f"开始 {start_str} → 目标截止：{end_str}"
+            else:
+                sched_str = f"开始 {start_str} → 目标截止：【待补齐】"
+            hr_note = f"｜指定工时 {act.estimated_hours}h" if act.estimated_hours and act.estimated_hours > 0 else ""
+
             lines.append(
-                f"{idx}. `[{act.priority.value}][{act.list_type.value}]` **{act.project_name}**（{act.work_domain.value}）："
-                f"{act.title}｜周期 `{span}`（{span_days}天）{hr_note}"
+                f"▸ 新任务 {idx}：{act.title}"
+                f"（归属：{act.project_name} / {act.work_domain.value}｜{act.priority.value}）"
             )
+            lines.append(f"  1）目标与交付成果：{deliverable_str}")
+            if act.timeline:
+                lines.append(f"  2）当前进度与往来沟通：{stage_str}")
+                for entry in act.timeline[-3:]:
+                    ch_label = _CHANNEL_LABELS.get(entry.channel, "沟通")
+                    who = _format_party_flow(entry.from_party, entry.to_party, entry.cc_parties)
+                    meta_parts = [p for p in (_short_ts(entry.timestamp), ch_label, who) if p]
+                    lines.append(f"     - [{'｜'.join(meta_parts)}] {entry.summary}")
+            else:
+                lines.append(f"  2）当前进度与往来沟通：{stage_str}")
+            lines.append(
+                f"  3）责任分工：负责人：{owner_str} ｜ 实施人：{assignee_str} ｜ 外部协作：{ext_str}"
+            )
+            lines.append(f"  4）时间排期：{sched_str}{hr_note}")
+            blocker_txt = (act.blocker_note or "").strip()
+            files_txt = ", ".join(act.linked_files) if act.linked_files else ""
+            has_conv = bool(act.mail_conversation_ids)
+            if blocker_txt or files_txt or has_conv:
+                tail_parts = [blocker_txt or "无"]
+                if files_txt:
+                    tail_parts.append(f"档案：{files_txt}")
+                if has_conv:
+                    tail_parts.append("会话已自动绑定")
+                lines.append(f"  5）卡点与关联档案：{' ｜ '.join(tail_parts)}")
+            if act.comments:
+                cmt_txt = "；".join(c.content for c in act.comments[-2:])
+                lines.append(f"  6）补充备注（Comments）：{cmt_txt}")
+            if act.ceo_evaluation:
+                ev_txt = act.ceo_evaluation[-1].content
+                lines.append(f"  7）CEO 评价：{ev_txt}")
+
+            if act.missing_required_fields:
+                labels = [_MISSING_FIELD_LABELS.get(f, f) for f in act.missing_required_fields]
+                missing_summary.append(f"- 新任务 {idx} 缺少：{'、'.join(labels)}")
+
+    if proposal.task_updates:
+        lines.append("\n【二、拟追加到已有在途任务的往来沟通】")
+        for upd in proposal.task_updates:
+            tl = upd.timeline_entry
+            title_part = f"《{upd.target_task_title}》" if upd.target_task_title else ""
+            ch_label = _CHANNEL_LABELS.get(tl.channel, "沟通")
+            who = _format_party_flow(tl.from_party, tl.to_party, tl.cc_parties)
+            meta_parts = [p for p in (_short_ts(tl.timestamp), ch_label, who) if p]
+            stage_note = f"（状态更新：{upd.milestone_stage_update}）" if upd.milestone_stage_update else ""
+            lines.append(f"- 归入 任务 #{upd.target_task_id}{title_part}：")
+            lines.append(f"  ↳ [{'｜'.join(meta_parts)}] {tl.summary}{stage_note}")
+
+    if proposal.fyi_notices:
+        lines.append("\n【三、纯知会与团队进展同步】")
+        for fyi in proposal.fyi_notices:
+            who = _format_party_flow(fyi.from_party, fyi.to_party)
+            meta_parts = [p for p in (_short_ts(fyi.timestamp), "抄送知会", who) if p]
+            lines.append(f"- [{'｜'.join(meta_parts)}] {fyi.summary}")
+
+    if missing_summary:
+        lines.append("\n⚠️ 缺失必填提示：\n" + "\n".join(missing_summary))
     if proposal.overload_warning:
-        lines.append(f"\n⚠️ **负荷提醒**：{proposal.overload_warning}")
+        lines.append(f"\n⚠️ 负荷提醒：{proposal.overload_warning}")
+    if critic_issues:
+        clean_issues = [str(x).strip() for x in critic_issues if str(x).strip()]
+        if clean_issues:
+            lines.append(f"\n⚠️ 审计待人工复核点：{'；'.join(clean_issues)}")
     if proposal.citations:
-        lines.append(f"\n📎 **证据出处**：{'; '.join(proposal.citations)}")
-    lines.append("\n回复 `1` 确认落盘 ｜ `2` 仅存想法 ｜ `改：<意见>` 调整重算")
+        lines.append(f"\n📎 证据出处：{'; '.join(proposal.citations)}")
+    lines.append("\n👉 回复 1 确认落盘 ｜ 2 仅存想法 ｜ 0 作废 ｜ 改：<补全或调整意见> 重算")
     if cockpit_url:
         lines.append(f"📊 驾驶舱：{cockpit_url}")
     return "\n".join(lines)
@@ -126,6 +253,158 @@ def format_decision_card(proposal_id: int, proposal: TriageProposal, cockpit_url
 
 _COCKPIT_EXACT = {"看板", "驾驶舱", "页面", "dashboard"}
 _WORKLOAD_EXACT = {"负荷", "待办", "今日待办", "todo"}
+
+
+def _direct_note_or_timeline_shortcut(raw_text: str) -> dict[str, Any] | None:
+    """Deterministic zero-LLM parser for v2.0 task note/evaluation/progress/timeline/field-update shortcuts."""
+    text = (raw_text or "").strip()
+    if not text:
+        return None
+    m_eval = re.match(r"^评价\s*#?(\d+)\s*[：:\s]\s*(.*)$", text, flags=re.DOTALL)
+    if m_eval:
+        return {
+            "intent": "append_note",
+            "target_item_id": int(m_eval.group(1)),
+            "note_kind": "ceo_evaluation",
+            "note_content": m_eval.group(2).strip(),
+        }
+    m_cmt = re.match(r"^备注\s*#?(\d+)\s*[：:\s]\s*(.*)$", text, flags=re.DOTALL)
+    if m_cmt:
+        return {
+            "intent": "append_note",
+            "target_item_id": int(m_cmt.group(1)),
+            "note_kind": "comment",
+            "note_content": m_cmt.group(2).strip(),
+        }
+    m_prog = re.match(r"^#?(\d+)\s*(?:进展|进度)\s*[：:\s]\s*(.*)$", text, flags=re.DOTALL)
+    if m_prog:
+        return {
+            "intent": "append_note",
+            "target_item_id": int(m_prog.group(1)),
+            "note_kind": "progress",
+            "note_content": m_prog.group(2).strip(),
+        }
+    m_view = re.match(r"^查\s*#?(\d+)\s*(?:沟通记录|时间轴|往来记录|进展记录)$", text)
+    if m_view:
+        return {
+            "intent": "view_timeline",
+            "target_item_id": int(m_view.group(1)),
+        }
+    m_due = re.match(
+        r"^#?(\d+)\s*(?:目标截止日期|目标截止时间|截止日期|截止时间|截止日|截止)\s*(?:改到|改为|改成|调整为|更新为|设为|：|:)\s*(.+)$",
+        text,
+    )
+    if m_due:
+        return {
+            "intent": "update_item_fields",
+            "target_item_id": int(m_due.group(1)),
+            "update_field": "planned_end_at",
+            "update_value": m_due.group(2).strip(),
+        }
+    m_assignee = re.match(
+        r"^#?(\d+)\s*(?:实施人|执行人)\s*(?:改为|改成|指定为|更新为|设为|：|:)\s*(.+)$",
+        text,
+    )
+    if m_assignee:
+        return {
+            "intent": "update_item_fields",
+            "target_item_id": int(m_assignee.group(1)),
+            "update_field": "assignee",
+            "update_value": m_assignee.group(2).strip(),
+        }
+    m_owner = re.match(
+        r"^#?(\d+)\s*(?:负责人)\s*(?:改为|改成|指定为|更新为|设为|：|:)\s*(.+)$",
+        text,
+    )
+    if m_owner:
+        return {
+            "intent": "update_item_fields",
+            "target_item_id": int(m_owner.group(1)),
+            "update_field": "owner",
+            "update_value": m_owner.group(2).strip(),
+        }
+    return None
+
+
+_TRUSTED_META_BLOCK_RE = re.compile(
+    r"\[SYSTEM_TRUSTED_MAIL_META\](.*?)\[/SYSTEM_TRUSTED_MAIL_META\]",
+    flags=re.DOTALL,
+)
+
+
+def _extract_trusted_mail_conv_map(raw_text: str) -> tuple[dict[str, str], list[str]]:
+    """Parse `MAIL-k -> conversationId` ONLY from trusted system metadata blocks."""
+    ref_map: dict[str, str] = {}
+    ordered_convs: list[str] = []
+    for block in _TRUSTED_META_BLOCK_RE.findall(raw_text or ""):
+        m_ref = re.search(r"邮件编号：(MAIL-\d+)", block)
+        m_cid = re.search(r"会话号\(conversationId\)：(\S+)", block)
+        if m_cid:
+            cid = m_cid.group(1).strip()
+            if cid:
+                if cid not in ordered_convs:
+                    ordered_convs.append(cid)
+                if m_ref:
+                    ref_map[m_ref.group(1).strip()] = cid
+    return ref_map, ordered_convs
+
+
+def _backfill_mail_conversation_ids(proposal: TriageProposal, raw_text: str) -> TriageProposal:
+    """Deterministically resolve `MAIL-k` refs and backfill real Graph `conversationId` onto mail actions."""
+    ref_map, ordered_convs = _extract_trusted_mail_conv_map(raw_text)
+    if not ordered_convs:
+        return proposal
+
+    for idx, act in enumerate(proposal.actions):
+        resolved_cids: list[str] = []
+        for raw_cid in list(act.mail_conversation_ids or []):
+            clean = str(raw_cid or "").strip()
+            mapped = ref_map.get(clean, clean)
+            if mapped and mapped not in resolved_cids:
+                resolved_cids.append(mapped)
+        for tl in act.timeline or []:
+            raw_tl_cid = str(tl.mail_conversation_id or "").strip()
+            if raw_tl_cid:
+                mapped_tl = ref_map.get(raw_tl_cid, raw_tl_cid)
+                tl.mail_conversation_id = mapped_tl
+                if mapped_tl and mapped_tl not in resolved_cids:
+                    resolved_cids.append(mapped_tl)
+        if not resolved_cids:
+            if len(ordered_convs) == 1:
+                resolved_cids.append(ordered_convs[0])
+            elif len(proposal.actions) == 1:
+                resolved_cids.extend(ordered_convs)
+            elif idx < len(ordered_convs):
+                resolved_cids.append(ordered_convs[idx])
+        act.mail_conversation_ids = resolved_cids
+
+    for upd in proposal.task_updates or []:
+        raw_tl_cid = str(upd.timeline_entry.mail_conversation_id or "").strip()
+        if raw_tl_cid in ref_map:
+            upd.timeline_entry.mail_conversation_id = ref_map[raw_tl_cid]
+        elif not raw_tl_cid and len(ordered_convs) == 1:
+            upd.timeline_entry.mail_conversation_id = ordered_convs[0]
+
+    return proposal
+
+
+def _format_pure_fyi_message(proposal: TriageProposal) -> str:
+    """Format a read-only pure-FYI mail/message summary without creating a blocking pending card."""
+    clean_headline = re.sub(
+        r"^(?:确认\s*#?\d*\s*[｜|:\-：]\s*)+",
+        "",
+        (proposal.headline or "").strip(),
+    ).strip() or "团队进展与抄送知会"
+    lines = [f"📌 {clean_headline}（纯知会，不建任务卡）"]
+    if proposal.fyi_notices:
+        lines.append("\n【纯知会与团队进展同步】")
+        for fyi in proposal.fyi_notices:
+            who = _format_party_flow(fyi.from_party, fyi.to_party)
+            meta_parts = [p for p in (_short_ts(fyi.timestamp), "抄送知会", who) if p]
+            lines.append(f"- [{'｜'.join(meta_parts)}] {fyi.summary}")
+    elif proposal.executive_summary:
+        lines.append(proposal.executive_summary)
+    return "\n".join(lines)
 
 
 def _operational_override(raw_text: str, pending: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -156,10 +435,17 @@ def _operational_override(raw_text: str, pending: dict[str, Any] | None) -> dict
         if m_done.group(2):
             parsed["actual_hours"] = float(m_done.group(2))
         return parsed
+    multi_ids = re.findall(r"#(\d+)", text)
+    if len(multi_ids) >= 2 and any(
+        k in text for k in ("开始", "启动", "开工", "完成", "做完", "搞定", "结束", "闭环")
+    ):
+        return {"intent": "checkin", "resolved_text": text}
     if pending and text in {"1", "确认"}:
         return {"intent": "confirm_pending"}
     if pending and text in {"2", "仅存想法"}:
         return {"intent": "confirm_pending", "pending_ideas_only": True}
+    if pending and text in {"0", "取消", "放弃", "作废"}:
+        return {"intent": "discard_pending"}
     if pending and text.startswith(("改：", "改:")):
         corr = text[2:].strip()
         return {
@@ -204,6 +490,7 @@ class ChiefOfStaffEngine:
         ckpt_file = Path(checkpoints_path or Path(db.db_path).parent / "checkpoints.db")
         ckpt_file.parent.mkdir(parents=True, exist_ok=True)
         self._ckpt_conn = sqlite3.connect(str(ckpt_file), check_same_thread=False)
+        self._ckpt_finalizer = weakref.finalize(self, self._ckpt_conn.close)
         self._turn_lock = threading.RLock()
         self._progress_cb: Callable[[str], None] | None = None
         self.checkpointer = SqliteSaver(self._ckpt_conn)
@@ -214,11 +501,28 @@ class ChiefOfStaffEngine:
         if cb is not None:
             try:
                 cb(stage_label)
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.warning("Progress callback error: %s", type(exc).__name__)
+
+    @staticmethod
+    def _cleanup_pending_files(pending_files: list[dict[str, Any]]) -> None:
+        """Delete temporary cached attachment files once discarded or archived."""
+        for pf in pending_files or []:
+            raw_path = str(pf.get("path") or "").strip()
+            if not raw_path:
+                continue
+            try:
+                p = Path(raw_path)
+                if p.exists() and p.is_file():
+                    p.unlink(missing_ok=True)
+            except OSError as exc:
+                logger.warning("Failed to cleanup tmp attachment %s: %s", raw_path, type(exc).__name__)
 
     def close(self) -> None:
-        self._ckpt_conn.close()
+        if getattr(self, "_ckpt_finalizer", None) is not None and self._ckpt_finalizer.alive:
+            self._ckpt_finalizer()
+        else:
+            self._ckpt_conn.close()
 
     def _record_turn_pair(
         self,
@@ -308,8 +612,8 @@ class ChiefOfStaffEngine:
             latest = self.db.get_latest_episode_summary(thread_id)
             if latest and int(latest["last_turn_id"]) == last_turn_id:
                 self.db.upsert_episode_summary(thread_id, res.summary, last_turn_id=last_turn_id)
-        except Exception:
-            pass  # keep the extractive fallback summary
+        except Exception as exc:
+            logger.warning("Background semantic summary error: %s", type(exc).__name__)
 
     def _record_latest_call(self, rec) -> None:
         self.db.record_model_call(
@@ -322,68 +626,67 @@ class ChiefOfStaffEngine:
             success=rec.success,
         )
 
-    def _ingest_attachments_and_source(self, state: WorkflowState) -> tuple[list[int], list[list[dict[str, Any]]], str]:
+    def _ingest_attachments_and_source(self, state: WorkflowState) -> tuple[list[int], str]:
         """Extract pages from incoming files and index source text before reasoning."""
+        existing_ids = list(state.get("source_ids") or [])
+        if existing_ids:
+            return existing_ids, state.get("ingested_att_text", "")
+
         raw_text = state.get("raw_text", "")
         sender = state.get("sender", "owner")
         ext_id = state.get("external_msg_id")
         attachments = state.get("attachments") or []
 
-        all_pages: list[dict[str, Any]] = []
-        excel_tables: list[list[dict[str, Any]]] = []
         att_summaries: list[str] = []
-        source_ids: list[int] = list(state.get("source_ids") or [])
+        source_ids: list[int] = []
 
-        if not source_ids:
-            # First extract pages from each attachment and index each file as a dedicated raw_source too
-            main_id, _ = self.db.insert_raw_source(
-                source_type="wechat_msg",
-                external_msg_id=ext_id,
+        main_id, _ = self.db.insert_raw_source(
+            source_type="wechat_msg",
+            external_msg_id=ext_id,
+            sender=sender,
+            title=(raw_text.splitlines()[0][:60] if raw_text else "微信输入"),
+            raw_text=raw_text,
+            is_confidential=False,
+        )
+        source_ids.append(main_id)
+
+        for idx, att in enumerate(attachments):
+            fpath = Path(att.get("path", ""))
+            fname = att.get("filename") or fpath.name
+            pages = att.get("pages")
+            if pages is None and fpath.exists():
+                pages = extract_document_pages(fpath)
+            pages = pages or []
+
+            att_text = "\n".join(f"[第{p.get('page', 1)}页] {p.get('text', '')}" for p in pages)
+            att_summaries.append(f"附件《{fname}》（共{len(pages)}页）：{att_text[:1000]}")
+            att_msg_id = f"{ext_id}:att:{idx}" if ext_id else None
+            sid, _ = self.db.insert_raw_source(
+                source_type=fpath.suffix.lstrip(".") or "file",
+                external_msg_id=att_msg_id,
                 sender=sender,
-                title=(raw_text.splitlines()[0][:60] if raw_text else "微信输入"),
-                raw_text=raw_text,
-                is_confidential=False,
+                title=fname,
+                raw_text=att_text[:4000],
+                extracted_pages=pages,
             )
-            source_ids.append(main_id)
+            source_ids.append(sid)
 
-            for idx, att in enumerate(attachments):
-                fpath = Path(att.get("path", ""))
-                fname = att.get("filename") or fpath.name
-                pages = att.get("pages")
-                if pages is None and fpath.exists():
-                    pages = extract_document_pages(fpath)
-                    if fpath.suffix.lower() in {".xlsx", ".xlsm"}:
-                        excel_tables.append(parse_excel_quote_rows(fpath))
-                elif att.get("excel_rows"):
-                    excel_tables.append(att["excel_rows"])
-                pages = pages or []
-                all_pages.extend(pages)
+            if self.onedrive is not None and fpath.exists():
+                ym = date.today().strftime("%Y%m")
+                inbox_path = f"00_原件收件箱/{ym}/{fname}"
+                try:
+                    res = self.onedrive.upload_bytes(inbox_path, fpath.read_bytes())
+                    self.db.update_source_onedrive_paths(
+                        sid, raw_path=inbox_path, web_url=res.get("webUrl", "")
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        "OneDrive raw inbox backup failed for %s: %s",
+                        fname,
+                        redact_secrets(f"{type(exc).__name__}: {exc}", self.settings),
+                    )
 
-                att_text = "\n".join(f"[第{p.get('page', 1)}页] {p.get('text', '')}" for p in pages)
-                att_summaries.append(f"附件《{fname}》（共{len(pages)}页）：{att_text[:1000]}")
-                att_msg_id = f"{ext_id}:att:{idx}" if ext_id else None
-                sid, _ = self.db.insert_raw_source(
-                    source_type=fpath.suffix.lstrip(".") or "file",
-                    external_msg_id=att_msg_id,
-                    sender=sender,
-                    title=fname,
-                    raw_text=att_text[:4000],
-                    extracted_pages=pages,
-                )
-                source_ids.append(sid)
-
-                if self.onedrive is not None and fpath.exists():
-                    ym = date.today().strftime("%Y%m")
-                    inbox_path = f"00_原件收件箱/{ym}/{fname}"
-                    try:
-                        res = self.onedrive.upload_bytes(inbox_path, fpath.read_bytes())
-                        self.db.update_source_onedrive_paths(
-                            sid, raw_path=inbox_path, web_url=res.get("webUrl", "")
-                        )
-                    except Exception:
-                        pass
-
-        return source_ids, excel_tables, "\n".join(att_summaries)
+        return source_ids, "\n".join(att_summaries)
 
     # --- LangGraph nodes ---
 
@@ -402,11 +705,28 @@ class ChiefOfStaffEngine:
             "has_pending_proposal": bool(ctx.pending_proposal),
         }
 
+        direct_note = _direct_note_or_timeline_shortcut(raw_text)
+        if direct_note:
+            intent = str(direct_note.pop("intent"))
+            return {
+                **ctx_fields,
+                **direct_note,
+                "intent": intent,
+                "trajectory": traj + [f"tool:direct_shortcut={intent}"],
+            }
+
+        if state.get("force_work_triage"):
+            return {
+                **ctx_fields,
+                "intent": "work_triage",
+                "resolved_text": raw_text,
+                "trajectory": traj + ["tool:force_work_triage"],
+            }
+
         if state.get("user_correction"):
             return {
                 **ctx_fields,
                 "intent": "work_triage",
-                "needs_deep_research": False,
                 "resolved_text": state.get("user_correction", raw_text),
                 "trajectory": traj,
             }
@@ -420,7 +740,6 @@ class ChiefOfStaffEngine:
             return {
                 **ctx_fields,
                 "intent": "chitchat",
-                "needs_deep_research": False,
                 "reply_text": "您好，AI工作助理在线！您可以直接发送语音想法、转发聊天记录、文件，或发送 `看板` / `负荷`。",
                 "trajectory": traj,
             }
@@ -444,22 +763,19 @@ class ChiefOfStaffEngine:
             return {
                 **ctx_fields,
                 **forced_on_error,
-                "needs_deep_research": False,
                 "intent": intent,
                 "trajectory": traj + [f"tool:operational_override={intent}", f"tool:router_error={type(exc).__name__}"],
             }
         self._record_latest_call(rec)
 
         effective_intent = route.intent
-        explicit_search_req = bool(
-            re.search(r"(?:查一下|上网查|联网查|联网搜|搜一下|帮我查|查一查|查下)", raw_text)
-        )
         extra_updates: dict[str, Any] = {
-            "needs_deep_research": bool(route.needs_deep_research and explicit_search_req),
             "resolved_text": route.resolved_intent_text or raw_text,
             "search_queries": list(route.search_queries or []),
             "target_item_id": route.target_item_id,
             "actual_hours": route.actual_hours,
+            "note_kind": route.note_kind or "",
+            "note_content": route.note_content or "",
             "clarify_question": route.clarify_question or "",
         }
         # Low confidence only blocks new work assignment; short queries / check-ins keep flowing.
@@ -505,6 +821,19 @@ class ChiefOfStaffEngine:
             "trajectory": trajectory,
         }
 
+    def _safe_sync_onedrive(self) -> tuple[bool, str]:
+        if self.onedrive is None:
+            return True, ""
+        try:
+            urls = self.onedrive.sync_all_lists(self.db)
+            return True, urls.get("01_今日与行动待办.md", "")
+        except Exception as exc:
+            logger.warning(
+                "OneDrive board sync error: %s",
+                redact_secrets(f"{type(exc).__name__}: {exc}", self.settings),
+            )
+            return False, ""
+
     def _node_action_shortcut(self, state: WorkflowState) -> WorkflowState:
         intent = state.get("intent", "")
         thread_id = state.get("thread_id", "owner")
@@ -523,12 +852,106 @@ class ChiefOfStaffEngine:
             if not pending:
                 return {"reply_text": "当前没有可取消的待确认卡片。", "trajectory": traj}
             self.db.cancel_pending_proposal(int(pending["id"]))
+            self._cleanup_pending_files(pending.get("pending_files") or [])
             return {"reply_text": f"🗑️ 已作废待确认卡片 #{pending['id']}，未写入任何清单。", "trajectory": traj}
+
+        if intent == "update_item_fields":
+            tid = state.get("target_item_id")
+            field = (state.get("update_field") or "").strip()
+            val = (state.get("update_value") or "").strip()
+            if tid is None or not field or not val:
+                return {
+                    "reply_text": "请指明任务编号与修改内容（例如 `#1 截止改到 2026-12-05` 或 `#1 实施人改为 王楠`）。",
+                    "trajectory": traj,
+                }
+            existing = self.db.get_item(int(tid))
+            if not existing:
+                return {"reply_text": f"未找到任务编号 #{tid}。", "trajectory": traj}
+            if field == "planned_end_at":
+                try:
+                    if len(val) < 10:
+                        raise ValueError("short date")
+                    d_end = date.fromisoformat(val[:10])
+                    ps_raw = (existing.get("planned_start_at") or "").strip()
+                    if ps_raw:
+                        d_start = date.fromisoformat(ps_raw[:10])
+                        if d_end < d_start:
+                            return {
+                                "reply_text": f"⚠️ 目标截止日期 {val[:10]} 不能早于开始日期 {ps_raw[:10]}，未修改任务 #{tid}。",
+                                "trajectory": traj,
+                            }
+                    val = d_end.isoformat()
+                except ValueError:
+                    return {
+                        "reply_text": f"⚠️ 日期格式非法（{val}），请提供合法的 YYYY-MM-DD 日历日期（例如 `#1 截止改到 2026-12-05`）。",
+                        "trajectory": traj,
+                    }
+            updated = self.db.update_item_fields(int(tid), {field: val})
+            if not updated:
+                return {"reply_text": f"未找到任务编号 #{tid}。", "trajectory": traj}
+            od_ok, _ = self._safe_sync_onedrive()
+            sync_tail = "" if od_ok else "（本地已更新，云端同步稍后重试）"
+            field_lbl = {"planned_end_at": "目标截止时间", "assignee": "实施人", "owner": "负责人"}.get(field, field)
+            return {
+                "reply_text": f"✏️ 已更新任务 #{tid}《{updated['title']}》的{field_lbl}为：{val}{sync_tail}",
+                "trajectory": traj,
+            }
+
+        if intent == "append_note":
+            tid = state.get("target_item_id")
+            kind = (state.get("note_kind") or "").strip()
+            content = (state.get("note_content") or "").strip()
+            if tid is None or not content:
+                return {
+                    "reply_text": "请补充具体内容（例如 `评价 #1：推进偏慢`、`备注 #1：排除金属外壳` 或 `#1 进展：已发点表`）。",
+                    "trajectory": traj,
+                }
+            if kind == "ceo_evaluation":
+                item = self.db.append_task_ceo_evaluation(int(tid), content)
+                if not item:
+                    return {"reply_text": f"未找到任务编号 #{tid}。", "trajectory": traj}
+                od_ok, _ = self._safe_sync_onedrive()
+                sync_tail = "" if od_ok else "（本地已保存，云端同步稍后重试）"
+                return {"reply_text": f"💬 已为 #{tid}《{item['title']}》记录 CEO 评价：{content}{sync_tail}", "trajectory": traj}
+            if kind == "comment":
+                item = self.db.append_task_comment(int(tid), content)
+                if not item:
+                    return {"reply_text": f"未找到任务编号 #{tid}。", "trajectory": traj}
+                od_ok, _ = self._safe_sync_onedrive()
+                sync_tail = "" if od_ok else "（本地已保存，云端同步稍后重试）"
+                return {"reply_text": f"📝 已为 #{tid}《{item['title']}》追加补充备注：{content}{sync_tail}", "trajectory": traj}
+            entry = self.db.append_task_timeline(int(tid), summary=content, channel="wechat", from_party="徐宏玮")
+            if not entry:
+                return {"reply_text": f"未找到任务编号 #{tid}。", "trajectory": traj}
+            od_ok, _ = self._safe_sync_onedrive()
+            sync_tail = "" if od_ok else "（本地已保存，云端同步稍后重试）"
+            return {"reply_text": f"📌 已为 #{tid} 追加进展时间轴：[{entry['timestamp']}] {content}{sync_tail}", "trajectory": traj}
+
+        if intent == "view_timeline":
+            tid = state.get("target_item_id")
+            if tid is None:
+                return {"reply_text": "请指明要查询的任务编号（例如 `查 #1 沟通记录`）。", "trajectory": traj}
+            existing = self.db.get_item(int(tid))
+            if not existing:
+                return {"reply_text": f"未找到任务编号 #{tid}（当前不存在该任务）。", "trajectory": traj}
+            tl = existing.get("timeline") or []
+            if not tl:
+                return {"reply_text": f"任务 #{tid}《{existing['title']}》暂无沟通与进展记录。", "trajectory": traj}
+            lines = [f"🗂️ 任务 #{tid}《{existing['title']}》完整沟通与进展时间轴（共 {len(tl)} 条）："]
+            ch_map = {"wechat": "微信", "mail_in": "收件", "mail_out": "发件", "web": "驾驶舱"}
+            for e in tl:
+                ch_lbl = ch_map.get(e.get("channel", "wechat"), e.get("channel", ""))
+                who = _format_party_flow(e.get("from_party", ""), e.get("to_party", ""), e.get("cc_parties"))
+                who_part = f"｜{who}" if who else ""
+                lines.append(f"- [{_short_ts(e.get('timestamp', ''))}｜{ch_lbl}{who_part}] {e.get('summary', '')}")
+            return {"reply_text": "\n".join(lines), "trajectory": traj}
 
         if intent == "undo":
             ok, msg = self.db.undo_last_commit()
-            if ok and self.onedrive is not None:
-                self.onedrive.sync_all_lists(self.db)
+            if ok:
+                od_ok, _ = self._safe_sync_onedrive()
+                if not od_ok:
+                    msg += "（本地已回滚，云端同步稍后重试）"
             return {"reply_text": ("↩️ " if ok else "ℹ️ ") + msg, "trajectory": traj}
 
         if intent in {"mutate_existing_item", "checkin"}:
@@ -536,6 +959,7 @@ class ChiefOfStaffEngine:
             multi_hash_ids = [int(x) for x in re.findall(r"#(\d+)", raw_text)]
             if len(multi_hash_ids) >= 2:
                 results: list[str] = []
+                missing_ids: list[int] = []
                 for clause in re.split(r"[，,；;。\n]+", raw_text):
                     c_ids = [int(x) for x in re.findall(r"#(\d+)", clause)]
                     if not c_ids:
@@ -548,23 +972,32 @@ class ChiefOfStaffEngine:
                             it = self.db.start_item(cid)
                             if it:
                                 results.append(f"▶️ **#{it['id']}** 已开始：`{it['title']}`（{it['actual_start_at']}）")
+                            else:
+                                missing_ids.append(cid)
                         else:
                             it = self.db.complete_item(cid, actual_hours=state.get("actual_hours"))
                             if it:
                                 results.append(
                                     f"✅ **#{it['id']}** 已完成：`{it['title']}`（跨度 `{it.get('actual_span_days', 1)} 天`）"
                                 )
+                            else:
+                                missing_ids.append(cid)
                 if results:
-                    if self.onedrive is not None:
-                        self.onedrive.sync_all_lists(self.db)
-                    return {
-                        "reply_text": "已批量刷新进度（已同步云端 `.md`）：\n" + "\n".join(results),
-                        "trajectory": traj,
-                    }
+                    od_ok, _ = self._safe_sync_onedrive()
+                    sync_note = "（已同步云端 `.md`）" if od_ok else "（本地已保存，云端同步稍后重试）"
+                    lines = [f"已批量刷新进度{sync_note}："] + results
+                    if missing_ids:
+                        miss_str = "、".join(f"#{x}" for x in missing_ids)
+                        lines.append(f"⚠️ 以下待办编号未找到：{miss_str}")
+                    return {"reply_text": "\n".join(lines), "trajectory": traj}
+                if missing_ids:
+                    miss_str = "、".join(f"#{x}" for x in missing_ids)
+                    return {"reply_text": f"未找到以下待办编号：{miss_str}。", "trajectory": traj}
 
             target_id = state.get("target_item_id")
             if target_id is None:
-                m_id = re.search(r"#?(\d+)", raw_text)
+                stripped_hours = re.sub(r"\d+(?:\.\d+)?\s*(?:[hH]|小时)", "", raw_text)
+                m_id = re.search(r"#?(\d+)", stripped_hours)
                 target_id = int(m_id.group(1)) if m_id else None
             if target_id is None:
                 open_items = self.db.list_items(include_done=False)
@@ -576,30 +1009,37 @@ class ChiefOfStaffEngine:
                     "trajectory": traj,
                 }
             res_text = state.get("resolved_text") or raw_text
-            is_start = any(k in res_text for k in ("开始", "启动", "正在做", "开工")) and not any(
-                k in res_text for k in ("完成", "做完", "搞定", "结束", "闭环")
-            )
+            has_done_kw = any(k in res_text.lower() for k in ("完成", "做完", "搞定", "结束", "闭环", "done"))
+            is_start = any(k in res_text for k in ("开始", "启动", "正在做", "开工")) and not has_done_kw
             if is_start:
                 item = self.db.start_item(int(target_id))
                 if not item:
                     return {"reply_text": f"未找到待办编号 #{target_id}。", "trajectory": traj}
-                if self.onedrive is not None:
-                    self.onedrive.sync_all_lists(self.db)
+                od_ok, _ = self._safe_sync_onedrive()
+                sync_tail = "" if od_ok else "（本地已更新，云端同步稍后重试）"
                 return {
-                    "reply_text": f"▶️ 已记录 **#{item['id']}** 开始执行：`{item['title']}`（{item['actual_start_at']}）。",
+                    "reply_text": f"▶️ 已记录 **#{item['id']}** 开始执行：`{item['title']}`（{item['actual_start_at']}）{sync_tail}。",
+                    "trajectory": traj,
+                }
+            if not has_done_kw:
+                return {
+                    "reply_text": (
+                        f"暂未明确您要对 #{target_id} 执行的操作，为防止误结项未做改动。\n"
+                        f"可回复：完成 #{target_id} ｜ 开始 #{target_id} ｜ #{target_id} 截止改到 YYYY-MM-DD ｜ #{target_id} 进展：..."
+                    ),
                     "trajectory": traj,
                 }
             item = self.db.complete_item(int(target_id), actual_hours=state.get("actual_hours"))
             if not item:
                 return {"reply_text": f"未找到待办编号 #{target_id}。", "trajectory": traj}
-            if self.onedrive is not None:
-                self.onedrive.sync_all_lists(self.db)
+            od_ok, _ = self._safe_sync_onedrive()
             span_days = item.get("actual_span_days", 1)
             hrs_note = f"（指定实耗 {item['actual_hours']}h）" if (item.get("actual_hours") or 0) > 0 else ""
+            sync_tail = "（已同步刷新云端 `.md`）" if od_ok else "（本地已更新，云端同步稍后重试）"
             return {
                 "reply_text": (
                     f"✅ 已标记 **#{item['id']}** 完成：`{item['title']}`\n"
-                    f"实际完成跨度：**`{span_days} 天`**{hrs_note}（已同步刷新云端 `.md`）。"
+                    f"实际完成跨度：**`{span_days} 天`**{hrs_note}{sync_tail}。"
                 ),
                 "trajectory": traj,
             }
@@ -690,12 +1130,18 @@ class ChiefOfStaffEngine:
         for it in ev_pack["matched_items"][:10]:
             ev_blocks.append(
                 f"[待办记录 #{it['id']}] [{it['status']}][{it['priority']}][{it['list_type']}] "
-                f"{it['project_name']}: {it['title']} (责任人:{it['owner']}, 周期:{it['planned_start_at']}~{it['planned_end_at']})"
+                f"{it['project_name']}: {it['title']} "
+                f"(负责人:{it['owner']}, 实施人:{it.get('assignee') or it['owner']}, 外部:{it.get('external_partner') or '无'}, "
+                f"交付物:{it.get('deliverable') or '-'}, 阶段:{it.get('milestone_stage') or '-'}, "
+                f"卡点:{it.get('blocker_note') or '无'}, 周期:{it['planned_start_at']}~{it['planned_end_at'] or '待补齐'})"
             )
         for pj in ev_pack["matched_projects"][:5]:
             ev_blocks.append(
                 f"[在途项目] {pj['name']} ({pj['work_domain']}) 周期:{pj['planned_start_date']}~{pj['target_end_date']} 近况:{pj.get('latest_brief') or '-'}"
             )
+
+        if state.get("ingested_att_text"):
+            ev_blocks.append(f"本次随附文件提取内容：\n{state['ingested_att_text'][:2000]}")
 
         asks_about_pending = bool(
             ctx.pending_proposal
@@ -736,7 +1182,7 @@ class ChiefOfStaffEngine:
     def _node_react_investigator(self, state: WorkflowState) -> WorkflowState:
         self._emit_progress("2/5 正在提取附件文本并检索历史档案与排期")
         traj = list(state.get("trajectory") or []) + ["node:react_investigator"]
-        source_ids, excel_tables, att_text = self._ingest_attachments_and_source(state)
+        source_ids, att_text = self._ingest_attachments_and_source(state)
         query_text = state.get("raw_text", "")
         resolved = state.get("resolved_text") or query_text
         ctx = self.context_assembler.assemble(state.get("thread_id", "owner"), query_text)
@@ -755,16 +1201,6 @@ class ChiefOfStaffEngine:
             days=14,
         )
         traj.append("tool:check_workload_and_schedule")
-
-        excel_diff = None
-        if len(excel_tables) >= 2:
-            excel_diff = analyze_excel_quote(excel_tables[-2], excel_tables[-1])
-            traj.append("tool:analyze_excel_quote")
-
-        search_brief = None
-        if state.get("needs_deep_research"):
-            search_brief = search_public_tech_intel(resolved or query_text, self.settings)
-            traj.append("tool:search_public_tech_intel")
 
         cards: list[dict[str, Any]] = []
         for h in ev_pack["doc_hits"]:
@@ -789,8 +1225,6 @@ class ChiefOfStaffEngine:
             "source_ids": source_ids,
             "evidence_cards": cards,
             "schedule_snapshot": schedule,
-            "excel_diff": excel_diff,
-            "search_brief": search_brief,
             "trajectory": traj,
         }
 
@@ -815,10 +1249,6 @@ class ChiefOfStaffEngine:
                 f"未来7天每日排期密度（每日超过{sched.get('max_items_per_day', 5)}项视为拥挤）：{json.dumps(days_summary, ensure_ascii=False)}；"
                 f"推荐不拥挤起始日：{sched.get('recommended_start_date')}"
             )
-        if state.get("excel_diff"):
-            tool_parts.append(f"Excel精确Diff计算：{json.dumps(state['excel_diff'], ensure_ascii=False)}")
-        if state.get("search_brief"):
-            tool_parts.append(f"脱敏外部调研：{json.dumps(state['search_brief'], ensure_ascii=False)}")
 
         return {
             "evidence_text": ev_text,
@@ -854,7 +1284,11 @@ class ChiefOfStaffEngine:
                 return json.dumps(compact, ensure_ascii=False)
             if name == "calc_business_date":
                 traj.append("tool:calc_business_date_in_loop")
-                return calc_business_date(args.get("base_date", today_str), int(args.get("offset_days", 1)))
+                try:
+                    return calc_business_date(args.get("base_date") or today_str, int(args.get("offset_days", 1)))
+                except Exception as exc:
+                    logger.warning("calc_business_date tool error: %s", type(exc).__name__)
+                    return next_biz
             return "{}"
 
         tools = [
@@ -916,6 +1350,7 @@ class ChiefOfStaffEngine:
             max_tokens=2048,
         )
         self._record_latest_call(rec)
+        proposal = _backfill_mail_conversation_ids(proposal, raw_input)
         return {"proposal": proposal.model_dump(mode="json"), "trajectory": traj}
 
     def _node_heterogeneous_critic(self, state: WorkflowState) -> WorkflowState:
@@ -954,6 +1389,8 @@ class ChiefOfStaffEngine:
                     "role": "user",
                     "content": (
                         f"原始输入：\n{state.get('raw_text', '')}\n\n"
+                        f"近期对话上下文：\n{state.get('dialogue_context_text', '')}\n\n"
+                        f"在途项目与待办快照：\n{state.get('workspace_context_text', '')}\n\n"
                         f"证据与工具计算结果：\n{state.get('evidence_text', '')}\n{state.get('tool_outputs_text', '')}\n\n"
                         f"待审方案：\n{proposal.model_dump_json()}"
                     ),
@@ -973,13 +1410,24 @@ class ChiefOfStaffEngine:
         traj = list(state.get("trajectory") or []) + ["node:hitl_preview_gate"]
         proposal_dict = state["proposal"]
         proposal = TriageProposal.model_validate(proposal_dict)
+        # Pure-FYI batch (no new actions and no existing-task updates): never persist a blocking pending card!
+        if not proposal.actions and not proposal.task_updates:
+            fyi_text = _format_pure_fyi_message(proposal)
+            assert_no_secrets_leaked(fyi_text, self.settings)
+            return {
+                "proposal_id": None,
+                "reply_text": fyi_text,
+                "trajectory": traj + ["hitl:pure_fyi_no_card"],
+            }
         pid = self.db.save_pending_proposal(
             thread_id=state.get("thread_id", "owner"),
             proposal_dict=proposal_dict,
             source_ids=list(state.get("source_ids") or []),
             pending_files=list(state.get("attachments") or []),
         )
-        card_text = format_decision_card(pid, proposal)
+        verdict = state.get("critic_verdict") or {}
+        unpassed_issues = list(verdict.get("issues") or []) if not verdict.get("passed", True) else []
+        card_text = format_decision_card(pid, proposal, critic_issues=unpassed_issues)
         assert_no_secrets_leaked(card_text, self.settings)
         return {"proposal_id": pid, "reply_text": card_text, "trajectory": traj}
 
@@ -1005,7 +1453,16 @@ class ChiefOfStaffEngine:
             return "quick_qa"
         if intent == "conversational_chat":
             return "conversational"
-        if intent in {"confirm_pending", "discard_pending", "mutate_existing_item", "undo", "checkin"}:
+        if intent in {
+            "confirm_pending",
+            "discard_pending",
+            "mutate_existing_item",
+            "update_item_fields",
+            "undo",
+            "checkin",
+            "append_note",
+            "view_timeline",
+        }:
             return "action_shortcut"
         if intent in {"open_cockpit", "show_workload"}:
             return "direct_reply"
@@ -1068,27 +1525,52 @@ class ChiefOfStaffEngine:
     # --- Commit & Shortcut handlers ---
 
     def commit_pending_proposal(self, pending: dict[str, Any], *, ideas_only: bool = False) -> str:
-        """Mint ApprovalToken, pass before_tool_callback, apply atomically, and sync OneDrive."""
+        """Mint ApprovalToken, pass before_tool_callback, commit SQLite atomically FIRST, then sync OneDrive."""
         proposal_id = int(pending["id"])
         proposal = TriageProposal.model_validate(pending["proposal"])
+        task_updates = list(proposal.task_updates or [])
+        if not proposal.actions and not task_updates:
+            self.db.cancel_pending_proposal(proposal_id)
+            self._cleanup_pending_files(pending.get("pending_files") or [])
+            return f"ℹ️ 确认卡 #{proposal_id} 不含可执行动作，已自动关闭，不会阻塞后续处理。"
+
         actions = [a for a in proposal.actions if (not ideas_only or a.list_type == ListType.IDEA)]
-        if not actions:
-            return "当前待确认卡片中没有可落盘的想法项。"
+        if ideas_only and not actions:
+            return (
+                f"ℹ️ 确认卡 #{proposal_id} 没有想法项（0 条想法），未写入任何清单。\n"
+                "如需全量落盘请回复 `1`，如需作废请回复 `0`。"
+            )
+        effective_updates = [] if ideas_only else task_updates
 
         secret = self.settings.web_access_secret or self.settings.dashscope_api_key
         token = ApprovalToken.mint(proposal_id, secret)
 
         before_tool_callback(
             "propose_list_mutations",
-            {"proposal_id": proposal_id, "count": len(actions)},
+            {"proposal_id": proposal_id, "count": len(actions) + len(effective_updates)},
             approval_token=token,
             signing_secret=secret,
         )
 
+        # 1. Local SQLite atomic commit with CAS FIRST (prevents premature deletion of tmp files on DB failure)
+        commit_res = self.db.apply_proposal_atomic(
+            proposal_id=proposal_id,
+            actions=actions,
+            task_updates=effective_updates,
+            source_ids=pending.get("source_ids", []),
+            doc_paths=[],
+            brief_summary=proposal.executive_summary,
+            project_web_urls={},
+        )
+        if commit_res.get("already_processed"):
+            return f"ℹ️ 确认卡 #{proposal_id} 已确认或已失效，未重复落盘。"
+
+        # 2. Only after local SQLite commit succeeds, archive attachments & sync OneDrive
         archived_paths: list[str] = []
         proj_urls: dict[str, str] = {}
         ymd = date.today().strftime("%Y%m%d")
-        first_proj = actions[0].project_name
+        first_proj = actions[0].project_name if actions else "日常事务"
+        onedrive_failed = False
 
         if self.onedrive is not None:
             before_tool_callback(
@@ -1097,48 +1579,69 @@ class ChiefOfStaffEngine:
                 approval_token=token,
                 signing_secret=secret,
             )
-            for pf in pending.get("pending_files", []):
-                fpath = Path(pf.get("path", ""))
-                fname = pf.get("filename") or fpath.name
-                if fpath.exists():
-                    safe_proj = first_proj.replace("/", "_")
-                    target_path = f"01_项目归档/{safe_proj}/{ymd}_{safe_proj}_{fname}"
-                    res = self.onedrive.upload_and_cleanup_local(target_path, fpath)
-                    archived_paths.append(target_path)
-                    if res.get("webUrl"):
-                        proj_urls[first_proj] = res["webUrl"]
-
-            note_entry = (
-                f"### {date.today().isoformat()}｜{proposal.headline}\n"
-                f"- **摘要**：{proposal.executive_summary}\n"
-                + "\n".join(f"- **[{a.priority.value}]** {a.title}（{a.estimated_hours}h）" for a in actions)
-            )
-            self.onedrive.append_project_note(first_proj, note_entry)
-
-        commit_res = self.db.apply_proposal_atomic(
-            proposal_id=proposal_id,
-            actions=actions,
-            source_ids=pending.get("source_ids", []),
-            doc_paths=archived_paths,
-            brief_summary=proposal.executive_summary,
-            project_web_urls=proj_urls,
-        )
-
-        board_url = ""
-        if self.onedrive is not None:
             before_tool_callback(
                 "compose_markdown_brief",
                 {"proposal_id": proposal_id},
                 approval_token=token,
                 signing_secret=secret,
             )
-            urls = self.onedrive.sync_all_lists(self.db)
-            board_url = urls.get("01_今日与行动待办.md", "")
+            try:
+                for pf in pending.get("pending_files", []):
+                    fpath = Path(pf.get("path", ""))
+                    fname = pf.get("filename") or fpath.name
+                    if fpath.exists():
+                        safe_proj = first_proj.replace("/", "_")
+                        target_path = f"01_项目归档/{safe_proj}/{ymd}_{safe_proj}_{fname}"
+                        res = self.onedrive.upload_and_cleanup_local(target_path, fpath)
+                        archived_paths.append(target_path)
+                        if res.get("webUrl"):
+                            proj_urls[first_proj] = res["webUrl"]
 
-        ids_str = ", ".join(f"#{i}" for i in commit_res["inserted_item_ids"])
-        tail = f"\n☁️ 云端看板已刷新：{board_url}" if board_url else ""
+                if actions:
+                    note_entry = (
+                        f"### {date.today().isoformat()}｜{proposal.headline}\n"
+                        f"- **摘要**：{proposal.executive_summary}\n"
+                        + "\n".join(f"- **[{a.priority.value}]** {a.title}（{a.estimated_hours}h）" for a in actions)
+                    )
+                    self.onedrive.append_project_note(first_proj, note_entry)
+                if archived_paths or proj_urls:
+                    self.db.update_items_onedrive_docs(
+                        commit_res["inserted_item_ids"],
+                        archived_paths,
+                        proj_urls,
+                    )
+            except Exception as exc:
+                onedrive_failed = True
+                logger.warning(
+                    "OneDrive archive sync error during commit: %s",
+                    redact_secrets(f"{type(exc).__name__}: {exc}", self.settings),
+                )
+
+        board_url = ""
+        if self.onedrive is not None:
+            od_ok, board_url = self._safe_sync_onedrive()
+            if not od_ok:
+                onedrive_failed = True
+
+        inserted_ids = commit_res.get("inserted_item_ids") or []
+        updated_ids = commit_res.get("updated_item_ids") or []
+        ids_str = ", ".join(f"#{i}" for i in inserted_ids)
+        upd_str = ", ".join(f"#{i}" for i in updated_ids)
+        if board_url:
+            tail = f"\n☁️ 云端看板已刷新：{board_url}"
+        elif onedrive_failed:
+            tail = "\n⚠️ 本地数据库已安全落盘（云端 OneDrive 同步暂遇网络波动，恢复后将自动刷新）。"
+        else:
+            tail = ""
+
+        summary_parts: list[str] = []
+        if ids_str:
+            summary_parts.append(f"新增项编号 {ids_str}")
+        if upd_str:
+            summary_parts.append(f"已更新已有任务 {upd_str} 时间轴与进展")
+        summary_str = "；".join(summary_parts) or "已落盘"
         return (
-            f"✅ **已确认落盘**（确认卡 #{proposal_id} → 新增项编号 `{ids_str}`）。\n"
+            f"✅ 已确认落盘（确认卡 #{proposal_id} → {summary_str}）。\n"
             f"可用 `开始 <编号>` / `完成 <编号> 1.5h` 打卡，或 24h 内回复 `撤销` 完整回滚。{tail}"
         )
 
@@ -1151,6 +1654,7 @@ class ChiefOfStaffEngine:
         attachments: list[dict[str, Any]] | None = None,
         thread_id: str = "owner",
         progress_callback: Callable[[str], None] | None = None,
+        force_work_triage: bool = False,
     ) -> dict[str, Any]:
         """Unified entry point enforcing instant commands and LangGraph orchestration."""
         text = (raw_text or "").strip()
@@ -1165,6 +1669,7 @@ class ChiefOfStaffEngine:
                     external_msg_id=external_msg_id,
                     atts=atts,
                     thread_id=thread_id,
+                    force_work_triage=force_work_triage,
                 )
             finally:
                 self._progress_cb = prev_cb
@@ -1177,21 +1682,51 @@ class ChiefOfStaffEngine:
         external_msg_id: str | None,
         atts: list[dict[str, Any]],
         thread_id: str,
+        force_work_triage: bool = False,
     ) -> dict[str, Any]:
+        if not text and not atts:
+            return {
+                "reply_text": "您好，收到空白消息，请直接发送文字、语音、附件，或回复 `看板` / `负荷`。",
+                "proposal_id": None,
+                "source_ids": [],
+                "trajectory": ["short_circuit:empty_input"],
+            }
+
         init_state: WorkflowState = {
             "thread_id": thread_id,
             "raw_text": text,
             "sender": sender,
             "external_msg_id": external_msg_id or "",
             "attachments": atts,
+            "source_ids": [],
+            "ingested_att_text": "",
+            "intent": "",
+            "resolved_text": "",
+            "search_queries": [],
+            "target_item_id": None,
+            "actual_hours": None,
+            "clarify_question": "",
+            "has_pending_proposal": False,
+            "pending_ideas_only": False,
+            "user_correction": "",
+            "proposal": {},
+            "critic_verdict": {},
+            "proposal_id": None,
+            "reply_text": "",
+            "force_work_triage": force_work_triage,
             "loop_count": 0,
             "trajectory": [],
         }
+        run_thread_id = f"{thread_id}:{external_msg_id or uuid.uuid4().hex}"
         with self._turn_lock:
             try:
+                if atts:
+                    ingested_ids, ingested_text = self._ingest_attachments_and_source(init_state)
+                    init_state["source_ids"] = ingested_ids
+                    init_state["ingested_att_text"] = ingested_text
                 out = self.graph.invoke(
                     init_state,
-                    config={"configurable": {"thread_id": f"{thread_id}:{external_msg_id or date.today().isoformat()}"}},
+                    config={"configurable": {"thread_id": run_thread_id}},
                 )
             except Exception as exc:
                 user_line = text or f"[附件: {', '.join(a.get('filename', 'file') for a in atts)}]"
@@ -1206,8 +1741,12 @@ class ChiefOfStaffEngine:
                         reply_text=fallback,
                         intent=f"error:{type(exc).__name__}",
                     )
-                except Exception:
-                    pass
+                except Exception as db_exc:
+                    logger.error("Failed to persist fallback turn: %s", type(db_exc).__name__)
+                    fallback = (
+                        f"⚠️ 刚才处理这条消息时遇到临时异常（{type(exc).__name__}），本次没有生成待办或改动任何数据。\n"
+                        "请稍后重新发送。"
+                    )
                 return {
                     "reply_text": fallback,
                     "proposal_id": None,

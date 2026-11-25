@@ -9,10 +9,26 @@ from wechat_assistant.schemas import ListType, TriageProposal
 
 # Extract meaningful multi-digit numbers, decimals, percentages, or currency figures (>= 2 chars / decimal)
 _NUM_PATTERN = re.compile(r"(?<!\d)(?:\d+\.\d+|\d{2,})(?:%|h|元|万元|天)?")
+_UNTRUSTED_BLOCK_RE = re.compile(r"\[UNTRUSTED_EXTERNAL_DATA\].*?\[/UNTRUSTED_EXTERNAL_DATA\]", flags=re.DOTALL)
+_TRUSTED_ROLE_RE = re.compile(r"chairman_role=(owner|assignee|cc_observer|approver)")
+_CHAIRMAN_TOKENS = ("本人", "徐宏玮", "董事长", "老板", "chairman", "john.xu@")
 
 
 def _normalize_number_token(tok: str) -> str:
     return re.sub(r"[%h元万天,]", "", tok).strip()
+
+
+def _is_chairman_identity(name: str) -> bool:
+    low = (name or "").strip().lower()
+    if not low:
+        return False
+    return any(tok in low for tok in _CHAIRMAN_TOKENS)
+
+
+def _extract_trusted_mail_roles(raw_input: str) -> list[str]:
+    """Read chairman_role hints ONLY from trusted system sections outside `[UNTRUSTED_EXTERNAL_DATA]`."""
+    trusted_only = _UNTRUSTED_BLOCK_RE.sub("", raw_input or "")
+    return _TRUSTED_ROLE_RE.findall(trusted_only)
 
 
 def deterministic_critic_check(
@@ -25,15 +41,43 @@ def deterministic_critic_check(
     """Run hard programmatic checks before or alongside heterogeneous LLM audit."""
     issues: list[str] = []
     combined_source = "\n".join((raw_input, evidence_text, tool_outputs_text)).replace(",", "")
+    trusted_mail_roles = _extract_trusted_mail_roles(raw_input)
+    batch_all_cc = bool(trusted_mail_roles) and all(r == "cc_observer" for r in trusted_mail_roles)
 
-    # 1. Check calendar duration vs net CEO effort hours separation
+    # 1. Check CC-observer role guardrail, date validity, non-reversed range, and effort separation
     for act in proposal.actions:
+        if act.chairman_role == "cc_observer" or batch_all_cc:
+            if _is_chairman_identity(act.owner) or _is_chairman_identity(act.assignee):
+                issues.append(
+                    f"事项「{act.title}」的邮件仅抄送董事长（cc_observer），严禁将董事长填为负责人（{act.owner}）或实施人（{act.assignee}）；"
+                    "请按邮件主送/发件人填写具体负责或实施同事。"
+                )
+
+        span_days = 1
+        start_raw = (act.planned_start_at or "").strip()
+        end_raw = (act.planned_end_at or "").strip()
+        end_is_tbd = end_raw == "" and "planned_end_at" in (act.missing_required_fields or [])
         try:
-            d_start = date.fromisoformat(act.planned_start_at[:10])
-            d_end = date.fromisoformat(act.planned_end_at[:10])
-            span_days = max(1, (d_end - d_start).days + 1)
+            if len(start_raw) < 10:
+                raise ValueError("incomplete start date")
+            d_start = date.fromisoformat(start_raw[:10])
+            if end_is_tbd:
+                span_days = 1
+            else:
+                if len(end_raw) < 10:
+                    raise ValueError("incomplete end date")
+                d_end = date.fromisoformat(end_raw[:10])
+                if d_end < d_start:
+                    issues.append(
+                        f"事项「{act.title}」的计划结束日期（{end_raw}）早于开始日期（{start_raw}），请修正排期。"
+                    )
+                else:
+                    span_days = max(1, (d_end - d_start).days + 1)
         except ValueError:
-            span_days = 1
+            issues.append(
+                f"事项「{act.title}」的计划日期非法（{act.planned_start_at} ~ {act.planned_end_at}），"
+                "请修正为合法 YYYY-MM-DD 日历日期。"
+            )
 
         if act.list_type == ListType.WAITING_FOR and span_days >= 3 and act.estimated_hours >= span_days * 4:
             issues.append(

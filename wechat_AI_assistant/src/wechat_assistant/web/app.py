@@ -12,17 +12,17 @@ import os
 import secrets
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from wechat_assistant.config import DashScopeLLMGateway, Settings
 from wechat_assistant.graph import ChiefOfStaffEngine
-from wechat_assistant.intake.mail_poller import mail_poller_loop
+from wechat_assistant.intake.mail_poller import mail_hourly_scheduler_loop
 from wechat_assistant.intake.wecom_gateway import WeComGateway
 from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel, WorkDomain
 from wechat_assistant.storage.db import Database
@@ -32,38 +32,104 @@ COOKIE_NAME = "chairman_cockpit_session"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
+def _validate_optional_iso_date(v: str | None) -> str | None:
+    if v is None:
+        return None
+    cleaned = v.strip()
+    if not cleaned:
+        return ""
+    if len(cleaned) < 10:
+        raise ValueError("Date must be YYYY-MM-DD")
+    date.fromisoformat(cleaned[:10])
+    return cleaned[:10]
+
+
 class ItemUpdateBody(BaseModel):
-    title: str | None = None
-    list_type: str | None = None
-    work_domain: str | None = None
-    project_name: str | None = None
-    owner: str | None = None
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    list_type: ListType | None = None
+    work_domain: WorkDomain | None = None
+    project_name: str | None = Field(default=None, min_length=1, max_length=80)
+    deliverable: str | None = Field(default=None, max_length=300)
+    acceptance_criteria: str | None = Field(default=None, max_length=300)
+    milestone_stage: str | None = Field(default=None, max_length=80)
+    owner: str | None = Field(default=None, min_length=1, max_length=80)
+    assignee: str | None = Field(default=None, max_length=80)
+    external_partner: str | None = Field(default=None, max_length=120)
+    blocker_note: str | None = Field(default=None, max_length=300)
     planned_start_at: str | None = None
     planned_end_at: str | None = None
     estimated_hours: float | None = Field(default=None, ge=0.0, le=200.0)
     actual_hours: float | None = Field(default=None, ge=0.0, le=200.0)
-    priority: str | None = None
-    status: str | None = None
+    priority: PriorityLevel | None = None
+    status: Literal["todo", "in_progress", "done"] | None = None
     stage: str | None = None
+
+    @field_validator("planned_start_at", "planned_end_at")
+    @classmethod
+    def _check_dates(cls, v: str | None) -> str | None:
+        return _validate_optional_iso_date(v)
+
+    @model_validator(mode="after")
+    def _check_date_order(self) -> "ItemUpdateBody":
+        if self.planned_start_at and self.planned_end_at and self.planned_end_at < self.planned_start_at:
+            raise ValueError("planned_end_at cannot be earlier than planned_start_at")
+        return self
 
 
 class ItemCreateBody(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     list_type: ListType = ListType.NEXT_ACTION
     work_domain: WorkDomain = WorkDomain.RD
-    project_name: str = Field(default="General Ops", min_length=1, max_length=80)
-    owner: str = "Chairman"
+    project_name: str = Field(default="通用待办", min_length=1, max_length=80)
+    deliverable: str = Field(default="", max_length=300)
+    acceptance_criteria: str = Field(default="", max_length=300)
+    milestone_stage: str = Field(default="已启动", max_length=80)
+    owner: str = "本人"
+    assignee: str = ""
+    external_partner: str = "无"
+    blocker_note: str = Field(default="", max_length=300)
     planned_start_at: str | None = None
     planned_end_at: str | None = None
     estimated_hours: float = Field(default=0.0, ge=0.0, le=200.0)
     priority: PriorityLevel = PriorityLevel.P1
+
+    @field_validator("planned_start_at", "planned_end_at")
+    @classmethod
+    def _check_dates(cls, v: str | None) -> str | None:
+        return _validate_optional_iso_date(v)
+
+    @model_validator(mode="after")
+    def _check_date_order(self) -> "ItemCreateBody":
+        if self.planned_start_at and self.planned_end_at and self.planned_end_at < self.planned_start_at:
+            raise ValueError("planned_end_at cannot be earlier than planned_start_at")
+        return self
+
+
+class NoteCreateBody(BaseModel):
+    kind: Literal["ceo_evaluation", "comment", "progress"]
+    content: str = Field(min_length=1, max_length=500)
+    from_party: str = "徐宏玮"
 
 
 class PromoteIdeaBody(BaseModel):
     project_name: str = Field(min_length=1, max_length=80)
     planned_start_at: str
     planned_end_at: str
-    estimated_hours: float = Field(default=1.0, ge=0.1, le=200.0)
+    estimated_hours: float = Field(default=0.0, ge=0.0, le=200.0)
+
+    @field_validator("planned_start_at", "planned_end_at")
+    @classmethod
+    def _check_dates(cls, v: str) -> str:
+        res = _validate_optional_iso_date(v)
+        if not res:
+            raise ValueError("Date must be YYYY-MM-DD")
+        return res
+
+    @model_validator(mode="after")
+    def _check_date_order(self) -> "PromoteIdeaBody":
+        if self.planned_end_at < self.planned_start_at:
+            raise ValueError("planned_end_at cannot be earlier than planned_start_at")
+        return self
 
 
 class CompleteItemBody(BaseModel):
@@ -83,10 +149,17 @@ class AuthManager:
         self._magic_tokens: dict[str, float] = {}
         self._login_codes: dict[str, float] = {}
         self._rate_hits: dict[str, list[float]] = {}
+        self._verify_failures: list[float] = []
+        self._verify_locked_until: float = 0.0
+
+    def is_verify_locked(self) -> bool:
+        return time.time() < self._verify_locked_until
 
     def mint_magic_token(self, ttl_seconds: int = 300) -> str:
+        now = time.time()
+        self._magic_tokens = {k: v for k, v in self._magic_tokens.items() if v > now}
         tok = secrets.token_urlsafe(24)
-        self._magic_tokens[tok] = time.time() + ttl_seconds
+        self._magic_tokens[tok] = now + ttl_seconds
         return tok
 
     def consume_magic_token(self, token: str) -> bool:
@@ -112,11 +185,19 @@ class AuthManager:
 
     def verify_login_code(self, code: str) -> bool:
         now = time.time()
+        if now < self._verify_locked_until:
+            return False
         self._login_codes = {k: v for k, v in self._login_codes.items() if v > now}
+        self._verify_failures = [t for t in self._verify_failures if now - t < 600]
         for valid_code in list(self._login_codes):
             if hmac.compare_digest(valid_code, code.strip()):
                 del self._login_codes[valid_code]
+                self._verify_failures.clear()
                 return True
+        self._verify_failures.append(now)
+        if len(self._verify_failures) >= 5:
+            self._login_codes.clear()
+            self._verify_locked_until = now + 600
         return False
 
     def sign_session_cookie(self) -> str:
@@ -141,17 +222,104 @@ class AuthManager:
 
 
 def build_daily_digest_message(ov: dict[str, Any], kind: str, magic_url: str) -> str:
-    """Build morning or evening WeChat digest; evening digest prompts active progress check-in."""
+    """Build v2.0 flat independent task-card Morning/Evening WeChat digest (zero repetition)."""
     today = ov["today"]
-    today_info = ov["workload"]["days"].get(today, {})
-    open_items = [i for i in ov["items"] if i["status"] != "done"]
-    top_todos = open_items[:5]
-    todo_text = "\n".join(
-        f"- `#{i['id']}` `[{i['priority']}]` {i['title']}（{i['planned_start_at'] or '-'}~{i['planned_end_at'] or '-'}）"
-        for i in top_todos
-    ) or "- 暂无未完成待办"
-    waits = ov["waiting_items"][:3]
-    wait_text = "\n".join(f"- 等{w['owner']}：{w['title']}（已等 {w['waiting_days']} 天）" for w in waits)
+    today_dt = date.fromisoformat(today[:10])
+    open_items = [i for i in ov["items"] if i["status"] != "done" and i.get("list_type") != ListType.IDEA.value]
+    waits = ov.get("waiting_items") or []
+    urgent_cnt = 0
+    for i in open_items:
+        pe_raw = (i.get("planned_end_at") or "").strip()
+        if pe_raw:
+            try:
+                if (date.fromisoformat(pe_raw[:10]) - today_dt).days <= 2:
+                    urgent_cnt += 1
+            except ValueError:
+                pass
+
+    ch_map = {"wechat": "微信", "mail_in": "邮件", "mail_out": "发件", "web": "驾驶舱"}
+    status_map = {"todo": "待办", "in_progress": "进行中", "done": "已完成"}
+
+    card_blocks: list[str] = []
+    for it in open_items[:8]:
+        st_lbl = "等待外部" if it.get("list_type") == ListType.WAITING_FOR.value else status_map.get(it.get("status", "todo"), "待办")
+        deliverable = (it.get("deliverable") or "").strip() or it["title"]
+        stage_lbl = (it.get("milestone_stage") or "已启动").strip()
+        owner = (it.get("owner") or "本人").strip()
+        assignee = (it.get("assignee") or "").strip() or owner
+        ext = (it.get("external_partner") or "").strip() or "无"
+
+        ps_str = (it.get("planned_start_at") or "").strip()
+        pe_str = (it.get("planned_end_at") or "").strip()
+        elapsed_note = ""
+        if ps_str:
+            try:
+                ps_dt = date.fromisoformat(ps_str[:10])
+                if ps_dt > today_dt:
+                    elapsed_note = f"距开始还有 {(ps_dt - today_dt).days} 天"
+                else:
+                    elapsed_days = (today_dt - ps_dt).days + 1
+                    elapsed_note = f"已进行 {elapsed_days} 天"
+            except ValueError:
+                pass
+        due_note = ""
+        if pe_str:
+            try:
+                left = (date.fromisoformat(pe_str[:10]) - today_dt).days
+                due_note = f"距截止剩 {left} 天" if left >= 0 else f"已超期 {abs(left)} 天"
+            except ValueError:
+                pass
+        span_notes = "｜".join(x for x in (elapsed_note, due_note) if x)
+        sched_line = f"{ps_str or '-'} → {pe_str or '【待补齐】'}" + (f"（{span_notes}）" if span_notes else "")
+
+        block_lines = [
+            f"【任务 #{it['id']}】{it['title']}（归属：{it.get('project_name', '日常事务')} / {it.get('work_domain', '')}｜{it.get('priority', 'P1')}｜{st_lbl}）",
+            f"1）目标与交付成果：{deliverable}",
+        ]
+        timeline = list(it.get("timeline") or [])
+        if timeline:
+            block_lines.append(f"2）当前进度与往来沟通：{stage_lbl}")
+            for entry in timeline[-2:]:
+                ch_lbl = ch_map.get(entry.get("channel", "wechat"), entry.get("channel", ""))
+                who = (
+                    f"{entry.get('from_party', '')}→{entry.get('to_party', '')}"
+                    if entry.get("to_party")
+                    else (entry.get("from_party") or "")
+                )
+                who_part = f"｜{who}" if who else ""
+                raw_ts = str(entry.get("timestamp") or "").strip()
+                short_ts = raw_ts[5:16] if (len(raw_ts) >= 16 and raw_ts[4:5] == "-" and raw_ts[7:8] == "-") else raw_ts
+                block_lines.append(f"   - [{short_ts}｜{ch_lbl}{who_part}] {entry.get('summary', '')}")
+        else:
+            block_lines.append(f"2）当前进度与往来沟通：{stage_lbl}")
+
+        block_lines.append(f"3）责任分工：负责人：{owner} ｜ 实施人：{assignee} ｜ 外部协作：{ext}")
+        block_lines.append(f"4）时间排期：{sched_line}")
+
+        blocker = (it.get("blocker_note") or "").strip() or "无"
+        docs = list(it.get("onedrive_doc_paths") or [])
+        doc_part = f" ｜ 档案：{', '.join(str(d).rsplit('/', 1)[-1] for d in docs[:2])}" if docs else ""
+        block_lines.append(f"5）卡点与关联档案：{blocker}{doc_part}")
+
+        comments = list(it.get("comments") or [])
+        if comments:
+            latest_cmts = "；".join(
+                f"[{c.get('date', '')}] {c.get('content', '')}" if isinstance(c, dict) else str(c)
+                for c in comments[-2:]
+            )
+            block_lines.append(f"6）补充备注（Comments）：{latest_cmts}")
+
+        ceo_evals = list(it.get("ceo_evaluation") or [])
+        if ceo_evals:
+            last_ev = ceo_evals[-1]
+            ev_txt = f"[{last_ev.get('date', '')}] {last_ev.get('content', '')}" if isinstance(last_ev, dict) else str(last_ev)
+            block_lines.append(f"7）CEO 评价：{ev_txt}")
+
+        card_blocks.append("\n".join(block_lines))
+
+    body_text = "\n\n━━━━━━━━━━━━━━━━━━━━\n".join(card_blocks) if card_blocks else "- 暂无未完成在途任务"
+    if len(open_items) > 8:
+        body_text += f"\n\n…另有 {len(open_items) - 8} 项在途任务，请打开驾驶舱查看全量"
 
     checkin_block = ""
     if "晚间" in kind:
@@ -171,18 +339,19 @@ def build_daily_digest_message(ov: dict[str, Any], kind: str, magic_url: str) ->
                     tag = "进行中"
                 lines.append(f"- `#{it['id']}` [{tag}] {it['title']}")
             checkin_block = (
-                "\n📝 **今日进度盘点（请一句话确认，方便自动闭合周期）**：\n"
+                "\n\n📝 **今日进度盘点（请一句话确认，方便自动闭合周期）**：\n"
                 + "\n".join(lines)
-                + "\n👉 可直接回复：`#3 做完了，#5 开始了`（未完事项也可说明新截止日）\n"
+                + "\n👉 可直接回复：`#3 做完了，#5 开始了`（未完事项也可说明新截止日）"
             )
 
     return (
         f"{kind}（{today}）\n"
-        f"📅 今日在途事项：{len(today_info.get('items', []))} 项 ｜ 平均完成跨度：{ov.get('avg_completion_span_days', 0)} 天\n\n"
-        f"📌 **今日优先事项**：\n{todo_text}\n"
-        + (f"\n⏳ **外部卡点**：\n{wait_text}\n" if wait_text else "")
+        f"📊 在途任务：{len(open_items)} 项 ｜ 外部等待：{len(waits)} 项 ｜ 临期/超期预警：{urgent_cnt} 项\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n{body_text}"
         + checkin_block
-        + f"\n📊 点击打开驾驶舱：{magic_url}"
+        + "\n\n━━━━━━━━━━━━━━━━━━━━\n"
+        + "👉 微信直接回复：`完成 #1` 闭环 ｜ `评价 #2：...` 加 CEO 评价 ｜ `备注 #2：...` 加补充说明\n"
+        + f"📊 点击打开驾驶舱：{magic_url}"
     )
 
 
@@ -196,21 +365,23 @@ async def _daily_digest_scheduler(engine: ChiefOfStaffEngine, gateway: WeComGate
             hm = now.strftime("%H:%M")
             day_key = f"{now.strftime('%Y-%m-%d')}:{hm}"
             if now.weekday() < 5 and hm in {morning, evening} and day_key not in sent_marks:
-                sent_marks.add(day_key)
-                kind = "🌅 早间工作简报" if hm == morning else "🌆 晚间复盘简报"
+                kind = "🌅 早间工作报告" if hm == morning else "🌆 晚间复盘简报"
                 ov = engine.db.dashboard_overview(engine.settings.daily_capacity_hours)
                 magic_url = engine.magic_link_factory()
                 msg = build_daily_digest_message(ov, kind, magic_url)
                 await gateway.send_app_push(msg)
+                sent_marks.add(day_key)
                 # Persist digest into dialogue history so follow-up replies ("#3做完了") resolve cleanly
                 engine.db.append_conversation_turn(
                     thread_id="owner",
                     role="assistant",
                     content=msg,
-                    intent="digest:evening_checkin",
+                    intent="digest:morning" if hm == morning else "digest:evening_checkin",
                 )
-        except Exception:
-            pass
+                if len(sent_marks) > 32:
+                    sent_marks = {day_key}
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("Daily digest scheduler error: %s", type(exc).__name__)
         await asyncio.sleep(30)
 
 
@@ -241,8 +412,8 @@ async def run_turn_with_heartbeat(
                     await gateway.send_app_push(
                         f"⏳ 仍在处理中（已用时 {elapsed}s）：当前正在【{stage['label']}】"
                     )
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logging.getLogger("uvicorn.error").warning("Heartbeat push failed: %s", type(exc).__name__)
                 wait_s = interval_seconds
 
     watcher = asyncio.create_task(_watcher())
@@ -261,8 +432,8 @@ async def run_turn_with_heartbeat(
         done_evt.set()
         try:
             await watcher
-        except Exception:
-            pass
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("Heartbeat watcher cleanup error: %s", type(exc).__name__)
 
 
 def create_app(
@@ -316,28 +487,32 @@ def create_app(
             if od_client is not None:
                 try:
                     await asyncio.to_thread(od_client.sync_all_lists, store)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logging.getLogger("uvicorn.error").warning("Initial OneDrive sync failed: %s", type(exc).__name__)
             bg_tasks.append(asyncio.create_task(_daily_digest_scheduler(eng, wc_gw)))
-            if cfg.mail_enabled and od_client is not None:
-                async def on_email(body: str, sender: str, ext_id: str) -> None:
-                    reply = await asyncio.to_thread(
-                        eng.handle_incoming_turn,
-                        body,
-                        sender=f"mail:{sender}",
-                        external_msg_id=ext_id,
-                        thread_id="owner",
-                    )
-                    if reply.get("proposal_id"):
-                        await wc_gw.send_app_push(f"📧 新邮件幕僚分析：\n{reply['reply_text']}")
+            has_mail_creds = bool(
+                (cfg.mail_tenant_id and cfg.mail_client_id and cfg.mail_client_secret)
+                or od_client is not None
+            )
+            if cfg.mail_enabled and has_mail_creds:
                 bg_tasks.append(
-                    asyncio.create_task(mail_poller_loop(cfg, od_client, on_email, mark_seen=store.mark_external_seen))
+                    asyncio.create_task(
+                        mail_hourly_scheduler_loop(
+                            settings=cfg,
+                            db=store,
+                            od_client=od_client,
+                            engine=eng,
+                            send_push=wc_gw.send_app_push,
+                        )
+                    )
                 )
         try:
             yield
         finally:
             for t in bg_tasks:
                 t.cancel()
+            if bg_tasks:
+                await asyncio.gather(*bg_tasks, return_exceptions=True)
             eng.close()
 
     app = FastAPI(title="董事长个人 AI 助理与项目管理驾驶舱", lifespan=lifespan)
@@ -368,8 +543,8 @@ def create_app(
         if od_client is not None:
             try:
                 await asyncio.to_thread(od_client.sync_all_lists, store)
-            except Exception:
-                pass
+            except Exception as exc:
+                logging.getLogger("uvicorn.error").warning("Async OneDrive sync failed: %s", type(exc).__name__)
 
     @app.get("/healthz")
     async def healthz():
@@ -410,7 +585,8 @@ def create_app(
             return PlainTextResponse(content="success", status_code=200)
         except PermissionError:
             raise HTTPException(status_code=403, detail="invalid signature")
-        except Exception:
+        except Exception as exc:
+            logging.getLogger("uvicorn.error").warning("WeCom callback POST parse error: %s", type(exc).__name__)
             return PlainTextResponse(content="success", status_code=200)
 
     # --- Web UI & Auth routes ---
@@ -458,6 +634,8 @@ def create_app(
 
     @app.post("/api/auth/verify-code")
     async def verify_login_code(request: Request, body: VerifyCodeBody, response: Response):
+        if auth.is_verify_locked():
+            raise HTTPException(status_code=429, detail="Too many failed verification attempts. Please request a new code later.")
         if not auth.verify_login_code(body.code):
             raise HTTPException(status_code=401, detail="Invalid or expired verification code")
         _set_session_cookie(request, response)
@@ -480,18 +658,25 @@ def create_app(
     @app.post("/api/items", dependencies=[Depends(require_session)])
     async def create_item_api(body: ItemCreateBody):
         today_str = datetime.now().strftime("%Y-%m-%d")
-        start_d = body.planned_start_at or today_str
-        end_d = body.planned_end_at or start_d
+        start_d = body.planned_start_at if body.planned_start_at else today_str
+        end_d = start_d if body.planned_end_at is None else body.planned_end_at
         act = ActionMutation(
             list_type=body.list_type,
             work_domain=body.work_domain,
-            project_name=body.project_name.strip() or "General Ops",
+            project_name=body.project_name.strip() or "通用待办",
             title=body.title.strip(),
-            owner=body.owner.strip() or "Chairman",
+            deliverable=body.deliverable.strip(),
+            acceptance_criteria=body.acceptance_criteria.strip(),
+            milestone_stage=body.milestone_stage.strip() or "已启动",
+            owner=body.owner.strip() or "本人",
+            assignee=body.assignee.strip(),
+            external_partner=body.external_partner.strip() or "无",
+            blocker_note=body.blocker_note.strip(),
             planned_start_at=start_d,
             planned_end_at=end_d,
             estimated_hours=body.estimated_hours,
             priority=body.priority,
+            missing_required_fields=(["planned_end_at"] if end_d == "" else []),
         )
         res = store.apply_proposal_atomic(
             proposal_id=None,
@@ -503,9 +688,41 @@ def create_app(
         asyncio.create_task(_sync_onedrive_async())
         return {"created_ids": res["inserted_item_ids"]}
 
+    @app.post("/api/items/{item_id}/note", dependencies=[Depends(require_session)])
+    async def append_item_note_api(item_id: int, body: NoteCreateBody):
+        if body.kind == "ceo_evaluation":
+            updated = store.append_task_ceo_evaluation(item_id, body.content)
+            if not updated:
+                raise HTTPException(status_code=404, detail="Item not found")
+            asyncio.create_task(_sync_onedrive_async())
+            return {"item": updated}
+        if body.kind == "comment":
+            updated = store.append_task_comment(item_id, body.content)
+            if not updated:
+                raise HTTPException(status_code=404, detail="Item not found")
+            asyncio.create_task(_sync_onedrive_async())
+            return {"item": updated}
+        entry = store.append_task_timeline(
+            item_id,
+            summary=body.content,
+            channel="web",
+            from_party=body.from_party.strip() or "徐宏玮",
+        )
+        if not entry:
+            raise HTTPException(status_code=404, detail="Item not found")
+        asyncio.create_task(_sync_onedrive_async())
+        return {"timeline_entry": entry}
+
+    @app.get("/api/items/{item_id}/timeline", dependencies=[Depends(require_session)])
+    async def get_item_timeline_api(item_id: int):
+        item = store.get_item(item_id)
+        if not item:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return {"item_id": item_id, "timeline": item.get("timeline") or []}
+
     @app.patch("/api/items/{item_id}", dependencies=[Depends(require_session)])
     async def patch_item(item_id: int, body: ItemUpdateBody):
-        updated = store.update_item_fields(item_id, body.model_dump(exclude_none=True))
+        updated = store.update_item_fields(item_id, body.model_dump(mode="json", exclude_none=True))
         if not updated:
             raise HTTPException(status_code=404, detail="Item not found or no fields changed")
         asyncio.create_task(_sync_onedrive_async())
@@ -520,13 +737,16 @@ def create_app(
 
     @app.post("/api/items/{item_id}/promote", dependencies=[Depends(require_session)])
     async def promote_item(item_id: int, body: PromoteIdeaBody):
-        updated = store.promote_idea_to_project(
-            item_id,
-            project_name=body.project_name,
-            planned_start_at=body.planned_start_at,
-            planned_end_at=body.planned_end_at,
-            estimated_hours=body.estimated_hours,
-        )
+        try:
+            updated = store.promote_idea_to_project(
+                item_id,
+                project_name=body.project_name,
+                planned_start_at=body.planned_start_at,
+                planned_end_at=body.planned_end_at,
+                estimated_hours=body.estimated_hours,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc))
         if not updated:
             raise HTTPException(status_code=404, detail="Idea item not found")
         asyncio.create_task(_sync_onedrive_async())

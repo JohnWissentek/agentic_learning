@@ -1,0 +1,18 @@
+{
+  "domains": [
+    "palmarytech.com",
+    "wissentek.com",
+    "budi.de",
+    "vandf.com",
+    "tera-instruments.com"
+  ],
+  "internal_domains": [
+    "palmarytech.com",
+    "wissentek.com"
+  ],
+  "partner_domains": [
+    "budi.de",
+    "vandf.com",
+    "tera-instruments.com"
+  ]
+}

@@ -1,0 +1,353 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://assistant.fire-matrix.com/schemas/task_card_schema.v2.json",
+  "title": "Executive Independent Task Card & Mail Batch Canonical Schema (v2.0)",
+  "description": "单一真理源 JSON 契约：统一规范微信输入、Outlook 邮件汇总、SQLite 持久化、早间工作报告与 Web 驾驶舱的数据结构。",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "2.0"
+    },
+    "task_cards": {
+      "type": "array",
+      "description": "扁平单层独立任务卡列表（一件事 = 一张卡，办完即闭环）",
+      "items": { "$ref": "#/$defs/TaskCard" }
+    },
+    "unified_triage_proposal": {
+      "$ref": "#/$defs/UnifiedTriageProposal"
+    },
+    "mail_batch_proposal": {
+      "$ref": "#/$defs/UnifiedTriageProposal",
+      "description": "与 unified_triage_proposal 共用同一套路径④提案结构，确保微信与邮件通道契约完全一致"
+    }
+  },
+  "$defs": {
+    "WorkDomain": {
+      "type": "string",
+      "enum": [
+        "产品研发",
+        "客户销售",
+        "项目交付",
+        "采购供应链",
+        "公司治理与人事",
+        "个人思考"
+      ]
+    },
+    "PriorityLevel": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2"]
+    },
+    "TaskStatus": {
+      "type": "string",
+      "enum": ["todo", "in_progress", "done"],
+      "description": "统一沿用 todo / in_progress / done；「等待外部」由 list_type=waiting_for 表达，避免双字段冲突"
+    },
+    "ListType": {
+      "type": "string",
+      "enum": ["project_action", "next_action", "waiting_for", "idea"]
+    },
+    "TimelineEntry": {
+      "type": "object",
+      "description": "挂在任务卡第 2 条下的单条带时间戳进展/沟通记录（支持微信汇报与邮件收发双向串线）",
+      "required": ["timestamp", "channel", "from_party", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {
+          "type": "string",
+          "description": "本地时间 YYYY-MM-DD HH:MM"
+        },
+        "channel": {
+          "type": "string",
+          "enum": ["wechat", "mail_in", "mail_out", "web"]
+        },
+        "from_party": {
+          "type": "string",
+          "description": "发起人/发件人（如 Arnab(Budi)、王楠、徐宏玮）"
+        },
+        "to_party": {
+          "type": "string",
+          "default": "",
+          "description": "主送接收方（如 徐宏玮、Arnab(Budi)）"
+        },
+        "cc_parties": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "抄送方列表（用于区分知情与执行，绝不把仅抄送方误判为执行人）"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "一句话压缩后的核心进展、约定、决定或回复内容"
+        },
+        "source_ref": {
+          "type": "string",
+          "default": "",
+          "description": "原始消息/邮件唯一标识（internetMessageId 或 external_msg_id）"
+        },
+        "mail_conversation_id": {
+          "type": "string",
+          "default": "",
+          "description": "Microsoft Graph 原生 conversationId，用于同一封邮件来回自动串线"
+        }
+      }
+    },
+    "TimestampedNote": {
+      "type": "object",
+      "description": "带日期留痕的备注或 CEO 评价条目（只追加不覆盖历史）",
+      "required": ["date", "content"],
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "YYYY-MM-DD"
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        }
+      }
+    },
+    "TaskCard": {
+      "type": "object",
+      "description": "单层独立任务卡（与早间工作报告 1~7 条一一映射）",
+      "required": [
+        "title",
+        "project_name",
+        "work_domain",
+        "list_type",
+        "priority",
+        "status",
+        "deliverable",
+        "owner",
+        "assignee",
+        "planned_start_at",
+        "planned_end_at"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "type": ["integer", "null"],
+          "default": null,
+          "description": "SQLite list_items.id（新建草案时为 null，落盘后自动分配）"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "【必填】独立任务名称"
+        },
+        "project_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "【必填】轻量归属项目标签（用于筛选与 OneDrive 目录归档，不嵌套子任务；无特定项目时填「日常事务」或「【待补齐】」）"
+        },
+        "work_domain": { "$ref": "#/$defs/WorkDomain" },
+        "list_type": { "$ref": "#/$defs/ListType" },
+        "priority": { "$ref": "#/$defs/PriorityLevel" },
+        "status": { "$ref": "#/$defs/TaskStatus" },
+        "deliverable": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "【必填｜1）目标与交付成果】最终可验收的硬结果（文档/图纸/BOM/签字/样机/测试通过）"
+        },
+        "acceptance_criteria": {
+          "type": "string",
+          "default": "",
+          "maxLength": 300,
+          "description": "【选填】验收标准细则（为空时复用 deliverable）"
+        },
+        "milestone_stage": {
+          "type": "string",
+          "default": "已启动",
+          "maxLength": 80,
+          "description": "【选填｜2）当前阶段】当前进展阶段短语（如 范围已收口 / BOM 选型中 / 待客户确认）"
+        },
+        "timeline": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TimelineEntry" },
+          "default": [],
+          "description": "【选填｜2）往来沟通与进展时间轴】按时间顺序沉淀微信汇报与邮件收发记录"
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "description": "【必填｜3）负责人】总负责/拍板人（邮件仅抄送董事长时，绝不可盲目填董事长）"
+        },
+        "assignee": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "description": "【必填｜3）实施人】内部实际执行人（如 王楠 / 李文颖 / 本人 / 【待补齐】）"
+        },
+        "external_partner": {
+          "type": "string",
+          "default": "无",
+          "maxLength": 120,
+          "description": "【选填｜3）外部协作】客户/设计院/供应商对接人（如 韩工 / Arnab(Budi)）"
+        },
+        "chairman_role": {
+          "type": "string",
+          "enum": ["owner", "assignee", "cc_observer", "approver"],
+          "default": "owner",
+          "description": "董事长在本任务中的真实角色（由微信指令或邮件 From/To/Cc 推断）"
+        },
+        "role_inference_reason": {
+          "type": "string",
+          "default": "",
+          "maxLength": 200,
+          "description": "角色推断依据（如：外部发件主送王楠、仅抄送董事长 -> 实施人=王楠，董事长=知情监督）"
+        },
+        "planned_start_at": {
+          "type": "string",
+          "description": "【选填｜4）开始时间】YYYY-MM-DD（默认当天）"
+        },
+        "planned_end_at": {
+          "type": "string",
+          "description": "【必填｜4）目标截止时间】YYYY-MM-DD；用户/邮件未提供时填 \"\"（严禁瞎猜当天），并写入 missing_required_fields"
+        },
+        "blocker_note": {
+          "type": "string",
+          "default": "",
+          "maxLength": 300,
+          "description": "【选填｜5）卡点与风险】当前卡在谁/等什么/风险提醒"
+        },
+        "linked_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "【选填｜5）关联档案】OneDrive 归档路径、图纸或邮件名称"
+        },
+        "mail_conversation_ids": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "绑定的 Microsoft Graph conversationId 列表，供后续往来邮件自动归入本卡"
+        },
+        "comments": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TimestampedNote" },
+          "default": [],
+          "description": "【选填｜6）补充备注】超出 1~5 条的所有客观背景与技术约束（按日期追加）"
+        },
+        "ceo_evaluation": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TimestampedNote" },
+          "default": [],
+          "description": "【选填｜7）CEO 评价】董事长本人的主观评价与批示（按日期追加，严格私密仅本人可见）"
+        },
+        "missing_required_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["project_name", "deliverable", "owner", "assignee", "planned_end_at"]
+          },
+          "default": [],
+          "description": "本轮尚未从用户输入或邮件中提取到的必填项清单，用于触发主动提醒补全"
+        }
+      }
+    },
+    "TaskTimelineUpdate": {
+      "type": "object",
+      "description": "匹配到已有在途任务卡的往来沟通/进展追加动作（绝不新建重复卡）",
+      "required": ["target_task_id", "timeline_entry"],
+      "additionalProperties": false,
+      "properties": {
+        "target_task_id": {
+          "type": "integer",
+          "description": "已有任务卡 ID（list_items.id）"
+        },
+        "target_task_title": {
+          "type": "string",
+          "default": ""
+        },
+        "match_method": {
+          "type": "string",
+          "enum": ["conversation_id", "semantic_match"],
+          "default": "semantic_match"
+        },
+        "timeline_entry": { "$ref": "#/$defs/TimelineEntry" },
+        "milestone_stage_update": {
+          "type": "string",
+          "default": ""
+        },
+        "blocker_note_update": {
+          "type": "string",
+          "default": ""
+        },
+        "comment_append": {
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "FyiNotice": {
+      "type": "object",
+      "description": "纯抄送/知会类邮件摘要（无需董事长出手，不建新卡）",
+      "required": ["timestamp", "from_party", "to_party", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": { "type": "string" },
+        "from_party": { "type": "string" },
+        "to_party": { "type": "string" },
+        "summary": { "type": "string", "maxLength": 240 },
+        "mail_conversation_id": { "type": "string", "default": "" }
+      }
+    },
+    "UnifiedTriageProposal": {
+      "type": "object",
+      "description": "微信交办与每小时邮件批次共用的统一路径④标准 JSON 契约",
+      "required": ["headline", "new_tasks", "task_updates", "fyi_notices"],
+      "additionalProperties": false,
+      "properties": {
+        "headline": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "核心标题（严禁包含「确认 #N」前缀）"
+        },
+        "executive_summary": {
+          "type": "string",
+          "default": "",
+          "maxLength": 800,
+          "description": "一句话全局摘要"
+        },
+        "new_tasks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TaskCard" },
+          "description": "真正需要新建的独立任务卡（一件事只建 1 张卡）"
+        },
+        "task_updates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/TaskTimelineUpdate" },
+          "description": "命中已有在途任务的进展与往来邮件追加（不新建重复卡）"
+        },
+        "fyi_notices": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/FyiNotice" },
+          "description": "纯抄送知会/信息同步条目（不建卡）"
+        },
+        "referenced_numbers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "citations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        },
+        "overload_warning": {
+          "type": ["string", "null"],
+          "default": null
+        }
+      }
+    }
+  }
+}

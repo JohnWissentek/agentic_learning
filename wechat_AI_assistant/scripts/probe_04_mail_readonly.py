@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage 2 Probe 4: Verify 21Vianet Graph Mail.Read (metadata only, zero content printed) and 403 Send prohibition."""
+"""Stage 2 Probe 4: Verify Global/HK or 21Vianet Graph Mail.Read (metadata only, zero content printed) and 403 Send prohibition."""
 
 from __future__ import annotations
 
@@ -12,19 +12,38 @@ from wechat_assistant.config import Settings
 
 
 def main() -> int:
-    settings = Settings.load(require_bailian=False, require_ms365=True)
+    settings = Settings.load(require_bailian=False, require_ms365=False)
+    if settings.mail_tenant_id and settings.mail_client_id and settings.mail_client_secret:
+        client_id = settings.mail_client_id
+        tenant_id = settings.mail_tenant_id
+        client_secret = settings.mail_client_secret
+        auth_url = settings.mail_auth_url.rstrip("/")
+        graph = settings.mail_graph_url.rstrip("/")
+        scope = "https://graph.microsoft.com/.default"
+        cloud_label = "global_hk"
+    else:
+        settings = Settings.load(require_bailian=False, require_ms365=True)
+        client_id = settings.ms_client_id
+        tenant_id = settings.ms_tenant_id
+        client_secret = settings.ms_client_secret
+        auth_url = settings.ms_auth_url.rstrip("/")
+        graph = settings.ms_graph_url.rstrip("/")
+        scope = "https://microsoftgraph.chinacloudapi.cn/.default"
+        cloud_label = "china_21vianet"
+
     app = msal.ConfidentialClientApplication(
-        settings.ms_client_id,
-        authority=f"{settings.ms_auth_url.rstrip('/')}/{settings.ms_tenant_id}",
-        client_credential=settings.ms_client_secret,
+        client_id,
+        authority=f"{auth_url}/{tenant_id}",
+        client_credential=client_secret,
     )
-    tok = app.acquire_token_for_client(scopes=["https://microsoftgraph.chinacloudapi.cn/.default"])
+    tok = app.acquire_token_for_client(scopes=[scope])
     if "access_token" not in tok:
-        raise RuntimeError(f"MSAL error: {tok.get('error')}")
+        raise RuntimeError(f"MSAL ({cloud_label}) error: {tok.get('error')} - {tok.get('error_description', '')}")
 
     headers = {"Authorization": f"Bearer {tok['access_token']}"}
-    graph = settings.ms_graph_url.rstrip("/")
     mailbox = settings.mail_user
+    if not mailbox:
+        raise RuntimeError("MAIL_USER is empty; set the target Outlook email address in env/.env.ms365")
 
     with httpx.Client(timeout=30.0) as client:
         # 1. Read-only listing (never log subject, sender, or body)
@@ -37,7 +56,10 @@ def main() -> int:
         msgs = r_read.json().get("value", [])
         with_msg_id = sum(1 for m in msgs if m.get("internetMessageId"))
         with_att = sum(1 for m in msgs if m.get("hasAttachments"))
-        print(f"[PROBE-4 mail_read] status={r_read.status_code} fetched={len(msgs)} has_internet_id={with_msg_id} with_attachments={with_att}")
+        print(
+            f"[PROBE-4 mail_read cloud={cloud_label} mailbox={mailbox}] "
+            f"status={r_read.status_code} fetched={len(msgs)} has_internet_id={with_msg_id} with_attachments={with_att}"
+        )
 
         # 2. Negative outbound send test (must return 403)
         r_send = client.post(

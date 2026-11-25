@@ -11,18 +11,30 @@ from typing import Any
 
 import httpx
 import msal
+import requests
 
 from wechat_assistant.config import Settings
 from wechat_assistant.schemas import ListType
 from wechat_assistant.storage.db import Database
 
 
+class _TimeoutRequestsSession(requests.Session):
+    """Requests session enforcing a bounded default timeout for MSAL token calls."""
+
+    def __init__(self, timeout: float = 20.0) -> None:
+        super().__init__()
+        self._default_timeout = timeout
+
+    def request(self, method: str, url: str, *args: Any, **kwargs: Any) -> requests.Response:
+        kwargs.setdefault("timeout", self._default_timeout)
+        return super().request(method, url, *args, **kwargs)
+
+
 def render_lists_markdown(db: Database) -> dict[str, str]:
-    """Render the 5 Markdown executive boards purely from SQLite state."""
+    """Render the 5 Markdown executive boards purely from SQLite state (v2.0 flat task cards)."""
     items = db.list_items(include_done=True)
     projects = db.list_projects()
     rules = db.list_memory_rules()
-    workload = db.get_daily_workload(days=7)
 
     # 1. 01_今日与行动待办.md
     action_types = {ListType.PROJECT_ACTION.value, ListType.NEXT_ACTION.value}
@@ -31,12 +43,13 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
     lines_01 = [
         "# 01｜今日与行动待办（自动重绘）\n",
         f"> 当前未完成行动项：**{len(open_actions)} 项**\n",
-        "| ID | 优先级 | 状态 | 事项 | 项目/板块 | 计划起止周期 | 计划/实际完成跨度 |",
-        "| :---: | :---: | :---: | :--- | :--- | :--- | :---: |",
+        "| ID | 优先级 | 状态 | 任务与交付成果 | 归属项目/板块 | 负责人 / 实施人 / 外部 | 计划起止周期 | 计划/实际完成跨度 |",
+        "| :---: | :---: | :---: | :--- | :--- | :--- | :--- | :---: |",
     ]
     for it in actions:
         status_icon = "✅ 已完成" if it["status"] == "done" else ("🔄 进行中" if it["status"] == "in_progress" else "⬜ 待办")
-        span = f"{it['planned_start_at'] or '-'} ~ {it['planned_end_at'] or '-'}"
+        pe_disp = it["planned_end_at"] or "【待补齐】"
+        span = f"{it['planned_start_at'] or '-'} ~ {pe_disp}"
         try:
             from datetime import date as _d
             ps = _d.fromisoformat((it["planned_start_at"] or "")[:10])
@@ -44,7 +57,7 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
             p_days = max(1, (pe - ps).days + 1)
         except ValueError:
             p_days = 1
-        span_col = f"计划 {p_days} 天"
+        span_col = f"计划 {p_days} 天" if it["planned_end_at"] else "待补齐"
         if it["status"] == "done":
             try:
                 from datetime import date as _d
@@ -56,11 +69,14 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
                     span_col += f"（实{it['actual_hours']}h）"
             except ValueError:
                 span_col = "已完成"
+        deliv = (it.get("deliverable") or "").strip()
+        title_cell = f"{it['title']}" + (f"<br>成果：{deliv}" if deliv and deliv != it["title"] else "")
+        role_cell = f"{it['owner']} / {it.get('assignee') or it['owner']} / {it.get('external_partner') or '无'}"
         lines_01.append(
-            f"| {it['id']} | **{it['priority']}** | {status_icon} | {it['title']} | {it['project_name']}（{it['work_domain']}） | {span} | {span_col} |"
+            f"| {it['id']} | **{it['priority']}** | {status_icon} | {title_cell} | {it['project_name']}（{it['work_domain']}） | {role_cell} | {span} | {span_col} |"
         )
     if not actions:
-        lines_01.append("| - | - | - | 暂无行动待办 | - | - | - |")
+        lines_01.append("| - | - | - | 暂无行动待办 | - | - | - | - |")
 
     # 2. 02_在途项目总览.md
     lines_02 = [
@@ -157,6 +173,7 @@ class OneDrive21VianetClient:
                     self.settings.ms_client_id,
                     authority=f"{self.settings.ms_auth_url.rstrip('/')}/{self.settings.ms_tenant_id}",
                     client_credential=self.settings.ms_client_secret,
+                    http_client=_TimeoutRequestsSession(timeout=20.0),
                 )
             res = self._msal_app.acquire_token_for_client(
                 scopes=["https://microsoftgraph.chinacloudapi.cn/.default"]
@@ -194,7 +211,13 @@ class OneDrive21VianetClient:
                 url = f"{self.graph}/sites/{site_id}/drive/root:/{encoded}:/content"
                 r = client.put(url, headers=self._headers({"Content-Type": content_type}), content=data)
                 r.raise_for_status()
-                return r.json()
+                item = r.json()
+                returned_size = item.get("size")
+                if returned_size is not None and int(returned_size) != len(data):
+                    raise RuntimeError(
+                        f"Uploaded size mismatch for {remote_path}: expected={len(data)}, got={returned_size}"
+                    )
+                return item
 
             sess_url = f"{self.graph}/sites/{site_id}/drive/root:/{encoded}:/createUploadSession"
             sr = client.post(

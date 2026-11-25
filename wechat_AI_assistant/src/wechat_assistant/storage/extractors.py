@@ -83,18 +83,32 @@ def _extract_zip_pages(p: Path, *, depth: int) -> list[dict[str, Any]]:
                 if processed_files > _MAX_ZIP_FILES:
                     pages.append({"page": len(pages) + 1, "text": f"[压缩包内文件超过 {_MAX_ZIP_FILES} 个上限，其余已保留原件]"})
                     break
-                total_bytes += max(0, info.file_size)
-                if total_bytes > _MAX_ZIP_UNCOMPRESSED_BYTES:
+                # Zip-slip path traversal guard (strict is_relative_to blocks sibling-prefix tricks)
+                dest = (tmp_root / info.filename).resolve()
+                if not dest.is_relative_to(tmp_root):
+                    continue
+                if info.file_size and total_bytes + max(0, info.file_size) > _MAX_ZIP_UNCOMPRESSED_BYTES:
                     pages.append({"page": len(pages) + 1, "text": "[压缩包解压体积超限，已停止展开，原件已归档]"})
                     break
-
-                # Zip-slip path traversal guard
-                dest = (tmp_root / info.filename).resolve()
-                if not str(dest).startswith(str(tmp_root)):
-                    continue
                 dest.parent.mkdir(parents=True, exist_ok=True)
+                exceeded = False
                 with zf.open(info, "r") as src, dest.open("wb") as dst:
-                    dst.write(src.read())
+                    while True:
+                        chunk = src.read(65536)
+                        if not chunk:
+                            break
+                        total_bytes += len(chunk)
+                        if total_bytes > _MAX_ZIP_UNCOMPRESSED_BYTES:
+                            exceeded = True
+                            break
+                        dst.write(chunk)
+                if exceeded:
+                    try:
+                        dest.unlink(missing_ok=True)
+                    except OSError:
+                        pass
+                    pages.append({"page": len(pages) + 1, "text": "[压缩包解压体积超限，已停止展开，原件已归档]"})
+                    break
 
                 inner_pages = extract_document_pages(dest, _zip_depth=depth + 1)
                 for ip in inner_pages:
@@ -142,28 +156,36 @@ def extract_document_pages(file_path: str | Path, *, _zip_depth: int = 0) -> lis
             return [{"page": 1, "text": f"[PDF 暂无法解析正文（原件已归档，请补充说明）: {p.name}]"}]
 
     if suffix == ".docx":
-        doc = Document(str(p))
-        lines = [para.text.strip() for para in doc.paragraphs if para.text.strip()]
-        for tbl in doc.tables:
-            for row in tbl.rows:
-                cells = [c.text.strip().replace("\n", " ") for c in row.cells]
-                if any(cells):
-                    lines.append(" | ".join(cells))
-        return [{"page": 1, "text": "\n".join(lines)}]
+        try:
+            doc = Document(str(p))
+            lines = [para.text.strip() for para in doc.paragraphs if para.text.strip()]
+            for tbl in doc.tables:
+                for row in tbl.rows:
+                    cells = [c.text.strip().replace("\n", " ") for c in row.cells]
+                    if any(cells):
+                        lines.append(" | ".join(cells))
+            return [{"page": 1, "text": "\n".join(lines)}]
+        except Exception:
+            return [{"page": 1, "text": f"[Word 文档暂无法解析正文（可能已加密或格式损坏，原件已归档）: {p.name}]"}]
 
     if suffix in {".xlsx", ".xlsm"}:
-        wb = load_workbook(filename=str(p), data_only=True, read_only=True)
-        pages = []
-        for idx, name in enumerate(wb.sheetnames, start=1):
-            ws = wb[name]
-            rows_txt: list[str] = [f"[Sheet: {name}]"]
-            for row in ws.iter_rows(values_only=True):
-                vals = [str(v) if v is not None else "" for v in row]
-                if any(vals):
-                    rows_txt.append(" | ".join(vals))
-            pages.append({"page": idx, "sheet": name, "text": "\n".join(rows_txt)})
-        wb.close()
-        return pages
+        try:
+            wb = load_workbook(filename=str(p), data_only=True, read_only=True)
+            try:
+                pages = []
+                for idx, name in enumerate(wb.sheetnames, start=1):
+                    ws = wb[name]
+                    rows_txt: list[str] = [f"[Sheet: {name}]"]
+                    for row in ws.iter_rows(values_only=True):
+                        vals = [str(v) if v is not None else "" for v in row]
+                        if any(vals):
+                            rows_txt.append(" | ".join(vals))
+                    pages.append({"page": idx, "sheet": name, "text": "\n".join(rows_txt)})
+                return pages
+            finally:
+                wb.close()
+        except Exception:
+            return [{"page": 1, "text": f"[Excel 表格暂无法解析正文（可能已加密或格式损坏，原件已归档）: {p.name}]"}]
 
     if suffix == ".zip":
         return _extract_zip_pages(p, depth=_zip_depth)
@@ -188,26 +210,3 @@ def extract_document_pages(file_path: str | Path, *, _zip_depth: int = 0) -> lis
             "text": f"[未解析二进制附件（{suffix or '未知格式'}，{size_kb} KB），不支持自动提取正文，原件已归档，请补充文字/语音说明]: {p.name}",
         }
     ]
-
-
-def parse_excel_quote_rows(file_path: str | Path, sheet_index: int = 0) -> list[dict[str, Any]]:
-    """Extract normalized numeric quote rows from an Excel sheet for deterministic Diff."""
-    wb = load_workbook(filename=str(file_path), data_only=True, read_only=True)
-    try:
-        sheet = wb[wb.sheetnames[sheet_index]]
-        all_rows = list(sheet.iter_rows(values_only=True))
-    finally:
-        wb.close()
-
-    if not all_rows:
-        return []
-
-    headers = [str(h or f"col_{i}").strip() for i, h in enumerate(all_rows[0])]
-    records: list[dict[str, Any]] = []
-    for r_idx, row in enumerate(all_rows[1:], start=2):
-        if not any(v is not None and str(v).strip() != "" for v in row):
-            continue
-        item = {headers[i]: row[i] for i in range(min(len(headers), len(row)))}
-        item["_row_num"] = r_idx
-        records.append(item)
-    return records

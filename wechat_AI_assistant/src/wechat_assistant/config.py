@@ -53,6 +53,7 @@ class Settings:
     wecom_app_secret: str = ""
     wecom_app_token: str = ""
     wecom_app_aes_key: str = ""
+    wecom_app_owner_userid: str = ""
     wecom_kf_secret: str = ""
     wecom_kf_open_kfid: str = ""
     wecom_kf_url: str = ""
@@ -148,6 +149,7 @@ class Settings:
             wecom_app_secret=get("WECOM_APP_SECRET"),
             wecom_app_token=get("WECOM_APP_TOKEN"),
             wecom_app_aes_key=get("WECOM_APP_AES_KEY"),
+            wecom_app_owner_userid=get("WECOM_APP_OWNER_USERID"),
             wecom_kf_secret=get("WECOM_KF_SECRET"),
             wecom_kf_open_kfid=get("WECOM_KF_OPEN_KFID"),
             wecom_kf_url=get("WECOM_KF_URL"),
@@ -375,7 +377,12 @@ class DashScopeLLMGateway:
                     ],
                 })
                 for tc in tool_calls:
-                    args = json.loads(tc.function.arguments or "{}")
+                    try:
+                        args = json.loads(tc.function.arguments or "{}")
+                        if not isinstance(args, dict):
+                            args = {}
+                    except json.JSONDecodeError:
+                        args = {}
                     result = tool_executor(tc.function.name, args)
                     assert_no_secrets_leaked(result, self.settings)
                     history.append({

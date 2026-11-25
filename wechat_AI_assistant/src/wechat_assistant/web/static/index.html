@@ -1434,7 +1434,7 @@
         if (dom && i.work_domain !== dom) return false;
         if (prio && i.priority !== prio) return false;
         if (q) {
-          const hay = `${i.title} ${i.project_name} ${i.owner} ${domainMeta(i.work_domain).label}`.toLowerCase();
+          const hay = `${i.title} ${i.project_name} ${i.owner} ${i.assignee || ""} ${i.external_partner || ""} ${i.deliverable || ""} ${i.blocker_note || ""} ${domainMeta(i.work_domain).label}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -1773,7 +1773,7 @@
 
     async function saveTimeline(id) {
       const s = document.getElementById("pop-start").value;
-      const e = document.getElementById("pop-end").value || s;
+      const e = document.getElementById("pop-end").value;
       closePopovers();
       await api(`/api/items/${id}`, {
         method: "PATCH",
@@ -1819,11 +1819,11 @@
               <div class="form-row-2">
                 <div>
                   <label class="form-label">Project Name</label>
-                  <input id="ni-project" class="input" value="General Ops" />
+                  <input id="ni-project" class="input" value="日常事务" />
                 </div>
                 <div>
                   <label class="form-label">Owner</label>
-                  <input id="ni-owner" class="input" value="Chairman" />
+                  <input id="ni-owner" class="input" value="徐宏玮" />
                 </div>
               </div>
               <div class="form-row-2">
@@ -1832,8 +1832,8 @@
                   <input type="date" id="ni-start" class="input" value="${STATE.today}" />
                 </div>
                 <div>
-                  <label class="form-label">Target End Date</label>
-                  <input type="date" id="ni-end" class="input" value="${addDaysIso(STATE.today, 2)}" />
+                  <label class="form-label">Target End Date (留空表示待补齐)</label>
+                  <input type="date" id="ni-end" class="input" value="" />
                 </div>
               </div>
               <div>
@@ -1863,10 +1863,10 @@
           title,
           list_type: document.getElementById("ni-list").value,
           work_domain: document.getElementById("ni-domain").value,
-          project_name: document.getElementById("ni-project").value.trim() || "General Ops",
-          owner: document.getElementById("ni-owner").value.trim() || "Chairman",
+          project_name: document.getElementById("ni-project").value.trim() || "日常事务",
+          owner: document.getElementById("ni-owner").value.trim() || "徐宏玮",
           planned_start_at: document.getElementById("ni-start").value || STATE.today,
-          planned_end_at: document.getElementById("ni-end").value || STATE.today,
+          planned_end_at: document.getElementById("ni-end").value || "",
           priority: document.getElementById("ni-prio").value,
           estimated_hours: 0.0
         })

@@ -6,11 +6,13 @@ import hashlib
 import json
 import sqlite3
 import threading
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel
+from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel, TaskTimelineUpdate
 
 
 def _now_str() -> str:
@@ -28,6 +30,30 @@ def _parse_iso_date(val: str | None) -> date | None:
         return date.fromisoformat(val[:10])
     except ValueError:
         return None
+
+
+def _safe_json_list(raw: str | None) -> list[Any]:
+    if not raw:
+        return []
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, list) else []
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
+def _safe_json_dict(raw: str | None) -> dict[str, Any]:
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, dict) else {}
+    except (json.JSONDecodeError, TypeError):
+        return {}
+
+
+def _escape_like(term: str) -> str:
+    return term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 def compute_priority_score(priority: str, planned_end_at: str | None, list_type: str) -> float:
@@ -57,13 +83,18 @@ class Database:
         self.fts_tokenizer = "unicode61"
         self._init_schema()
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
         conn = sqlite3.connect(str(self.db_path), timeout=15.0, check_same_thread=False)
-        conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=WAL;")
-        conn.execute("PRAGMA foreign_keys=ON;")
-        conn.execute("PRAGMA busy_timeout=5000;")
-        return conn
+        try:
+            conn.row_factory = sqlite3.Row
+            conn.execute("PRAGMA journal_mode=WAL;")
+            conn.execute("PRAGMA foreign_keys=ON;")
+            conn.execute("PRAGMA busy_timeout=5000;")
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def _init_schema(self) -> None:
         with self._lock, self._connect() as conn:
@@ -109,12 +140,19 @@ class Database:
                     project_name TEXT DEFAULT '通用待办',
                     work_domain TEXT DEFAULT '产品研发',
                     title TEXT NOT NULL,
+                    deliverable TEXT DEFAULT '',
+                    acceptance_criteria TEXT DEFAULT '',
+                    milestone_stage TEXT DEFAULT '已启动',
                     owner TEXT DEFAULT '本人',
+                    assignee TEXT DEFAULT '',
+                    external_partner TEXT DEFAULT '无',
+                    chairman_role TEXT DEFAULT 'owner',
+                    blocker_note TEXT DEFAULT '',
                     planned_start_at TEXT DEFAULT '',
                     planned_end_at TEXT DEFAULT '',
                     actual_start_at TEXT DEFAULT '',
                     actual_end_at TEXT DEFAULT '',
-                    estimated_hours REAL DEFAULT 0.5,
+                    estimated_hours REAL DEFAULT 0.0,
                     actual_hours REAL,
                     priority TEXT DEFAULT 'P1',
                     priority_score REAL DEFAULT 60.0,
@@ -123,9 +161,30 @@ class Database:
                     relation_note TEXT DEFAULT '',
                     source_ids_json TEXT DEFAULT '[]',
                     onedrive_doc_paths_json TEXT DEFAULT '[]',
+                    comments TEXT DEFAULT '[]',
+                    ceo_evaluation TEXT DEFAULT '[]',
+                    mail_conversation_ids TEXT DEFAULT '[]',
+                    missing_required_fields TEXT DEFAULT '[]',
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 );
+
+                CREATE TABLE IF NOT EXISTS task_timeline (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    item_id INTEGER NOT NULL REFERENCES list_items(id) ON DELETE CASCADE,
+                    timestamp TEXT NOT NULL,
+                    channel TEXT NOT NULL DEFAULT 'wechat',
+                    from_party TEXT DEFAULT '',
+                    to_party TEXT DEFAULT '',
+                    cc_parties_json TEXT DEFAULT '[]',
+                    summary TEXT NOT NULL,
+                    source_ref TEXT DEFAULT '',
+                    mail_conversation_id TEXT DEFAULT '',
+                    created_at TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_task_timeline_item ON task_timeline(item_id, id ASC);
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_task_timeline_dedup
+                    ON task_timeline(item_id, source_ref) WHERE source_ref != '';
 
                 CREATE TABLE IF NOT EXISTS memory_rules (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -232,6 +291,75 @@ class Database:
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS seen_external_ids (ext_id TEXT PRIMARY KEY, seen_at TEXT NOT NULL)"
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS mail_poll_cursor (
+                    folder TEXT PRIMARY KEY,
+                    watermark_utc TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                )
+                """
+            )
+            # Lossless schema migration for existing pre-v2.0 list_items tables
+            existing_cols = {
+                str(r["name"]) for r in conn.execute("PRAGMA table_info(list_items)").fetchall()
+            }
+            v2_migrations = (
+                ("deliverable", "TEXT DEFAULT ''"),
+                ("acceptance_criteria", "TEXT DEFAULT ''"),
+                ("milestone_stage", "TEXT DEFAULT '已启动'"),
+                ("assignee", "TEXT DEFAULT ''"),
+                ("external_partner", "TEXT DEFAULT '无'"),
+                ("chairman_role", "TEXT DEFAULT 'owner'"),
+                ("blocker_note", "TEXT DEFAULT ''"),
+                ("comments", "TEXT DEFAULT '[]'"),
+                ("ceo_evaluation", "TEXT DEFAULT '[]'"),
+                ("mail_conversation_ids", "TEXT DEFAULT '[]'"),
+                ("missing_required_fields", "TEXT DEFAULT '[]'"),
+            )
+            for col_name, col_def in v2_migrations:
+                if col_name not in existing_cols:
+                    conn.execute(f"ALTER TABLE list_items ADD COLUMN {col_name} {col_def}")
+
+    def get_mail_watermark(self, folder: str) -> str | None:
+        """Return the last completed UTC ISO-8601 watermark for a mail folder (`inbox` or `sent`)."""
+        key = (folder or "").strip().lower()
+        if not key:
+            return None
+        with self._lock, self._connect() as conn:
+            row = conn.execute(
+                "SELECT watermark_utc FROM mail_poll_cursor WHERE folder = ?",
+                (key,),
+            ).fetchone()
+            return str(row["watermark_utc"]) if row else None
+
+    def set_mail_watermark(self, folder: str, watermark_utc: str) -> None:
+        """Persist or advance the UTC ISO-8601 watermark for a mail folder (`inbox` or `sent`)."""
+        key = (folder or "").strip().lower()
+        if not key or not watermark_utc:
+            return
+        with self._lock, self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO mail_poll_cursor (folder, watermark_utc, updated_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(folder) DO UPDATE SET
+                    watermark_utc = excluded.watermark_utc,
+                    updated_at = excluded.updated_at
+                """,
+                (key, watermark_utc.strip(), _now_str()),
+            )
+
+    def is_external_seen(self, ext_id: str) -> bool:
+        """Check whether an external message id has already been processed without mutating state."""
+        if not ext_id:
+            return False
+        with self._lock, self._connect() as conn:
+            row = conn.execute(
+                "SELECT 1 FROM seen_external_ids WHERE ext_id = ?",
+                (ext_id,),
+            ).fetchone()
+            return row is not None
 
     def mark_external_seen(self, ext_id: str) -> bool:
         """Atomically mark an external message id as processed. Returns True only the first time."""
@@ -261,15 +389,16 @@ class Database:
         extracted_pages: list[dict[str, Any]] | None = None,
     ) -> tuple[int, bool]:
         """Insert a raw source with `external_msg_id` deduplication. Returns `(id, is_new)`."""
+        ext_id = (external_msg_id or "").strip() or None
         pages = extracted_pages or []
         content_hash = hashlib.sha256(f"{source_type}|{title}|{raw_text}".encode("utf-8")).hexdigest()
         now = _now_str()
 
         with self._lock, self._connect() as conn:
-            if external_msg_id:
+            if ext_id:
                 existing = conn.execute(
                     "SELECT id FROM raw_sources WHERE external_msg_id = ?",
-                    (external_msg_id,),
+                    (ext_id,),
                 ).fetchone()
                 if existing:
                     return int(existing["id"]), False
@@ -284,7 +413,7 @@ class Database:
                 """,
                 (
                     source_type,
-                    external_msg_id,
+                    ext_id,
                     sender,
                     title,
                     raw_text,
@@ -349,11 +478,11 @@ class Database:
                 except sqlite3.OperationalError:
                     pass
 
-                like_pat = f"%{tok}%"
+                like_pat = f"%{_escape_like(tok)}%"
                 rows_like = conn.execute(
                     """
                     SELECT id FROM raw_sources
-                    WHERE title LIKE ? OR raw_text LIKE ? OR extracted_pages_json LIKE ?
+                    WHERE title LIKE ? ESCAPE '\\' OR raw_text LIKE ? ESCAPE '\\' OR extracted_pages_json LIKE ? ESCAPE '\\'
                     ORDER BY id DESC LIMIT ?
                     """,
                     (like_pat, like_pat, like_pat, top_k * 2),
@@ -363,9 +492,9 @@ class Database:
                     matched_ids[sid] = matched_ids.get(sid, 0.0) + 1.0
 
             if not matched_ids and query.strip():
-                like_pat = f"%{query.strip()}%"
+                like_pat = f"%{_escape_like(query.strip())}%"
                 for r in conn.execute(
-                    "SELECT id FROM raw_sources WHERE title LIKE ? OR raw_text LIKE ? OR extracted_pages_json LIKE ? LIMIT ?",
+                    "SELECT id FROM raw_sources WHERE title LIKE ? ESCAPE '\\' OR raw_text LIKE ? ESCAPE '\\' OR extracted_pages_json LIKE ? ESCAPE '\\' LIMIT ?",
                     (like_pat, like_pat, like_pat, top_k),
                 ).fetchall():
                     matched_ids[int(r["id"])] = 1.0
@@ -385,7 +514,7 @@ class Database:
                 if sid in row_map:
                     item = row_map[sid]
                     item["score"] = matched_ids[sid]
-                    item["pages"] = json.loads(item.get("extracted_pages_json") or "[]")
+                    item["pages"] = _safe_json_list(item.get("extracted_pages_json"))
                     results.append(item)
             return results
 
@@ -398,7 +527,7 @@ class Database:
             ).fetchone()
             if not row:
                 return []
-            pages = json.loads(row["extracted_pages_json"] or "[]")
+            pages = _safe_json_list(row["extracted_pages_json"])
             if not pages and row["raw_text"]:
                 pages = [{"page": 1, "text": row["raw_text"]}]
             if page_numbers:
@@ -474,6 +603,222 @@ class Database:
             (round(float(row["est"]), 2), round(float(row["act"]), 2), _now_str(), project_id),
         )
 
+    @staticmethod
+    def _hydrate_item_row(row: sqlite3.Row | dict[str, Any], timeline: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+        item = dict(row)
+        item["comments"] = _safe_json_list(item.get("comments"))
+        item["ceo_evaluation"] = _safe_json_list(item.get("ceo_evaluation"))
+        item["mail_conversation_ids"] = _safe_json_list(item.get("mail_conversation_ids"))
+        item["missing_required_fields"] = _safe_json_list(item.get("missing_required_fields"))
+        item["onedrive_doc_paths"] = _safe_json_list(item.get("onedrive_doc_paths_json"))
+        item.setdefault("deliverable", "")
+        item.setdefault("acceptance_criteria", "")
+        item.setdefault("milestone_stage", "已启动")
+        item.setdefault("assignee", "")
+        item.setdefault("external_partner", "无")
+        item.setdefault("chairman_role", "owner")
+        item.setdefault("blocker_note", "")
+        if timeline is not None:
+            item["timeline"] = timeline
+        return item
+
+    def get_item(self, item_id: int) -> dict[str, Any] | None:
+        """Fetch a single hydrated task card by ID, or None if not found."""
+        with self._lock, self._connect() as conn:
+            row = conn.execute("SELECT * FROM list_items WHERE id = ?", (int(item_id),)).fetchone()
+            if not row:
+                return None
+            tl_rows = conn.execute(
+                "SELECT * FROM task_timeline WHERE item_id = ? ORDER BY id ASC",
+                (int(item_id),),
+            ).fetchall()
+            tl: list[dict[str, Any]] = []
+            for r in tl_rows:
+                d = dict(r)
+                d["cc_parties"] = _safe_json_list(d.get("cc_parties_json"))
+                tl.append(d)
+            return self._hydrate_item_row(row, timeline=tl)
+
+    def append_task_timeline(
+        self,
+        item_id: int,
+        *,
+        summary: str,
+        channel: str = "wechat",
+        from_party: str = "",
+        to_party: str = "",
+        cc_parties: list[str] | None = None,
+        timestamp: str | None = None,
+        source_ref: str = "",
+        mail_conversation_id: str = "",
+    ) -> dict[str, Any] | None:
+        """Append a chronological progress/communication entry onto an existing task card (idempotent on source_ref)."""
+        clean_summary = (summary or "").strip()
+        if not clean_summary:
+            return None
+        now = _now_str()
+        ts = (timestamp or "").strip() or now[:16]
+        cc_list = [str(c).strip() for c in (cc_parties or []) if str(c).strip()]
+        conv_id = (mail_conversation_id or "").strip()
+        clean_ref = (source_ref or "").strip()
+        with self._lock, self._connect() as conn:
+            row = conn.execute("SELECT id, mail_conversation_ids FROM list_items WHERE id = ?", (item_id,)).fetchone()
+            if not row:
+                return None
+            if clean_ref:
+                existing_tl = conn.execute(
+                    "SELECT * FROM task_timeline WHERE item_id = ? AND source_ref = ? LIMIT 1",
+                    (int(item_id), clean_ref),
+                ).fetchone()
+                if existing_tl:
+                    d = dict(existing_tl)
+                    d["cc_parties"] = _safe_json_list(d.get("cc_parties_json"))
+                    return d
+            cur = conn.execute(
+                """
+                INSERT INTO task_timeline (
+                    item_id, timestamp, channel, from_party, to_party, cc_parties_json,
+                    summary, source_ref, mail_conversation_id, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    int(item_id),
+                    ts,
+                    channel,
+                    from_party.strip(),
+                    to_party.strip(),
+                    json.dumps(cc_list, ensure_ascii=False),
+                    clean_summary[:300],
+                    clean_ref,
+                    conv_id,
+                    now,
+                ),
+            )
+            if conv_id:
+                existing_convs = _safe_json_list(row["mail_conversation_ids"])
+                if conv_id not in existing_convs:
+                    existing_convs.append(conv_id)
+                    conn.execute(
+                        "UPDATE list_items SET mail_conversation_ids = ?, updated_at = ? WHERE id = ?",
+                        (json.dumps(existing_convs, ensure_ascii=False), now, int(item_id)),
+                    )
+            return {
+                "id": int(cur.lastrowid),
+                "item_id": int(item_id),
+                "timestamp": ts,
+                "channel": channel,
+                "from_party": from_party.strip(),
+                "to_party": to_party.strip(),
+                "cc_parties": cc_list,
+                "summary": clean_summary[:300],
+                "source_ref": clean_ref,
+                "mail_conversation_id": conv_id,
+            }
+
+    def get_task_timeline(self, item_id: int, *, limit: int | None = None) -> list[dict[str, Any]]:
+        """Return chronological timeline entries for a task card (most recent `limit` if specified)."""
+        with self._lock, self._connect() as conn:
+            if limit is not None and limit > 0:
+                rows = conn.execute(
+                    "SELECT * FROM task_timeline WHERE item_id = ? ORDER BY id DESC LIMIT ?",
+                    (int(item_id), int(limit)),
+                ).fetchall()
+                rows = list(reversed(rows))
+            else:
+                rows = conn.execute(
+                    "SELECT * FROM task_timeline WHERE item_id = ? ORDER BY id ASC",
+                    (int(item_id),),
+                ).fetchall()
+            out: list[dict[str, Any]] = []
+            for r in rows:
+                d = dict(r)
+                d["cc_parties"] = _safe_json_list(d.get("cc_parties_json"))
+                out.append(d)
+            return out
+
+    def append_task_comment(
+        self,
+        item_id: int,
+        content: str,
+        *,
+        date_str: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Append a dated objective comment to `list_items.comments` without overwriting prior entries."""
+        clean = (content or "").strip()
+        if not clean:
+            return None
+        d_str = (date_str or "").strip() or _today_str()
+        now = _now_str()
+        with self._lock, self._connect() as conn:
+            row = conn.execute("SELECT * FROM list_items WHERE id = ?", (int(item_id),)).fetchone()
+            if not row:
+                return None
+            notes = _safe_json_list(row["comments"])
+            notes.append({"date": d_str, "content": clean[:500]})
+            conn.execute(
+                "UPDATE list_items SET comments = ?, updated_at = ? WHERE id = ?",
+                (json.dumps(notes, ensure_ascii=False), now, int(item_id)),
+            )
+            updated = conn.execute("SELECT * FROM list_items WHERE id = ?", (int(item_id),)).fetchone()
+            return self._hydrate_item_row(updated) if updated else None
+
+    def append_task_ceo_evaluation(
+        self,
+        item_id: int,
+        content: str,
+        *,
+        date_str: str | None = None,
+    ) -> dict[str, Any] | None:
+        """Append a dated Chairman subjective evaluation to `list_items.ceo_evaluation`."""
+        clean = (content or "").strip()
+        if not clean:
+            return None
+        d_str = (date_str or "").strip() or _today_str()
+        now = _now_str()
+        with self._lock, self._connect() as conn:
+            row = conn.execute("SELECT * FROM list_items WHERE id = ?", (int(item_id),)).fetchone()
+            if not row:
+                return None
+            notes = _safe_json_list(row["ceo_evaluation"])
+            notes.append({"date": d_str, "content": clean[:500]})
+            conn.execute(
+                "UPDATE list_items SET ceo_evaluation = ?, updated_at = ? WHERE id = ?",
+                (json.dumps(notes, ensure_ascii=False), now, int(item_id)),
+            )
+            updated = conn.execute("SELECT * FROM list_items WHERE id = ?", (int(item_id),)).fetchone()
+            return self._hydrate_item_row(updated) if updated else None
+
+    def find_task_by_mail_conversation_id(
+        self,
+        conversation_id: str,
+        *,
+        include_done: bool = False,
+    ) -> dict[str, Any] | None:
+        """Find a task card bound to an Outlook Graph `conversationId` (prefers open tasks)."""
+        cid = (conversation_id or "").strip()
+        if not cid:
+            return None
+        with self._lock, self._connect() as conn:
+            sql = "SELECT * FROM list_items"
+            if not include_done:
+                sql += " WHERE status != 'done'"
+            sql += " ORDER BY id DESC"
+            for r in conn.execute(sql).fetchall():
+                cids = _safe_json_list(r["mail_conversation_ids"])
+                if cid in cids:
+                    return self._hydrate_item_row(r)
+            tl_row = conn.execute(
+                """
+                SELECT l.* FROM task_timeline t
+                JOIN list_items l ON l.id = t.item_id
+                WHERE t.mail_conversation_id = ?
+                  AND (? = 1 OR l.status != 'done')
+                ORDER BY l.id DESC LIMIT 1
+                """,
+                (cid, 1 if include_done else 0),
+            ).fetchone()
+            return self._hydrate_item_row(tl_row) if tl_row else None
+
     def apply_proposal_atomic(
         self,
         *,
@@ -483,15 +828,32 @@ class Database:
         doc_paths: list[str],
         brief_summary: str = "",
         project_web_urls: dict[str, str] | None = None,
+        task_updates: list[TaskTimelineUpdate] | None = None,
     ) -> dict[str, Any]:
-        """Commit a confirmed TriageProposal atomically and record a 24h undo snapshot."""
+        """Commit a confirmed TriageProposal (new task cards + existing task timeline updates) atomically."""
         now = _now_str()
+        today_str = _today_str()
         inserted_item_ids: list[int] = []
+        inserted_timeline_ids: list[int] = []
+        updated_items_prev: list[dict[str, Any]] = []
         created_project_ids: list[int] = []
         previous_projects: list[dict[str, Any]] = []
         web_map = project_web_urls or {}
 
         with self._lock, self._connect() as conn:
+            if proposal_id is not None:
+                cur_cas = conn.execute(
+                    "UPDATE pending_proposals SET status = 'confirmed' WHERE id = ? AND status = 'pending'",
+                    (proposal_id,),
+                )
+                if cur_cas.rowcount == 0:
+                    return {
+                        "already_processed": True,
+                        "inserted_item_ids": [],
+                        "updated_item_ids": [],
+                        "undo_snapshot_id": None,
+                    }
+
             touched_project_ids: set[int] = set()
             for act in actions:
                 proj_name = act.project_name.strip() or "日常事务"
@@ -513,13 +875,34 @@ class Database:
 
                 score = compute_priority_score(act.priority.value, act.planned_end_at, act.list_type.value)
                 stage = "闪念收集" if act.list_type == ListType.IDEA else "待执行"
+                merged_docs = list(doc_paths)
+                for lf in act.linked_files or []:
+                    if lf and lf not in merged_docs:
+                        merged_docs.append(lf)
+                comments_payload = [
+                    {"date": (n.date or today_str), "content": n.content}
+                    for n in (act.comments or [])
+                ]
+                ceo_eval_payload = [
+                    {"date": (n.date or today_str), "content": n.content}
+                    for n in (act.ceo_evaluation or [])
+                ]
+                conv_ids = [str(c).strip() for c in (act.mail_conversation_ids or []) if str(c).strip()]
+                for tl_entry in act.timeline or []:
+                    if tl_entry.mail_conversation_id and tl_entry.mail_conversation_id not in conv_ids:
+                        conv_ids.append(tl_entry.mail_conversation_id)
+
                 cur = conn.execute(
                     """
                     INSERT INTO list_items (
-                        list_type, project_id, project_name, work_domain, title, owner,
+                        list_type, project_id, project_name, work_domain, title,
+                        deliverable, acceptance_criteria, milestone_stage,
+                        owner, assignee, external_partner, chairman_role, blocker_note,
                         planned_start_at, planned_end_at, estimated_hours, priority, priority_score,
-                        status, stage, source_ids_json, onedrive_doc_paths_json, created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'todo', ?, ?, ?, ?, ?)
+                        status, stage, source_ids_json, onedrive_doc_paths_json,
+                        comments, ceo_evaluation, mail_conversation_ids, missing_required_fields,
+                        created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'todo', ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         act.list_type.value,
@@ -527,7 +910,14 @@ class Database:
                         proj_name,
                         act.work_domain.value,
                         act.title,
+                        act.deliverable,
+                        act.acceptance_criteria,
+                        act.milestone_stage or "已启动",
                         act.owner,
+                        act.assignee,
+                        act.external_partner or "无",
+                        act.chairman_role,
+                        act.blocker_note,
                         act.planned_start_at,
                         act.planned_end_at,
                         round(float(act.estimated_hours), 2),
@@ -535,18 +925,124 @@ class Database:
                         score,
                         stage,
                         json.dumps(source_ids),
-                        json.dumps(doc_paths, ensure_ascii=False),
+                        json.dumps(merged_docs, ensure_ascii=False),
+                        json.dumps(comments_payload, ensure_ascii=False),
+                        json.dumps(ceo_eval_payload, ensure_ascii=False),
+                        json.dumps(conv_ids, ensure_ascii=False),
+                        json.dumps(list(act.missing_required_fields or []), ensure_ascii=False),
                         now,
                         now,
                     ),
                 )
-                inserted_item_ids.append(int(cur.lastrowid))
+                new_item_id = int(cur.lastrowid)
+                inserted_item_ids.append(new_item_id)
+
+                for tl_entry in act.timeline or []:
+                    t_cur = conn.execute(
+                        """
+                        INSERT INTO task_timeline (
+                            item_id, timestamp, channel, from_party, to_party, cc_parties_json,
+                            summary, source_ref, mail_conversation_id, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            new_item_id,
+                            (tl_entry.timestamp or now[:16]),
+                            tl_entry.channel,
+                            tl_entry.from_party,
+                            tl_entry.to_party,
+                            json.dumps(list(tl_entry.cc_parties or []), ensure_ascii=False),
+                            tl_entry.summary[:300],
+                            tl_entry.source_ref,
+                            tl_entry.mail_conversation_id,
+                            now,
+                        ),
+                    )
+                    inserted_timeline_ids.append(int(t_cur.lastrowid))
+
+            updated_item_ids: list[int] = []
+            for upd in task_updates or []:
+                existing_row = conn.execute(
+                    "SELECT * FROM list_items WHERE id = ?",
+                    (int(upd.target_task_id),),
+                ).fetchone()
+                if not existing_row:
+                    continue
+                if not any(u["id"] == int(existing_row["id"]) for u in updated_items_prev):
+                    updated_items_prev.append(
+                        {
+                            "id": int(existing_row["id"]),
+                            "milestone_stage": existing_row["milestone_stage"],
+                            "blocker_note": existing_row["blocker_note"],
+                            "comments": existing_row["comments"],
+                            "mail_conversation_ids": existing_row["mail_conversation_ids"],
+                            "updated_at": existing_row["updated_at"],
+                        }
+                    )
+                tl = upd.timeline_entry
+                clean_tl_ref = (tl.source_ref or "").strip()
+                dup_tl = None
+                if clean_tl_ref:
+                    dup_tl = conn.execute(
+                        "SELECT id FROM task_timeline WHERE item_id = ? AND source_ref = ? LIMIT 1",
+                        (int(upd.target_task_id), clean_tl_ref),
+                    ).fetchone()
+                if dup_tl is None:
+                    t_cur = conn.execute(
+                        """
+                        INSERT INTO task_timeline (
+                            item_id, timestamp, channel, from_party, to_party, cc_parties_json,
+                            summary, source_ref, mail_conversation_id, created_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                        (
+                            int(upd.target_task_id),
+                            (tl.timestamp or now[:16]),
+                            tl.channel,
+                            tl.from_party,
+                            tl.to_party,
+                            json.dumps(list(tl.cc_parties or []), ensure_ascii=False),
+                            tl.summary[:300],
+                            clean_tl_ref,
+                            tl.mail_conversation_id,
+                            now,
+                        ),
+                    )
+                    inserted_timeline_ids.append(int(t_cur.lastrowid))
+
+                new_stage = upd.milestone_stage_update.strip() or existing_row["milestone_stage"]
+                new_blocker = upd.blocker_note_update.strip() or existing_row["blocker_note"]
+                notes_list = _safe_json_list(existing_row["comments"])
+                if upd.comment_append and upd.comment_append.strip():
+                    notes_list.append({"date": today_str, "content": upd.comment_append.strip()[:500]})
+                cids_list = _safe_json_list(existing_row["mail_conversation_ids"])
+                if tl.mail_conversation_id and tl.mail_conversation_id not in cids_list:
+                    cids_list.append(tl.mail_conversation_id)
+                conn.execute(
+                    """
+                    UPDATE list_items
+                    SET milestone_stage = ?, blocker_note = ?, comments = ?, mail_conversation_ids = ?, updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        new_stage,
+                        new_blocker,
+                        json.dumps(notes_list, ensure_ascii=False),
+                        json.dumps(cids_list, ensure_ascii=False),
+                        now,
+                        int(upd.target_task_id),
+                    ),
+                )
+                if int(upd.target_task_id) not in updated_item_ids:
+                    updated_item_ids.append(int(upd.target_task_id))
 
             for pid in touched_project_ids:
                 self._recalculate_project_hours(conn, pid)
 
             snapshot = {
                 "inserted_item_ids": inserted_item_ids,
+                "inserted_timeline_ids": inserted_timeline_ids,
+                "updated_items": updated_items_prev,
                 "created_project_ids": created_project_ids,
                 "previous_projects": previous_projects,
             }
@@ -554,13 +1050,38 @@ class Database:
                 "INSERT INTO undo_snapshots (proposal_id, snapshot_json, created_at, restored) VALUES (?, ?, ?, 0)",
                 (proposal_id, json.dumps(snapshot, ensure_ascii=False), now),
             )
-            if proposal_id is not None:
-                conn.execute("UPDATE pending_proposals SET status = 'confirmed' WHERE id = ?", (proposal_id,))
 
             return {
+                "already_processed": False,
                 "inserted_item_ids": inserted_item_ids,
+                "updated_item_ids": updated_item_ids,
                 "undo_snapshot_id": int(cur_undo.lastrowid),
             }
+
+    def update_items_onedrive_docs(
+        self,
+        item_ids: list[int],
+        doc_paths: list[str],
+        project_web_urls: dict[str, str] | None = None,
+    ) -> None:
+        """Backfill OneDrive archived document paths and project web URLs after local commit."""
+        if not item_ids and not project_web_urls:
+            return
+        now = _now_str()
+        with self._lock, self._connect() as conn:
+            if item_ids and doc_paths:
+                docs_json = json.dumps(doc_paths, ensure_ascii=False)
+                for iid in item_ids:
+                    conn.execute(
+                        "UPDATE list_items SET onedrive_doc_paths_json = ?, updated_at = ? WHERE id = ?",
+                        (docs_json, now, int(iid)),
+                    )
+            for pname, url in (project_web_urls or {}).items():
+                if url:
+                    conn.execute(
+                        "UPDATE projects SET onedrive_web_url = ?, updated_at = ? WHERE name = ?",
+                        (url, now, pname),
+                    )
 
     def undo_last_commit(self, max_age_hours: int = 24) -> tuple[bool, str]:
         """Roll back the most recent committed proposal within `max_age_hours`."""
@@ -571,36 +1092,67 @@ class Database:
             if not row:
                 return False, "当前没有可撤销的近期落盘记录。"
 
-            created_dt = datetime.strptime(row["created_at"], "%Y-%m-%d %H:%M:%S")
+            created_dt = datetime.fromisoformat(str(row["created_at"]).strip())
             if datetime.now() - created_dt > timedelta(hours=max_age_hours):
                 return False, f"最近一次操作已超过 {max_age_hours} 小时撤销窗口。"
 
-            snap = json.loads(row["snapshot_json"])
+            snap = _safe_json_dict(row["snapshot_json"])
+            for tid in snap.get("inserted_timeline_ids", []):
+                conn.execute("DELETE FROM task_timeline WHERE id = ?", (int(tid),))
+            for prev_it in snap.get("updated_items", []):
+                conn.execute(
+                    """
+                    UPDATE list_items
+                    SET milestone_stage = ?, blocker_note = ?, comments = ?,
+                        mail_conversation_ids = ?, updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (
+                        prev_it.get("milestone_stage", "已启动"),
+                        prev_it.get("blocker_note", ""),
+                        prev_it.get("comments", "[]"),
+                        prev_it.get("mail_conversation_ids", "[]"),
+                        prev_it.get("updated_at", _now_str()),
+                        int(prev_it["id"]),
+                    ),
+                )
             for iid in snap.get("inserted_item_ids", []):
                 conn.execute("DELETE FROM list_items WHERE id = ?", (int(iid),))
             for pid in snap.get("created_project_ids", []):
-                conn.execute("DELETE FROM projects WHERE id = ?", (int(pid),))
+                remaining_cnt = int(
+                    conn.execute("SELECT COUNT(*) FROM list_items WHERE project_id = ?", (int(pid),)).fetchone()[0]
+                )
+                if remaining_cnt == 0:
+                    conn.execute("DELETE FROM projects WHERE id = ?", (int(pid),))
+                else:
+                    self._recalculate_project_hours(conn, int(pid))
             for prev in snap.get("previous_projects", []):
                 conn.execute(
                     """
                     UPDATE projects
                     SET planned_start_date = ?, target_end_date = ?,
-                        total_estimated_hours = ?, total_actual_hours = ?,
                         latest_brief = ?, updated_at = ?
                     WHERE id = ?
                     """,
                     (
                         prev["planned_start_date"],
                         prev["target_end_date"],
-                        prev["total_estimated_hours"],
-                        prev["total_actual_hours"],
                         prev["latest_brief"],
                         prev["updated_at"],
                         prev["id"],
                     ),
                 )
+                self._recalculate_project_hours(conn, int(prev["id"]))
             conn.execute("UPDATE undo_snapshots SET restored = 1 WHERE id = ?", (row["id"],))
-            return True, f"已完整回滚 {len(snap.get('inserted_item_ids', []))} 条清单项及对应项目记录。"
+            n_items = len(snap.get("inserted_item_ids", []))
+            n_tl = len(snap.get("inserted_timeline_ids", []))
+            n_upd = len(snap.get("updated_items", []))
+            if n_items > 0:
+                extra = f"及 {n_tl} 条时间轴更新" if n_upd > 0 and n_tl > 0 else ""
+                return True, f"已完整回滚 {n_items} 条清单项{extra}及对应项目记录。"
+            if n_tl > 0 or n_upd > 0:
+                return True, f"已完整回滚 {n_tl} 条任务时间轴记录及 {n_upd} 项既有任务状态更新。"
+            return True, "已完整回滚最近一次落盘操作。"
 
     # --- Pending HITL proposals (F8 crash-recovery) ---
 
@@ -646,9 +1198,9 @@ class Database:
             if not row:
                 return None
             out = dict(row)
-            out["proposal"] = json.loads(out["proposal_json"])
-            out["source_ids"] = json.loads(out["source_ids_json"])
-            out["pending_files"] = json.loads(out["pending_files_json"])
+            out["proposal"] = _safe_json_dict(out.get("proposal_json"))
+            out["source_ids"] = _safe_json_list(out.get("source_ids_json"))
+            out["pending_files"] = _safe_json_list(out.get("pending_files_json"))
             return out
 
     def cancel_pending_proposal(self, proposal_id: int) -> bool:
@@ -720,7 +1272,7 @@ class Database:
             out = []
             for r in rows:
                 item = dict(r)
-                item["topic_tags"] = json.loads(item.get("topic_tags_json") or "[]")
+                item["topic_tags"] = _safe_json_list(item.get("topic_tags_json"))
                 out.append(item)
             return out
 
@@ -737,7 +1289,7 @@ class Database:
             out = []
             for r in reversed(rows):
                 item = dict(r)
-                item["topic_tags"] = json.loads(item.get("topic_tags_json") or "[]")
+                item["topic_tags"] = _safe_json_list(item.get("topic_tags_json"))
                 out.append(item)
             return out
 
@@ -790,7 +1342,7 @@ class Database:
                     if tid in excl:
                         continue
                     item = dict(r)
-                    item["topic_tags"] = json.loads(item.get("topic_tags_json") or "[]")
+                    item["topic_tags"] = _safe_json_list(item.get("topic_tags_json"))
                     prev_score = scored[tid][0] if tid in scored else 0.0
                     bonus = 2.0 if kw in item["topic_tags"] else 1.0
                     scored[tid] = (prev_score + bonus, item)
@@ -809,7 +1361,7 @@ class Database:
                 "UPDATE list_items SET status = 'in_progress', actual_start_at = ?, updated_at = ? WHERE id = ?",
                 (row["actual_start_at"] or now, now, item_id),
             )
-            return dict(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
+            return self._hydrate_item_row(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
 
     def complete_item(self, item_id: int, actual_hours: float | None = None) -> dict[str, Any] | None:
         now = _now_str()
@@ -817,6 +1369,19 @@ class Database:
             row = conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone()
             if not row:
                 return None
+            if row["status"] == "done":
+                start_d = (
+                    _parse_iso_date(row["actual_start_at"])
+                    or _parse_iso_date(row["planned_start_at"])
+                    or _parse_iso_date(row["created_at"])
+                    or date.today()
+                )
+                end_d = _parse_iso_date(row["actual_end_at"]) or date.today()
+                out = self._hydrate_item_row(row)
+                out["actual_span_days"] = max(1, (end_d - start_d).days + 1)
+                out["already_done"] = True
+                return out
+
             hours = round(float(actual_hours if actual_hours is not None else row["estimated_hours"]), 2)
             start_str = row["actual_start_at"] or now
             start_d = _parse_iso_date(row["actual_start_at"]) or _parse_iso_date(row["planned_start_at"]) or _parse_iso_date(row["created_at"]) or date.today()
@@ -849,7 +1414,7 @@ class Database:
                     now,
                 ),
             )
-            out = dict(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
+            out = self._hydrate_item_row(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
             out["actual_span_days"] = span_days
             return out
 
@@ -859,7 +1424,14 @@ class Database:
             "list_type",
             "work_domain",
             "project_name",
+            "deliverable",
+            "acceptance_criteria",
+            "milestone_stage",
             "owner",
+            "assignee",
+            "external_partner",
+            "chairman_role",
+            "blocker_note",
             "planned_start_at",
             "planned_end_at",
             "estimated_hours",
@@ -877,15 +1449,47 @@ class Database:
             if not row:
                 return None
             merged = dict(row) | filtered
+            touched_pids: set[int] = set()
+            if row["project_id"]:
+                touched_pids.add(int(row["project_id"]))
+            if "project_name" in filtered:
+                new_pname = str(filtered["project_name"]).strip()
+                if not new_pname:
+                    return None
+                filtered["project_name"] = new_pname
+                merged["project_name"] = new_pname
+                new_pid, _ = self._upsert_project(
+                    conn,
+                    name=new_pname,
+                    work_domain=str(merged["work_domain"]),
+                    start_date=str(merged.get("planned_start_at") or ""),
+                    end_date=str(merged.get("planned_end_at") or ""),
+                    onedrive_folder=f"01_项目归档/{new_pname}",
+                )
+                filtered["project_id"] = new_pid
+                touched_pids.add(new_pid)
+            # Prune any newly filled required fields from missing_required_fields
+            existing_missing = _safe_json_list(row["missing_required_fields"])
+            req_fields = ("project_name", "deliverable", "owner", "assignee", "planned_end_at")
+            if any(k in filtered for k in req_fields):
+                new_missing = list(existing_missing)
+                for rf in req_fields:
+                    if rf in filtered:
+                        val_str = str(filtered[rf] or "").strip()
+                        if val_str and not val_str.startswith("【待补齐"):
+                            new_missing = [m for m in new_missing if m != rf]
+                        elif rf == "planned_end_at" and val_str == "" and rf not in new_missing:
+                            new_missing.append(rf)
+                filtered["missing_required_fields"] = json.dumps(new_missing, ensure_ascii=False)
             filtered["priority_score"] = compute_priority_score(
                 merged["priority"], merged["planned_end_at"], merged["list_type"]
             )
             filtered["updated_at"] = _now_str()
             sets = ", ".join(f"{k} = ?" for k in filtered)
             conn.execute(f"UPDATE list_items SET {sets} WHERE id = ?", (*filtered.values(), item_id))
-            if row["project_id"]:
-                self._recalculate_project_hours(conn, int(row["project_id"]))
-            return dict(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
+            for pid in touched_pids:
+                self._recalculate_project_hours(conn, pid)
+            return self._hydrate_item_row(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
 
     def delete_item(self, item_id: int) -> bool:
         with self._lock, self._connect() as conn:
@@ -910,6 +1514,8 @@ class Database:
             row = conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone()
             if not row:
                 return None
+            if row["list_type"] != ListType.IDEA.value:
+                raise ValueError(f"Item #{item_id} is '{row['list_type']}', only 'idea' items can be promoted")
             proj_id, _ = self._upsert_project(
                 conn,
                 name=project_name,
@@ -930,7 +1536,7 @@ class Database:
                 (proj_id, project_name, planned_start_at, planned_end_at, estimated_hours, score, _now_str(), item_id),
             )
             self._recalculate_project_hours(conn, proj_id)
-            return dict(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
+            return self._hydrate_item_row(conn.execute("SELECT * FROM list_items WHERE id = ?", (item_id,)).fetchone())
 
     def list_items(self, *, list_type: str | None = None, include_done: bool = True) -> list[dict[str, Any]]:
         with self._lock, self._connect() as conn:
@@ -942,7 +1548,7 @@ class Database:
             if not include_done:
                 sql += " AND status != 'done'"
             sql += " ORDER BY CASE WHEN status='done' THEN 1 ELSE 0 END ASC, priority_score DESC, id ASC"
-            return [dict(r) for r in conn.execute(sql, params).fetchall()]
+            return [self._hydrate_item_row(r) for r in conn.execute(sql, params).fetchall()]
 
     def list_projects(self) -> list[dict[str, Any]]:
         with self._lock, self._connect() as conn:
@@ -1053,6 +1659,7 @@ class Database:
         today = date.today()
         done_spans: list[int] = []
         for it in items:
+            it["timeline"] = self.get_task_timeline(int(it["id"]))
             ps = _parse_iso_date(it.get("planned_start_at"))
             pe = _parse_iso_date(it.get("planned_end_at")) or ps
             it["planned_span_days"] = max(1, (pe - ps).days + 1) if (ps and pe) else 1

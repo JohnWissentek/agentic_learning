@@ -19,10 +19,9 @@ class _RouteAwareCompletions:
 
         if model == "qwen3.8-flash":
             if "第几页" in user_msg or "是多少" in user_msg:
-                payload = {"intent": "quick_query", "confidence": 0.97, "needs_deep_research": False, "summary": "查文档"}
+                payload = {"intent": "quick_query", "confidence": 0.97, "summary": "查文档"}
             else:
-                needs_res = "想法" in user_msg or "标准" in user_msg
-                payload = {"intent": "work_triage", "confidence": 0.95, "needs_deep_research": needs_res, "summary": "分拣"}
+                payload = {"intent": "work_triage", "confidence": 0.95, "summary": "分拣"}
         elif model == "qwen3.8-max":
             if "问题：" in user_msg:
                 payload = {"found": True, "answer": "在《Spec.pdf》第 4 页写明系数为 0.0095。", "citations": ["Spec.pdf 第 4 页"]}
@@ -65,7 +64,7 @@ class _RouteAwareCompletions:
         (6, "完成 999 1.5h", "node:action_shortcut=checkin"),
         (7, "Spec.pdf 第几页写了补偿系数是多少", "tool:hybrid_search"),
         (8, "某个从未存在过的太空项目预算是多少", "node:quick_qa_responder"),
-        (9, "我刚有个新想法，查一下2U工业机箱抗干扰标准", "tool:search_public_tech_intel"),
+        (9, "我刚有个新想法，查一下2U工业机箱抗干扰标准", "node:hitl_preview_gate"),
         (10, "把周五帕莫瑞技术协议评审安排上，大概占1小时", "node:hitl_preview_gate"),
     ],
 )

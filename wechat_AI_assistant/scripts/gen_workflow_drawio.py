@@ -1,13 +1,18 @@
-"""Generate the 6-stage workflow diagram (draw.io) for wechat_AI_assistant.
+"""Generate the strict OMG UML 2.5 Behavioral State Machine Diagram (.drawio) for wechat_AI_assistant.
 
-Layout rules:
-- Stages 1-5 run left to right; stage 6 (scheduled jobs) is a separate lane at the bottom.
-- Standard flowchart symbols: rectangle = code step, process-box = LLM call, diamond = decision,
-  cylinder = storage, parallelogram = WeChat / email input or output.
-- Every edge uses explicit waypoints through empty corridors so no line crosses a card.
+Conforms strictly to OMG UML 2.5 State Machine Diagram notation:
+- Initial Pseudostate: solid black circle (`shape=startState`) — no incoming edge, unguarded outgoing edge.
+- Final State: bullseye double circle (`shape=endState`) — zero outgoing edges.
+- Simple / Composite States: rounded rectangles with standard `entry /`, `do /`, `exit /` compartments.
+  NO flowchart cylinders, NO I/O parallelograms, NO sharp-corner process boxes.
+- Choice Pseudostate: small hollow diamond (`rhombus`) with mutually exclusive `[guard]` branches + explicit `[else]`.
+- Transitions: solid orthogonal arrows with open arrowheads and `trigger [guard] / effect` syntax.
+- Bounded loop proof: explicit `[未通过 且 重写次数 < 2] / 重写次数+1` and `[else：通过 或 重写次数 >= 2]`.
+- Orthogonal Regions: dashed dividers separating concurrent background monitors (Stage 6) from the main turn flow.
+- Plain business Chinese throughout (no raw code identifiers or programmer jargon).
 
-Run:  python3 scripts/gen_workflow_drawio.py
-Then: draw.io -x -f png|pdf docs/04-AI分拣工作流全景图_A0.drawio
+Run:  uv run python scripts/gen_workflow_drawio.py
+Then: "/Applications/draw.io.app/Contents/MacOS/draw.io" -x -f png -o docs/04-AI分拣工作流全景图_A0.png docs/04-AI分拣工作流全景图_A0.drawio
 """
 
 from __future__ import annotations
@@ -16,48 +21,157 @@ import html
 from pathlib import Path
 
 OUT_PATH = Path(__file__).resolve().parents[1] / "docs" / "04-AI分拣工作流全景图_A0.drawio"
-PAGE_W, PAGE_H = 5100, 2820
+PAGE_W, PAGE_H = 4960, 2720
 
-_TEXT = "whiteSpace=wrap;html=1;fontSize=14;align=left;verticalAlign=top;spacingTop=10;spacingLeft=14;spacingRight=12;"
-S_CODE = "rounded=0;fillColor=#dae8fc;strokeColor=#2b6cb0;strokeWidth=2;" + _TEXT
-S_LLM = "shape=process;size=0.035;fillColor=#e1d5e7;strokeColor=#6b46c1;strokeWidth=2.5;" + _TEXT.replace("spacingLeft=14", "spacingLeft=30").replace("spacingRight=12", "spacingRight=28")
-S_DECISION = "rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#b7950b;strokeWidth=2.5;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;"
-S_DB = "shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=14;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#2f855a;strokeWidth=2;fontSize=13;align=center;verticalAlign=middle;"
-S_IO = "shape=parallelogram;perimeter=parallelogramPerimeter;size=0.07;fixedSize=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#555555;strokeWidth=2;fontSize=13;align=center;verticalAlign=middle;"
-S_CARD = S_IO.replace("#f5f5f5", "#ffe6cc").replace("#555555", "#dd6b20")
-S_NOTE = "rounded=0;dashed=1;fillColor=#fffbe6;strokeColor=#b7950b;strokeWidth=1.5;" + _TEXT.replace("fontSize=14", "fontSize=13")
-S_ZONE = "rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#adb5bd;strokeWidth=2;dashed=1;fontSize=18;fontStyle=1;align=left;verticalAlign=top;spacingTop=12;spacingLeft=16;"
-S_TERM = "rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#2d3748;strokeColor=#1a202c;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#ffffff;align=center;verticalAlign=middle;"
-S_CONN = "ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#dd6b20;strokeWidth=3;fontSize=18;fontStyle=1;fontColor=#dd6b20;align=center;verticalAlign=middle;"
-S_TITLE = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=26;fontStyle=1;"
+# --- Strict OMG UML 2.5 mxGraph styles ---
+S_TITLE = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=28;fontStyle=1;fontColor=#0f172a;"
+S_SUBTITLE = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;fontColor=#475569;"
 
-C_MAIN, C_ROUTE, C_EXEC, C_LOOP, C_READ, C_REPLY = "#2b6cb0", "#6b46c1", "#dd6b20", "#c53030", "#2f855a", "#777777"
+S_INITIAL = "ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;"
+S_FINAL = "ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;"
+S_CHOICE = "rhombus;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#b45309;strokeWidth=2.5;"
+
+# Composite state container (rounded outer rectangle with top header bar)
+S_COMPOSITE_MAIN = (
+    "swimlane;startSize=40;rounded=1;arcSize=3;fillColor=#ffffff;strokeColor=#334155;"
+    "strokeWidth=2.5;fontSize=17;fontStyle=1;fontColor=#0f172a;align=left;spacingLeft=16;"
+)
+S_COMPOSITE_TURN = (
+    "swimlane;startSize=38;rounded=1;arcSize=3;fillColor=#f8fafc;strokeColor=#2563eb;"
+    "strokeWidth=2.2;fontSize=16;fontStyle=1;fontColor=#1e3a8a;align=left;spacingLeft=14;"
+)
+S_COMPOSITE_SUB = (
+    "swimlane;startSize=34;rounded=1;arcSize=4;fillColor=#faf5ff;strokeColor=#7c3aed;"
+    "strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#5b21b6;align=left;spacingLeft=12;"
+)
+S_COMPOSITE_STAGE3 = (
+    "swimlane;startSize=34;rounded=1;arcSize=5;fillColor=#fffbeb;strokeColor=#b45309;"
+    "strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#92400e;align=left;spacingLeft=12;"
+)
+
+# Orthogonal region dashed divider lines
+S_ORTHO_H = "line;strokeWidth=2;dashed=1;dashPattern=8 6;strokeColor=#64748b;fillColor=none;html=1;"
+S_ORTHO_V = "line;strokeWidth=2;dashed=1;dashPattern=8 6;strokeColor=#94a3b8;fillColor=none;html=1;direction=south;"
+S_REGION_LBL = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;fontStyle=1;fontColor=#334155;"
+S_STAGE_TAG = "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontStyle=1;fontColor=#475569;"
+
+# UML 2.5 Note (dog-eared corner note box — valid UML 2.5 Comment element)
+S_UML_NOTE = (
+    "shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=16;"
+    "fillColor=#fefce8;strokeColor=#ca8a04;strokeWidth=1.5;"
+    "fontSize=13;align=left;verticalAlign=top;spacingTop=8;spacingLeft=12;spacingRight=14;fontColor=#422006;"
+)
+
+# Color palette for UML 2.5 simple state compartments (code vs AI vs commit vs idle)
+PALETTES = {
+    "idle": ("#f1f5f9", "#475569", "#0f172a"),       # Wait / Idle state
+    "code": ("#eff6ff", "#1d4ed8", "#1e3a8a"),       # Deterministic code state
+    "llm": ("#f5f3ff", "#6d28d9", "#4c1d95"),        # AI model reasoning state
+    "commit": ("#fff7ed", "#c2410c", "#7c2d12"),     # Stage 5 controlled write state
+    "bg": ("#ecfdf5", "#047857", "#064e3b"),         # Orthogonal background monitor state
+}
+
+C_MAIN = "#1e40af"
+C_ROUTE = "#6d28d9"
+C_COMMIT = "#c2410c"
+C_LOOP = "#b91c1c"
+C_RET = "#475569"
+C_BG = "#047857"
 
 cells: list[str] = []
 
 
-def _label(title: str, body: str = "") -> str:
-    inner = f"<b>{html.escape(title)}</b>"
-    if body:
-        inner += "<br/>" + "<br/>".join(html.escape(x) for x in body.splitlines())
-    return html.escape(inner, quote=True)
+def _esc(val: str) -> str:
+    return html.escape(val, quote=True)
 
 
-def node(cid: str, x: int, y: int, w: int, h: int, style: str, title: str, body: str = "") -> None:
-    cells.append(
-        f'<mxCell id="{cid}" value="{_label(title, body)}" style="{style}" vertex="1" parent="1">'
+def add_raw(xml_snippet: str) -> None:
+    cells.append(xml_snippet)
+
+
+def add_text(cid: str, x: int, y: int, w: int, h: int, value: str, style: str) -> None:
+    lines = "<br/>".join(html.escape(line) for line in value.splitlines())
+    add_raw(
+        f'<mxCell id="{cid}" value="{_esc(lines)}" style="{style}" vertex="1" parent="1">'
         f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>'
     )
 
 
-def text(cid: str, x: int, y: int, w: int, h: int, value: str, style: str) -> None:
-    cells.append(
-        f'<mxCell id="{cid}" value="{html.escape(value, quote=True)}" style="{style}" vertex="1" parent="1">'
+def add_container(cid: str, x: int, y: int, w: int, h: int, title: str, style: str) -> None:
+    add_raw(
+        f'<mxCell id="{cid}" value="{_esc(title)}" style="{style}" vertex="1" parent="1">'
         f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>'
     )
 
 
-def edge(
+def add_state(
+    cid: str,
+    x: int,
+    y: int,
+    w: int,
+    h: int,
+    name: str,
+    compartments: list[str],
+    kind: str = "code",
+) -> None:
+    """Render an OMG UML 2.5 rounded-rectangle state with header divider and entry/do/exit body."""
+    fill, stroke, title_color = PALETTES[kind]
+    title_html = f"<b>{html.escape(name)}</b>"
+    body_html = "<br/>".join(html.escape(line) for line in compartments)
+    # Standard UML 2.5 two-compartment state rendered cleanly via HTML divider inside rounded box
+    inner = (
+        f'<div style="text-align:center;font-size:15px;color:{title_color};padding:6px 10px 6px 10px;'
+        f'border-bottom:1.5px solid {stroke};">{title_html}</div>'
+        f'<div style="text-align:left;font-size:13px;color:#1e293b;padding:8px 12px 8px 12px;line-height:1.45;">'
+        f'{body_html}</div>'
+    )
+    style = (
+        f"rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={stroke};"
+        "strokeWidth=2;verticalAlign=top;spacing=0;"
+    )
+    add_raw(
+        f'<mxCell id="{cid}" value="{_esc(inner)}" style="{style}" vertex="1" parent="1">'
+        f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>'
+    )
+
+
+def add_initial(cid: str, x: int, y: int, size: int = 30) -> None:
+    add_raw(
+        f'<mxCell id="{cid}" value="" style="{S_INITIAL}" vertex="1" parent="1">'
+        f'<mxGeometry x="{x}" y="{y}" width="{size}" height="{size}" as="geometry"/></mxCell>'
+    )
+
+
+def add_final(cid: str, x: int, y: int, size: int = 34) -> None:
+    add_raw(
+        f'<mxCell id="{cid}" value="" style="{S_FINAL}" vertex="1" parent="1">'
+        f'<mxGeometry x="{x}" y="{y}" width="{size}" height="{size}" as="geometry"/></mxCell>'
+    )
+
+
+def add_choice(cid: str, x: int, y: int, size: int = 44) -> None:
+    add_raw(
+        f'<mxCell id="{cid}" value="" style="{S_CHOICE}" vertex="1" parent="1">'
+        f'<mxGeometry x="{x}" y="{y}" width="{size}" height="{size}" as="geometry"/></mxCell>'
+    )
+
+
+def add_note(cid: str, x: int, y: int, w: int, h: int, title: str, lines: list[str]) -> None:
+    body = f"<b>{html.escape(title)}</b><br/>" + "<br/>".join(html.escape(l) for l in lines)
+    add_raw(
+        f'<mxCell id="{cid}" value="{_esc(body)}" style="{S_UML_NOTE}" vertex="1" parent="1">'
+        f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>'
+    )
+
+
+def add_line(cid: str, x: int, y: int, w: int, h: int, style: str) -> None:
+    add_raw(
+        f'<mxCell id="{cid}" value="" style="{style}" vertex="1" parent="1">'
+        f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>'
+    )
+
+
+def add_transition(
     eid: str,
     src: str,
     dst: str,
@@ -67,221 +181,636 @@ def edge(
     exit_xy: tuple[float, float],
     entry_xy: tuple[float, float],
     points: list[tuple[int, int]] | None = None,
-    dashed: bool = False,
-    width: float = 2.5,
+    width: float = 2.2,
+    label_pos: float = 0.0,
+    label_offset_y: int = -14,
 ) -> None:
     style = (
-        "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;"
-        f"exitX={exit_xy[0]};exitY={exit_xy[1]};exitDx=0;exitDy=0;entryX={entry_xy[0]};entryY={entry_xy[1]};entryDx=0;entryDy=0;"
-        f"strokeColor={color};strokeWidth={width};{'dashed=1;' if dashed else ''}"
+        "edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;"
+        "endArrow=open;endFill=0;endSize=10;"
+        f"exitX={exit_xy[0]};exitY={exit_xy[1]};exitDx=0;exitDy=0;"
+        f"entryX={entry_xy[0]};entryY={entry_xy[1]};entryDx=0;entryDy=0;"
+        f"strokeColor={color};strokeWidth={width};"
         f"fontSize=13;fontStyle=1;fontColor={color};labelBackgroundColor=#ffffff;"
     )
     pts = ""
     if points:
         pts = '<Array as="points">' + "".join(f'<mxPoint x="{px}" y="{py}"/>' for px, py in points) + "</Array>"
-    cells.append(
-        f'<mxCell id="{eid}" value="{html.escape(label, quote=True)}" style="{style}" edge="1" parent="1" source="{src}" target="{dst}">'
-        f'<mxGeometry relative="1" as="geometry">{pts}</mxGeometry></mxCell>'
+    geo_attr = 'relative="1" as="geometry"'
+    offset_xml = ""
+    if label:
+        geo_attr = f'x="{label_pos}" y="{label_offset_y}" relative="1" as="geometry"'
+        offset_xml = '<mxPoint as="offset"/>'
+    add_raw(
+        f'<mxCell id="{eid}" value="{_esc(label)}" style="{style}" edge="1" parent="1" source="{src}" target="{dst}">'
+        f"<mxGeometry {geo_attr}>{pts}{offset_xml}</mxGeometry></mxCell>"
     )
 
 
-# ------------------------------------------------------------------ title & legend
-text("title", 40, 22, 2300, 50, "董事长 AI 工作助理 — 六阶段工作流全景图", S_TITLE)
-text("subtitle", 40, 70, 2300, 30,
-     "每次处理从「开始」单向走到「本次结束」，每条路径都会记录对话；只有阶段五能改待办和看板（必须经你确认）；底部灰色虚线是外层循环",
-     "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=15;fontColor=#555555;")
-lg_y = 18
-node("lg_term", 2360, lg_y + 8, 140, 56, S_TERM, "开始")
-node("lg_code", 2520, lg_y, 280, 70, S_CODE, "代码步骤", "确定性执行，不调用大模型")
-node("lg_llm", 2820, lg_y, 280, 70, S_LLM, "调用大模型", "标明模型与作用")
-node("lg_dec", 3120, lg_y - 4, 190, 78, S_DECISION, "判断")
-node("lg_db", 3330, lg_y, 190, 72, S_DB, "数据存储")
-node("lg_io", 3540, lg_y, 230, 70, S_IO, "微信 / 邮件 收发")
-text("lg_lines", 3790, lg_y, 1270, 72,
-     "连线：蓝=主流程　紫=按意图分流　橙=执行落盘　红虚线=审核不通过重写　绿虚线=读取数据　灰虚线=回到微信 / 外层循环",
-     "rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=13;align=left;verticalAlign=middle;spacingLeft=12;")
+# ==============================================================================
+# 0. TITLE & STRICT UML 2.5 LEGEND BAR
+# ==============================================================================
+add_text(
+    "title", 40, 20, 2200, 44,
+    "董事长个人 AI 项目助理 — UML 2.5 行为状态机架构图（纯 PMO 纳管版）",
+    S_TITLE,
+)
+add_text(
+    "subtitle", 40, 66, 2600, 30,
+    "严格遵循 OMG UML 2.5 状态机图标准：实心黑圆●=入口，双圆◉=本轮终止，圆角框=状态（entry/do/exit），空心菱形◇=动态分流，实线箭头=触发事件 [监护条件] / 动作，虚线分隔=并发正交区域",
+    S_SUBTITLE,
+)
 
-ZONE_TOP, ZONE_BOTTOM = 130, 2190
+# Compact UML 2.5 visual legend (top right)
+add_initial("lg_init", 2920, 34, 24)
+add_text("lg_init_t", 2952, 26, 120, 40, "初始伪状态 ●", "text;html=1;strokeColor=none;fillColor=none;fontSize=13;align=left;verticalAlign=middle;")
+add_final("lg_fin", 3080, 32, 28)
+add_text("lg_fin_t", 3116, 26, 130, 40, "终止状态 ◉", "text;html=1;strokeColor=none;fillColor=none;fontSize=13;align=left;verticalAlign=middle;")
+add_choice("lg_ch", 3254, 30, 32)
+add_text("lg_ch_t", 3294, 26, 140, 40, "选择伪状态 ◇", "text;html=1;strokeColor=none;fillColor=none;fontSize=13;align=left;verticalAlign=middle;")
+add_state("lg_code", 3440, 14, 190, 74, "确定性代码状态", ["do / 0模型确定性执行"], "code")
+add_state("lg_llm", 3648, 14, 190, 74, "大模型推理状态", ["do / 调用指定档位模型"], "llm")
+add_state("lg_commit", 3856, 14, 190, 74, "受控写库状态", ["entry / 校验人类确认令牌"], "commit")
+add_note("lg_note", 4064, 14, 856, 74, "迁移标签语法：触发事件 [监护条件] / 执行动作", [
+    "全图唯一回环位于路径④审核处，由 [未通过 且 重写次数 < 2] 严格封顶；本系统为纯项目管理（PMO），绝不代干具体业务活。"
+])
 
-# ------------------------------------------------------------------ stage 1: receive & pre-process
-text("z1", 40, ZONE_TOP, 690, ZONE_BOTTOM - ZONE_TOP, "阶段一｜接收与预处理（硬编码；仅语音调用模型）", S_ZONE)
-node("start", 205, 195, 360, 70, S_TERM, "开始：收到消息 / 到点触发")
-node("in_wx", 70, 300, 300, 130, S_IO, "微信消息", "主入口 / 备用客服通道\n（含你对确认卡的回复）")
-node("in_mail", 390, 300, 300, 130, S_IO, "邮件", "工作日 08:30 补夜间与周末\n09:00–21:00 每小时一次\n夜间与周末不拉")
-node("intake", 70, 460, 620, 360, S_CODE, "接入与预处理",
-     "硬编码（不调用模型）：\n"
-     "• 微信：验签、解密，0.5 秒回「已收到」\n"
-     "• 连续转发停手 2 秒，合并成一件事\n"
-     "• 邮件不回「已收到」；按 JSON 域名去重，正文加不可信标记\n"
-     "• 收件合成一张确认卡；发出的信只记在同一条里\n"
-     "• 附件按页提取文字；原件先备份到 OneDrive\n"
-     "调用模型（只有这一处）：\n"
-     "• 语音转文字：qwen3-asr-flash\n"
-     "输出：一段统一的文本 + 附件")
-edge("e_start_wx", "start", "in_wx", "", C_MAIN, exit_xy=(0.25, 1), entry_xy=(0.5, 0))
-edge("e_start_mail", "start", "in_mail", "", C_MAIN, exit_xy=(0.75, 1), entry_xy=(0.5, 0))
-edge("e_wx", "in_wx", "intake", "", C_MAIN, exit_xy=(0.5, 1), entry_xy=(0.24, 0))
-edge("e_mail", "in_mail", "intake", "", C_MAIN, exit_xy=(0.5, 1), entry_xy=(0.76, 0))
-edge("e_intake_ctx", "intake", "ctx", "", C_MAIN, exit_xy=(1, 0.45), entry_xy=(0, 0.12))
+# ==============================================================================
+# 1. TOP-LEVEL COMPOSITE STATE CONTAINER (7x24 Online System with 2 Orthogonal Regions)
+# ==============================================================================
+add_container(
+    "sys_root", 40, 112, 4880, 2568,
+    "董事长个人 AI 项目助理系统（7×24 在线 · 含两个并发正交区域）",
+    S_COMPOSITE_MAIN,
+)
 
-# ------------------------------------------------------------------ stage 2: assemble context
-text("z2", 790, ZONE_TOP, 540, ZONE_BOTTOM - ZONE_TOP, "阶段二｜装配上下文（全部硬编码）", S_ZONE)
-node("ctx_db", 900, 330, 320, 150, S_DB, "SQLite 数据库", "对话记录 · 待确认卡 · 项目待办 · 文档索引")
-node("ctx", 820, 600, 480, 620, S_CODE, "装配 4 层上下文（全部硬编码）",
-     "不调用模型。只读取数据库里已经写好的内容。\n"
-     "滚动摘要是以前生成的，这里不重新生成。\n\n"
-     "按固定顺序拼成提示词：\n\n"
-     "1. 跨天滚动摘要 + 最近 30 轮对话\n"
-     "　（间隔超 30 分钟会标注，防止串话题）\n\n"
-     "2. 待确认卡片\n"
-     "　（你还没回复确认的方案）\n\n"
-     "3. 在途项目、待办快照\n"
-     "　（提到项目名时自动附上项目卡）\n\n"
-     "4. 历史文档与旧对话检索（数据库检索）\n"
-     "　（查资料和工作交办时才检索）\n\n"
-     "输出：一份完整的上下文提示词")
-edge("e_ctx_read", "ctx_db", "ctx", "读取", C_READ, exit_xy=(0.5, 1), entry_xy=(0.5, 0), dashed=True)
+# Region A label (Main message processing state machine)
+add_text(
+    "reg_a_lbl", 64, 160, 1400, 30,
+    "正交区域 A｜单次消息处理主状态机（事件驱动：来一条消息走完一遍，随即回到「待机等待中」，不在后台空转）",
+    S_REGION_LBL,
+)
 
-# ------------------------------------------------------------------ stage 3: decide & dispatch
-text("z3", 1390, ZONE_TOP, 600, ZONE_BOTTOM - ZONE_TOP, "阶段三｜判断意图（模型前、模型后都有硬编码）", S_ZONE)
-node("pre_router", 1410, 190, 400, 250, S_CODE, "模型之前：两处硬编码",
-     "不调用路由模型。\n"
-     "• 整句是「你好 / 在吗 / hi / hello」\n"
-     "　且没有历史、没有待确认卡\n"
-     "　→ 直接回复问候\n"
-     "• 状态里已经写好修改意见\n"
-     "　→ 直接走路径④\n"
-     "　你新发的「改：…」不走这里")
-node("router", 1410, 800, 280, 190, S_LLM, "调用模型：判断意图", "qwen3.8-flash\n读阶段二拼好的上下文\n判断走哪条路\n补全「这个 / 刚才那事」")
-node("which", 1720, 800, 240, 200, S_DECISION, "走哪条路？")
-edge("e_ctx_router", "ctx", "router", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_router_which", "router", "which", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-node("brake_note", 1410, 1020, 400, 280, S_NOTE, "模型之后①：三条刹车",
-     "与整句词表无关。提示词写了同样的话，\n"
-     "这里用代码拦住，不再调用模型。\n"
-     "• 没有待确认卡，却要确认、\n"
-     "　只存想法或作废 → 改成闲聊，不写库\n"
-     "• 判成工作交办，置信度 < 0.55\n"
-     "　→ 路径⑤，先问清楚，不建卡\n"
-     "• 想联网，原话没有\n"
-     "　「查一下 / 上网查 / 联网搜」→ 不联网")
-node("lexicon_note", 1410, 1320, 400, 520, S_NOTE, "模型之后②：整句词表（最后执行）",
-     "只锁整句完全一致的话，表不再加长。\n"
-     "命中后改掉模型（以及刹车）的判断。\n"
-     "「好的」「做完了」「改成下周五」\n"
-     "不在表里，仍只听模型。\n"
-     "会改数据，认错就改回：\n"
-     "• 撤销\n"
-     "• 开始 3 / 完成 3 / 完成 #3 2h\n"
-     "• 有待确认卡时：1 / 确认\n"
-     "• 2 / 仅存想法\n"
-     "• 改：…\n"
-     "只改回复，不改数据：\n"
-     "• 看板 / 驾驶舱 / 页面 / dashboard\n"
-     "• 负荷 / 待办 / 今日待办 / todo")
+# Top-level Initial -> Waiting Idle State
+add_initial("top_init", 68, 435, 30)
+add_state(
+    "s_idle", 124, 340, 256, 220,
+    "待机等待中",
+    [
+        "do / 持续监听微信消息回调与定时汇总唤醒",
+        "说明 / 上一轮的对话历史、待确认卡片与在途待办均已安全保存在本地数据库",
+    ],
+    "idle",
+)
+add_transition("t_top_init", "top_init", "s_idle", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 
-# ------------------------------------------------------------------ stage 4: five paths
-Z4_X = 2050
-text("z4", Z4_X, ZONE_TOP, 2480, ZONE_BOTTOM - ZONE_TOP, "阶段四｜五条处理路径", S_ZONE)
-BX, BW, BH = 2120, 600, 170
-OX, OW, OH = 2800, 250, 100
+# ==============================================================================
+# 2. COMPOSITE STATE: SINGLE TURN LIFECYCLE (Stages 1 -> 5)
+# ==============================================================================
+add_container(
+    "s_turn", 540, 200, 4340, 1940,
+    "复合状态：单次处理周期（阶段一 接收预处理 → 阶段二 装配背景 → 阶段三 分诊把关 → 阶段四 五条处理路径 → 阶段五 确认落盘）",
+    S_COMPOSITE_TURN,
+)
 
-node("p1", BX, 245, BW, BH, S_CODE, "① 直接执行（代码）", "阶段三认定之后才执行：\n确认、作废、开始/完成、撤销 → 阶段五\n看板、负荷 → 只回复，不改待办")
-node("p2", BX, 535, BW, BH, S_LLM, "② 参谋回复（qwen3.8-flash）", "每条消息回复一次，不建待办\n聊几轮由你决定")
-node("p3", BX, 825, BW, BH, S_LLM, "③ 查档问答（代码检索 + qwen3.8-flash）", "先查文档和旧对话，再只依据查到的内容回答\n必须带出处页码；查不到就说查不到")
-node("p5", BX, 1115, BW, BH, S_CODE, "⑤ 请你澄清（代码）", "说明能力边界，或追问一个关键细节\n不建待办")
-for pid, y in (("p2", 535), ("p3", 825), ("p5", 1115)):
-    node(f"{pid}_out", OX, y + (BH - OH) // 2, OW, OH, S_IO, "回复发到微信")
-    edge(f"e_{pid}_out", pid, f"{pid}_out", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+# Trigger from Idle -> Single Turn, and Completion Transition from Single Turn -> Idle
+add_transition(
+    "t_idle_to_turn", "s_idle", "s_turn",
+    "收到微信消息\n或 邮件汇总触发",
+    C_MAIN,
+    exit_xy=(1, 0.42), entry_xy=(0, 0.12),
+    points=[(460, 432), (460, 432)],
+    label_pos=0.0, label_offset_y=-24,
+)
+add_transition(
+    "t_turn_to_idle", "s_turn", "s_idle",
+    "本轮抵达◉ / 回到待机，等待你的下一条回复（如回 1 确认、0 作废或改：…）",
+    C_RET,
+    exit_xy=(0.14, 1), entry_xy=(0.5, 1),
+    points=[(1148, 2178), (252, 2178)],
+    label_pos=-0.45, label_offset_y=-16,
+)
 
-edge("e_r1", "which", "p1", "确认/作废卡片 · 打卡 · 撤销", C_ROUTE, exit_xy=(0.5, 0), entry_xy=(0, 0.5), points=[(1840, 330)])
-edge("e_r2", "which", "p2", "闲聊 · 讨论 · 问建议", C_ROUTE, exit_xy=(0.75, 0.25), entry_xy=(0, 0.5), points=[(2010, 860), (2010, 620)])
-edge("e_r3", "which", "p3", "查文档 · 查进度", C_ROUTE, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_r5", "which", "p5", "太模糊 · 做不了", C_ROUTE, exit_xy=(0.75, 0.75), entry_xy=(0, 0.5), points=[(2020, 960), (2020, 1200)])
-edge("e_r4", "which", "t1", "交办工作 · 转发 · 附件 · 改卡片", C_ROUTE, exit_xy=(0.5, 1), entry_xy=(0, 0.5), points=[(1840, 1590)], width=3)
+# --- Stage 1: Receive & Pre-process ---
+add_text("lbl_s1", 570, 250, 440, 26, "【阶段一｜接收与预处理】", S_STAGE_TAG)
+add_initial("turn_init", 575, 425, 28)
+add_state(
+    "s1_intake", 635, 290, 430, 355,
+    "接收与预处理中",
+    [
+        "entry / 微信通道：验签、解密、单人白名单过滤；首条消息0.5秒内回「已收到」（发回执超时不丢消息）",
+        "entry / 邮件通道：不回「已收到」，按名单过滤并加不可信隔离边界；解析/处理成功后再标已读防丢信",
+        "do / 连续逐条转发停手 2 秒自动合并（发「好了」立即结束等待）",
+        "do / 语音消息调用 qwen3-asr-flash 转文字（失败降级占位提示，不中断）",
+        "do / 随附文件（PDF/Word/Excel/ZIP 等）前置按页提取入库并备份 OneDrive 收件箱（损坏或加密文件优雅占位）",
+        "exit / 汇总为统一文本与已入库附件清单",
+    ],
+    "code",
+)
+add_transition("t_turn_init", "turn_init", "s1_intake", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.42))
 
-node("hb_note", 3600, 560, 860, 140, S_NOTE, "进度心跳",
-     "任何一条路径处理超过 12 秒，就向微信推送当前在做哪一步，此后每 25 秒一次，直到出结果")
+# --- Stage 2: Assemble Context ---
+add_text("lbl_s2", 1135, 250, 400, 26, "【阶段二｜装配上下文】", S_STAGE_TAG)
+add_state(
+    "s2_ctx", 1135, 290, 410, 355,
+    "装配上下文中",
+    [
+        "do / 纯代码读取本地 SQLite 真值（0 次大模型调用，脏 JSON 自动容错）：",
+        "  ① 跨天滚动摘要（只读历史）+ 近 30 轮对话（间隔超 30 分钟插入分割线防串话题）",
+        "  ② 桌上的待确认卡片（标注距今分钟数与 60 分钟新鲜度窗口）",
+        "  ③ 在途项目与未完待办快照（提到项目名时自动挂载项目卡）",
+        "  ④ 历史档案与旧对话全文索引（仅路径③查档与路径④立卡时检索）",
+        "exit / 拼出完整上下文背景（严格条数与字数截断，防撑爆模型窗口）",
+    ],
+    "code",
+)
+add_transition(
+    "t_s1_s2", "s1_intake", "s2_ctx",
+    "批次就绪", C_MAIN,
+    exit_xy=(1, 0.5), entry_xy=(0, 0.5),
+    label_offset_y=-14,
+)
 
-node("record", 3150, 535, 330, 750, S_CODE, "记录本次对话（代码）",
-     "把你这句话和回复写入对话记录\n\n"
-     "下次处理时，阶段二从这里读取，所以对话能接上\n\n"
-     "每满 8 轮，后台刷新一次滚动摘要\n\n"
-     "路径①和④同样会记录\n（分别在执行完、出卡后）\n\n"
-     "只记对话，不改待办和看板")
-for pid, frac in (("p2", 0.113), ("p3", 0.5), ("p5", 0.887)):
-    edge(f"e_{pid}_rec", f"{pid}_out", "record", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, frac))
-node("end_main", 3560, 875, 220, 70, S_TERM, "本次结束")
-edge("e_rec_end", "record", "end_main", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+# --- Stage 3: Composite State (AI Secretary + Gatekeeper Safety Lock & Secret Commands) ---
+add_text("lbl_s3", 1615, 250, 560, 26, "【阶段三｜意图分诊与老管家两道把关】", S_STAGE_TAG)
+add_container(
+    "s3_router_box", 1615, 290, 625, 760,
+    "复合状态：意图分诊（AI 小秘书先理解 + 老管家两道死规矩把关）",
+    S_COMPOSITE_STAGE3,
+)
 
-# path ④ pipeline
-TY, TH = 1490, 200
-text("p4_label", BX, 1420, 1500, 40, "④ 工作交办（最长的一条路径，按顺序执行）",
-     "text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#6b46c1;")
-node("t1", BX, TY, 400, TH, S_CODE, "1 查证（代码）", "查历史文档和旧对话\n查未来 14 天每日排期密度\n两版 Excel 报价自动逐行比对")
-node("t2", 2590, TY, 330, TH, S_CODE, "2 压缩（代码）", "把查到的长材料截成精简证据卡，避免模型被长文本淹没")
-node("t3", 2990, TY, 420, TH, S_LLM, "3 起草方案（qwen3.8-max）", "拆出做什么、谁负责、起止日期、所属项目\n可自己调用排期和工作日推算工具\n不估工时，不代做外部调研")
-node("t4", 3480, TY, 400, TH, S_LLM, "4 审核（代码 + deepseek-v4-pro）", "代码核对数字是否都有出处\n另一个模型挑漏项和逻辑错误")
-node("t4_ok", 3940, 1500, 200, 180, S_DECISION, "通过？")
-node("card", 4180, 1520, 340, 140, S_CARD, "5 出卡", "待确认卡存入数据库（原件已备份）\n记录本次对话，发卡到微信")
-node("card_next", 4200, 1800, 300, 150, S_IO, "本次结束：等你回复",
-     "回「1 / 好的」→ 路径① 执行\n回「改：…」→ 回到本路径重新起草")
-edge("e_t12", "t1", "t2", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_t23", "t2", "t3", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_t34", "t3", "t4", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_t4ok", "t4", "t4_ok", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_fail", "t4_ok", "t3", "否：带修改意见重写（最多 2 次）", C_LOOP, exit_xy=(0.5, 1), entry_xy=(0.5, 1),
-     points=[(4040, 1780), (3200, 1780)], dashed=True)
-edge("e_pass", "t4_ok", "card", "是", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_card_exec", "card", "exec", "你确认后（回复「1」，经路径①）", C_EXEC, exit_xy=(1, 0.5), entry_xy=(0, 0.7),
-     points=[(4565, 1590), (4565, 481)], dashed=True)
-edge("e_card_next", "card", "card_next", "", C_REPLY, exit_xy=(0.5, 1), entry_xy=(0.5, 0), dashed=True)
+add_initial("s3_init", 1645, 352, 24)
+add_choice("s3_pre_ch", 1715, 344, 40)
+add_transition("t_s3_init", "s3_init", "s3_pre_ch", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
 
-# ------------------------------------------------------------------ stage 5: execute after confirmation
-Z5_X = 4590
-text("z5", Z5_X, ZONE_TOP, 470, ZONE_BOTTOM - ZONE_TOP, "阶段五｜你确认后修改待办与看板", S_ZONE)
-node("exec", 4630, 250, 400, 330, S_CODE, "修改待办与看板（代码）",
-     "唯一能改正式数据的地方：\n• 先校验确认令牌，没有令牌拒绝写入\n"
-     "• 一次性写入待办与项目，留 24 小时撤销快照\n"
-     "• 附件归档到 OneDrive 对应项目目录\n"
-     "• 重绘 5 份 .md 看板\n"
-     "• 回复结果到微信，记录对话（本次结束）")
-node("db", 4630, 680, 180, 170, S_DB, "SQLite", "待办 · 项目 · 对话")
-node("od", 4850, 680, 180, 170, S_DB, "OneDrive", "原件 · 归档 · 5 份看板")
-node("web", 4630, 950, 400, 230, S_CODE, "Web 驾驶舱",
-     "直接读同一个数据库\n表格 · 甘特图 · 排期密度 · 统计\n网页上的修改同样写库并重绘看板")
-edge("e_p1_exec", "p1", "exec", "执行", C_EXEC, exit_xy=(1, 0.5), entry_xy=(0, 0.242))
-edge("e_exec_db", "exec", "db", "", C_EXEC, exit_xy=(0.225, 1), entry_xy=(0.5, 0))
-edge("e_exec_od", "exec", "od", "", C_EXEC, exit_xy=(0.775, 1), entry_xy=(0.5, 0))
-edge("e_db_web", "db", "web", "读取", C_READ, exit_xy=(0.5, 1), entry_xy=(0.225, 0), dashed=True)
-edge("e_outer_loop", "card_next", "start",
-     "外层循环：你的下一条消息 / 下一次触发 → 回到开始（阶段二会读取上次存下的状态）",
-     C_REPLY, exit_xy=(0.5, 1), entry_xy=(0, 0.5), points=[(4350, 2280), (18, 2280), (18, 230)], dashed=True, width=3)
+add_state(
+    "s3_ai", 1650, 445, 555, 165,
+    "1. AI 小秘书初步判断意图",
+    [
+        "do / 调用 qwen3.8-flash（主备自动切换，最多重试 4 次）阅读上下文背景",
+        "do / 听懂日常口语（「好的按这个办」「刚才那个审完了」）、补全「这个/刚才那事」指代并提炼查档关键词",
+        "注 / 万一大模型断网故障，直接跳往下方「老板专属死暗号」保底通道",
+    ],
+    "llm",
+)
+add_transition(
+    "t_s3_pre_ai", "s3_pre_ch", "s3_ai",
+    "[else：需理解上下文]", C_MAIN,
+    exit_xy=(0.5, 1), entry_xy=(0.15, 0),
+    label_pos=-0.1, label_offset_y=0,
+)
+add_transition(
+    "t_s3_pre_hi", "s3_pre_ch", "s4_record",
+    "[纯问候(你好/在吗) 且 无历史无待确认卡] / 直接回复问候",
+    C_RET,
+    exit_xy=(1, 0.5), entry_xy=(0.75, 0),
+    points=[(2265, 364), (2265, 278), (3875, 278)],
+    label_pos=0.42, label_offset_y=-14,
+)
 
-# ------------------------------------------------------------------ stage 6: scheduled jobs (independent lane)
-text("z6", 40, 2330, 5020, 450, "阶段六｜每日定时任务（独立运行，到点后从「开始」进入）", S_ZONE)
-node("timer", 120, 2420, 380, 140, S_CODE, "定时器", "工作日 08:30 早报\n工作日 18:00 晚间复盘")
-node("digest", 600, 2400, 900, 180, S_CODE, "生成简报（代码）",
-     "早报：今日在途事项、平均完成跨度、优先待办、外部卡点、驾驶舱链接\n"
-     "18:00：额外列出「进行中 / 今日到期 / 已超期」事项，请你确认进度\n"
-     "简报同时写入对话记录，方便你直接回复")
-node("digest_out", 1600, 2430, 560, 120, S_IO, "推送到微信",
-     "你回复「#3 做完了，#5 开始了」→ 作为下一条消息走路径①")
-node("mail_job", 2280, 2388, 1080, 200, S_CODE, "邮件汇总（工作日）",
-     "08:30 推出夜间与周末积压\n"
-     "09:00–21:00 有新邮件才推一条\n"
-     "夜间与周末不拉取、不推送\n"
-     "收件合成一张确认卡；发出的信只记在同一条里\n"
-     "域名：config/mail_domains.json；有邮件才从「开始」进入")
-node("sum_job", 3420, 2418, 1550, 140, S_LLM, "滚动摘要（每 8 轮对话，后台运行，qwen3.8-flash）",
-     "把上一版摘要与新对话合并成语义摘要：进行中项目、已定事项、待跟进人和日期\n失败时保留关键词摘要，不影响回复速度")
-edge("e_timer", "timer", "digest", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
-edge("e_digest", "digest", "digest_out", "", C_REPLY, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_state(
+    "s3_guard", 1650, 660, 555, 360,
+    "2. 铁面老管家两道把关（纯代码，0 次模型）",
+    [
+        "do / 【第一道·防闯祸安全锁（专拦小秘书瞎办事）】",
+        "  • 桌上根本没有待确认卡，却判成要签字/存想法/作废 → 拦住改成「参谋聊天」，绝不碰库",
+        "  • 小秘书自己把握不到五成半（没听清没听懂）→ 拦住不准瞎立项，改去「先问清楚」",
+        "  • 纯 PMO 边界：系统已物理移除联网公网搜索与代算业务报价工具",
+        "do / 【第二道·老板专属死暗号（含义唯一，一锤定音，最高优先级）】",
+        "  • 整句只发「看板 / 负荷」→ 只看网页或日程，绝不改待办",
+        "  • 整句只发「撤销 / 开始 3 / 完成 3」→ 必定改对应状态",
+        "  • 桌上有卡时整句发「1 / 2 / 0 / 取消 / 改：…」→ 必定签字、存想法、作废或重排",
+        "  （日常口语「好的」「做完了」含义随语境变化，不放死暗号表，仍交由小秘书结合上下文判断）",
+    ],
+    "code",
+)
+add_transition(
+    "t_s3_ai_guard", "s3_ai", "s3_guard",
+    "给出初步判断 或 网关故障", C_MAIN,
+    exit_xy=(0.5, 1), entry_xy=(0.5, 0),
+    label_offset_y=0,
+)
 
+# Link Stage 2 -> Stage 3 composite state
+add_transition(
+    "t_s2_s3", "s2_ctx", "s3_router_box",
+    "背景就绪", C_MAIN,
+    exit_xy=(1, 0.5), entry_xy=(0, 0.23),
+    label_offset_y=-14,
+)
+
+# --- Stage 3 Exit Choice Pseudostate ◇ (Routing to Stage 4's 5 Paths + Read-only Direct Reply) ---
+add_choice("ch_route", 2310, 818, 48)
+add_transition(
+    "t_s3_choice", "s3_router_box", "ch_route",
+    "最终裁决", C_ROUTE,
+    exit_xy=(1, 0.72), entry_xy=(0, 0.5),
+    label_offset_y=-14,
+)
+
+# ==============================================================================
+# 3. STAGE 4: FIVE PROCESSING PATHS + STAGE 5 CONTROLLED COMMIT
+# ==============================================================================
+add_text("lbl_s4", 2560, 252, 760, 26, "【阶段四｜五条受控处理路径（仅路径①通往阶段五改库）】", S_STAGE_TAG)
+
+# Path ①: Action Shortcut -> Stage 5 Commit
+add_state(
+    "s4_p1", 2580, 295, 520, 155,
+    "路径①：执行确认、打卡与撤销指令",
+    [
+        "do / 解析确认卡编号、作废指令、单条或一句话批量开始/完成打卡、或 24 小时撤销指令",
+        "注 / 凡是「看板 / 负荷」只读查询，直接输出网页链接或近 3 日日程，不改待办",
+    ],
+    "code",
+)
+# Path ②: Conversational Advisor
+add_state(
+    "s4_p2", 2580, 500, 520, 150,
+    "路径②：参谋单轮对谈",
+    [
+        "do / 调用 qwen3.8-max 结合上下文提供参谋意见（每条消息只回一次，绝不后台自聊死循环）",
+        "注 / 绝不新建或修改任何正式待办；聊几轮完全由你决定",
+    ],
+    "llm",
+)
+# Path ③: Grounded QA
+add_state(
+    "s4_p3", 2580, 700, 520, 165,
+    "路径③：闭卷查档与进度问答",
+    [
+        "do / 检索本地历史文档（含本轮刚发并前置入库的新附件）、旧对话与在途项目待办",
+        "do / 查无依据直接回复「未查到」（0 次模型）；有依据则调 qwen3.8-max 严格带页码出处作答",
+    ],
+    "llm",
+)
+# Path ⑤: Clarify / Unsupported
+add_state(
+    "s4_p5", 2580, 915, 520, 145,
+    "路径⑤：追问澄清与能力边界说明",
+    [
+        "do / 说明本助理只做项目管理（不支持代发外部微信/邮件或订票），或礼貌追问项目名/具体事项",
+        "注 / 0 次数据库写入，绝不强行乱建待办",
+    ],
+    "code",
+)
+
+# Shared Turn-End State for Paths ②/③/⑤ & Read-only Replies
+add_state(
+    "s4_record", 3560, 580, 420, 270,
+    "回复微信并记录本次对话",
+    [
+        "entry / 扫描输出文本，严防任何密钥或令牌泄漏",
+        "do / 分片推送回复到你的个人微信（语音消息附带转写原文回显）",
+        "do / 将你的原话与助理回复成对写入本地对话记录（供下次阶段二衔接上下文）",
+        "exit / 若累计满 8 轮新对话，同步写入保底摘要并唤醒正交区 B 升级语义摘要",
+    ],
+    "code",
+)
+add_final("turn_fin_main", 4080, 698, 34)
+add_transition("t_rec_fin", "s4_record", "turn_fin_main", "本轮结束", C_RET, exit_xy=(1, 0.5), entry_xy=(0, 0.5), label_offset_y=-14)
+
+# --- Stage 5: Controlled Formal Data Commit ---
+add_text("lbl_s5", 4220, 250, 620, 26, "【阶段五｜唯一能修改正式待办与看板的受控门禁】", S_STAGE_TAG)
+add_state(
+    "s5_commit", 4220, 295, 610, 340,
+    "修改正式待办、项目与云端看板",
+    [
+        "entry / 对 AI 提案卡：现场签发并校验一次性 HMAC 人类确认令牌（无有效令牌物理拒写）",
+        "do / 本地 SQLite 单事务原子落盘：写入项目与待办，同时留存 24 小时完整撤销快照",
+        "do / 将临时附件正式归档至世纪互联 OneDrive 对应项目目录，并重绘 5 份 .md 清单看板",
+        "do / 云端容错：若 OneDrive 瞬时网络波动，绝不回滚本地已落盘待办，如实告知稍后补刷",
+        "exit / 脱敏推送执行结果到微信，并写入对话记录（Web 驾驶舱实时共享同一数据库）",
+    ],
+    "commit",
+)
+add_final("turn_fin_s5", 4508, 700, 34)
+add_transition("t_s5_fin", "s5_commit", "turn_fin_s5", "落盘并回复完毕", C_COMMIT, exit_xy=(0.5, 1), entry_xy=(0.5, 0), label_offset_y=0)
+
+# Routing transitions from ◇ ch_route to Paths ① / ② / ③ / ⑤ / ④
+add_transition(
+    "t_r_p1", "ch_route", "s4_p1",
+    "[确认/作废/打卡/撤销/看板/负荷]", C_ROUTE,
+    exit_xy=(0.5, 0), entry_xy=(0, 0.5),
+    points=[(2334, 372)],
+    label_pos=0.18, label_offset_y=-14,
+)
+add_transition(
+    "t_r_p2", "ch_route", "s4_p2",
+    "[探讨思路 或 无卡误触确认]", C_ROUTE,
+    exit_xy=(0.75, 0.25), entry_xy=(0, 0.5),
+    points=[(2410, 830), (2410, 575)],
+    label_pos=0.32, label_offset_y=-14,
+)
+add_transition(
+    "t_r_p3", "ch_route", "s4_p3",
+    "[查文档 或 查进度]", C_ROUTE,
+    exit_xy=(1, 0.5), entry_xy=(0, 0.5),
+    points=[(2470, 842), (2470, 782)],
+    label_pos=0.25, label_offset_y=-14,
+)
+add_transition(
+    "t_r_p5", "ch_route", "s4_p5",
+    "[把握不足五成半\n或 超出职责]", C_ROUTE,
+    exit_xy=(0.75, 0.75), entry_xy=(0, 0.5),
+    points=[(2430, 854), (2430, 987)],
+    label_pos=0.55, label_offset_y=-24,
+)
+
+# Path ① -> Stage 5 (or Read-only -> Record)
+add_choice("ch_p1_write", 3220, 350, 44)
+add_transition("t_p1_ch", "s4_p1", "ch_p1_write", "", C_COMMIT, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition(
+    "t_p1_s5", "ch_p1_write", "s5_commit",
+    "[确认/作废/打卡/撤销（需改数据）]", C_COMMIT,
+    exit_xy=(1, 0.5), entry_xy=(0, 0.23),
+    label_offset_y=-14,
+)
+add_transition(
+    "t_p1_ro", "ch_p1_write", "s4_record",
+    "[else：看板 / 负荷（只读不改库）]", C_RET,
+    exit_xy=(0.5, 1), entry_xy=(0.25, 0),
+    points=[(3242, 480), (3665, 480)],
+    label_pos=-0.05, label_offset_y=-14,
+)
+
+# Paths ② / ③ / ⑤ -> Shared Reply & Record state
+add_transition("t_p2_rec", "s4_p2", "s4_record", "", C_RET, exit_xy=(1, 0.5), entry_xy=(0, 0.25), points=[(3340, 575), (3340, 648)])
+add_transition("t_p3_rec", "s4_p3", "s4_record", "", C_RET, exit_xy=(1, 0.5), entry_xy=(0, 0.55), points=[(3340, 782), (3340, 728)])
+add_transition("t_p5_rec", "s4_p5", "s4_record", "", C_RET, exit_xy=(1, 0.5), entry_xy=(0, 0.85), points=[(3340, 987), (3340, 810)])
+
+# ==============================================================================
+# 4. COMPOSITE STATE: PATH ④ PURE PMO CARD DRAFTING & BOUNDED CRITIC LOOP
+# ==============================================================================
+add_container(
+    "s4_p4_box", 1615, 1170, 3215, 920,
+    "路径④ 复合状态：项目管理立卡与派单排期（纯 PMO 纳管——把具体工作拆成卡片安排人做，绝不代干具体业务活）",
+    S_COMPOSITE_SUB,
+)
+add_transition(
+    "t_r_p4", "ch_route", "s4_p4_box",
+    "[else：具体工作事项、派人、转发、附件或修改卡片]", C_ROUTE,
+    exit_xy=(0.5, 1), entry_xy=(0.223, 0),
+    points=[(2334, 1170)],
+    width=3.0, label_pos=0.45, label_offset_y=-14,
+)
+
+add_initial("p4_init", 1650, 1425, 28)
+
+add_state(
+    "p4_s1", 1715, 1295, 420, 290,
+    "1. 前置查证与排期密度体检",
+    [
+        "do / 检索历史档案库与跨时段旧对话，找齐同项目上下文",
+        "do / 查询未来 14 天每日已排事项数量与拥挤日期（单日 ≥5 项标为拥挤）",
+        "注 / 随附原件已在阶段一完成提取入库与原件备份，此处不再重复",
+    ],
+    "code",
+)
+add_state(
+    "p4_s2", 2205, 1320, 350, 220,
+    "2. 证据压缩整理",
+    [
+        "do / 将检索到的长文档、旧对话与新附件截断浓缩为最多 12 张精简证据卡",
+        "do / 附带未来 7 天排期密度摘要，防止长文本淹没主模型注意力",
+    ],
+    "code",
+)
+add_state(
+    "p4_s3", 2635, 1270, 500, 320,
+    "3. PMO 立卡与排期起草",
+    [
+        "do / 调用 qwen3.8-max 拆解为标准项目管理动作：",
+        "  • 归属项目与六大业务板块",
+        "  • 区分本人亲办（责任人=本人）vs 委派同事/外部跟进（责任人=张工/王总等，入委派跟进清单）",
+        "  • 调用排期密度与工作日推算工具确定起止验收日（自动避开拥挤日）",
+        "do / 铁律：默认不猜个人净工时（0.0h），绝不代写调研报告或代算业务内容",
+        "注 / 内部工具调用严格封顶 ≤5 轮，防工具循环",
+    ],
+    "llm",
+)
+add_state(
+    "p4_s4", 3220, 1285, 470, 290,
+    "4. 双重独立把关审核",
+    [
+        "do / 第一重（硬编码）：核对卡片里每个关键数字是否 100% 出自原文或工具事实；核对外部等待项不误填工时",
+        "do / 第二重（异构模型 deepseek-v4-pro）：打破同源盲区，独立挑出漏项、想法混入紧急待办或拥挤排期未提醒等问题",
+        "exit / 输出审核结论（是否通过 + 具体整改意见）",
+    ],
+    "llm",
+)
+
+add_choice("p4_ch_ok", 3775, 1408, 48)
+
+add_state(
+    "p4_s5", 4120, 1280, 540, 300,
+    "5. 暂存草稿卡并推送微信确认",
+    [
+        "entry / 将提案存入「待确认暂存表」（绝不改动正式待办与看板）",
+        "entry / 卡片醒目打印：项目名、事项、责任人（本人/被委派人）、起止周期",
+        "entry / 若满 2 轮重写仍有未消解审核疑点，显式印出「⚠️ 审计待人工复核点」提醒董事长裁决",
+        "do / 扫描防密钥泄漏 → 推送确认卡到微信 → 记录本轮对话",
+    ],
+    "commit",
+)
+add_final("p4_fin", 4735, 1413, 34)
+
+# Path ④ internal transitions (including strict bounded loop!)
+add_transition("t_p4_init", "p4_init", "p4_s1", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition("t_p4_12", "p4_s1", "p4_s2", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition("t_p4_23", "p4_s2", "p4_s3", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition("t_p4_34", "p4_s3", "p4_s4", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition("t_p4_4c", "p4_s4", "p4_ch_ok", "", C_MAIN, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+
+# Bounded loop: [未通过 且 重写次数 < 2] / 重写次数+1
+add_transition(
+    "t_p4_retry", "p4_ch_ok", "p4_s3",
+    "[审核未通过 且 重写次数 < 2] / 携带整改意见，重写次数+1（全图唯一有界回环）",
+    C_LOOP,
+    exit_xy=(0.5, 1), entry_xy=(0.5, 1),
+    points=[(3799, 1730), (2885, 1730)],
+    width=2.6, label_pos=0.0, label_offset_y=-16,
+)
+# Escape / Pass: [else：审核通过 或 重写次数 >= 2]
+add_transition(
+    "t_p4_pass", "p4_ch_ok", "p4_s5",
+    "[else：审核通过 或 重写次数 >= 2]",
+    C_MAIN,
+    exit_xy=(1, 0.5), entry_xy=(0, 0.5),
+    label_pos=0.0, label_offset_y=-16,
+)
+add_transition("t_p4_fin", "p4_s5", "p4_fin", "", C_COMMIT, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+
+# UML Comment note explaining cross-turn human confirmation (no illegal arrow out of Final State!)
+add_note(
+    "p4_hitl_note", 3990, 1810, 780, 225,
+    "人机签字闭环说明（为什么这里先抵达终止状态 ◉？）",
+    [
+        "• 发出待确认卡后，本次处理立即结束（回到左侧「待机等待中」），AI 绝不擅自改你的正式待办。",
+        "• 当你下一条微信回复「1 / 好的」→ 触发全新一次处理 → 经阶段三进入路径① → 阶段五验签落盘。",
+        "• 当你回复「0 / 取消」→ 经路径①作废草稿卡；回复「改：交给李工，下周五截止」→ 携带原卡重走路径④。",
+        "• 任何未预期系统异常均会被顶层捕获：先把你的原话记入对话库并主动告知，绝不静默崩溃或乱改数据。",
+    ],
+)
+
+# ==============================================================================
+# 5. ORTHOGONAL REGION B (Stage 6: Concurrent Background Monitors & Schedulers)
+# ==============================================================================
+add_line("ortho_div_ab", 42, 2215, 4876, 10, S_ORTHO_H)
+add_text(
+    "reg_b_lbl", 64, 2236, 1600, 30,
+    "正交区域 B｜阶段六并发伴随机制（与主消息处理并行独立运行，通过虚线正交隔离，各自独立启停、互不阻塞）",
+    S_REGION_LBL,
+)
+
+# Sub-region B1: Progress Heartbeat Monitor
+add_text("lbl_b1", 80, 2280, 500, 24, "并发子区 B1｜长耗时进度心跳监控（防假死焦虑）", S_STAGE_TAG)
+add_initial("b1_init", 84, 2425, 24)
+add_state(
+    "b1_watch", 140, 2345, 410, 185,
+    "监控单次处理耗时",
+    [
+        "do / 随单次处理启动异步计时器",
+        "注 / 12 秒内处理完直接安静退出，零打扰",
+    ],
+    "bg",
+)
+add_state(
+    "b1_beat", 860, 2345, 470, 185,
+    "定期播报当前步骤",
+    [
+        "do / 每次超时向微信推送「已用时 Xs：正在执行【当前步骤】」",
+        "exit / 主流程结束或异常退出时，finally 强制销毁心跳协程",
+    ],
+    "bg",
+)
+add_transition("t_b1_init", "b1_init", "b1_watch", "", C_BG, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition(
+    "t_b1_start", "b1_watch", "b1_beat",
+    "after(12秒) [仍在处理中] / 首次播报", C_BG,
+    exit_xy=(1, 0.35), entry_xy=(0, 0.35),
+    label_offset_y=-14,
+)
+add_transition(
+    "t_b1_loop", "b1_beat", "b1_beat",
+    "after(25秒) [仍未结束] / 继续播报", C_BG,
+    exit_xy=(0.75, 1), entry_xy=(0.25, 1),
+    points=[(1212, 2595), (978, 2595)],
+    label_offset_y=-14,
+)
+add_transition(
+    "t_b1_stop", "b1_beat", "b1_watch",
+    "单次处理结束 / 销毁计时器", C_RET,
+    exit_xy=(0, 0.72), entry_xy=(1, 0.72),
+    label_offset_y=16,
+)
+
+# Vertical dashed divider B1 | B2
+add_line("ortho_div_b12", 1420, 2280, 10, 360, S_ORTHO_V)
+
+# Sub-region B2: Daily Digest & Workday Mail Summary Scheduler
+add_text("lbl_b2", 1470, 2280, 820, 24, "并发子区 B2｜工作日定时早晚简报与邮件汇总", S_STAGE_TAG)
+add_initial("b2_init", 1474, 2425, 24)
+add_state(
+    "b2_wait", 1530, 2340, 440, 200,
+    "按时钟轮询等待唤醒",
+    [
+        "do / 每 30 秒核对本地时钟（仅周一至周五运行）",
+        "do / 推送成功后再记同日防重标，失败记日志不静默丢失",
+    ],
+    "bg",
+)
+add_state(
+    "b2_digest", 2320, 2315, 580, 130,
+    "推送早间简报 / 18:00 晚间盘点",
+    [
+        "do / 汇总今日在途、外部委派卡点与进度盘点列表，推送微信并写入对话库",
+        "exit / 方便你直接回复「#3 做完了，#5 开始了」批量打卡",
+    ],
+    "bg",
+)
+add_state(
+    "b2_mail", 2320, 2475, 580, 145,
+    "拉取白名单邮件汇总（只读）",
+    [
+        "do / 08:30 补夜间与周末积压；09:00–21:00 每小时一次（夜间与周末不拉）",
+        "do / 收件合成一张待确认卡触发正交区 A；发出的信同条列出；成功后再标已读",
+    ],
+    "bg",
+)
+add_transition("t_b2_init", "b2_init", "b2_wait", "", C_BG, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition(
+    "t_b2_dig", "b2_wait", "b2_digest",
+    "at(工作日 08:30 / 18:00)", C_BG,
+    exit_xy=(1, 0.25), entry_xy=(0, 0.5),
+    points=[(2120, 2390), (2120, 2380)],
+    label_offset_y=-14,
+)
+add_transition(
+    "t_b2_mail", "b2_wait", "b2_mail",
+    "at(工作日 08:30 及 09:00–21:00 整点) [有新邮件]", C_BG,
+    exit_xy=(1, 0.78), entry_xy=(0, 0.5),
+    points=[(2120, 2496), (2120, 2547)],
+    label_offset_y=-14,
+)
+add_transition(
+    "t_b2_dig_back", "b2_digest", "b2_wait",
+    "", C_RET,
+    exit_xy=(0.5, 0), entry_xy=(0.5, 0),
+    points=[(2610, 2292), (1750, 2292)],
+)
+add_transition(
+    "t_b2_mail_back", "b2_mail", "b2_wait",
+    "", C_RET,
+    exit_xy=(0.5, 1), entry_xy=(0.5, 1),
+    points=[(2610, 2642), (1750, 2642)],
+)
+
+# Vertical dashed divider B2 | B3
+add_line("ortho_div_b23", 2970, 2280, 10, 360, S_ORTHO_V)
+
+# Sub-region B3: Rolling Semantic Summary Background Upgrader
+add_text("lbl_b3", 3020, 2280, 900, 24, "并发子区 B3｜跨天滚动会话摘要后台升级（不阻塞主回复）", S_STAGE_TAG)
+add_initial("b3_init", 3024, 2425, 24)
+add_state(
+    "b3_idle", 3080, 2345, 510, 185,
+    "空闲等待对话满 8 轮",
+    [
+        "do / 监听新对话入库计数，未满 8 轮不耗模型",
+        "note / 满 8 轮瞬间由主流程先同步写关键词保底摘要并推进游标（防并发重入）",
+    ],
+    "bg",
+)
+add_state(
+    "b3_run", 3980, 2335, 840, 205,
+    "后台线程语义摘要升级",
+    [
+        "do / 调用 qwen3.8-flash 将上一版摘要与新增 8 轮对话合并为 ≤600 字中文要点",
+        "do / 核对乐观锁（无更新版本抢先写入时）覆盖更新至数据库",
+        "do / 若模型超时或失败：安全保留关键词保底摘要，绝不影响前台回复速度",
+    ],
+    "llm",
+)
+add_transition("t_b3_init", "b3_init", "b3_idle", "", C_BG, exit_xy=(1, 0.5), entry_xy=(0, 0.5))
+add_transition(
+    "t_b3_go", "b3_idle", "b3_run",
+    "新增对话满 8 轮 / 启守护线程", C_BG,
+    exit_xy=(1, 0.35), entry_xy=(0, 0.35),
+    label_offset_y=-14,
+)
+add_transition(
+    "t_b3_done", "b3_run", "b3_idle",
+    "升级完成 或 异常保留保底摘要", C_RET,
+    exit_xy=(0, 0.72), entry_xy=(1, 0.72),
+    label_offset_y=16,
+)
+
+# ==============================================================================
+# 6. SERIALIZE DRAW.IO XML
+# ==============================================================================
 xml = (
     '<?xml version="1.0" encoding="UTF-8"?>\n'
-    '<mxfile host="app.diagrams.net" agent="Antigravity" version="24.7.17">\n'
-    '  <diagram id="six-stage-workflow" name="六阶段工作流全景图">\n'
+    '<mxfile host="app.diagrams.net" agent="Antigravity-UML25" version="24.7.17">\n'
+    '  <diagram id="uml25-state-machine" name="UML 2.5 状态机架构图">\n'
     f'    <mxGraphModel dx="2400" dy="1600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" '
     f'fold="1" page="1" pageScale="1" pageWidth="{PAGE_W}" pageHeight="{PAGE_H}" math="0" shadow="0">\n'
     "      <root>\n"

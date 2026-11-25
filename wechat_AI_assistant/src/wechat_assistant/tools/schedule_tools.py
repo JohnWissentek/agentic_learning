@@ -8,11 +8,19 @@ from typing import Any
 from wechat_assistant.storage.db import Database
 
 
+MAX_BUSINESS_DAY_OFFSET = 3650
+
+
 def calc_business_date(base_date_str: str, offset_business_days: int) -> str:
     """Deterministically add business days (Mon-Fri) to an ISO date string."""
+    offset = int(offset_business_days)
+    if abs(offset) > MAX_BUSINESS_DAY_OFFSET:
+        raise ValueError(
+            f"offset_business_days={offset} exceeds safety limit (+/-{MAX_BUSINESS_DAY_OFFSET})"
+        )
     cur = date.fromisoformat(base_date_str[:10])
-    step = 1 if offset_business_days >= 0 else -1
-    remaining = abs(offset_business_days)
+    step = 1 if offset >= 0 else -1
+    remaining = abs(offset)
     while remaining > 0:
         cur += timedelta(days=step)
         if cur.weekday() < 5:

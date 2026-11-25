@@ -17,11 +17,8 @@ from wechat_assistant.intake.wecom_gateway import WeComGateway
 from wechat_assistant.nodes.critic_rules import deterministic_critic_check
 from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel, TriageProposal, WorkDomain
 from wechat_assistant.storage.db import Database
-from wechat_assistant.storage.extractors import parse_excel_quote_rows
-from wechat_assistant.tools.calc_tools import analyze_excel_quote
 from wechat_assistant.tools.guard import ApprovalToken, before_tool_callback
 from wechat_assistant.tools.onedrive_tools import render_lists_markdown
-from wechat_assistant.tools.search_tools import sanitize_external_query
 from wechat_assistant.web.app import create_app
 
 
@@ -167,34 +164,6 @@ def test_bounded_reflection_loop_revises_rejected_proposal(tmp_path):
     assert "critic:deterministic_reject" in res["trajectory"]
     assert "0.5h" in res["reply_text"]
     eng.close()
-
-
-def test_excel_quote_diff_precision(tmp_path):
-    p1 = tmp_path / "q1.xlsx"
-    p2 = tmp_path / "q2.xlsx"
-    for path, rows in [
-        (p1, [["物料", "单价", "数量", "小计"], ["光纤探头", 1200, 10, 12000], ["主机箱", 5000, 1, 5000]]),
-        (p2, [["物料", "单价", "数量", "小计"], ["光纤探头", 1350, 10, 13500], ["主机箱", 5000, 1, 5000]]),
-    ]:
-        wb = Workbook()
-        ws = wb.active
-        for r in rows:
-            ws.append(r)
-        wb.save(path)
-
-    diff = analyze_excel_quote(parse_excel_quote_rows(p1), parse_excel_quote_rows(p2))
-    assert diff["old_total"] == 17000.0
-    assert diff["new_total"] == 18500.0
-    assert diff["total_delta"] == 1500.0
-    assert diff["changed"][0]["key"] == "光纤探头"
-
-
-def test_external_query_sanitization():
-    safe, redacted = sanitize_external_query("帕莫瑞科技有限公司 锅炉测温 2U机箱 ¥128000 EMI标准")
-    assert "帕莫瑞" not in safe
-    assert "128000" not in safe
-    assert "2U机箱" in safe
-    assert len(redacted) >= 2
 
 
 def test_before_tool_callback_blocks_without_token():

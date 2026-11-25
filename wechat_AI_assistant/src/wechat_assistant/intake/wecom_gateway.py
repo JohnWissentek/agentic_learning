@@ -83,7 +83,7 @@ class QuietAggregator:
         atts = attachments or []
         t = (text or "").strip()
 
-        if t == "好了":
+        if t == "好了" and self.has_pending_batch(sender_key):
             await self.flush_now(sender_key)
             return
 
@@ -143,6 +143,7 @@ class WeComGateway:
         self._token_lock = asyncio.Lock()
         self._seen_msg_ids: set[str] = set()
         self._seen_order: list[str] = []
+        self._in_flight_msg_ids: set[str] = set()
         self._blocked_attempts = 0
         self.aggregator = QuietAggregator(
             quiet_seconds=float(os.environ.get("SEGMENT_QUIET_SECONDS", "2")),
@@ -205,24 +206,44 @@ class WeComGateway:
             self._token_exp = now + int(data.get("expires_in", 7200))
             return self._token_value
 
+    async def invalidate_access_token(self) -> None:
+        async with self._token_lock:
+            self._token_value = ""
+            self._token_exp = 0.0
+
     async def send_app_push(self, content: str) -> dict[str, Any]:
         """Push proactive text notification via self-built App (`工作助理`) -> WeChat Plugin."""
         if not (self.settings.wecom_corp_id and self.settings.wecom_app_agent_id and self.settings.wecom_app_secret):
             return {"skipped": True, "reason": "missing_wecom_app_config"}
+        touser = self.settings.wecom_app_owner_userid or "@all"
         token = await self.get_access_token()
+        data: dict[str, Any] = {"errcode": 0}
         async with httpx.AsyncClient(timeout=15.0) as client:
             for part in self._split_chunks(content, limit=1800):
-                resp = await client.post(
-                    "https://qyapi.weixin.qq.com/cgi-bin/message/send",
-                    params={"access_token": token},
-                    json={
-                        "touser": "@all",
-                        "msgtype": "text",
-                        "agentid": int(self.settings.wecom_app_agent_id),
-                        "text": {"content": part},
-                    },
-                )
-                data = resp.json()
+                for attempt in range(2):
+                    resp = await client.post(
+                        "https://qyapi.weixin.qq.com/cgi-bin/message/send",
+                        params={"access_token": token},
+                        json={
+                            "touser": touser,
+                            "msgtype": "text",
+                            "agentid": int(self.settings.wecom_app_agent_id),
+                            "text": {"content": part},
+                        },
+                    )
+                    resp.raise_for_status()
+                    data = resp.json()
+                    errcode = int(data.get("errcode", 0) or 0)
+                    if errcode in (40014, 42001) and attempt == 0:
+                        logger.warning("WeCom access_token expired (errcode=%s), refreshing and retrying", errcode)
+                        await self.invalidate_access_token()
+                        token = await self.get_access_token()
+                        continue
+                    if errcode != 0:
+                        raise RuntimeError(
+                            f"WeCom message/send failed: errcode={errcode} errmsg={data.get('errmsg', '')}"
+                        )
+                    break
         return data
 
     async def send_kf_text(self, *, touser: str, open_kfid: str, content: str) -> None:
@@ -346,6 +367,9 @@ class WeComGateway:
                 return
         texts.append("[收到语音消息，暂未能识别清晰文字，请补充文字说明]")
 
+    def _is_seen(self, msgid: str) -> bool:
+        return bool(msgid and msgid in self._seen_msg_ids)
+
     def _mark_seen(self, msgid: str) -> bool:
         if not msgid:
             return True
@@ -376,11 +400,14 @@ class WeComGateway:
                 return None
             disp = r.headers.get("content-disposition", "")
             m = re.search(r'filename="?([^";]+)"?', disp)
-            clean_explicit = Path(explicit_filename).name if explicit_filename else ""
-            fname = clean_explicit or (
-                urllib.parse.unquote(m.group(1)) if m else f"{secrets.token_hex(4)}{fallback_ext}"
-            )
-            local_path = self.tmp_dir / f"{int(time.time())}_{fname}"
+            raw_name = explicit_filename or (urllib.parse.unquote(m.group(1)) if m else "")
+            sanitized = Path(raw_name.replace("\\", "/")).name if raw_name else ""
+            if not sanitized or sanitized in {".", ".."}:
+                sanitized = f"{secrets.token_hex(4)}{fallback_ext}"
+            fname = sanitized
+            local_path = (self.tmp_dir / f"{int(time.time())}_{fname}").resolve()
+            if not local_path.is_relative_to(self.tmp_dir.resolve()):
+                local_path = (self.tmp_dir / f"{int(time.time())}_{secrets.token_hex(4)}{fallback_ext}").resolve()
             local_path.write_bytes(r.content)
             return {"filename": fname, "path": str(local_path), "size": len(r.content)}
 
@@ -459,20 +486,35 @@ class WeComGateway:
             return
 
         msgid = ev.get("MsgId", "")
-        if not self._mark_seen(msgid):
+        if self._is_seen(msgid) or (msgid and msgid in self._in_flight_msg_ids):
             return
 
         from_user = ev.get("FromUserName", "owner") or "owner"
-        sender_key = f"app|{from_user}"
-        if not self.aggregator.has_pending_batch(sender_key):
-            ack = self._build_arrival_ack(msg_type.lower(), (ev.get("Content") or "").strip())
-            if ack:
-                await self.send_app_push(ack)
-
-        text, atts = await self._parse_app_xml_message(ev)
-        if not (text or atts):
+        if self.settings.wecom_app_owner_userid and from_user != self.settings.wecom_app_owner_userid:
+            self._blocked_attempts += 1
             return
-        await self.aggregator.push(sender_key, text=text, attachments=atts, msg_id=msgid)
+
+        if msgid:
+            self._in_flight_msg_ids.add(msgid)
+        try:
+            sender_key = f"app|{from_user}"
+            if not self.aggregator.has_pending_batch(sender_key):
+                ack = self._build_arrival_ack(msg_type.lower(), (ev.get("Content") or "").strip())
+                if ack:
+                    try:
+                        await self.send_app_push(ack)
+                    except Exception as exc:
+                        logger.warning("WeCom arrival ack failed: %s", type(exc).__name__)
+
+            text, atts = await self._parse_app_xml_message(ev)
+            if not self._mark_seen(msgid):
+                return
+            if not (text or atts):
+                return
+            await self.aggregator.push(sender_key, text=text, attachments=atts, msg_id=msgid)
+        finally:
+            if msgid:
+                self._in_flight_msg_ids.discard(msgid)
 
     async def _parse_kf_message(self, msg: dict[str, Any]) -> tuple[str, list[dict[str, Any]]]:
         """Extract normalized text and downloaded attachments from text/merged_msg/voice/file/image."""
@@ -515,7 +557,22 @@ class WeComGateway:
                 if smtype == "text" and isinstance(mc, dict):
                     content_str = mc.get("text", {}).get("content", "")
                     texts.append(f"{idx}. [{t_label} {sender}] {content_str}")
-                elif smtype in {"file", "image", "voice"} and isinstance(mc, dict):
+                elif smtype == "voice" and isinstance(mc, dict):
+                    voice_obj = mc.get("voice", {}) if isinstance(mc.get("voice"), dict) else {}
+                    media_id = voice_obj.get("media_id", "")
+                    rec = (voice_obj.get("recognition") or "").strip()
+                    if rec:
+                        texts.append(f"{idx}. [{t_label} {sender}] [语音转写] {rec}")
+                    else:
+                        dl = await self._download_media(media_id, ".amr")
+                        if dl:
+                            atts.append(dl)
+                            asr_text = await self._transcribe_audio_dashscope(dl["path"])
+                            if asr_text:
+                                texts.append(f"{idx}. [{t_label} {sender}] [语音转写] {asr_text}")
+                            else:
+                                texts.append(f"{idx}. [{t_label} {sender}] <语音附件: {dl['filename']}>")
+                elif smtype in {"file", "image"} and isinstance(mc, dict):
                     media_id = mc.get(smtype, {}).get("media_id", "")
                     dl = await self._download_media(media_id, f".{smtype}")
                     if dl:
@@ -546,9 +603,8 @@ class WeComGateway:
             ).json()
 
         if res.get("errcode", 0) != 0:
+            logger.warning("WeCom kf/sync_msg failed: errcode=%s", res.get("errcode"))
             return
-        if res.get("next_cursor"):
-            cursor_file.write_text(res["next_cursor"], encoding="utf-8")
 
         owner_ext = self.get_owner_external_userid()
         for msg in res.get("msg_list", []):
@@ -556,7 +612,7 @@ class WeComGateway:
                 continue  # Ignore non-WeChat-user system/self messages
             msgid = msg.get("msgid", "")
             ext_id = msg.get("external_userid", "")
-            if not self._mark_seen(msgid) or not ext_id or msg.get("msgtype") == "event":
+            if self._is_seen(msgid) or not ext_id or msg.get("msgtype") == "event":
                 continue
 
             if not owner_ext:
@@ -572,12 +628,20 @@ class WeComGateway:
                 raw_txt = (msg.get("text", {}).get("content") or "").strip() if mtype == "text" else ""
                 ack = self._build_arrival_ack(mtype, raw_txt)
                 if ack:
-                    await self.send_kf_text(touser=ext_id, open_kfid=kfid, content=ack)
+                    try:
+                        await self.send_kf_text(touser=ext_id, open_kfid=kfid, content=ack)
+                    except Exception as exc:
+                        logger.warning("WeCom KF arrival ack failed: %s", type(exc).__name__)
 
             text, atts = await self._parse_kf_message(msg)
+            if not self._mark_seen(msgid):
+                continue
             if not (text or atts):
                 continue
             await self.aggregator.push(sender_key, text=text, attachments=atts, msg_id=msgid)
+
+        if res.get("next_cursor"):
+            cursor_file.write_text(res["next_cursor"], encoding="utf-8")
 
     async def _handle_flushed_kf_batch(
         self,
@@ -607,4 +671,12 @@ class WeComGateway:
                 "WeCom turn failed: %s",
                 redact_secrets(f"{type(exc).__name__}: {exc}", self.settings),
             )
-            await self.send_app_push("⚠️ 刚才处理消息时遇到瞬时异常，请稍后重试或换文字发送。")
+            err_msg = "⚠️ 刚才处理消息时遇到瞬时异常，请稍后重试或换文字发送。"
+            if is_app:
+                await self.send_app_push(err_msg)
+            else:
+                try:
+                    await self.send_kf_text(touser=ext_id, open_kfid=kfid, content=err_msg)
+                except Exception as send_exc:
+                    logger.warning("WeCom KF error reply failed, falling back to app push: %s", type(send_exc).__name__)
+                    await self.send_app_push(err_msg)

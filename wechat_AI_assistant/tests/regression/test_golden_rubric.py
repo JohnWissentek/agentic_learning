@@ -7,7 +7,6 @@ import json
 from wechat_assistant.nodes.critic_rules import deterministic_critic_check
 from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel, TriageProposal, WorkDomain
 from wechat_assistant.storage.db import Database
-from wechat_assistant.tools.calc_tools import analyze_excel_quote
 
 
 def test_golden_rubric_multi_item_split_and_effort_separation(tmp_path):
@@ -59,22 +58,3 @@ def test_golden_rubric_multi_item_split_and_effort_separation(tmp_path):
     # Workload uses 1.2h total CEO net hours, NEVER 22 calendar waiting days!
     wl = db.get_daily_workload(start_date="2026-11-17", days=1, daily_capacity=6.0)
     assert wl["days"]["2026-11-17"]["booked_hours"] == 1.2
-
-
-def test_golden_rubric_excel_fidelity_and_critic():
-    old_rows = [{"物料": "A1探头", "单价": 800, "数量": 5, "小计": 4000}]
-    new_rows = [{"物料": "A1探头", "单价": 850, "数量": 5, "小计": 4250}]
-    diff = analyze_excel_quote(old_rows, new_rows)
-    proposal = TriageProposal(
-        headline="报价单核对",
-        executive_summary="A1探头单价由 800 调至 850，总价增加 250。",
-        actions=[],
-        referenced_numbers=["800", "850", "250"],
-    )
-    issues = deterministic_critic_check(
-        proposal,
-        raw_input="请帮我对比两份报价单",
-        evidence_text="",
-        tool_outputs_text=json.dumps(diff, ensure_ascii=False),
-    )
-    assert issues == []

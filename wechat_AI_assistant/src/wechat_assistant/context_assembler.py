@@ -70,6 +70,16 @@ def _parse_ts(ts_str: str | None) -> datetime | None:
         return None
 
 
+def _safe_json_list(raw: str | None) -> list[Any]:
+    if not raw:
+        return []
+    try:
+        parsed = json.loads(raw)
+        return parsed if isinstance(parsed, list) else []
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
 def _format_gap_label(delta_seconds: float) -> str:
     mins = max(1, int(delta_seconds // 60))
     if mins < 60:
@@ -190,9 +200,18 @@ class ContextAssembler:
             prop = pending.get("proposal") or {}
             act_lines = [
                 f"  - [{a.get('priority')}][{a.get('list_type')}] {a.get('project_name')}: {a.get('title')} "
-                f"(周期 {a.get('planned_start_at')}~{a.get('planned_end_at')}, 净工时 {a.get('estimated_hours')}h)"
+                f"(负责人:{a.get('owner')}, 实施人:{a.get('assignee') or a.get('owner')}, "
+                f"周期 {a.get('planned_start_at')}~{a.get('planned_end_at') or '待补齐'})"
                 for a in prop.get("actions", [])[:6]
             ]
+            for upd in prop.get("task_updates", [])[:6]:
+                tl = upd.get("timeline_entry") or {}
+                act_lines.append(
+                    f"  - [归入已有任务 #{upd.get('target_task_id')}] {upd.get('target_task_title', '')}: "
+                    f"{tl.get('summary', '')}"
+                )
+            for fyi in prop.get("fyi_notices", [])[:4]:
+                act_lines.append(f"  - [抄送知会] {fyi.get('summary', '')}")
             pending_text = (
                 f"待确认卡片 #{pending['id']}（生成于 {pending.get('created_at')}，距今约 {max(0, int(age_min))} 分钟，"
                 f"{'仍在当前连续讨论窗口内' if pending_fresh else '已隔较长时间'}）：\n"
@@ -217,7 +236,7 @@ class ContextAssembler:
         match_hay = (current_text or "") + " " + " ".join(anchor_entities)
         proj_cards: list[str] = []
         for p in projects:
-            aliases = json.loads(p.get("aliases_json") or "[]")
+            aliases = _safe_json_list(p.get("aliases_json"))
             names = [p["name"], *[str(a) for a in aliases if a]]
             if any(n and n in match_hay for n in names):
                 p_items = [it for it in all_open_items if it.get("project_name") == p["name"]][:5]
@@ -239,7 +258,12 @@ class ContextAssembler:
                 "未完成待办/等待项：\n"
                 + "\n".join(
                     f"  - #{it['id']} [{it['priority']}][{it['list_type']}][{it['status']}] "
-                    f"{it['project_name']}: {it['title']} (责任人:{it['owner']}, 周期:{it['planned_start_at']}~{it['planned_end_at']})"
+                    f"{it['project_name']}: {it['title']} "
+                    f"(负责人:{it['owner']}, 实施人:{it.get('assignee') or it['owner']}, "
+                    f"外部:{it.get('external_partner') or '无'}, "
+                    f"交付物:{(it.get('deliverable') or '')[:40]}, "
+                    f"阶段:{it.get('milestone_stage') or '-'}, "
+                    f"周期:{it['planned_start_at']}~{it['planned_end_at'] or '待补齐'})"
                     for it in open_items
                 )
             )
@@ -341,7 +365,20 @@ class ContextAssembler:
                 if any(t in hay for t in tok_lowers):
                     matched_projects.append(proj)
             for it in self.db.list_items(include_done=True):
-                hay = f"#{it['id']} {it['title']} {it['project_name']} {it['owner']} {it['work_domain']}".lower()
+                cmt_blob = " ".join(
+                    c.get("content", "") if isinstance(c, dict) else str(c)
+                    for c in (it.get("comments") or [])
+                )
+                eval_blob = " ".join(
+                    c.get("content", "") if isinstance(c, dict) else str(c)
+                    for c in (it.get("ceo_evaluation") or [])
+                )
+                hay = (
+                    f"#{it['id']} {it['title']} {it['project_name']} {it['owner']} "
+                    f"{it.get('assignee', '')} {it.get('external_partner', '')} "
+                    f"{it.get('deliverable', '')} {it.get('milestone_stage', '')} "
+                    f"{it.get('blocker_note', '')} {it['work_domain']} {cmt_blob} {eval_blob}"
+                ).lower()
                 if any(t in hay for t in tok_lowers):
                     matched_items.append(it)
                     if len(matched_items) >= 15:
