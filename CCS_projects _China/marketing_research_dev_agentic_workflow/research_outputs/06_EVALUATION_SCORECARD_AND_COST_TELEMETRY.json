@@ -1,776 +1,1326 @@
 {
-  "run_id": "vf-native-c4409dd5",
-  "completed_at_utc": "2026-11-15T09:29:52.871013+00:00",
+  "schema_version": "2.0",
+  "run_id": "vf-v2-native-7e7eb590",
+  "completed_at_utc": "2026-11-25T12:20:20.064948+00:00",
   "profile": "flagship",
   "llm_engine": "antigravity_native:pro",
   "stage_gate_passed": true,
-  "pass_threshold": 85.0,
-  "judge_rubric": {
-    "china_grounding_and_project_specificity": 20.0,
-    "market_sizing_and_pain_point_rigor": 20.0,
-    "competitive_battlecard_accuracy": 20.0,
-    "dual_track_gtm_and_roi_actionability": 20.0,
-    "evidence_traceability_and_prose": 20.0,
-    "total_score": 100.0,
-    "pass_stage_gate": true,
-    "executive_commentary": "The V&F IMR-MS China CCS/CCUS Research Dossier demonstrates outstanding strategic, technical, and commercial rigor, earning a perfect score of 100/100 and passing the executive Stage-Gate evaluation unconditionally. \n\n1. China Grounding & Project Specificity (20/20): Deeply anchored in China's '15th Five-Year Plan' macro-industrial policy and 21 landmark megaprojects across CNPC, Sinopec, PipeChina, and CNOOC. It accurately reflects the operational ecosystem of top-tier engineering design institutes (SEI, HQC, CPECC, Tianchen) and overcomes institutional barriers including GB/T 3836 explosion-proof certification, Sinopec/CNPC AVL vendor qualifications, and lump-sum EPC contracting practices.\n2. Market Sizing & Pain Point Rigor (20/20): Ruthlessly separates high-ROI industrial must-haves (sub-second supercritical CO2 pipeline acid-dew pitting interlock with 15.1-month payback and 74.6% IRR; marine LCO2 cross-border BOG return at 19.0-month payback and 56.3% IRR; green methanol/e-SAF Cu/ZnO catalyst Tripwire protection) from 3 identified low-margin/fake-need traps (food-grade offline QC at 292.8-month payback, bulk industrial cleaning at 196.7-month payback, and bottling lines). Physical-chemical failure mechanisms (phase change, acid condensation, ppb-level poison kinetics) are analyzed with extreme mathematical rigor.\n3. Competitive Battlecard Accuracy (20/20): Thoroughly benchmarks 19 competitors across 4 core detection technologies (10 shortlisted, 8 eliminated). It articulates first-principles physical differentiators—specifically contrasting V&F's 8.4–14.0 eV soft chemical ionization (Kr+/Xe+/Hg+) against 70 eV EI-MS fragmentation, FTIR non-polar homonuclear diatomic blindness (N2, O2), and Process GC 5–15 min cycle latency versus <200 ms sub-second ESD requirements. Tailored battlecards and objection-handling scripts arm frontline technical sales for every key stakeholder persona.\n4. Dual-Track GTM & ROI Actionability (20/20): Strategically elevates V&F from a ¥300k–800k commodity EPC analyzer into a ¥3.2M–5.5M 'Major Process Asset Tripwire Safety Protection System' tapping into owner safety revamping budgets. The Track A (CO2Sense research core, ¥1.4M–2.2M) and Track B (VF-QAS-CN explosion-proof shelter, ¥3.2M–5.5M) framework, combined with domestic PAC integrator partnerships and FEED stage spec-in tactics, provides an executable blueprint.\n5. Evidence Traceability & Executive Prose (20/20): Exemplary evidence citation architecture ([EV-SIGGI-*], [EV-CN-*], [EV-GL-*]) backed by deterministic calculations, delivered in boardroom-grade strategic memo prose."
-  },
-  "deterministic_contract_checks": {
-    "total_evidences": 223,
-    "siggi_evidences": 48,
-    "cn_evidences": 113,
-    "global_evidences": 62,
-    "meets_total_evidence_gate": true,
-    "meets_siggi_evidence_gate": true,
-    "meets_cn_evidence_gate": true,
-    "meets_global_evidence_gate": true,
-    "all_5_volumes_non_empty": true,
-    "has_mkt_calc_tag": true,
-    "has_roi_calc_tag": true,
-    "has_dual_track_coverage": true,
-    "distinct_citations_used": 39,
-    "evaluated_wedges_count": 10
+  "deterministic_audit_report": {
+    "passed": true,
+    "vault_stats": {
+      "total": 426,
+      "siggi_count": 48,
+      "cn_count": 237,
+      "global_count": 141,
+      "unique_sources": 426
+    },
+    "dropped_unverified_count": 0,
+    "dropped_unverified_records": [],
+    "full_edition_audits": [
+      {
+        "volume_name": "00_EXECUTIVE_DECISION_MEMO_AND_VERDICT.md",
+        "edition": "full",
+        "total_chars": 44874,
+        "distinct_valid_ids": 107,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "01_CHINA_CCUS_MARKET_SIZING_AND_PAIN_POINTS.md",
+        "edition": "full",
+        "total_chars": 41822,
+        "distinct_valid_ids": 108,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "02_COMPETITIVE_LANDSCAPE_AND_BATTLECARDS.md",
+        "edition": "full",
+        "total_chars": 59802,
+        "distinct_valid_ids": 102,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "03_COMMERCIAL_GTM_PRICING_AND_PARTNERSHIP_PLAN.md",
+        "edition": "full",
+        "total_chars": 51228,
+        "distinct_valid_ids": 104,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "04_ACTION_ROADMAP_30_60_90_AND_12_24M.md",
+        "edition": "full",
+        "total_chars": 31499,
+        "distinct_valid_ids": 87,
+        "invalid_ids": []
+      }
+    ],
+    "executive_edition_audits": [
+      {
+        "volume_name": "00_EXECUTIVE_DECISION_MEMO_AND_VERDICT.md",
+        "edition": "executive",
+        "total_chars": 21751,
+        "distinct_valid_ids": 106,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "01_CHINA_CCUS_MARKET_SIZING_AND_PAIN_POINTS.md",
+        "edition": "executive",
+        "total_chars": 23393,
+        "distinct_valid_ids": 107,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "02_COMPETITIVE_LANDSCAPE_AND_BATTLECARDS.md",
+        "edition": "executive",
+        "total_chars": 25107,
+        "distinct_valid_ids": 100,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "03_COMMERCIAL_GTM_PRICING_AND_PARTNERSHIP_PLAN.md",
+        "edition": "executive",
+        "total_chars": 25914,
+        "distinct_valid_ids": 103,
+        "invalid_ids": []
+      },
+      {
+        "volume_name": "04_ACTION_ROADMAP_30_60_90_AND_12_24M.md",
+        "edition": "executive",
+        "total_chars": 19787,
+        "distinct_valid_ids": 82,
+        "invalid_ids": []
+      }
+    ],
+    "invalid_citations_by_volume": {},
+    "numeric_consistency_passed": true,
+    "numeric_discrepancies": [],
+    "dual_edition_complete": true,
+    "dual_track_covered": true,
+    "eliminated_wedges_disclosed": true,
+    "secret_leak_check_passed": true,
+    "failed_gates": []
   },
   "evidence_vault_stats": {
-    "total": 223,
+    "total": 426,
     "siggi_count": 48,
-    "cn_count": 113,
-    "global_count": 62,
-    "unique_sources": 223
+    "cn_count": 237,
+    "global_count": 141,
+    "unique_sources": 426
   },
   "market_sizing_summary": {
     "calc_tag": "[MKT-CALC]",
     "segments": [
       {
         "sector": "S1_pipeline_ship_eor",
-        "horizon": "2026-2030",
+        "sub_segment": "lco2_export_vessel_hub",
+        "horizon": "2031-2036",
         "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
         "asp_cny_wan": 420.0,
         "conservative": {
           "scenario": "conservative",
-          "tam_units": 50,
-          "tam_cny_wan": 21000.0,
-          "sam_units": 43,
-          "sam_cny_wan": 18060.0,
-          "som_units": 8,
-          "som_cny_wan": 3360.0
+          "tam_units": 17,
+          "tam_cny_wan": 7140.0,
+          "sam_units": 13,
+          "sam_cny_wan": 5460.0,
+          "som_units": 2,
+          "som_cny_wan": 840.0
         },
         "baseline": {
           "scenario": "baseline",
-          "tam_units": 70,
-          "tam_cny_wan": 29400.0,
-          "sam_units": 60,
-          "sam_cny_wan": 25200.0,
-          "som_units": 15,
-          "som_cny_wan": 6300.0
+          "tam_units": 24,
+          "tam_cny_wan": 10080.0,
+          "sam_units": 19,
+          "sam_cny_wan": 7980.0,
+          "som_units": 5,
+          "som_cny_wan": 2100.0
         },
         "optimistic": {
           "scenario": "optimistic",
-          "tam_units": 94,
-          "tam_cny_wan": 39480.0,
-          "sam_units": 81,
-          "sam_cny_wan": 34020.0,
-          "som_units": 25,
-          "som_cny_wan": 10500.0
+          "tam_units": 32,
+          "tam_cny_wan": 13440.0,
+          "sam_units": 26,
+          "sam_cny_wan": 10920.0,
+          "som_units": 8,
+          "som_cny_wan": 3360.0
         },
         "evidence_ids": [
-          "EV-CN-081",
-          "EV-CN-050",
-          "EV-GL-018",
-          "EV-GL-019",
-          "EV-GL-038"
+          "EV-CN-001",
+          "EV-CN-127",
+          "EV-CN-130",
+          "EV-CN-211",
+          "EV-CN-212",
+          "EV-SIGGI-007",
+          "EV-SIGGI-008"
         ]
       },
       {
         "sector": "S1_pipeline_ship_eor",
-        "horizon": "2031-2036",
-        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
-        "asp_cny_wan": 420.0,
-        "conservative": {
-          "scenario": "conservative",
-          "tam_units": 162,
-          "tam_cny_wan": 68040.0,
-          "sam_units": 145,
-          "sam_cny_wan": 60900.0,
-          "som_units": 38,
-          "som_cny_wan": 15960.0
-        },
-        "baseline": {
-          "scenario": "baseline",
-          "tam_units": 225,
-          "tam_cny_wan": 94500.0,
-          "sam_units": 202,
-          "sam_cny_wan": 84840.0,
-          "som_units": 71,
-          "som_cny_wan": 29820.0
-        },
-        "optimistic": {
-          "scenario": "optimistic",
-          "tam_units": 304,
-          "tam_cny_wan": 127680.0,
-          "sam_units": 273,
-          "sam_cny_wan": 114660.0,
-          "som_units": 117,
-          "som_cny_wan": 49140.0
-        },
-        "evidence_ids": [
-          "EV-CN-081",
-          "EV-GL-002",
-          "EV-GL-019",
-          "EV-GL-036",
-          "EV-GL-038"
-        ]
-      },
-      {
-        "sector": "S2_green_methanol_ccu_chem",
+        "sub_segment": "lco2_export_vessel_hub",
         "horizon": "2026-2030",
-        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
-        "asp_cny_wan": 420.0,
+        "primary_delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
+        "asp_cny_wan": 720.0,
         "conservative": {
           "scenario": "conservative",
-          "tam_units": 65,
-          "tam_cny_wan": 27300.0,
-          "sam_units": 55,
-          "sam_cny_wan": 23100.0,
-          "som_units": 7,
-          "som_cny_wan": 2940.0
-        },
-        "baseline": {
-          "scenario": "baseline",
-          "tam_units": 90,
-          "tam_cny_wan": 37800.0,
-          "sam_units": 76,
-          "sam_cny_wan": 31920.0,
-          "som_units": 14,
-          "som_cny_wan": 5880.0
-        },
-        "optimistic": {
-          "scenario": "optimistic",
-          "tam_units": 122,
-          "tam_cny_wan": 51240.0,
-          "sam_units": 103,
-          "sam_cny_wan": 43260.0,
-          "som_units": 23,
-          "som_cny_wan": 9660.0
-        },
-        "evidence_ids": [
-          "EV-CN-035",
-          "EV-CN-050",
-          "EV-GL-026",
-          "EV-GL-048",
-          "EV-SIGGI-001"
-        ]
-      },
-      {
-        "sector": "S2_green_methanol_ccu_chem",
-        "horizon": "2031-2036",
-        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
-        "asp_cny_wan": 420.0,
-        "conservative": {
-          "scenario": "conservative",
-          "tam_units": 173,
-          "tam_cny_wan": 72660.0,
-          "sam_units": 156,
-          "sam_cny_wan": 65520.0,
-          "som_units": 33,
-          "som_cny_wan": 13860.0
-        },
-        "baseline": {
-          "scenario": "baseline",
-          "tam_units": 240,
-          "tam_cny_wan": 100800.0,
-          "sam_units": 216,
-          "sam_cny_wan": 90720.0,
-          "som_units": 60,
-          "som_cny_wan": 25200.0
-        },
-        "optimistic": {
-          "scenario": "optimistic",
-          "tam_units": 324,
-          "tam_cny_wan": 136080.0,
-          "sam_units": 292,
-          "sam_cny_wan": 122640.0,
-          "som_units": 100,
-          "som_cny_wan": 42000.0
-        },
-        "evidence_ids": [
-          "EV-CN-050",
-          "EV-CN-052",
-          "EV-GL-048",
-          "EV-GL-054",
-          "EV-SIGGI-001"
-        ]
-      },
-      {
-        "sector": "S3_capture_rd_industry",
-        "horizon": "2026-2030",
-        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
-        "asp_cny_wan": 180.0,
-        "conservative": {
-          "scenario": "conservative",
-          "tam_units": 65,
-          "tam_cny_wan": 11700.0,
-          "sam_units": 45,
-          "sam_cny_wan": 8100.0,
-          "som_units": 8,
+          "tam_units": 8,
+          "tam_cny_wan": 5760.0,
+          "sam_units": 7,
+          "sam_cny_wan": 5040.0,
+          "som_units": 2,
           "som_cny_wan": 1440.0
         },
         "baseline": {
           "scenario": "baseline",
-          "tam_units": 90,
-          "tam_cny_wan": 16200.0,
-          "sam_units": 63,
-          "sam_cny_wan": 11340.0,
-          "som_units": 16,
+          "tam_units": 12,
+          "tam_cny_wan": 8640.0,
+          "sam_units": 10,
+          "sam_cny_wan": 7200.0,
+          "som_units": 4,
           "som_cny_wan": 2880.0
         },
         "optimistic": {
           "scenario": "optimistic",
-          "tam_units": 122,
-          "tam_cny_wan": 21960.0,
-          "sam_units": 85,
-          "sam_cny_wan": 15300.0,
-          "som_units": 26,
-          "som_cny_wan": 4680.0
+          "tam_units": 16,
+          "tam_cny_wan": 11520.0,
+          "sam_units": 14,
+          "sam_cny_wan": 10080.0,
+          "som_units": 6,
+          "som_cny_wan": 4320.0
         },
         "evidence_ids": [
-          "EV-CN-026",
-          "EV-CN-050",
-          "EV-CN-058",
-          "EV-CN-059",
-          "EV-SIGGI-002",
-          "EV-SIGGI-003"
+          "EV-GL-125",
+          "EV-GL-126",
+          "EV-GL-127",
+          "EV-GL-128",
+          "EV-GL-129",
+          "EV-SIGGI-008",
+          "EV-SIGGI-014",
+          "EV-SIGGI-015",
+          "EV-SIGGI-016"
         ]
       },
       {
-        "sector": "S3_capture_rd_industry",
+        "sector": "S1_pipeline_ship_eor",
+        "sub_segment": "offshore_ccus_storage",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
+        "asp_cny_wan": 720.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 3,
+          "tam_cny_wan": 2160.0,
+          "sam_units": 3,
+          "sam_cny_wan": 2160.0,
+          "som_units": 1,
+          "som_cny_wan": 720.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 4,
+          "tam_cny_wan": 2880.0,
+          "sam_units": 4,
+          "sam_cny_wan": 2880.0,
+          "som_units": 1,
+          "som_cny_wan": 720.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 5,
+          "tam_cny_wan": 3600.0,
+          "sam_units": 5,
+          "sam_cny_wan": 3600.0,
+          "som_units": 2,
+          "som_cny_wan": 1440.0
+        },
+        "evidence_ids": [
+          "EV-CN-202",
+          "EV-CN-204",
+          "EV-CN-205",
+          "EV-CN-206",
+          "EV-GL-121",
+          "EV-SIGGI-007"
+        ]
+      },
+      {
+        "sector": "S1_pipeline_ship_eor",
+        "sub_segment": "offshore_ccus_storage",
         "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
+        "asp_cny_wan": 720.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 8,
+          "tam_cny_wan": 5760.0,
+          "sam_units": 8,
+          "sam_cny_wan": 5760.0,
+          "som_units": 2,
+          "som_cny_wan": 1440.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 12,
+          "tam_cny_wan": 8640.0,
+          "sam_units": 11,
+          "sam_cny_wan": 7920.0,
+          "som_units": 3,
+          "som_cny_wan": 2160.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 16,
+          "tam_cny_wan": 11520.0,
+          "sam_units": 15,
+          "sam_cny_wan": 10800.0,
+          "som_units": 5,
+          "som_cny_wan": 3600.0
+        },
+        "evidence_ids": [
+          "EV-CN-202",
+          "EV-CN-204",
+          "EV-CN-205",
+          "EV-CN-206",
+          "EV-GL-085",
+          "EV-GL-121",
+          "EV-SIGGI-007"
+        ]
+      },
+      {
+        "sector": "S1_pipeline_ship_eor",
+        "sub_segment": "onboard_occs_shipboard",
+        "horizon": "2026-2030",
         "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
         "asp_cny_wan": 420.0,
         "conservative": {
           "scenario": "conservative",
-          "tam_units": 216,
-          "tam_cny_wan": 90720.0,
-          "sam_units": 130,
-          "sam_cny_wan": 54600.0,
-          "som_units": 20,
-          "som_cny_wan": 8400.0
-        },
-        "baseline": {
-          "scenario": "baseline",
-          "tam_units": 300,
-          "tam_cny_wan": 126000.0,
-          "sam_units": 180,
-          "sam_cny_wan": 75600.0,
-          "som_units": 36,
-          "som_cny_wan": 15120.0
-        },
-        "optimistic": {
-          "scenario": "optimistic",
-          "tam_units": 405,
-          "tam_cny_wan": 170100.0,
-          "sam_units": 243,
-          "sam_cny_wan": 102060.0,
-          "som_units": 59,
-          "som_cny_wan": 24780.0
-        },
-        "evidence_ids": [
-          "EV-CN-059",
-          "EV-CN-031",
-          "EV-GL-002",
-          "EV-SIGGI-001",
-          "EV-SIGGI-003"
-        ]
-      },
-      {
-        "sector": "S4_food_beverage_dryice",
-        "horizon": "2026-2030",
-        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
-        "asp_cny_wan": 180.0,
-        "conservative": {
-          "scenario": "conservative",
-          "tam_units": 86,
-          "tam_cny_wan": 15480.0,
-          "sam_units": 30,
-          "sam_cny_wan": 5400.0,
+          "tam_units": 3,
+          "tam_cny_wan": 1260.0,
+          "sam_units": 2,
+          "sam_cny_wan": 840.0,
           "som_units": 0,
           "som_cny_wan": 0.0
         },
         "baseline": {
           "scenario": "baseline",
-          "tam_units": 120,
-          "tam_cny_wan": 21600.0,
-          "sam_units": 42,
-          "sam_cny_wan": 7560.0,
-          "som_units": 1,
-          "som_cny_wan": 180.0
+          "tam_units": 4,
+          "tam_cny_wan": 1680.0,
+          "sam_units": 3,
+          "sam_cny_wan": 1260.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
         },
         "optimistic": {
           "scenario": "optimistic",
-          "tam_units": 162,
-          "tam_cny_wan": 29160.0,
-          "sam_units": 57,
-          "sam_cny_wan": 10260.0,
+          "tam_units": 5,
+          "tam_cny_wan": 2100.0,
+          "sam_units": 4,
+          "sam_cny_wan": 1680.0,
           "som_units": 1,
-          "som_cny_wan": 180.0
+          "som_cny_wan": 420.0
         },
         "evidence_ids": [
-          "EV-CN-083",
-          "EV-CN-027",
-          "EV-CN-079",
-          "EV-CN-044",
-          "EV-GL-049"
+          "EV-GL-005",
+          "EV-GL-006",
+          "EV-GL-135",
+          "EV-GL-136",
+          "EV-GL-137",
+          "EV-GL-138"
         ]
       },
       {
-        "sector": "S4_food_beverage_dryice",
+        "sector": "S1_pipeline_ship_eor",
+        "sub_segment": "onboard_occs_shipboard",
         "horizon": "2031-2036",
         "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
         "asp_cny_wan": 420.0,
         "conservative": {
           "scenario": "conservative",
-          "tam_units": 115,
-          "tam_cny_wan": 48300.0,
-          "sam_units": 46,
-          "sam_cny_wan": 19320.0,
+          "tam_units": 11,
+          "tam_cny_wan": 4620.0,
+          "sam_units": 8,
+          "sam_cny_wan": 3360.0,
           "som_units": 1,
           "som_cny_wan": 420.0
         },
         "baseline": {
           "scenario": "baseline",
-          "tam_units": 160,
-          "tam_cny_wan": 67200.0,
-          "sam_units": 64,
-          "sam_cny_wan": 26880.0,
+          "tam_units": 16,
+          "tam_cny_wan": 6720.0,
+          "sam_units": 11,
+          "sam_cny_wan": 4620.0,
           "som_units": 2,
           "som_cny_wan": 840.0
         },
         "optimistic": {
           "scenario": "optimistic",
-          "tam_units": 216,
-          "tam_cny_wan": 90720.0,
-          "sam_units": 86,
-          "sam_cny_wan": 36120.0,
-          "som_units": 3,
+          "tam_units": 22,
+          "tam_cny_wan": 9240.0,
+          "sam_units": 15,
+          "sam_cny_wan": 6300.0,
+          "som_units": 4,
+          "som_cny_wan": 1680.0
+        },
+        "evidence_ids": [
+          "EV-GL-005",
+          "EV-GL-006",
+          "EV-GL-136",
+          "EV-GL-137",
+          "EV-GL-138",
+          "EV-CN-130"
+        ]
+      },
+      {
+        "sector": "S1_pipeline_ship_eor",
+        "sub_segment": "onshore_pipeline_eor",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
+        "asp_cny_wan": 420.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 21,
+          "tam_cny_wan": 8820.0,
+          "sam_units": 15,
+          "sam_cny_wan": 6300.0,
+          "som_units": 2,
+          "som_cny_wan": 840.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 30,
+          "tam_cny_wan": 12600.0,
+          "sam_units": 22,
+          "sam_cny_wan": 9240.0,
+          "som_units": 5,
+          "som_cny_wan": 2100.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 40,
+          "tam_cny_wan": 16800.0,
+          "sam_units": 30,
+          "sam_cny_wan": 12600.0,
+          "som_units": 8,
+          "som_cny_wan": 3360.0
+        },
+        "evidence_ids": [
+          "EV-CN-177",
+          "EV-CN-176",
+          "EV-CN-175",
+          "EV-CN-203",
+          "EV-CN-161",
+          "EV-CN-059",
+          "EV-GL-018",
+          "EV-GL-083",
+          "EV-GL-084",
+          "EV-GL-119"
+        ]
+      },
+      {
+        "sector": "S1_pipeline_ship_eor",
+        "sub_segment": "onshore_pipeline_eor",
+        "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
+        "asp_cny_wan": 420.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 59,
+          "tam_cny_wan": 24780.0,
+          "sam_units": 50,
+          "sam_cny_wan": 21000.0,
+          "som_units": 11,
+          "som_cny_wan": 4620.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 84,
+          "tam_cny_wan": 35280.0,
+          "sam_units": 71,
+          "sam_cny_wan": 29820.0,
+          "som_units": 20,
+          "som_cny_wan": 8400.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 113,
+          "tam_cny_wan": 47460.0,
+          "sam_units": 96,
+          "sam_cny_wan": 40320.0,
+          "som_units": 33,
+          "som_cny_wan": 13860.0
+        },
+        "evidence_ids": [
+          "EV-CN-177",
+          "EV-CN-203",
+          "EV-CN-204",
+          "EV-CN-059",
+          "EV-GL-018",
+          "EV-GL-083",
+          "EV-GL-084",
+          "EV-GL-121",
+          "EV-SIGGI-009"
+        ]
+      },
+      {
+        "sector": "S2_green_methanol_ccu_chem",
+        "sub_segment": "esaf_ptl_pilot_demo",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 6,
+          "tam_cny_wan": 1080.0,
+          "sam_units": 4,
+          "sam_cny_wan": 720.0,
+          "som_units": 1,
+          "som_cny_wan": 180.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 8,
+          "tam_cny_wan": 1440.0,
+          "sam_units": 6,
+          "sam_cny_wan": 1080.0,
+          "som_units": 2,
+          "som_cny_wan": 360.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 11,
+          "tam_cny_wan": 1980.0,
+          "sam_units": 8,
+          "sam_cny_wan": 1440.0,
+          "som_units": 2,
+          "som_cny_wan": 360.0
+        },
+        "evidence_ids": [
+          "EV-CN-142",
+          "EV-CN-179",
+          "EV-GL-116",
+          "EV-SIGGI-003"
+        ]
+      },
+      {
+        "sector": "S2_green_methanol_ccu_chem",
+        "sub_segment": "green_methanol_esaf",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
+        "asp_cny_wan": 420.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 19,
+          "tam_cny_wan": 7980.0,
+          "sam_units": 13,
+          "sam_cny_wan": 5460.0,
+          "som_units": 2,
+          "som_cny_wan": 840.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 27,
+          "tam_cny_wan": 11340.0,
+          "sam_units": 18,
+          "sam_cny_wan": 7560.0,
+          "som_units": 4,
+          "som_cny_wan": 1680.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 36,
+          "tam_cny_wan": 15120.0,
+          "sam_units": 24,
+          "sam_cny_wan": 10080.0,
+          "som_units": 6,
+          "som_cny_wan": 2520.0
+        },
+        "evidence_ids": [
+          "EV-CN-144",
+          "EV-CN-145",
+          "EV-CN-186",
+          "EV-CN-198",
+          "EV-SIGGI-003"
+        ]
+      },
+      {
+        "sector": "S2_green_methanol_ccu_chem",
+        "sub_segment": "green_methanol_esaf",
+        "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
+        "asp_cny_wan": 420.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 63,
+          "tam_cny_wan": 26460.0,
+          "sam_units": 44,
+          "sam_cny_wan": 18480.0,
+          "som_units": 8,
+          "som_cny_wan": 3360.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 90,
+          "tam_cny_wan": 37800.0,
+          "sam_units": 63,
+          "sam_cny_wan": 26460.0,
+          "som_units": 16,
+          "som_cny_wan": 6720.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 122,
+          "tam_cny_wan": 51240.0,
+          "sam_units": 85,
+          "sam_cny_wan": 35700.0,
+          "som_units": 26,
+          "som_cny_wan": 10920.0
+        },
+        "evidence_ids": [
+          "EV-CN-142",
+          "EV-CN-145",
+          "EV-CN-147",
+          "EV-CN-198",
+          "EV-SIGGI-014"
+        ]
+      },
+      {
+        "sector": "S3_capture_rd_industry",
+        "sub_segment": "amine_capture_demo_compliance",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
+        "asp_cny_wan": 420.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 19,
+          "tam_cny_wan": 7980.0,
+          "sam_units": 10,
+          "sam_cny_wan": 4200.0,
+          "som_units": 1,
+          "som_cny_wan": 420.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 27,
+          "tam_cny_wan": 11340.0,
+          "sam_units": 15,
+          "sam_cny_wan": 6300.0,
+          "som_units": 2,
+          "som_cny_wan": 840.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 36,
+          "tam_cny_wan": 15120.0,
+          "sam_units": 20,
+          "sam_cny_wan": 8400.0,
+          "som_units": 4,
+          "som_cny_wan": 1680.0
+        },
+        "evidence_ids": [
+          "EV-CN-195",
+          "EV-CN-167",
+          "EV-CN-169",
+          "EV-CN-166",
+          "EV-CN-002",
+          "EV-CN-003"
+        ]
+      },
+      {
+        "sector": "S3_capture_rd_industry",
+        "sub_segment": "amine_capture_industrial_scaleup",
+        "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_B_LOCALIZED_QAS",
+        "asp_cny_wan": 420.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 48,
+          "tam_cny_wan": 20160.0,
+          "sam_units": 26,
+          "sam_cny_wan": 10920.0,
+          "som_units": 4,
+          "som_cny_wan": 1680.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 68,
+          "tam_cny_wan": 28560.0,
+          "sam_units": 37,
+          "sam_cny_wan": 15540.0,
+          "som_units": 7,
+          "som_cny_wan": 2940.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 92,
+          "tam_cny_wan": 38640.0,
+          "sam_units": 50,
+          "sam_cny_wan": 21000.0,
+          "som_units": 11,
+          "som_cny_wan": 4620.0
+        },
+        "evidence_ids": [
+          "EV-CN-167",
+          "EV-CN-196",
+          "EV-CN-169",
+          "EV-CN-164",
+          "EV-CN-195",
+          "EV-CN-003"
+        ]
+      },
+      {
+        "sector": "S3_capture_rd_industry",
+        "sub_segment": "amine_capture_rd",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 17,
+          "tam_cny_wan": 3060.0,
+          "sam_units": 13,
+          "sam_cny_wan": 2340.0,
+          "som_units": 2,
+          "som_cny_wan": 360.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 24,
+          "tam_cny_wan": 4320.0,
+          "sam_units": 18,
+          "sam_cny_wan": 3240.0,
+          "som_units": 4,
+          "som_cny_wan": 720.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 32,
+          "tam_cny_wan": 5760.0,
+          "sam_units": 24,
+          "sam_cny_wan": 4320.0,
+          "som_units": 6,
+          "som_cny_wan": 1080.0
+        },
+        "evidence_ids": [
+          "EV-CN-002",
+          "EV-CN-004",
+          "EV-CN-192",
+          "EV-CN-166",
+          "EV-CN-167",
+          "EV-CN-164",
+          "EV-GL-110",
+          "EV-CN-207",
+          "EV-SIGGI-002"
+        ]
+      },
+      {
+        "sector": "S3_capture_rd_industry",
+        "sub_segment": "amine_capture_rd",
+        "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 21,
+          "tam_cny_wan": 3780.0,
+          "sam_units": 15,
+          "sam_cny_wan": 2700.0,
+          "som_units": 2,
+          "som_cny_wan": 360.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 30,
+          "tam_cny_wan": 5400.0,
+          "sam_units": 21,
+          "sam_cny_wan": 3780.0,
+          "som_units": 4,
+          "som_cny_wan": 720.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 40,
+          "tam_cny_wan": 7200.0,
+          "sam_units": 28,
+          "sam_cny_wan": 5040.0,
+          "som_units": 7,
           "som_cny_wan": 1260.0
         },
         "evidence_ids": [
-          "EV-CN-083",
-          "EV-CN-080",
-          "EV-CN-077",
-          "EV-GL-049"
+          "EV-CN-196",
+          "EV-CN-003",
+          "EV-CN-167",
+          "EV-CN-192",
+          "EV-CN-207"
+        ]
+      },
+      {
+        "sector": "S4_food_beverage_dryice",
+        "sub_segment": "electronic_co2_purification_probe",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 7,
+          "tam_cny_wan": 1260.0,
+          "sam_units": 3,
+          "sam_cny_wan": 540.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 10,
+          "tam_cny_wan": 1800.0,
+          "sam_units": 4,
+          "sam_cny_wan": 720.0,
+          "som_units": 1,
+          "som_cny_wan": 180.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 14,
+          "tam_cny_wan": 2520.0,
+          "sam_units": 5,
+          "sam_cny_wan": 900.0,
+          "som_units": 1,
+          "som_cny_wan": 180.0
+        },
+        "evidence_ids": [
+          "EV-CN-224",
+          "EV-GL-090",
+          "EV-GL-131",
+          "EV-GL-133",
+          "EV-GL-134",
+          "EV-CN-181",
+          "EV-CN-226"
+        ]
+      },
+      {
+        "sector": "S4_food_beverage_dryice",
+        "sub_segment": "electronic_co2_purification_probe",
+        "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 13,
+          "tam_cny_wan": 2340.0,
+          "sam_units": 6,
+          "sam_cny_wan": 1080.0,
+          "som_units": 1,
+          "som_cny_wan": 180.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 18,
+          "tam_cny_wan": 3240.0,
+          "sam_units": 9,
+          "sam_cny_wan": 1620.0,
+          "som_units": 2,
+          "som_cny_wan": 360.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 24,
+          "tam_cny_wan": 4320.0,
+          "sam_units": 12,
+          "sam_cny_wan": 2160.0,
+          "som_units": 3,
+          "som_cny_wan": 540.0
+        },
+        "evidence_ids": [
+          "EV-CN-224",
+          "EV-CN-181",
+          "EV-GL-090",
+          "EV-GL-131",
+          "EV-GL-133"
+        ]
+      },
+      {
+        "sector": "S4_food_beverage_dryice",
+        "sub_segment": "food_grade_control",
+        "horizon": "2026-2030",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 56,
+          "tam_cny_wan": 10080.0,
+          "sam_units": 11,
+          "sam_cny_wan": 1980.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 80,
+          "tam_cny_wan": 14400.0,
+          "sam_units": 16,
+          "sam_cny_wan": 2880.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 108,
+          "tam_cny_wan": 19440.0,
+          "sam_units": 22,
+          "sam_cny_wan": 3960.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "evidence_ids": [
+          "EV-CN-002",
+          "EV-CN-182",
+          "EV-CN-183",
+          "EV-CN-141",
+          "EV-CN-149",
+          "EV-CN-150",
+          "EV-CN-153",
+          "EV-GL-079",
+          "EV-SIGGI-008"
+        ]
+      },
+      {
+        "sector": "S4_food_beverage_dryice",
+        "sub_segment": "food_grade_control",
+        "horizon": "2031-2036",
+        "primary_delivery_track": "TRACK_A_IMPORTED_CORE",
+        "asp_cny_wan": 180.0,
+        "conservative": {
+          "scenario": "conservative",
+          "tam_units": 70,
+          "tam_cny_wan": 12600.0,
+          "sam_units": 14,
+          "sam_cny_wan": 2520.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "baseline": {
+          "scenario": "baseline",
+          "tam_units": 100,
+          "tam_cny_wan": 18000.0,
+          "sam_units": 20,
+          "sam_cny_wan": 3600.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "optimistic": {
+          "scenario": "optimistic",
+          "tam_units": 135,
+          "tam_cny_wan": 24300.0,
+          "sam_units": 27,
+          "sam_cny_wan": 4860.0,
+          "som_units": 0,
+          "som_cny_wan": 0.0
+        },
+        "evidence_ids": [
+          "EV-CN-182",
+          "EV-CN-183",
+          "EV-GL-079",
+          "EV-CN-141",
+          "EV-SIGGI-007",
+          "EV-SIGGI-008"
         ]
       }
     ],
     "horizon_totals": {
       "2026-2030": {
         "conservative": {
-          "tam_units": 266.0,
-          "tam_cny_wan": 75480.0,
-          "sam_units": 173.0,
-          "sam_cny_wan": 54660.0,
-          "som_units": 23.0,
-          "som_cny_wan": 7740.0
+          "tam_units": 159.0,
+          "tam_cny_wan": 49440.0,
+          "sam_units": 81.0,
+          "sam_cny_wan": 29580.0,
+          "som_units": 11.0,
+          "som_cny_wan": 4800.0
         },
         "baseline": {
-          "tam_units": 370.0,
-          "tam_cny_wan": 105000.0,
-          "sam_units": 241.0,
-          "sam_cny_wan": 76020.0,
-          "som_units": 46.0,
-          "som_cny_wan": 15240.0
+          "tam_units": 226.0,
+          "tam_cny_wan": 70440.0,
+          "sam_units": 116.0,
+          "sam_cny_wan": 42360.0,
+          "som_units": 23.0,
+          "som_cny_wan": 9480.0
         },
         "optimistic": {
-          "tam_units": 500.0,
-          "tam_cny_wan": 141840.0,
-          "sam_units": 326.0,
-          "sam_cny_wan": 102840.0,
-          "som_units": 75.0,
-          "som_cny_wan": 25020.0
+          "tam_units": 303.0,
+          "tam_cny_wan": 93960.0,
+          "sam_units": 156.0,
+          "sam_cny_wan": 57060.0,
+          "som_units": 36.0,
+          "som_cny_wan": 15360.0
         }
       },
       "2031-2036": {
         "conservative": {
-          "tam_units": 666.0,
-          "tam_cny_wan": 279720.0,
-          "sam_units": 477.0,
-          "sam_cny_wan": 200340.0,
-          "som_units": 92.0,
-          "som_cny_wan": 38640.0
+          "tam_units": 310.0,
+          "tam_cny_wan": 107640.0,
+          "sam_units": 184.0,
+          "sam_cny_wan": 71280.0,
+          "som_units": 31.0,
+          "som_cny_wan": 12900.0
         },
         "baseline": {
-          "tam_units": 925.0,
-          "tam_cny_wan": 388500.0,
-          "sam_units": 662.0,
-          "sam_cny_wan": 278040.0,
-          "som_units": 169.0,
-          "som_cny_wan": 70980.0
+          "tam_units": 442.0,
+          "tam_cny_wan": 153720.0,
+          "sam_units": 262.0,
+          "sam_cny_wan": 101340.0,
+          "som_units": 59.0,
+          "som_cny_wan": 24240.0
         },
         "optimistic": {
-          "tam_units": 1249.0,
-          "tam_cny_wan": 524580.0,
-          "sam_units": 894.0,
-          "sam_cny_wan": 375480.0,
-          "som_units": 279.0,
-          "som_cny_wan": 117180.0
+          "tam_units": 596.0,
+          "tam_cny_wan": 207360.0,
+          "sam_units": 354.0,
+          "sam_cny_wan": 137100.0,
+          "som_units": 97.0,
+          "som_cny_wan": 39840.0
         }
       }
     },
-    "grand_total_10yr_baseline_som_cny_wan": 86220.0,
-    "grand_total_10yr_baseline_som_units": 215
+    "grand_total_10yr_baseline_som_cny_wan": 33720.0,
+    "grand_total_10yr_baseline_som_units": 82
   },
-  "evaluated_wedges_top10": [
+  "evaluated_wedges_ranked": [
     {
       "rank": 1,
-      "wedge_id": "WEDGE_T3_01",
-      "sector": "S2_green_methanol_ccu_chem",
+      "wedge_id": "W_T1_01_PIPE_ACID_REDOX",
+      "sector": "S1_pipeline_ship_eor",
       "delivery_track": "TRACK_B_LOCALIZED_QAS",
-      "title": "生物质气化制绿色甲醇Cu/ZnO催化剂合成塔进料微量硫(H2S/COS)亚秒级Tripwire联锁保护",
-      "payback_months": 15.3,
-      "irr_5yr_pct": 73.42,
-      "npv_5yr_cny": 8098275.91,
-      "weighted_pillar_score": 91.06,
-      "elo_rating": 1593.99
+      "title": "超临界CO2干线及油气改输管道多杂质（O2/H2S/SO2/NOx/H2O）协同酸腐蚀链式预警监控",
+      "payback_months": 19.09,
+      "irr_5yr_pct": 56.07,
+      "npv_5yr_cny": 6340754.5,
+      "global_priority_score": 91.0,
+      "weighted_pillar_score": 89.76,
+      "merged_from_wedge_ids": [
+        "W_T1_01_PIPE_ACID_REDOX",
+        "W_T1_03_EOR_RECYCLE_NETWORK"
+      ]
     },
     {
       "rank": 2,
-      "wedge_id": "WEDGE_T3_02",
-      "sector": "S2_green_methanol_ccu_chem",
+      "wedge_id": "W4_1_AMINE_DEGRADATION_RD",
+      "sector": "S3_capture_rd_industry",
       "delivery_track": "TRACK_A_IMPORTED_CORE",
-      "title": "绿氢电催化与e-SAF(PtL/AtJ)合成催化剂研发及国家标准评测台位微量硫氨监测",
-      "payback_months": 12.39,
-      "irr_5yr_pct": 93.25,
-      "npv_5yr_cny": 5446586.47,
-      "weighted_pillar_score": 88.12,
-      "elo_rating": 1546.57
+      "title": "燃煤/工业烟气胺法吸收剂多杂质协同降解动力学与新型溶剂中试在线质谱平台",
+      "payback_months": 18.2,
+      "irr_5yr_pct": 59.57,
+      "npv_5yr_cny": 3021106.25,
+      "global_priority_score": 86.5,
+      "weighted_pillar_score": 86.2,
+      "merged_from_wedge_ids": [
+        "W4_1_AMINE_DEGRADATION_RD"
+      ]
     },
     {
       "rank": 3,
-      "wedge_id": "WEDGE_T3_03",
+      "wedge_id": "W-T3-02",
       "sector": "S2_green_methanol_ccu_chem",
-      "delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
-      "title": "万吨级CCU直接合成e-SAF/液体烃类工业装置高压CO2原料与循环气杂质全球枢纽级联锁分析",
-      "payback_months": 16.57,
-      "irr_5yr_pct": 66.79,
-      "npv_5yr_cny": 9453610.33,
-      "weighted_pillar_score": 83.33,
-      "elo_rating": 1528.13
+      "delivery_track": "TRACK_A_IMPORTED_CORE",
+      "title": "千吨/万吨级e-SAF（PtL/费托）中试与示范反应器防中毒核心监测",
+      "payback_months": 16.48,
+      "irr_5yr_pct": 67.26,
+      "npv_5yr_cny": 3719648.25,
+      "global_priority_score": 83.0,
+      "weighted_pillar_score": 81.5,
+      "merged_from_wedge_ids": [
+        "W-T3-02"
+      ]
     },
     {
       "rank": 4,
-      "wedge_id": "WEDGE-T4-RD-01",
-      "sector": "S3_capture_rd_industry",
-      "delivery_track": "TRACK_A_IMPORTED_CORE",
-      "title": "科研院所与设计院中试研发平台：有机胺溶剂热氧降解动力学与超微量致癌物（亚硝胺/硝胺）免衍生化在线质谱表征",
-      "payback_months": 17.9,
-      "irr_5yr_pct": 60.79,
-      "npv_5yr_cny": 3100960.45,
-      "weighted_pillar_score": 42.31,
-      "elo_rating": 1401.29
+      "wedge_id": "T2_W1_EXPORT_LCO2_CUSTODY_VAPOR_QAS",
+      "sector": "S1_pipeline_ship_eor",
+      "delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
+      "title": "出口LCO2运输船装卸贸易交接与空返气相线多组分在线质谱监测系统（Austria PremierGuard）",
+      "payback_months": 20.28,
+      "irr_5yr_pct": 51.83,
+      "npv_5yr_cny": 9808944.76,
+      "global_priority_score": 81.5,
+      "weighted_pillar_score": 81.1,
+      "merged_from_wedge_ids": [
+        "T2_W1_EXPORT_LCO2_CUSTODY_VAPOR_QAS"
+      ]
     },
     {
       "rank": 5,
-      "wedge_id": "W1_SUPERCRITICAL_PIPE_CORROSION_CUTOFF",
+      "wedge_id": "W_T1_02_OFFSHORE_CCUS_STORAGE",
       "sector": "S1_pipeline_ship_eor",
-      "delivery_track": "TRACK_B_LOCALIZED_QAS",
-      "title": "百万吨级超临界CO2管网微量酸雾与O2超限亚秒级联锁切断防爆小屋",
-      "payback_months": 15.09,
-      "irr_5yr_pct": 74.63,
-      "npv_5yr_cny": 9135651.52,
-      "weighted_pillar_score": 43.28,
-      "elo_rating": 1379.66
+      "delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
+      "title": "海上油气田CO2封存平台及海管相态波动与少人运维全组分监控（PremierGuard）",
+      "payback_months": 21.33,
+      "irr_5yr_pct": 48.45,
+      "npv_5yr_cny": 8970475.65,
+      "global_priority_score": 74.5,
+      "weighted_pillar_score": 78.57,
+      "merged_from_wedge_ids": [
+        "W_T1_02_OFFSHORE_CCUS_STORAGE"
+      ]
     },
     {
       "rank": 6,
-      "wedge_id": "WEDGE_T5_S1_01",
-      "sector": "S1_pipeline_ship_eor",
+      "wedge_id": "W-T3-03",
+      "sector": "S2_green_methanol_ccu_chem",
       "delivery_track": "TRACK_B_LOCALIZED_QAS",
-      "title": "高压长输CO2管道首站/阀室防爆正压小屋双轨本土化在线监测方案 (High-Pressure Long-Distance CO2 Pipeline Head/Valve Station Explosion-proof QAS Shelter)",
-      "payback_months": 15.09,
-      "irr_5yr_pct": 74.63,
-      "npv_5yr_cny": 9135651.52,
-      "weighted_pillar_score": 43.15,
-      "elo_rating": 1379.03
+      "title": "2031-2036商业化大型绿甲醇与e-SAF园区双工位闭环监测",
+      "payback_months": 17.03,
+      "irr_5yr_pct": 64.62,
+      "npv_5yr_cny": 8156890.82,
+      "global_priority_score": 69.0,
+      "weighted_pillar_score": 84.84,
+      "merged_from_wedge_ids": [
+        "W-T3-03"
+      ]
     },
     {
       "rank": 7,
-      "wedge_id": "WEDGE_T2_OFFSHORE_HUB_CUSTODY",
+      "wedge_id": "T2_W3_CHINA_COASTAL_LCO2_TERMINAL_2031",
       "sector": "S1_pipeline_ship_eor",
       "delivery_track": "TRACK_B_LOCALIZED_QAS",
-      "title": "海上油气田CCUS注碳增气外输枢纽贸易交接与高压井口防腐质谱监测系统",
-      "payback_months": 16.47,
-      "irr_5yr_pct": 67.3,
-      "npv_5yr_cny": 8017692.71,
-      "weighted_pillar_score": 43.01,
-      "elo_rating": 1371.91
-    },
-    {
-      "rank": 8,
-      "wedge_id": "WEDGE_T5_S1_02",
-      "sector": "S1_pipeline_ship_eor",
-      "delivery_track": "TRACK_B_LOCALIZED_QAS",
-      "title": "油田EOR高压注气井口与采出气伴生气循环在线多相杂质监控小屋 (Oilfield CCUS-EOR High-Pressure Injection & Produced Gas Recirculation Shelter)",
-      "payback_months": 18.49,
-      "irr_5yr_pct": 58.38,
-      "npv_5yr_cny": 7158713.31,
-      "weighted_pillar_score": 43.0,
-      "elo_rating": 1371.79
-    },
-    {
-      "rank": 9,
-      "wedge_id": "W2_EOR_INJECTION_WELL_SCALE_CORROSION_GUARD",
-      "sector": "S1_pipeline_ship_eor",
-      "delivery_track": "TRACK_B_LOCALIZED_QAS",
-      "title": "油田超临界CO2-EOR注气配气站井下腐蚀与结垢防爆在线监控系统",
+      "title": "中国远期（2031-2036）沿海多排放源LCO2液化枢纽与装船质检站（VF-QAS-CN）",
       "payback_months": 17.14,
       "irr_5yr_pct": 64.12,
       "npv_5yr_cny": 7538567.51,
-      "weighted_pillar_score": 43.03,
-      "elo_rating": 1340.5
-    },
-    {
-      "rank": 10,
-      "wedge_id": "W3_LCO2_OFFSHORE_SHIPPING_TERMINAL_GUARD",
-      "sector": "S1_pipeline_ship_eor",
-      "delivery_track": "TRACK_C_AUSTRIA_PREMIERGUARD",
-      "title": "离岸沿海枢纽LCO2运输船装卸站与跨界MRV高端认证PremierGuard QAS",
-      "payback_months": 19.03,
-      "irr_5yr_pct": 56.29,
-      "npv_5yr_cny": 10926903.57,
-      "weighted_pillar_score": 41.86,
-      "elo_rating": 1335.73
+      "global_priority_score": 61.5,
+      "weighted_pillar_score": 79.22,
+      "merged_from_wedge_ids": [
+        "T2_W3_CHINA_COASTAL_LCO2_TERMINAL_2031"
+      ]
     }
   ],
   "eliminated_wedges": [
     {
-      "wedge_id": "WEDGE_T2_LCO2_EXPORT_VESSEL",
+      "wedge_id": "W_T1_04_SINGLE_SOURCE_TRUCK_PSEUDO",
       "sector": "S1_pipeline_ship_eor",
-      "title": "中国大型船厂出口LCO2运输船船载液相装卸与BOG返气双流路在线质谱分析系统",
-      "baseline_payback_months": 23.23,
-      "conservative_payback_months": 46.56,
-      "elimination_reason": "保守情景回收期 46.6 个月超过准入门槛 42.0 个月",
+      "title": "单一洁净来源CO2槽车短途拉运及小规模单井试注纯度抽检（伪需求降级）",
+      "baseline_payback_months": 30.0,
+      "conservative_payback_months": 41.31,
+      "elimination_reason": "被业务判定为低支付意愿或伪需求对照赛道",
       "evidence_ids": [
-        "EV-CN-033",
-        "EV-CN-034",
-        "EV-CN-082",
-        "EV-CN-084"
+        "EV-CN-139",
+        "EV-CN-161",
+        "EV-SIGGI-004"
       ]
     },
     {
-      "wedge_id": "WEDGE-T4-RD-02",
-      "sector": "S3_capture_rd_industry",
-      "title": "火电/水泥/钢铁烟气碳捕集模拟与工艺优化中试：吸收塔胺逃逸气溶胶与酸性气协同穿透动态监测",
-      "baseline_payback_months": 25.45,
-      "conservative_payback_months": 57.04,
-      "elimination_reason": "保守情景回收期 57.0 个月超过准入门槛 42.0 个月",
+      "wedge_id": "T2_W2_ONBOARD_OCCS_OFFLOAD_QAS",
+      "sector": "S1_pipeline_ship_eor",
+      "title": "船载碳捕集（OCCS）胺法脱附与船上液化卸港质检橇（VF-QAS-CN船用版）",
+      "baseline_payback_months": 21.54,
+      "conservative_payback_months": 45.21,
+      "elimination_reason": "保守情景回收期 45.2 个月超过准入门槛 42.0 个月",
       "evidence_ids": [
+        "EV-GL-005",
+        "EV-GL-006",
+        "EV-GL-135",
+        "EV-GL-136",
+        "EV-GL-137",
+        "EV-GL-138",
+        "EV-GL-140",
+        "EV-CN-143",
+        "EV-SIGGI-002",
         "EV-SIGGI-003",
-        "EV-CN-031",
-        "EV-CN-026",
-        "EV-CN-059"
+        "EV-SIGGI-016"
       ]
     },
     {
-      "wedge_id": "WEDGE-T4-RD-03",
-      "sector": "S3_capture_rd_industry",
-      "title": "十万吨/百万吨级重大环保技术装备工业胺法捕集工程：成套防爆在线胺溶剂降解预警与产品CO2高洁净度保障系统",
-      "baseline_payback_months": 22.14,
-      "conservative_payback_months": 45.79,
-      "elimination_reason": "保守情景回收期 45.8 个月超过准入门槛 42.0 个月",
+      "wedge_id": "T2_W4_IMO_STACK_CARBON_METERING_PSEUDO",
+      "sector": "S1_pipeline_ship_eor",
+      "title": "常规船舶烟气碳排放在线计量系统替代（IMO排放核算伪需求）",
+      "baseline_payback_months": 38.0,
+      "conservative_payback_months": 42.71,
+      "elimination_reason": "保守情景回收期 42.7 个月超过准入门槛 42.0 个月；被业务判定为低支付意愿或伪需求对照赛道",
       "evidence_ids": [
-        "EV-SIGGI-001",
+        "EV-CN-143",
+        "EV-CN-156",
         "EV-SIGGI-003",
-        "EV-CN-059",
-        "EV-CN-031"
+        "EV-SIGGI-007",
+        "EV-SIGGI-009"
       ]
     },
     {
-      "wedge_id": "WEDGE_S4_FOOD_ROUTINE_GC_DISPLACE",
+      "wedge_id": "W-T3-01",
+      "sector": "S2_green_methanol_ccu_chem",
+      "title": "生物质气化与烟气碳捕集制绿色甲醇保护床防击穿在线监测",
+      "baseline_payback_months": 20.32,
+      "conservative_payback_months": 47.27,
+      "elimination_reason": "保守情景回收期 47.3 个月超过准入门槛 42.0 个月",
+      "evidence_ids": [
+        "EV-CN-144",
+        "EV-CN-145",
+        "EV-CN-146",
+        "EV-CN-186",
+        "EV-CN-198",
+        "EV-CN-214",
+        "EV-CN-215",
+        "EV-GL-103",
+        "EV-SIGGI-002",
+        "EV-SIGGI-003",
+        "EV-SIGGI-009",
+        "EV-SIGGI-010",
+        "EV-SIGGI-011",
+        "EV-SIGGI-014"
+      ]
+    },
+    {
+      "wedge_id": "W4_2_AMINE_NITROSAMINE_EMISSION_COMPLIANCE",
+      "sector": "S3_capture_rd_industry",
+      "title": "重点行业碳捕集示范工程有机胺、亚硝胺与氨逃逸在线合规监测集成系统",
+      "baseline_payback_months": 28.47,
+      "conservative_payback_months": 53.83,
+      "elimination_reason": "保守情景回收期 53.8 个月超过准入门槛 42.0 个月",
+      "evidence_ids": [
+        "EV-CN-166",
+        "EV-CN-164",
+        "EV-CN-195",
+        "EV-CN-169",
+        "EV-CN-207",
+        "EV-GL-088",
+        "EV-CN-003",
+        "EV-SIGGI-003",
+        "EV-SIGGI-016"
+      ]
+    },
+    {
+      "wedge_id": "W4_3_COMMERCIAL_SCALEUP_MULTI_IMPURITY_GUARD",
+      "sector": "S3_capture_rd_industry",
+      "title": "2031–2036规模化煤电/水泥/钢铁胺法捕集多杂质腐蚀预警与过程质谱运行站",
+      "baseline_payback_months": 23.64,
+      "conservative_payback_months": 46.04,
+      "elimination_reason": "保守情景回收期 46.0 个月超过准入门槛 42.0 个月",
+      "evidence_ids": [
+        "EV-CN-196",
+        "EV-CN-167",
+        "EV-CN-169",
+        "EV-CN-192",
+        "EV-CN-195",
+        "EV-CN-003",
+        "EV-SIGGI-003",
+        "EV-SIGGI-008",
+        "EV-SIGGI-009",
+        "EV-SIGGI-011"
+      ]
+    },
+    {
+      "wedge_id": "W4_4_NON_AMINE_ROUTINE_FLUE_PSEUDO",
+      "sector": "S3_capture_rd_industry",
+      "title": "非胺法钙基/碳酸盐循环及常规简单烟气监测场景（伪需求甄别）",
+      "baseline_payback_months": 41.11,
+      "conservative_payback_months": 55.0,
+      "elimination_reason": "保守情景回收期 55.0 个月超过准入门槛 42.0 个月；被业务判定为低支付意愿或伪需求对照赛道",
+      "evidence_ids": [
+        "EV-CN-140",
+        "EV-CN-164",
+        "EV-CN-193",
+        "EV-CN-004",
+        "EV-GL-110",
+        "EV-GL-111"
+      ]
+    },
+    {
+      "wedge_id": "W6_FOOD_BEV_GC_CTRL",
       "sector": "S4_food_beverage_dryice",
-      "title": "常规食品饮料添加剂CO2离线GC-MS替代与出厂在线快检 (负向对照伪需求)",
-      "baseline_payback_months": 88.0,
-      "conservative_payback_months": 292.8,
-      "elimination_reason": "保守情景回收期 292.8 个月超过准入门槛 42.0 个月；被业务判定为低支付意愿或伪需求对照赛道",
+      "title": "食品饮料级CO2成品常规质控（离线GC/NDIR替代负向对照）",
+      "baseline_payback_months": 113.68,
+      "conservative_payback_months": 293.33,
+      "elimination_reason": "保守情景回收期 293.3 个月超过准入门槛 42.0 个月；被业务判定为低支付意愿或伪需求对照赛道",
       "evidence_ids": [
-        "EV-CN-027",
-        "EV-CN-044",
-        "EV-CN-040",
-        "EV-CN-079",
-        "EV-CN-083"
+        "EV-CN-182",
+        "EV-CN-174",
+        "EV-CN-153",
+        "EV-CN-141",
+        "EV-CN-149",
+        "EV-CN-150",
+        "EV-GL-073",
+        "EV-GL-078",
+        "EV-GL-079",
+        "EV-GL-082",
+        "EV-SIGGI-003",
+        "EV-SIGGI-007",
+        "EV-SIGGI-008",
+        "EV-SIGGI-009"
       ]
     },
     {
-      "wedge_id": "WEDGE_S4_DRYICE_INDUSTRIAL_CLEANING_QC",
+      "wedge_id": "W6_DRY_ICE_FEED_CTRL",
       "sector": "S4_food_beverage_dryice",
-      "title": "大宗工业清洗及冷链干冰制造原料CO2杂质粗检 (低端红海淘汰)",
-      "baseline_payback_months": 98.18,
-      "conservative_payback_months": 196.66,
-      "elimination_reason": "保守情景回收期 196.7 个月超过准入门槛 42.0 个月；被业务判定为低支付意愿或伪需求对照赛道",
+      "title": "工业及冷链干冰制造/清洗原料CO2纯度监控（负向对照）",
+      "baseline_payback_months": 144.0,
+      "conservative_payback_months": 293.33,
+      "elimination_reason": "保守情景回收期 293.3 个月超过准入门槛 42.0 个月；被业务判定为低支付意愿或伪需求对照赛道",
       "evidence_ids": [
-        "EV-CN-076",
-        "EV-CN-044",
-        "EV-CN-083",
-        "EV-GL-049"
+        "EV-CN-182",
+        "EV-CN-183",
+        "EV-CN-003",
+        "EV-CN-004",
+        "EV-CN-149",
+        "EV-CN-150",
+        "EV-GL-073",
+        "EV-GL-078",
+        "EV-GL-079",
+        "EV-SIGGI-003",
+        "EV-SIGGI-009",
+        "EV-SIGGI-016"
       ]
     },
     {
-      "wedge_id": "WEDGE_S4_PREMIUM_BEVERAGE_BOTTLING_AUDIT",
+      "wedge_id": "W6_SEMI_UP_CO2_PROBE",
       "sector": "S4_food_beverage_dryice",
-      "title": "高端跨国品牌碳酸饮料与精酿啤酒旗舰灌装线突发恶臭杂质守门 (有条件防御性关注)",
-      "baseline_payback_months": 56.47,
-      "conservative_payback_months": 129.23,
-      "elimination_reason": "保守情景回收期 129.2 个月超过准入门槛 42.0 个月",
+      "title": "电子/半导体级CO2纯化上游在线防穿透监控（有条件例外探针）",
+      "baseline_payback_months": 40.65,
+      "conservative_payback_months": 88.0,
+      "elimination_reason": "保守情景回收期 88.0 个月超过准入门槛 42.0 个月",
       "evidence_ids": [
-        "EV-CN-077",
-        "EV-CN-078",
-        "EV-CN-040",
-        "EV-CN-088",
-        "EV-CN-083"
-      ]
-    },
-    {
-      "wedge_id": "WEDGE_T5_S1_03",
-      "sector": "S1_pipeline_ship_eor",
-      "title": "沿海枢纽低碳液化CO2船运装卸码头与跨境贸易交接计量高精原装防爆系统 (Coastal Hub Liquid CO2 Carrier Loading/Discharge & Cross-Border Custody Transfer PremierGuard System)",
-      "baseline_payback_months": 19.42,
-      "conservative_payback_months": 39.04,
-      "elimination_reason": "Stage 2 加权评分 39.3 未进入前 10 优先切入组合",
-      "evidence_ids": [
-        "EV-SIGGI-001",
-        "EV-GL-031",
-        "EV-GL-035",
-        "EV-CN-057"
-      ]
-    },
-    {
-      "wedge_id": "WEDGE_T2_COASTAL_TERMINAL_BOG_LIQUEFACTION",
-      "sector": "S1_pipeline_ship_eor",
-      "title": "沿海LCO2接收外输码头BOG再液化与跨海贸易交接全流程品质联锁监控系统",
-      "baseline_payback_months": 20.45,
-      "conservative_payback_months": 41.88,
-      "elimination_reason": "Stage 2 加权评分 35.8 未进入前 10 优先切入组合",
-      "evidence_ids": [
-        "EV-CN-033",
-        "EV-CN-034",
-        "EV-CN-082",
-        "EV-CN-084"
+        "EV-GL-090",
+        "EV-GL-131",
+        "EV-GL-132",
+        "EV-GL-133",
+        "EV-GL-134",
+        "EV-CN-181",
+        "EV-CN-182",
+        "EV-CN-183",
+        "EV-CN-224",
+        "EV-CN-226",
+        "EV-CN-227",
+        "EV-CN-141",
+        "EV-CN-149",
+        "EV-CN-150",
+        "EV-GL-082",
+        "EV-SIGGI-002",
+        "EV-SIGGI-003",
+        "EV-SIGGI-011"
       ]
     }
   ],
-  "elo_tournament_matches": [
-    {
-      "round_idx": 1,
-      "wedge_a_id": "WEDGE_T3_01",
-      "wedge_b_id": "WEDGE_T3_02",
-      "winner_id": "WEDGE_T3_01",
-      "rationale": "WEDGE_T3_01 is selected as the winner over WEDGE_T3_02 based on three decisive dimensions:\n\n1. Physical Necessity of IMR-MS:\nWEDGE_T3_01 demands sub-second (0.2s) online tripwire interlock to prevent catastrophic, irreversible sulfur poisoning of Cu/ZnO methanol synthesis catalysts (tolerance <0.1 ppm) caused by abrupt syngas breakthrough in biomass gasification. Traditional Process GC (5–15 min cycle time) physically cannot prevent catalyst destruction before detection. V&F IMR-MS using Xe+/Kr+ soft ionization eliminates hydrocarbon background fragmentation and achieves 10 ppb LOD at 0.2s response time, representing an irreplaceable physical necessity. In contrast, WEDGE_T3_02 serves laboratory/bench evaluation where offline or slower hyphenated analytical methods can act as viable substitutes.\n\n2. ROI Resilience & Industrial Loss Prevention:\nWhile WEDGE_T3_02 exhibits higher nominal R&D IRR (93.25%), WEDGE_T3_01 represents mission-critical industrial asset protection (CAPEX ¥380万 vs. tens of millions RMB in catalyst charges plus unrecoverable plant downtime), providing resilient commercial justification (Payback 15.3m, IRR 73.42%) backed by plant OPEX and insurance risk mitigation.\n\n3. 2026–2030 China Signing Probability & Macro Timing:\nDriven by IMO maritime carbon mandates and massive commercial green methanol project deployments in Northern China (Inner Mongolia, Jilin, Heilongjiang), WEDGE_T3_01 taps into commercial plant CAPEX procurement with significantly higher deal value and execution velocity compared to lab-scale e-SAF test-stand procurements (reflected in superior baseline metrics: Priority 92.5 vs 88.0, Moat 94.0 vs 92.0, Pillar score 91.06 vs 88.12).",
-      "elo_a_after": 1579.7,
-      "elo_b_after": 1537.02
-    },
-    {
-      "round_idx": 1,
-      "wedge_a_id": "WEDGE_T3_03",
-      "wedge_b_id": "W1_SUPERCRITICAL_PIPE_CORROSION_CUTOFF",
-      "winner_id": "WEDGE_T3_03",
-      "rationale": "在物理必要性、商业ROI韧性及2026-2030年中国落地签约概率三维综合评估中，WEDGE_T3_03全方位确立对W1_SUPERCRITICAL_PIPE_CORROSION_CUTOFF的压倒性竞争优势（Priority 78.5 vs 9.2，Moat 95.0 vs 9.5，Pillar 83.33 vs 43.28）：\n\n1. IMR-MS物理必要性与技术护城河（Moat 95.0 vs 9.5）：\ne-SAF/液体烃类CCU工业装置直接合成催化剂对原料CO2及循环气中夹带的吸收剂降解物（痕量有机胺、有机酸及杂质微量硫）具有极高敏感性，微量中毒即引发千万元级催化剂失活。IMR-MS凭借Kr+/Xe+软化学电离避免碎片离子重叠，能实现复杂有机物与痕量酸类在浓CO2基底下的实时同测与联锁保护，具有不可替代的物理刚需；相比之下管网切断（Track B）护城河仅9.5，容易面临常规分析或站场预处理方案的价值分流与降配挤压。\n\n2. ROI商业韧性与支付意愿：\n虽然Option B理论计算IRR略高（74.63% vs 66.79%），但在万吨级e-SAF数十亿重资产投资中，¥500万CAPEX在整体装置占比极低且能有效保障单次造价数千万的合成催化剂寿命，投资回收期16.57个月确定性极高；反观国内超临界CO2管网项目常受制于基建投资压降与国产化限价约束。\n\n3. 2026-2030年中国签约落地确定性（Priority 78.5 vs 9.2）：\n受欧盟ReFuelEU Aviation强制掺混配额及国际绿航煤认证驱动，中国沿海面向高端出口的e-SAF产业正处于密集资本开支周期。外资专利商、国际保险机构与海外买方对全套在线质谱分析系统提出严苛的欧标原装与高SIL等级合规要求。V&F奥地利原装PremierGuard QAS成套方案完美切中外资/高端项目准入门槛[EV-GL-048, EV-GL-053, EV-SIGGI-001]，2026-2030商用签单概率与战略优先级远高于管网端切断方案。",
-      "elo_a_after": 1542.42,
-      "elo_b_after": 1364.02
-    },
-    {
-      "round_idx": 1,
-      "wedge_a_id": "WEDGE_T5_S1_01",
-      "wedge_b_id": "W2_EOR_INJECTION_WELL_SCALE_CORROSION_GUARD",
-      "winner_id": "WEDGE_T5_S1_01",
-      "rationale": "【决斗评估结论：WEDGE_T5_S1_01 获胜】\n\n1. 物理不可替代性与技术护城河 (IMR-MS Physical Necessity):\n- 超临界高压长输管网中，高浓度CO2红外强吸收完全屏蔽FTIR测量同核双原子分子（N2/O2）的能力[EV-GL-035]；气相色谱(GC)因进样阀频繁切换与高压酸气腐蚀色谱柱导致分析滞后15分钟以上，无法应对管网水合物与酸露点突发风险；常规EI质谱碎片离子与基峰重叠严重[EV-CN-070]。\n- WEDGE_T5_S1_01方案基于V&F IMR-MS软化学电离，配合专有微量减压双路恒流闪蒸进样系统[EV-SIGGI-001]，实现ppb-ppm级超微量H2O、H2S、SO2及O2/N2秒级同步在线监测，彻底解决长输管网相变腐蚀与水合物堵塞痛点，物理替代必要性显著高于油田单井配气注气监控。\n\n2. 财务回报与确定性指标 (ROI Resilience):\n- CAPEX同为¥420.0万基准下，WEDGE_T5_S1_01表现出更强韧的财务回报：投资回收期为15.09个月（优于B方案的17.14个月），内部收益率(IRR)达74.63%（显著高于B方案的64.12%）；\n- 综合优先级得分(Priority 9.2 vs 8.8)与战略支柱得分(Pillar 43.15 vs 43.03)全面压制B方案。\n\n3. 2026-2030年中国落地与签约概率 (Signing Probability):\n- 在国家“十五五”CCUS战略规划中，百万吨级长输超临界CO2管网（如国家管网、中石化齐鲁-胜利、吉林油田及沿海枢纽管道）属于国家重点骨干工程，首站/阀室的防爆正压小屋在线QAS属于管线投产验收前强制配套的刚性预算；\n- 相比于油田分散式注气井口（容易受单井配注方案调整、成本分摊压力及现场抗硫防腐脱氧冗余药剂替代影响），长输管网首站/关键阀室集中度高、风险外溢效应大、业主（中石油/中石化/国家管网）支付意愿与合规采购意愿最为紧迫，2026-2030年商业化签约确定性极高。",
-      "elo_a_after": 1388.58,
-      "elo_b_after": 1356.14
-    },
-    {
-      "round_idx": 1,
-      "wedge_a_id": "WEDGE_T2_OFFSHORE_HUB_CUSTODY",
-      "wedge_b_id": "WEDGE_T5_S1_02",
-      "winner_id": "WEDGE_T2_OFFSHORE_HUB_CUSTODY",
-      "rationale": "WEDGE_T2_OFFSHORE_HUB_CUSTODY wins Round 1 based on a decisive balance across all three core evaluation criteria:\n\n1. ROI Resilience: WEDGE_T2_OFFSHORE_HUB_CUSTODY exhibits superior financial performance across every quantitative metric, delivering an IRR of 67.3% (+892 bps vs. 58.38%), a capital payback period of 16.47 months (-2.02 months faster vs. 18.49 months), and a leaner CAPEX of ¥420.0万 (vs. ¥450.0万).\n\n2. 2026–2030 China Signing Probability: Hub trade custody (贸易交接) is governed by statutory fiscal metering standards and non-discretionary state-owned enterprise (CNOOC/Sinopec) capital allocations. In offshore hub environments, the catastrophic failure risk of subsea pipeline corrosion (where a single workover or replacement event exceeds tens of millions of RMB) eliminates customer price sensitivity and shortens the procurement approval chain compared to cost-sensitive onshore EOR fields.\n\n3. IMR-MS Physical Necessity & Real-Time Operational Defense: In supercritical CO2 offshore hub injection, NDIR is impaired by overwhelming CO2 spectral background absorption, and conventional GC cycle times (>10 min) are fundamentally incapable of triggering real-time Emergency Shutdown (ESD) interlocks. V&F IMR-MS delivers sub-ppm sensitivity for H2S and amine carryover with sub-second response times, acting as the indispensable, mission-critical barrier protecting subsea pipeline and wellhead integrity.",
-      "elo_a_after": 1388.04,
-      "elo_b_after": 1356.0
-    },
-    {
-      "round_idx": 1,
-      "wedge_a_id": "WEDGE-T4-RD-01",
-      "wedge_b_id": "W3_LCO2_OFFSHORE_SHIPPING_TERMINAL_GUARD",
-      "winner_id": "WEDGE-T4-RD-01",
-      "rationale": "WEDGE-T4-RD-01 wins over W3_LCO2_OFFSHORE_SHIPPING_TERMINAL_GUARD across all three core evaluation dimensions:\n\n1. IMR-MS Physical Necessity:\nAmine-based carbon capture solvents (MEA/PZ, etc.) undergo thermal and oxidative degradation, generating trace carcinogenic nitrosamines (e.g., NDMA), nitramines, and aldehydes. Standard GC-MS/EI-MS methods require tedious chemical derivatization and manual handling, which inherently causes sample thermal degradation, loss of volatile intermediates, and severe molecular fragmentation. V&F IMR-MS employs soft chemical ionization (Kr+/Xe+/Hg+) to ionize intact parent molecules without fragmentation or derivatization, delivering true ppb-level real-time kinetics across 7-8 orders of magnitude dynamic range. For R&D and pilot platforms studying reaction kinetics and toxicity, IMR-MS is an indispensable physical necessity. In contrast, terminal LCO2 bulk impurities (H2O, O2, SOx, NOx) face alternative competition from multi-sensor skid analyzers (TDLAS/CRDS/NDIR/process GC).\n\n2. ROI Resilience & Commercial Metrics:\nWEDGE-T4-RD-01 outperforms on commercial priority and capital efficiency: Priority score of 9.3 (vs. 7.8) and Pillar score of 42.31 (vs. 41.86). With a CAPEX of ¥185.0万 (vs. ¥720.0万), Payback of 17.9 months (vs. 19.03 months), and IRR of 60.79% (vs. 56.29%), it represents a much lower capital hurdle with superior investment returns.\n\n3. 2026–2030 China Signing Probability:\nDuring China's 15th Five-Year Plan (2026–2030), proprietary low-energy solvent formulation R&D, pilot demonstration upgrades, and amine emission environmental assessments are being actively funded across dozens of top-tier research institutes and design institutes (e.g., Sinopec SEI, CNPC CPECC, CHN Energy, Huaneng CERI, Tsinghua, Zhejiang University). An instrument CAPEX of ¥185万 aligns directly with single-equipment procurement thresholds and lab upgrade budgets. Conversely, offshore LCO2 shipping terminals remain highly centralized megaprojects with only 1–2 potential demonstration sites, prolonged multi-year EPC procurement cycles, and heavy international shipping regulatory dependencies, making WEDGE-T4-RD-01 drastically more probable to close and scale rapidly in the 2026–2030 timeframe.",
-      "elo_a_after": 1385.16,
-      "elo_b_after": 1351.52
-    },
-    {
-      "round_idx": 2,
-      "wedge_a_id": "WEDGE_T3_01",
-      "wedge_b_id": "WEDGE_T3_03",
-      "winner_id": "WEDGE_T3_01",
-      "rationale": "【判定结果】WEDGE_T3_01 胜出。\n\n【核心对决裁决依据】\n1. IMR-MS 物理必要性（Physical Necessity）：\n   - WEDGE_T3_01 属于不可替代的亚秒级联锁刚需：生物质气化进料组分波动剧烈，脱硫床存在突发性穿透风险，而铜锌基(Cu/ZnO)甲醇合成催化剂耐硫极限低于 0.1 ppm，一旦穿透将引发数千万元级催化剂永久中毒并被迫停炉。传统 Process GC 存在 5-15 分钟的分析滞后，在穿透发生时无法保护床层；V&F IMR-MS 的 0.2 秒亚秒级响应和 10 ppb 灵敏度是唯一能够充当真实 Tripwire 紧急旁路联锁的物理级解决方案。\n   - WEDGE_T3_03 虽具有多组分痕量杂质监控价值，但 e-SAF 原料高压 CO2 杂质监控多属工况监控与保险合规属性，联锁容忍时间相对更宽，物理紧迫性略逊于 WEDGE_T3_01。\n\n2. ROI 财务弹性与投资回报（ROI Resilience）：\n   - WEDGE_T3_01 财务指标全面占优：CAPEX 门槛更低（¥380.0万 vs ¥500.0万），静态投资回收期更短（15.3个月 vs 16.57个月），IRR 显著更高（73.42% vs 66.79%）。综合 Pillar 分数（91.06 vs 83.33）与 Priority 分数（92.5 vs 78.5）展现出压倒性的综合经济韧性。\n\n3. 2026-2030 中国市场签约确定性（China Signing Probability）：\n   - 绿色甲醇受全球航运减碳脱碳（IMO 2026/2030 航运新规及欧盟 ETS/FuelEU Maritime）的实质性外贸订单驱动，已在三北地区（内蒙古、吉林等）形成数十个十万吨至百万吨级集中投产潮，催化剂保护需求属于立竿见影的“必采项”；结合 Track B 本地化集成，更容易突破大型能源国企的采购预算周期。\n   - 相比之下，万吨级 CCU 直接合成 e-SAF（WEDGE_T3_03）在国内尚处于百吨/千吨级中试与先导示范阶段，Track C 纯原装进口模式受限于外资/出海认证周期，规模化签单爆发期大概率滞后于绿色甲醇。",
-      "elo_a_after": 1593.99,
-      "elo_b_after": 1528.13
-    },
-    {
-      "round_idx": 2,
-      "wedge_a_id": "WEDGE_T3_02",
-      "wedge_b_id": "WEDGE_T5_S1_01",
-      "winner_id": "WEDGE_T3_02",
-      "rationale": "【商业优先权决斗裁决：WEDGE_T3_02 胜出】\n\n1. IMR-MS 物理必要性与技术壁垒 (Moat 92.0 vs 9.0)：\n- WEDGE_T3_02 聚焦国家能源局《绿色航空燃料》行业标准制定(20260001)与高端合成催化剂(PtL/AtJ)寿命评测。催化剂毒化对超微量总硫(<4 ppb)及NH3(<100 ppb)极其敏感，常规EI质谱碎片重叠严重，GC色谱分析存在强吸附滞后与低频采样问题。V&F IMR-MS依托软化学电离(Kr+/Xe+/Hg+)实现无碎片基质干扰下的ppb级秒级多组分原位同步监测，在反应动力学与标准评测台位具备物理级不可替代性。\n- WEDGE_T5_S1_01 属于长输管网在线监测，虽然IMR-MS具备秒级与多组分优势，但在工业管线现场面临传统防爆GC、FTIR与TDLAS的低价替代与工程资质挑战，技术护城河相对分散。\n\n2. 财务回报与资本韧性 (ROI Resilience)：\n- WEDGE_T3_02 属于轻量化进口核心标准配置(Track A)，CAPEX为¥190.0万，投资回收期仅12.39个月，IRR高达93.25%，具备极强的预算抗风险与极速兑现能力。\n- WEDGE_T5_S1_01 因防爆正压小屋整体集成(Track B)，CAPEX高达¥420.0万，回收期15.09个月，IRR为74.63%，固定资产审批链条长，对单点客户资本支出波动的抵御能力弱于T3_02。\n\n3. 2026-2030 中国市场签约确定性与政策驱动 (Priority 88.0 vs 9.2, Pillar 88.12 vs 43.15)：\n- WEDGE_T3_02 直接绑定国家能源局行业标准台位及中石化、中石油、中科院大连化物所等国家级实验室e-SAF标准评测仪器采购，2026-2027年处于标准立项与台位建设刚需期，招投标确定性极高。\n- WEDGE_T5_S1_01 依赖超临界CO2管网示范工程推进速度，国内长输管道阀室智能化改造周期长、审批严格，短期内规模化签约概率偏低。\n\n综合物理必要性、资本回报率及落地周期，WEDGE_T3_02 全面碾压 WEDGE_T5_S1_01，确立为优胜商业切入点。",
-      "elo_a_after": 1546.57,
-      "elo_b_after": 1379.03
-    },
-    {
-      "round_idx": 2,
-      "wedge_a_id": "WEDGE_T2_OFFSHORE_HUB_CUSTODY",
-      "wedge_b_id": "WEDGE-T4-RD-01",
-      "winner_id": "WEDGE-T4-RD-01",
-      "rationale": "1. IMR-MS Physical Necessity: WEDGE-T4-RD-01 represents an absolute, non-substitutable physical sweet spot for V&F IMR-MS. Thermally labile, ultra-trace carcinogenic degradation products (NDMA, nitrosamines, nitramines) undergo severe molecular fragmentation under conventional 70eV EI-MS and degrade during manual extraction/derivatization in offline GC-MS. The tunable soft chemical ionization (Kr+, Xe+, Hg+) of IMR-MS preserves parent ions without fragmentation, enabling direct sub-second online ppb-level detection across 7-8 orders of dynamic range. Conversely, in Option A, offshore pipeline acidic gas/H2S monitoring faces strong substitute competition from robust optical methods (TDLAS, UV-DOAS).\n\n2. ROI Resilience & Procurement Feasibility: Option B carries a CAPEX of ¥185.0万 (Payback 17.9m, IRR 60.79%), which sits squarely within the standard ¥200万 fast-track single-instrument procurement threshold for Chinese state key laboratories, CAS institutes, and SOE pilot centers. Option A's ¥420.0万 CAPEX requires complex marine engineering, Ex-d/Ex-p explosion-proof certifications, and stringent CNOOC offshore safety qualification, creating significant execution friction.\n\n3. 2026-2030 China Signing Probability: With China's 14th/15th Five-Year Plan driving post-combustion CCUS solvent upgrading and environmental toxicity compliance, dozens of major energy R&D hubs (e.g., Huaneng Clean Energy Institute, CHN Energy, Sinopec R&D, Tsinghua, Zhejiang University) are actively funding solvent degradation platforms. In contrast, China's offshore CCUS market is restricted to a very limited number of pilot injection platforms (such as Enping), making Option B vastly superior in sales pipeline velocity and repeatable multi-unit signing probability.",
-      "elo_a_after": 1371.91,
-      "elo_b_after": 1401.29
-    },
-    {
-      "round_idx": 2,
-      "wedge_a_id": "W1_SUPERCRITICAL_PIPE_CORROSION_CUTOFF",
-      "wedge_b_id": "W2_EOR_INJECTION_WELL_SCALE_CORROSION_GUARD",
-      "winner_id": "W1_SUPERCRITICAL_PIPE_CORROSION_CUTOFF",
-      "rationale": "【决策依据与多维对比评估】\n\n1. IMR-MS物理必要性与技术独占性（Physical Necessity & Moat）：\n- W1（管网酸雾与O2超限联锁切断）对分析响应时间具有刚性物理约束（硬实时<100ms）。在超临界CO2高压环境下，H2O、SO2、NO2、H2S及O2共存触发交叉酸性链式反应（Sonke 2024机理），压力/温度瞬变会导致亚微米级强腐蚀性硝酸与硫酸液滴瞬间析出，引发X65/X70碳钢管壁点蚀击穿。传统在线GC（10-15分钟分析周期）存在致命时间盲区；光学FTIR受浓CO2强红外吸收饱和且受物理对称性限制无法检测O2。V&F IMR-MS（Kr+/Xe+软化学电离）无需色谱分离即可在<100ms内实现多组分同步定量并联动站场ESD（紧急切断系统），具备不可替代的物理刚需。\n- 相比之下，W2（EOR注气配气站）的井下腐蚀与结垢虽严重，但反应动力学尺度为小时/天级别，主要用于指导脱氧剂注入与批次来气阻截，对亚秒级响应的硬性依赖弱于主管网防爆切断，部分工况仍易受准在线/离线检测方案的分流。\n\n2. ROI财务韧性（ROI Resilience）：\n- W1全面领先：IRR达到74.63%（高于W2的64.12%，溢价+10.51%），动态投资回收期仅15.09个月（快于W2的17.14个月），且两者的初始CAPEX同为420.0万元。在相同的资本开支下，W1依靠防止主管网重大击穿事故、规避长周期停产检修与生态罚款，展现出更高的经济净现值和更强的抗风险韧性。\n\n3. 2026-2030中国商业签约落地概率（China Signing Probability）：\n- 权重与评级：W1在战略权重（Priority=9.2 vs 8.8）、技术壁垒（Moat=9.5 vs 9.0）以及综合支柱评分（Pillar=43.28 vs 43.03）上全面超越W2。\n- 政策与行业迫切度：2026-2030年正值中国“十五五”百万吨级CCUS管网（如齐鲁-胜利长输管线、延长石油、吉林油田骨干管网）大规模并网投运期，长输管线穿越公共区域的安全防爆与国家级ESD联锁安全强制标准构成顶级合规压力。管网业主对防爆切断分析小屋的采购属于“一票否决”级安全刚需，商业合同签约确定性与落地节奏显著高于油田单井配气注气监控。\n\n综合三维评估，W1_SUPERCRITICAL_PIPE_CORROSION_CUTOFF胜出。",
-      "elo_a_after": 1379.66,
-      "elo_b_after": 1340.5
-    },
-    {
-      "round_idx": 2,
-      "wedge_a_id": "WEDGE_T5_S1_02",
-      "wedge_b_id": "W3_LCO2_OFFSHORE_SHIPPING_TERMINAL_GUARD",
-      "winner_id": "WEDGE_T5_S1_02",
-      "rationale": "【选定胜者：WEDGE_T5_S1_02】\n\n1. IMR-MS 物理不可替代性 (Physical Necessity):\n油田 CCUS-EOR 伴生气循环存在高浓度 C1-C5 复杂轻烃基质与微量 H2S、有机硫醇及脱碳残余有机胺。传统 EI 质谱（70 eV）引发强烈碎片化，导致烃类裂解碎片离子与硫化物/胺类分子离子严重质谱重叠（如烷烃碎片峰掩盖 H2S 与 CH3SH 信号，EV-CN-070），传统红外对同核/非极性分子亦不敏感。V&F IMR-MS 凭借 Kr/Xe 软电离技术精确控制电离能，实现分子离子零碎片软电离，可在复杂高烃背景下秒级精准定性定量微量含硫与有机物杂质，具备硬核物理壁垒；相比之下，离岸 LCO2 枢纽的常见杂质（NOx、SOx、水、氧）存在更多常规色谱/激光分析替代路径。\n\n2. ROI 财务韧性 (ROI Resilience):\nWEDGE_T5_S1_02 财务指标全面优于 Option B：CAPEX 显著降低 37.5%（¥450.0万 vs ¥720.0万），投资回收期更短（18.49个月 vs 19.03个月），IRR 更高（58.38% vs 56.29%），在油气资产采购中具备更强的抗预算缩减韧性与快速立项优势。\n\n3. 2026-2030 中国落地签约确定性 (China Signing Probability):\n中国“十五五”期间陆上油田 CCUS-EOR（如中石化胜利、中石油新疆/吉林/长庆等）已迈入百万吨级商业化稳产期，注气井口腐蚀与地层堵塞属关停高风险的即时刚需；而离岸沿海及跨界 LCO2 运输船枢纽在中国目前多属中远期国际航线与示范规划，审批及跨界 MRV 协调周期冗长。因此 WEDGE_T5_S1_02 商业转化与签约概率遥遥领先。",
-      "elo_a_after": 1371.79,
-      "elo_b_after": 1335.73
-    }
-  ],
-  "critique_loops_executed": 1,
+  "critique_loops_executed": 2,
   "critique_history": [
     {
       "loop": 1,
+      "passed": false,
+      "volumes_to_rewrite": [
+        "01_CHINA_CCUS_MARKET_SIZING_AND_PAIN_POINTS.md"
+      ],
+      "issues_count": 1,
+      "crag_queries": []
+    },
+    {
+      "loop": 2,
       "passed": true,
       "volumes_to_rewrite": [],
-      "crag_queries": [],
-      "assessment": "Critique Loop 1/2 completed with full pass. All volumes (00_EXECUTIVE_DECISION_MEMO_AND_VERDICT.md, 01_CHINA_CCUS_MARKET_SIZING_AND_PAIN_POINTS.md, 02_COMPETITIVE_LANDSCAPE_AND_BATTLECARDS.md, 03_COMMERCIAL_GTM_PRICING_AND_PARTNERSHIP_PLAN.md, and 04_ACTION_ROADMAP_30_60_90_AND_12_24M.md) demonstrate strict cross-volume numeric alignment with the authoritative [MKT-CALC] (10-year cumulative baseline SOM of 215 units / ¥862.2 million RMB) and [ROI-CALC] (Wedges #1 through #10 metrics, including payback periods between 12.4 and 18.5 months, IRR, and NPV). Competitor landscape analysis is rigorously grounded with legitimate market offerings (Thermo Fisher MAX-iR StarCO2/MAX-Bev, ABB/Siemens/Emerson Process GCs, FPI/TopCorr/JPR) without fabricated models. All [EV-*] citation identifiers are 100% valid. Negative controls and eliminated pseudo-demands (food/beverage fast QA and dry ice CCU) are strictly quarantined, and the Track A/B/C execution architecture is consistently integrated across engineering, pricing, and GTM execution."
+      "issues_count": 1,
+      "crag_queries": []
     }
   ],
   "cost_and_token_telemetry": {
-    "billing_mode": "Antigravity IDE Native Reasoning + Verified Local/Web Search (.env.ai_search)",
+    "billing_mode": "Antigravity IDE Native Flagship Reasoning + Verified Local/Web Search",
     "llm_engine": "antigravity_native:pro",
     "native_agent_invocations": {
-      "planner": 1,
-      "track_miners": 6,
-      "storm_panels": 10,
-      "elo_matches": 10,
-      "volume_synthesizers": 5,
-      "critic_loops": 1,
-      "judge": 1
+      "discovery_planner": 1,
+      "orthogonal_track_miners": 6,
+      "global_portfolio_arbitrator": 1,
+      "full_volume_synthesizers": 5,
+      "full_text_critic_calls": 10,
+      "full_text_rewrite_calls": 1,
+      "executive_distillers": 5
     },
-    "search_queries_in_vault": 45
+    "search_queries_in_vault": 97
   }
 }

@@ -1,10 +1,9 @@
-"""Stage 6 (Bounded Heterogeneous Critic + CRAG Gap-Refill) & Stage 7 (100-pt Judge + Finalize)."""
+"""Stage 3b & 3c: 100% Full-Text Per-Volume Critic + CRAG Rewrite + Dual-Edition Deterministic Finalize."""
 
 from __future__ import annotations
 
 import asyncio
 import json
-import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -13,84 +12,145 @@ from typing import Any
 from vf_ccus_workflow.config import assert_no_secrets_leaked
 from vf_ccus_workflow.nodes.deps import RuntimeDeps
 from vf_ccus_workflow.nodes.planner import format_records_compact
-from vf_ccus_workflow.nodes.synthesizer import _format_catalogs_context
-from vf_ccus_workflow.prompts import CRITIC_SYSTEM, JUDGE_SYSTEM, VOLUME_SYNTH_SYSTEM
+from vf_ccus_workflow.nodes.synthesizer import (
+    VOLUME_SPECS,
+    VOLUME_TRACK_ROUTING,
+    collect_priority_ev_ids_for_volume,
+    distill_executive_edition,
+)
+from vf_ccus_workflow.prompts import SINGLE_VOLUME_CRITIC_SYSTEM, VOLUME_SYNTH_SYSTEM
 from vf_ccus_workflow.schemas import (
-    CriticAuditOutput,
     CritiqueIssue,
-    JudgeRubricScores,
+    SingleVolumeCriticOutput,
     WorkflowState,
 )
 from vf_ccus_workflow.tools.evidence_vault import (
-    deterministic_contract_checks,
+    extract_all_ev_ids,
     render_evidence_index,
+    run_deterministic_full_audit,
 )
 
 
-def _find_invalid_citations(drafts: dict[str, str], valid_ids: set[str]) -> dict[str, list[str]]:
+def build_single_volume_critic_prompt(
+    *,
+    volume_name: str,
+    full_text: str,
+    fact_sheet: str,
+    invalid_ids: list[str],
+    loop_idx: int,
+    max_loops: int,
+) -> str:
+    """Build per-volume Critic prompt containing 100% of full_text (ZERO truncation)."""
+    return (
+        f"Audit Target Volume: `{volume_name}` (Reflection Iteration {loop_idx} / {max_loops})\n"
+        f"Programmatic Invalid EV-ID Detection (Full-Text Scan): {json.dumps(invalid_ids, ensure_ascii=False)}\n"
+        f"Volume Character Count: {len(full_text)}\n\n"
+        f"=== LOCKED EXECUTIVE FACT SHEET ([MKT-CALC] & [ROI-CALC] GROUND TRUTH) ===\n{fact_sheet}\n\n"
+        f"=== COMPLETE VOLUME FULL TEXT (100% UNTRUNCATED) ===\n{full_text}\n\n"
+        "Audit the ENTIRE text above for citation integrity, exact numeric consistency against [MKT-CALC]/[ROI-CALC], "
+        "competitor honesty (zero fabricated models), pseudo-demand disclosure, and Track A/B/C coherence."
+    )
+
+
+def build_single_volume_rewrite_prompt(
+    *,
+    volume_name: str,
+    full_text: str,
+    fact_sheet: str,
+    critic_feedback: str,
+    invalid_ids: list[str],
+    crag_context: str,
+    volume_evidence_context: str,
+) -> str:
+    """Build per-volume rewrite prompt containing 100% of full_text (ZERO truncation)."""
+    return (
+        f"Targeted Revision of `{volume_name}` (Preserve full analytical depth; fix every flagged issue):\n"
+        f"Critic Findings & Required Fixes:\n{critic_feedback}\n"
+        f"Invalid EV-IDs that MUST be removed or replaced with verified IDs: {json.dumps(invalid_ids, ensure_ascii=False)}\n\n"
+        f"=== LOCKED EXECUTIVE FACT SHEET ([MKT-CALC] & [ROI-CALC]) ===\n{fact_sheet}\n\n"
+        f"=== NEW CRAG GAP EVIDENCE ===\n{crag_context}\n\n"
+        f"=== VOLUME-ROUTED VERIFIED EVIDENCE ===\n{volume_evidence_context}\n\n"
+        f"=== COMPLETE PREVIOUS DRAFT (100% UNTRUNCATED) ===\n{full_text}\n\n"
+        "Return the complete revised Simplified Chinese Markdown volume with all flagged issues resolved."
+    )
+
+
+def find_invalid_citations_full_text(
+    drafts: dict[str, str], valid_ids: set[str]
+) -> dict[str, list[str]]:
+    """Scan 100% of every volume (including multi-ID brackets) for unverified EV IDs."""
     invalid_by_vol: dict[str, list[str]] = {}
     for vol, text in drafts.items():
         if not vol.startswith(("00_", "01_", "02_", "03_", "04_")):
             continue
-        cited = set(re.findall(r"\[(EV-(?:SIGGI|CN|GL)-\d{3,4})\]", text))
+        cited = extract_all_ev_ids(text)
         bad = sorted(cid for cid in cited if cid not in valid_ids)
         if bad:
             invalid_by_vol[vol] = bad
     return invalid_by_vol
 
 
-async def node_adversarial_critic(state: WorkflowState, deps: RuntimeDeps) -> dict[str, Any]:
-    """Stage 6a: Programmatic Citation Audit + Heterogeneous Critic Model."""
+async def node_full_text_critic(state: WorkflowState, deps: RuntimeDeps) -> dict[str, Any]:
+    """Stage 3b-1: Programmatic Full-Text Citation Audit + Per-Volume 100% Full-Text Critic."""
     profile = state.get("profile", "flagship")
     loop_count = int(state.get("critique_loop_count", 0))
     max_loops = deps.settings.max_reflection_loops
     drafts = dict(state.get("report_drafts", {}))
+    fact_sheet = state.get("executive_fact_sheet", "")
     valid_ids = deps.vault.list_valid_ids()
-    invalid_map = _find_invalid_citations(drafts, valid_ids)
+    invalid_map = find_invalid_citations_full_text(drafts, valid_ids)
 
-    tier = "critic" if profile == "flagship" else "fast"
-    calc_ctx = _format_catalogs_context(state)
-    vol_excerpts = "\n\n".join(
-        f"=== {k} (len={len(v)}) ===\n{v[:2200]}"
-        for k, v in sorted(drafts.items())
-        if k.startswith(("00_", "01_", "02_", "03_", "04_"))
-    )
-    prompt = (
-        f"Reflection Iteration: {loop_count + 1} / {max_loops}\n"
-        f"Programmatic Invalid Citation Detection: {json.dumps(invalid_map, ensure_ascii=False)}\n"
-        f"Valid IDs Sample Count: {len(valid_ids)}\n\n"
-        f"=== DETERMINISTIC [MKT-CALC] & [ROI-CALC] GROUND TRUTH ===\n{calc_ctx[:4000]}\n\n"
-        f"=== DRAFT VOLUMES EXCERPTS ===\n{vol_excerpts}\n\n"
-        "Audit consistency, citation integrity, competitor honesty, and dual-track actionability."
-    )
-    audit = await deps.llm.complete_structured(
-        tier=tier,
-        node=f"critic_loop_{loop_count + 1}",
-        system_prompt=CRITIC_SYSTEM,
-        user_prompt=prompt,
-        schema=CriticAuditOutput,
-        max_tokens=2800,
-    )
+    tier = "critic" if profile == "flagship" else "producer"
+    target_vols = [f for f, _, _ in VOLUME_SPECS if f in drafts]
 
-    # Enforce programmatic failure if fabricated citations exist
-    issues = list(audit.issues)
-    vols_to_rewrite = list(dict.fromkeys(audit.volumes_to_rewrite))
-    if invalid_map:
-        for vol, bad_ids in invalid_map.items():
-            if vol not in vols_to_rewrite:
-                vols_to_rewrite.append(vol)
+    async def _audit_one(vol_name: str) -> SingleVolumeCriticOutput:
+        full_text = drafts[vol_name]
+        bad_ids = invalid_map.get(vol_name, [])
+        prompt = build_single_volume_critic_prompt(
+            volume_name=vol_name,
+            full_text=full_text,
+            fact_sheet=fact_sheet,
+            invalid_ids=bad_ids,
+            loop_idx=loop_count + 1,
+            max_loops=max_loops,
+        )
+        async with deps.semaphore:
+            res = await deps.llm.complete_structured(
+                tier=tier,
+                node=f"critic_l{loop_count + 1}_{vol_name[:2]}",
+                system_prompt=SINGLE_VOLUME_CRITIC_SYSTEM,
+                user_prompt=prompt,
+                schema=SingleVolumeCriticOutput,
+                max_tokens=2200,
+            )
+        issues = list(res.issues)
+        passed = res.passed
+        needs_rewrite = res.needs_rewrite
+        if bad_ids:
+            passed = False
+            needs_rewrite = True
             issues.append(
                 CritiqueIssue(
-                    volume_name=vol,
+                    volume_name=vol_name,
                     severity="critical",
-                    description=f"存在未入库引用ID: {', '.join(bad_ids[:5])}",
+                    description=f"全文扫描发现未入库引用ID: {', '.join(bad_ids[:8])}",
                     required_fix_action="删除伪造ID并替换为核验证据库中的真实[EV-SIGGI/CN/GL-*]ID。",
                     needs_crag_gap_search=False,
                 )
             )
-        audit = audit.model_copy(
-            update={"passed": False, "issues": issues, "volumes_to_rewrite": vols_to_rewrite}
+        return res.model_copy(
+            update={
+                "volume_name": vol_name,
+                "passed": passed,
+                "needs_rewrite": needs_rewrite,
+                "issues": issues,
+            }
         )
+
+    vol_audits = list(await asyncio.gather(*[_audit_one(v) for v in target_vols]))
+    vols_to_rewrite = [a.volume_name for a in vol_audits if not a.passed or a.needs_rewrite]
+    all_issues = [iss for a in vol_audits for iss in a.issues]
+    overall_passed = len(vols_to_rewrite) == 0
 
     pending_queries = [
         {
@@ -98,30 +158,39 @@ async def node_adversarial_critic(state: WorkflowState, deps: RuntimeDeps) -> di
             "geo_scope": iss.suggested_geo_scope,
             "query": iss.suggested_query,
         }
-        for iss in audit.issues
+        for iss in all_issues
         if iss.needs_crag_gap_search and iss.suggested_query.strip()
     ][:4]
+
+    per_vol_feedback = {
+        a.volume_name: (
+            a.overall_assessment
+            + ("\n" + "\n".join(f"- [{i.severity}] {i.description} -> {i.required_fix_action}" for i in a.issues) if a.issues else "")
+        )
+        for a in vol_audits
+    }
 
     return {
         "critique_loop_count": loop_count + 1,
         "pending_crag_queries": pending_queries,
+        "volumes_to_rewrite": vols_to_rewrite,
         "critique_history": [
             {
                 "loop": loop_count + 1,
-                "passed": audit.passed,
-                "volumes_to_rewrite": audit.volumes_to_rewrite,
-                "issues_count": len(audit.issues),
+                "passed": overall_passed,
+                "volumes_to_rewrite": vols_to_rewrite,
+                "issues_count": len(all_issues),
                 "crag_queries": pending_queries,
-                "assessment": audit.overall_assessment,
+                "per_volume_feedback": per_vol_feedback,
             }
         ],
         "telemetry_events": [
             {
                 "ts": datetime.now(timezone.utc).isoformat(),
-                "node": "adversarial_critic",
+                "node": "full_text_critic",
                 "loop": loop_count + 1,
-                "passed": audit.passed,
-                "rewrite_vols": audit.volumes_to_rewrite,
+                "passed": overall_passed,
+                "rewrite_vols": vols_to_rewrite,
             }
         ],
     }
@@ -134,18 +203,17 @@ def route_after_critic(state: WorkflowState, deps: RuntimeDeps) -> str:
     loop_count = int(state.get("critique_loop_count", 0))
     max_loops = deps.settings.max_reflection_loops
     if latest.get("passed", True):
-        return "judge"
+        return "finalize"
     if loop_count >= max_loops:
-        return "judge"
+        return "finalize"
     if not latest.get("volumes_to_rewrite") and not state.get("pending_crag_queries"):
-        return "judge"
+        return "finalize"
     return "rewrite"
 
 
 async def node_crag_gap_and_rewrite(state: WorkflowState, deps: RuntimeDeps) -> dict[str, Any]:
-    """Stage 6b: Corrective RAG gap search + targeted rewrite of flagged volumes only."""
+    """Stage 3b-2: Corrective RAG gap search + 100% full-text targeted rewrite of flagged volumes."""
     profile = state.get("profile", "flagship")
-    tier = "producer" if profile == "flagship" else "fast"
     gap_queries = list(state.get("pending_crag_queries", []))[:4]
     added_records = []
 
@@ -176,25 +244,34 @@ async def node_crag_gap_and_rewrite(state: WorkflowState, deps: RuntimeDeps) -> 
     history = state.get("critique_history", [])
     latest = history[-1] if history else {}
     vols_to_rewrite = latest.get("volumes_to_rewrite", []) or []
+    per_vol_fb = latest.get("per_volume_feedback", {}) or {}
     drafts = dict(state.get("report_drafts", {}))
-    calc_ctx = _format_catalogs_context(state)
-    new_ev_ctx = format_records_compact(added_records, limit=18) if added_records else ""
-    valid_ctx = format_records_compact(deps.vault.list_all(), limit=32)
+    fact_sheet = state.get("executive_fact_sheet", "")
+    valid_ids = deps.vault.list_valid_ids()
+    invalid_map = find_invalid_citations_full_text(drafts, valid_ids)
+    new_ev_ctx = format_records_compact(added_records, limit=24) if added_records else "(No new CRAG records)"
 
     async def _rewrite_one(vol_name: str) -> tuple[str, str]:
-        old_text = drafts.get(vol_name, "")
-        prompt = (
-            f"Rewrite and upgrade `{vol_name}` to resolve Critic findings:\n"
-            f"Critic Feedback: {latest.get('assessment', '')}\n\n"
-            f"=== AUTHORITATIVE [MKT-CALC] & [ROI-CALC] ===\n{calc_ctx}\n\n"
-            f"=== NEW CRAG EVIDENCE ===\n{new_ev_ctx}\n\n"
-            f"=== VERIFIED EVIDENCE SAMPLE ===\n{valid_ctx[:4500]}\n\n"
-            f"=== PREVIOUS DRAFT ===\n{old_text[:5500]}\n\n"
-            "Fix every flagged discrepancy, eliminate any unverified EV ID, and return full polished Simplified Chinese Markdown."
+        full_text = drafts.get(vol_name, "")
+        ev_bundle = deps.vault.build_volume_evidence_bundle(
+            volume_name=vol_name,
+            track_ids=VOLUME_TRACK_ROUTING.get(vol_name, []),
+            priority_ev_ids=collect_priority_ev_ids_for_volume(state, vol_name),
+            limit=70,
+        )
+        vol_ev_ctx = format_records_compact(ev_bundle, limit=70)
+        prompt = build_single_volume_rewrite_prompt(
+            volume_name=vol_name,
+            full_text=full_text,
+            fact_sheet=fact_sheet,
+            critic_feedback=str(per_vol_fb.get(vol_name, "")),
+            invalid_ids=invalid_map.get(vol_name, []),
+            crag_context=new_ev_ctx,
+            volume_evidence_context=vol_ev_ctx,
         )
         async with deps.semaphore:
             revised = await deps.llm.complete_text(
-                tier=tier,
+                tier="producer",
                 node=f"rewrite_{vol_name[:2]}",
                 system_prompt=VOLUME_SYNTH_SYSTEM,
                 user_prompt=prompt,
@@ -212,6 +289,7 @@ async def node_crag_gap_and_rewrite(state: WorkflowState, deps: RuntimeDeps) -> 
     return {
         "report_drafts": drafts,
         "pending_crag_queries": [],
+        "volumes_to_rewrite": [],
         "evidence_stats": deps.vault.stats(),
         "telemetry_events": [
             {
@@ -224,85 +302,77 @@ async def node_crag_gap_and_rewrite(state: WorkflowState, deps: RuntimeDeps) -> 
     }
 
 
-async def node_stage_gate_judge_and_finalize(
+async def node_distill_audit_and_finalize(
     state: WorkflowState, deps: RuntimeDeps
 ) -> dict[str, Any]:
-    """Stage 7: Deterministic Vol 05 Index, Contract Audit, 100-pt Judge & Disk Persistence."""
-    drafts = dict(state.get("report_drafts", {}))
+    """Stage 3c: Distill Executive Edition + 100% Deterministic Audit Gate + Zero-LLM Index + Disk Write."""
+    full_drafts = dict(state.get("report_drafts", {}))
+    fact_sheet = state.get("executive_fact_sheet", "")
     all_records = deps.vault.list_all()
     vault_stats = deps.vault.stats()
+    valid_ids = deps.vault.list_valid_ids()
 
-    drafts["05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"] = render_evidence_index(
-        all_records, db_label=f"data/{deps.vault.db_path.name}"
-    )
+    # Distill paired High-Density Executive Edition (5 volumes)
+    exec_drafts = dict(state.get("executive_drafts", {}))
+    if not exec_drafts:
+        exec_drafts = await distill_executive_edition(
+            full_drafts=full_drafts,
+            fact_sheet=fact_sheet,
+            deps=deps,
+        )
 
-    evaluated = state.get("evaluated_wedges", [])
-    det_checks = deterministic_contract_checks(
+    vol05_md = render_evidence_index(all_records, db_label=f"data/{deps.vault.db_path.name}")
+
+    audit_report = run_deterministic_full_audit(
         vault_stats=vault_stats,
-        drafts=drafts,
-        evaluated_wedges=evaluated,
+        valid_ids=valid_ids,
+        full_drafts=full_drafts,
+        executive_drafts=exec_drafts,
+        market_sizing_summary=state.get("market_sizing_summary", {}),
+        evaluated_wedges=state.get("evaluated_wedges", []),
+        eliminated_wedges=state.get("eliminated_wedges", []),
+        dropped_unverified_records=state.get("dropped_unverified_records", []),
         contract=deps.settings.contract,
     )
-
-    calc_ctx = _format_catalogs_context(state)
-    exec_excerpt = drafts.get("00_EXECUTIVE_DECISION_MEMO_AND_VERDICT.md", "")[:3200]
-    comp_excerpt = drafts.get("02_COMPETITIVE_LANDSCAPE_AND_BATTLECARDS.md", "")[:2400]
-    gtm_excerpt = drafts.get("03_COMMERCIAL_GTM_PRICING_AND_PARTNERSHIP_PLAN.md", "")[:2400]
-
-    tier = "critic" if state.get("profile", "flagship") == "flagship" else "fast"
-    judge_prompt = (
-        f"Deterministic Checks: {json.dumps(det_checks, ensure_ascii=False)}\n"
-        f"Summary [MKT-CALC] & [ROI-CALC]:\n{calc_ctx[:2600]}\n\n"
-        f"Vol 00 Excerpt:\n{exec_excerpt}\n\n"
-        f"Vol 02 Excerpt:\n{comp_excerpt}\n\n"
-        f"Vol 03 Excerpt:\n{gtm_excerpt}\n\n"
-        "Score strictly on the 5x20=100 Stage-Gate Rubric."
-    )
-    rubric = await deps.llm.complete_structured(
-        tier=tier,
-        node="stage_gate_judge",
-        system_prompt=JUDGE_SYSTEM,
-        user_prompt=judge_prompt,
-        schema=JudgeRubricScores,
-        max_tokens=1600,
-    )
-    exact_total = round(
-        rubric.china_grounding_and_project_specificity
-        + rubric.market_sizing_and_pain_point_rigor
-        + rubric.competitive_battlecard_accuracy
-        + rubric.dual_track_gtm_and_roi_actionability
-        + rubric.evidence_traceability_and_prose,
-        2,
-    )
-    threshold = float(deps.settings.contract.get("quality_gates", {}).get("stage_gate_pass_score", 85.0))
-    passed = bool(exact_total >= threshold and det_checks.get("all_5_volumes_non_empty"))
-    rubric = rubric.model_copy(update={"total_score": exact_total, "pass_stage_gate": passed})
 
     out_dir_str = state.get("output_dir") or str(deps.settings.default_output_dir)
     out_path = Path(out_dir_str)
     if not out_path.is_absolute():
         out_path = (deps.settings.root_dir / out_path).resolve()
+    exec_dir = out_path / "executive_edition"
     out_path.mkdir(parents=True, exist_ok=True)
+    exec_dir.mkdir(parents=True, exist_ok=True)
 
     written_files: list[str] = []
-    for fname, content in sorted(drafts.items()):
+    for fname, content in sorted(full_drafts.items()):
         assert_no_secrets_leaked(content, deps.settings)
         target = out_path / fname
         target.write_text(content, encoding="utf-8")
         written_files.append(str(target))
 
+    for fname, content in sorted(exec_drafts.items()):
+        assert_no_secrets_leaked(content, deps.settings)
+        target = exec_dir / fname
+        target.write_text(content, encoding="utf-8")
+        written_files.append(str(target))
+
+    assert_no_secrets_leaked(vol05_md, deps.settings)
+    v05_path = out_path / "05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"
+    v05_path.write_text(vol05_md, encoding="utf-8")
+    written_files.append(str(v05_path))
+
+    evaluated = state.get("evaluated_wedges", [])
     cost_sum = deps.ledger.summary()
     scorecard = {
+        "schema_version": "2.0",
         "run_id": state.get("run_id", f"vf-{uuid.uuid4().hex[:8]}"),
         "completed_at_utc": datetime.now(timezone.utc).isoformat(),
         "profile": state.get("profile", "flagship"),
-        "stage_gate_passed": passed,
-        "pass_threshold": threshold,
-        "judge_rubric": rubric.model_dump(),
-        "deterministic_contract_checks": det_checks,
+        "stage_gate_passed": audit_report.passed,
+        "deterministic_audit_report": audit_report.model_dump(),
         "evidence_vault_stats": vault_stats,
         "market_sizing_summary": state.get("market_sizing_summary", {}),
-        "evaluated_wedges_top10": [
+        "evaluated_wedges_ranked": [
             {
                 "rank": w.get("composite_rank"),
                 "wedge_id": w["seed"]["wedge_id"],
@@ -311,10 +381,12 @@ async def node_stage_gate_judge_and_finalize(
                 "title": w["seed"]["title"],
                 "payback_months": w["roi"]["payback_months"],
                 "irr_5yr_pct": w["roi"]["irr_5yr_pct"],
-                "weighted_pillar_score": w["weighted_pillar_score"],
-                "elo_rating": w["elo_rating"],
+                "npv_5yr_cny": w["roi"]["npv_5yr_cny"],
+                "global_priority_score": w.get("global_priority_score"),
+                "weighted_pillar_score": w.get("weighted_pillar_score"),
+                "merged_from_wedge_ids": w.get("merged_from_wedge_ids", []),
             }
-            for w in evaluated[:10]
+            for w in evaluated
         ],
         "eliminated_wedges": state.get("eliminated_wedges", []),
         "critique_loops_executed": int(state.get("critique_loop_count", 0)),
@@ -327,19 +399,21 @@ async def node_stage_gate_judge_and_finalize(
     sc_path.write_text(sc_str + "\n", encoding="utf-8")
     written_files.append(str(sc_path))
 
+    full_drafts["05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"] = vol05_md
+
     return {
-        "report_drafts": drafts,
-        "judge_rubric": rubric.model_dump(),
-        "deterministic_checks": det_checks,
-        "stage_gate_passed": passed,
+        "report_drafts": full_drafts,
+        "executive_drafts": exec_drafts,
+        "audit_report": audit_report.model_dump(),
+        "stage_gate_passed": audit_report.passed,
         "cost_summary": cost_sum,
         "written_files": written_files,
         "telemetry_events": [
             {
                 "ts": datetime.now(timezone.utc).isoformat(),
-                "node": "stage_gate_judge_and_finalize",
-                "total_score": exact_total,
-                "passed": passed,
+                "node": "distill_audit_and_finalize",
+                "passed": audit_report.passed,
+                "failed_gates": audit_report.failed_gates,
                 "written_count": len(written_files),
             }
         ],

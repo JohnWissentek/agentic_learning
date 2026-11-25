@@ -10,8 +10,8 @@ from vf_ccus_workflow.schemas import (
     EliminatedWedge,
     EvaluatedWedge,
     HorizonSizingBreakdown,
-    ROIMetrics,
     ROIInputs,
+    ROIMetrics,
     ROIRangeInputs,
     ROIRangeMetrics,
     SegmentSizingInput,
@@ -27,6 +27,18 @@ DEFAULT_ASP_CNY_WAN: dict[str, float] = {
     "TRACK_C_AUSTRIA_PREMIERGUARD": 720.0,
 }
 
+DEFAULT_SCENARIO_MULTIPLIERS: dict[str, float] = {
+    "conservative": 0.70,
+    "baseline": 1.00,
+    "optimistic": 1.35,
+}
+
+DEFAULT_WIN_RATE_MULTIPLIERS: dict[str, float] = {
+    "conservative": 0.75,
+    "baseline": 1.00,
+    "optimistic": 1.22,
+}
+
 SECTOR_LABELS_CN: dict[str, str] = {
     "S1_pipeline_ship_eor": "S1: 超临界管道/油田EOR/LCO2船运枢纽",
     "S2_green_methanol_ccu_chem": "S2: 绿氢+CO2绿色甲醇/e-SAF合成",
@@ -35,20 +47,59 @@ SECTOR_LABELS_CN: dict[str, str] = {
 }
 
 
+def _build_horizon_breakdown(
+    *,
+    name: str,
+    base_tam_units: int,
+    base_sam_units: int,
+    win_rate: float,
+    asp: float,
+    v_mult: float,
+    w_mult: float,
+) -> HorizonSizingBreakdown:
+    t_u = max(1, round(base_tam_units * v_mult))
+    sa_u = max(1, round(base_sam_units * v_mult))
+    so_u = max(0, min(sa_u, round(sa_u * win_rate * w_mult)))
+    return HorizonSizingBreakdown(
+        scenario=name,  # type: ignore[arg-type]
+        tam_units=t_u,
+        tam_cny_wan=round(t_u * asp, 1),
+        sam_units=sa_u,
+        sam_cny_wan=round(sa_u * asp, 1),
+        som_units=so_u,
+        som_cny_wan=round(so_u * asp, 1),
+    )
+
+
 def compute_china_tam_sam_som(
     inputs: list[SegmentSizingInput],
     *,
     asp_map: dict[str, float] | None = None,
+    scenario_multipliers: dict[str, float] | None = None,
+    win_rate_multipliers: dict[str, float] | None = None,
 ) -> ChinaMarketSizingSummary:
-    """Deterministic bottom-up [MKT-CALC] engine across 2026-2030 & 2031-2036 (Low/Base/High)."""
+    """Deterministic bottom-up [MKT-CALC] engine across 2026-2030 & 2031-2036 (Low/Base/High).
+
+    Aggregates orthogonally by (sector, sub_segment, primary_delivery_track, horizon) so
+    e.g. onshore S1 pipelines (Track B) and offshore/ship LCO2 hubs (Track C) accumulate cleanly.
+    """
     asp_table = dict(DEFAULT_ASP_CNY_WAN)
     if asp_map:
         asp_table.update({k: float(v) for k, v in asp_map.items()})
 
-    # Deduplicate by (sector, horizon) keeping record with highest evidence backing
-    deduped: dict[tuple[str, str], SegmentSizingInput] = {}
+    vol_mults = dict(DEFAULT_SCENARIO_MULTIPLIERS)
+    if scenario_multipliers:
+        vol_mults.update({k: float(v) for k, v in scenario_multipliers.items()})
+
+    win_mults = dict(DEFAULT_WIN_RATE_MULTIPLIERS)
+    if win_rate_multipliers:
+        win_mults.update({k: float(v) for k, v in win_rate_multipliers.items()})
+
+    # Deduplicate only exact (sector, sub_segment, track, horizon) duplicates keeping strongest evidence
+    deduped: dict[tuple[str, str, str, str], SegmentSizingInput] = {}
     for item in inputs:
-        key = (item.sector, item.horizon)
+        norm_sub = item.sub_segment.strip().lower() or "general"
+        key = (item.sector, norm_sub, item.primary_delivery_track, item.horizon)
         cur = deduped.get(key)
         if cur is None or len(item.evidence_ids) > len(cur.evidence_ids):
             deduped[key] = item
@@ -65,30 +116,40 @@ def compute_china_tam_sam_som(
         },
     }
 
-    for (sector, horizon) in sorted(deduped.keys()):
-        seg = deduped[(sector, horizon)]
+    for key in sorted(deduped.keys()):
+        seg = deduped[key]
+        horizon = seg.horizon
         asp = asp_table.get(seg.primary_delivery_track, 420.0)
         base_tam_units = max(1, round(seg.addressable_project_or_line_count * seg.stations_per_project))
         base_sam_units = max(1, round(base_tam_units * seg.technical_fit_ratio))
-        base_som_units = max(0, round(base_sam_units * seg.realistic_som_win_rate))
 
-        def _make_bd(name: str, vol_mult: float, win_mult: float) -> HorizonSizingBreakdown:
-            t_u = max(1, round(base_tam_units * vol_mult))
-            sa_u = max(1, round(base_sam_units * vol_mult))
-            so_u = max(0, min(sa_u, round(sa_u * seg.realistic_som_win_rate * win_mult)))
-            return HorizonSizingBreakdown(
-                scenario=name,  # type: ignore[arg-type]
-                tam_units=t_u,
-                tam_cny_wan=round(t_u * asp, 1),
-                sam_units=sa_u,
-                sam_cny_wan=round(sa_u * asp, 1),
-                som_units=so_u,
-                som_cny_wan=round(so_u * asp, 1),
-            )
-
-        cons = _make_bd("conservative", 0.72, 0.75)
-        base = _make_bd("baseline", 1.00, 1.00)
-        opt = _make_bd("optimistic", 1.35, 1.22)
+        cons = _build_horizon_breakdown(
+            name="conservative",
+            base_tam_units=base_tam_units,
+            base_sam_units=base_sam_units,
+            win_rate=seg.realistic_som_win_rate,
+            asp=asp,
+            v_mult=vol_mults["conservative"],
+            w_mult=win_mults["conservative"],
+        )
+        base = _build_horizon_breakdown(
+            name="baseline",
+            base_tam_units=base_tam_units,
+            base_sam_units=base_sam_units,
+            win_rate=seg.realistic_som_win_rate,
+            asp=asp,
+            v_mult=vol_mults["baseline"],
+            w_mult=win_mults["baseline"],
+        )
+        opt = _build_horizon_breakdown(
+            name="optimistic",
+            base_tam_units=base_tam_units,
+            base_sam_units=base_sam_units,
+            win_rate=seg.realistic_som_win_rate,
+            asp=asp,
+            v_mult=vol_mults["optimistic"],
+            w_mult=win_mults["optimistic"],
+        )
 
         for scen_name, bd in (("conservative", cons), ("baseline", base), ("optimistic", opt)):
             bucket = horizon_totals[horizon][scen_name]
@@ -102,6 +163,7 @@ def compute_china_tam_sam_som(
         results.append(
             SegmentSizingResult(
                 sector=seg.sector,
+                sub_segment=seg.sub_segment,
                 horizon=seg.horizon,
                 primary_delivery_track=seg.primary_delivery_track,
                 asp_cny_wan=asp,
@@ -158,12 +220,7 @@ def _payback_tier(payback_months: float) -> str:
 
 def compute_roi_metrics(inputs: ROIInputs) -> ROIMetrics:
     """Deterministic PALMs financial computation ([ROI-CALC])."""
-    gross = (
-        inputs.avoided_corrosion_and_shutdown_loss_cny_yr
-        + inputs.avoided_catalyst_poison_or_flaring_cny_yr
-        + inputs.avoided_manual_lab_and_multi_gc_opex_cny_yr
-        + inputs.ccer_or_export_compliance_upside_cny_yr
-    )
+    gross = inputs.total_gross_benefit_cny_yr
     net_cf = gross - inputs.annual_opex_cny_yr
     capex = inputs.capex_cny
 
@@ -198,12 +255,7 @@ def clamp_range_inputs_to_guardrails(
 ) -> ROIRangeInputs:
     """Derive and clamp 3-scenario customer ROI ranges against YAML sector guardrails."""
     roi_in = wedge.roi_baseline
-    raw_gross = (
-        roi_in.avoided_corrosion_and_shutdown_loss_cny_yr
-        + roi_in.avoided_catalyst_poison_or_flaring_cny_yr
-        + roi_in.avoided_manual_lab_and_multi_gc_opex_cny_yr
-        + roi_in.ccer_or_export_compliance_upside_cny_yr
-    )
+    raw_gross = roi_in.total_gross_benefit_cny_yr
     rng = wedge.roi_range or ROIRangeInputs(
         capex_cny_min=round(roi_in.capex_cny * 0.85, 2),
         capex_cny_base=round(roi_in.capex_cny, 2),
@@ -235,10 +287,19 @@ def clamp_range_inputs_to_guardrails(
     return rng
 
 
-def compute_range_roi_metrics(rng: ROIRangeInputs) -> ROIRangeMetrics:
+def compute_range_roi_metrics(
+    rng: ROIRangeInputs,
+    template: ROIInputs | None = None,
+) -> ROIRangeMetrics:
     def _build(capex: float, gross: float, opex: float) -> ROIMetrics:
-        return compute_roi_metrics(
-            ROIInputs(
+        if template is not None:
+            roi_in = template.scaled(
+                capex_cny=capex,
+                target_gross_benefit_cny=gross,
+                annual_opex_cny=opex,
+            )
+        else:
+            roi_in = ROIInputs(
                 capex_cny=capex,
                 avoided_corrosion_and_shutdown_loss_cny_yr=round(gross * 0.45, 2),
                 avoided_catalyst_poison_or_flaring_cny_yr=round(gross * 0.30, 2),
@@ -246,7 +307,7 @@ def compute_range_roi_metrics(rng: ROIRangeInputs) -> ROIRangeMetrics:
                 ccer_or_export_compliance_upside_cny_yr=round(gross * 0.10, 2),
                 annual_opex_cny_yr=opex,
             )
-        )
+        return compute_roi_metrics(roi_in)
 
     return ROIRangeMetrics(
         conservative=_build(rng.capex_cny_max, rng.gross_benefit_cny_min, rng.annual_opex_cny_max),
@@ -291,7 +352,7 @@ def screen_wedge_pool(
     target_total: int = 10,
     max_conservative_payback_months: float = 42.0,
 ) -> tuple[list[EvaluatedWedge], list[EliminatedWedge]]:
-    """Stage 2 Funnel: Clamp ranges -> Compute [ROI-CALC] -> Hard gates -> Preserve eliminated wedges."""
+    """Stage 2 Funnel: Clamp ranges preserving 4-line ROI proportions -> Hard gates -> Preserve eliminated wedges."""
     deduped: dict[str, CommercialWedgeCandidate] = {}
     for c in candidates:
         cur = deduped.get(c.wedge_id)
@@ -301,10 +362,11 @@ def screen_wedge_pool(
     evaluated_all: list[EvaluatedWedge] = []
     for cand in deduped.values():
         clamped = clamp_range_inputs_to_guardrails(cand, guardrails=guardrails)
+        scaled_baseline = clamped.to_baseline_inputs(template=cand.roi_baseline)
         clean_cand = cand.model_copy(
-            update={"roi_range": clamped, "roi_baseline": clamped.to_baseline_inputs()}
+            update={"roi_range": clamped, "roi_baseline": scaled_baseline}
         )
-        roi_rng = compute_range_roi_metrics(clamped)
+        roi_rng = compute_range_roi_metrics(clamped, template=cand.roi_baseline)
         roi = roi_rng.baseline
         w_score = compute_weighted_wedge_score(
             roi=roi,
@@ -381,16 +443,17 @@ def format_market_sizing_table(summary: ChinaMarketSizingSummary) -> str:
     lines = [
         "### [MKT-CALC] 中国CCS/CCUS V&F IMR-MS 市场规模确定性测算总表（单位：台套数 / 人民币万元）",
         "",
-        "| 细分赛道 | 周期 | 主推交付轨道 | 单价基准(万元) | 保守TAM/SAM/SOM(万元) | 基准TAM/SAM/SOM(万元) | 基准SOM台套 | 乐观SOM(万元) | 依据ID |",
+        "| 细分赛道 / 子板块 | 周期 | 主推交付轨道 | 单价基准(万元) | 保守TAM/SAM/SOM(万元) | 基准TAM/SAM/SOM(万元) | 基准SOM台套 | 乐观SOM(万元) | 依据ID |",
         "| :--- | :--- | :--- | ---: | :--- | :--- | ---: | ---: | :--- |",
     ]
     for s in summary.segments:
         lbl = SECTOR_LABELS_CN.get(s.sector, s.sector)
+        sub_lbl = f"{lbl} ({s.sub_segment})" if s.sub_segment and s.sub_segment != "general" else lbl
         cons_s = f"{s.conservative.tam_cny_wan:,.0f} / {s.conservative.sam_cny_wan:,.0f} / **{s.conservative.som_cny_wan:,.0f}**"
         base_s = f"{s.baseline.tam_cny_wan:,.0f} / {s.baseline.sam_cny_wan:,.0f} / **{s.baseline.som_cny_wan:,.0f}**"
         evs = ", ".join(s.evidence_ids[:4])
         lines.append(
-            f"| {lbl} | {s.horizon} | `{s.primary_delivery_track}` | {s.asp_cny_wan:,.0f} | "
+            f"| {sub_lbl} | {s.horizon} | `{s.primary_delivery_track}` | {s.asp_cny_wan:,.0f} | "
             f"{cons_s} | {base_s} | **{s.baseline.som_units}** | {s.optimistic.som_cny_wan:,.0f} | {evs} |"
         )
 
@@ -422,7 +485,7 @@ def format_roi_table(wedges: list[dict[str, Any]]) -> str:
     lines = [
         "### [ROI-CALC] 入选高价值商业切入点三情景客户投资回报明细",
         "",
-        "| 排名 | Wedge ID | 切入场景 | 交付轨道 | 客户CAPEX(万) | 年净现金流(万) | 回收期[乐/基/保](月) | 5Y IRR | 5Y NPV(万) | 综合得分 |",
+        "| 排名 | Wedge ID | 切入场景 | 交付轨道 | 客户CAPEX(万) | 年净现金流(万) | 回收期[乐/基/保](月) | 5Y IRR | 5Y NPV(万) | 全局评分 |",
         "| :---: | :--- | :--- | :--- | ---: | ---: | :---: | ---: | ---: | ---: |",
     ]
     for w in wedges:
@@ -431,12 +494,13 @@ def format_roi_table(wedges: list[dict[str, Any]]) -> str:
         rng = w.get("roi_range") or {}
         opt_pb = (rng.get("optimistic") or {}).get("payback_months", roi["payback_months"])
         cons_pb = (rng.get("conservative") or {}).get("payback_months", roi["payback_months"])
+        score = w.get("global_priority_score") if w.get("global_priority_score") is not None else w.get("weighted_pillar_score", 0)
         lines.append(
             f"| #{w.get('composite_rank', 0)} | `{seed['wedge_id']}` | {seed['title']} | "
             f"`{seed['delivery_track']}` | ¥{roi['capex_cny']/10000:.1f} | "
             f"¥{roi['net_annual_cashflow_cny']/10000:.1f} | "
             f"{opt_pb:.1f} / **{roi['payback_months']:.1f}** / {cons_pb:.1f} | "
-            f"{roi['irr_5yr_pct']:.1f}% | ¥{roi['npv_5yr_cny']/10000:.1f} | {w.get('weighted_pillar_score', 0):.1f} |"
+            f"{roi['irr_5yr_pct']:.1f}% | ¥{roi['npv_5yr_cny']/10000:.1f} | {float(score):.1f} |"
         )
     return "\n".join(lines) + "\n"
 

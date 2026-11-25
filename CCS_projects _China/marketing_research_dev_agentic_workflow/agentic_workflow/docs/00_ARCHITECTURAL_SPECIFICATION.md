@@ -1,20 +1,24 @@
-# 00 系统架构规范 (`00_ARCHITECTURAL_SPECIFICATION`)
+# 00 系统架构规范 v2.0 (`00_ARCHITECTURAL_SPECIFICATION`)
 
-## 1. 工程结构与双运行模式
+## 1. 工程结构与主次双入口
 
-本系统采用 **“确定性 Python 工具脊柱 + 多智能体认知层”** 分离设计：
+本系统采用 **「全旗舰大脑 + 强确定性 Python 底盘」** 职责二分架构：
 
-- **认知与调度双模式**：
-  - **Standalone 模式** (`src/vf_ccus_workflow/graph.py`)：基于 `langgraph.graph.StateGraph` + `MemorySaver`，将 DashScope (`qwen3.8-flash` / `qwen3.8-max` / `deepseek-v4-pro`) 绑定至结构化节点，适合全自动 CI/无人值守批处理。
-  - **Antigravity Native Hybrid 模式** (`ide_workflows/antigravity_run_workflow.py`)：通过 `run_workflow` 在 IDE 原生高配模型上调度子智能体，同时通过 `vf-ccus-research` CLI 强制由 Python 负责联网搜索、SQLite 入库、确定性计算与 Stage-Gate 审计。
+- **主用入口 — Antigravity Native Hybrid 模式**（`ide_workflows/antigravity_run_workflow.py`）：
+  - 在 IDE 原生旗舰模型上执行认知推理，通过 `vf-ccus-research` CLI 复用 100% 同一套确定性 Python 底盘（单源 Schema 导出、一手资料解析、Metaso/Serper SQLite 证据库、细分 `[MKT-CALC]` & 保比例 `[ROI-CALC]`、卷宗精准证据路由、Zero-LLM 第 05 卷索引与 100% 双版本确定性门禁）。
+- **兼容入口 — Standalone LangGraph 模式**（`src/vf_ccus_workflow/graph.py`）：
+  - 基于 4 阶段 `StateGraph` + `MemorySaver`，适合无人值守批处理与离线轨迹测试。
 
-## 2. 核心设计不变式 (Engineering Invariants)
+## 2. v2.0 核心工程不变式（Engineering Invariants）
 
-1. **Zero LLM Arithmetic**：所有中国市场规模 (`TAM/SAM/SOM`, `[MKT-CALC]`) 与客户财务回报 (`Payback/IRR/NPV`, `[ROI-CALC]`) 由 `tools/market_and_roi_calculator.py` 纯 Python 计算。
-2. **EvidenceVault Single Source of Truth**：所有论断均需挂载经 `EvidenceVault` 赋予的序列 ID：
-   - `[EV-SIGGI-XXX]`：Siggi 会议纪要、V&F 幻灯片、Thermo 对比与 Shell/IFE 腐蚀论文一手资料；
-   - `[EV-CN-XXX]`：Metaso 中文实时检索（国家政策、央企/煤化工/绿醇/LCO2船厂项目、国内竞品与分析小屋集成商）；
-   - `[EV-GL-XXX]`：Serper 国际标准与海外项目核验（Northern Lights、Brevik、ISO 标准等）。
-3. **Anti-Survivorship Bias Funnel**：保留食品级 CO2 常规抽检等“伪需求/低支付意愿淘汰项”（`EliminatedWedge`），禁止将一切市场一律粉饰为可投机会。
-4. **Dual-Track Hybrid Localization**：产品交付模型按 **Track A (进口核心主机)** / **Track B (`VF-QAS-CN` 双轨本土化防爆分析小屋)** / **Track C (奥地利原装 `PremierGuard QAS`)** 严格区分定价、BOM、渠道与适用客群。
-5. **Secret Leak Prevention**：`assert_no_secrets_leaked` 在 Stage 7 写盘前及 `pytest` 全程扫描并拦截任何 API Token 泄露。
+1. **Single-Source Flat Schema**：`schemas.py` 是唯一红区契约源；`export_flat_json_schema` 自动展开 `$ref`/`$defs` 并保留全部上下界与枚举，彻底杜绝双写漂移与 0–10 vs 0–100 标尺分裂。
+2. **Zero LLM Arithmetic & Domain Fidelity**：
+   - `[MKT-CALC]` 按 `(sector, sub_segment, primary_delivery_track, horizon)` 累加测算，陆上管网（Track B）与出口 LCO2 船运/离岸枢纽（Track C）并存不覆盖；情景乘数全部从 `config/discovery_scope.yaml` 单源读取。
+   - `[ROI-CALC]` 在护栏钳制时按原始 4 项收益占比等比缩放，严禁硬编码覆写收益结构。
+3. **Zero Silent Evidence Backfill**：凡模型产出无法匹配真实 SQLite 证据 ID 的项目、竞品、PAC 集成商或切入点，一律严格剔除并记入 `dropped_unverified_records` 审计台账，严禁回填无关 `fallback_ids`。
+4. **Zero-Truncation Context & Full-Text Audit**：
+   - 按卷主题与关联引用 ID 精准路由证据包；
+   - 分卷 Critic 与定向 Rewrite 均传入 **100% 完整卷宗正文**（严禁截断）；
+   - 确定性审计门禁使用全量正则提取所有单条与多 ID 组合引用（如 `[EV-SIGGI-001, EV-CN-003]`），并跨双版本核验十年 SOM 与回收期数值一致性。
+5. **Dual-Edition Synchronized Deliverables**：每次完整运行同步交付 **5 卷原始详版**（`00_`–`04_`）与 **5 卷高密度高管版**（`executive_edition/00_`–`04_`），外加 Zero-LLM `05_` 证据索引与客观确定性 `06_` 遥测报告（取消 100 分制花瓶 LLM Judge）。
+6. **Secret Leak Prevention**：`assert_no_secrets_leaked` 在所有 12 份落盘文件写入前全量扫描拦截密钥泄露。

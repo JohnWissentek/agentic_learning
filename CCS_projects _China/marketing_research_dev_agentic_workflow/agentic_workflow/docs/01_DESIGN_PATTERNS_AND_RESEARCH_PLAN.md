@@ -1,13 +1,61 @@
-# 01 设计模式映射与八阶段研究逻辑 (`01_DESIGN_PATTERNS_AND_RESEARCH_PLAN`)
+# 01 四阶段研究逻辑与 OMG UML 2.5 状态机规范 (`01_DESIGN_PATTERNS_AND_RESEARCH_PLAN`)
 
-| 阶段 | 对应模块 | 《Agentic Design Patterns》依据 | 核心机制与防幻觉策略 |
+## 一、 四阶段精简主干映射表（取代旧版 8 阶段 34 次调用）
+
+| 阶段 | 核心模块 | 职责二分（大脑 vs 确定性底盘） | 关键防错与防截断设计 |
 | :--- | :--- | :--- | :--- |
-| **Stage 0a** | `siggi_corpus_loader` + `run_macro_recon` | Ch 14 Knowledge Retrieval / MCP Context | 解析 `information_from_siggi/` 全量 PDF/MD 赋予 `[EV-SIGGI-*]` + Metaso/Serper 实时扫描中国与国际动态 |
-| **Stage 0b** | `node_siggi_ingest_and_planner` | Ch 6 Planning + Step-Back Prompting | 零预设前提，由一手证据动态聚拢 5–6 个研究赛道并构建 4 赛道全景假说（含 S4 负向对照） |
-| **Stage 1** | `node_parallel_track_researcher` | Ch 3 Parallelization + Ch 12 Recovery | 并发运行 CN/GLOBAL 检索与全文提取；严格清洗并剔除一切无 Vault 来源的模型或项目 |
-| **Stage 2** | `aggregate_catalogs_and_screen` | Ch 5 Tool Use + Ch 17 Guardrails | Python `[MKT-CALC]` 计算 2026–2036 TAM/SAM/SOM + `[ROI-CALC]` 筛除高回收期或伪需求切入点 |
-| **Stage 3** | `node_size_screen_and_storm` | Ch 7 Multi-Agent + Stanford STORM | 三桶油总工/设计院室主任/煤化工CFO/分析小屋集成商 四重视角质询落地阻力 |
-| **Stage 4** | `node_swiss_elo_ranker` | Ch 20/21 Prioritization & Tournament | 基于物理护城河与 `[ROI-CALC]` 保守韧性开展瑞士轮配对 Elo 排序 |
-| **Stage 5** | `node_parallel_volume_synthesizer` | Ch 1 Prompt Chaining & Parallel Fan-Out | 5 卷旗帜级报告并发撰写（严格绑定相同计算锚点与证据库 ID） |
-| **Stage 6** | `node_adversarial_critic` + CRAG | Ch 4 Reflection + Corrective RAG | 程序化检查非法引用 ID + 异构 Critic (`deepseek-v4-pro`/Native Critic) Audit；最多 2 轮定向补检重写 |
-| **Stage 7** | `node_stage_gate_judge_and_finalize` | Ch 19 Evaluation + Zero-LLM Index | 确定性渲染第 05 卷全量证据索引，运行 100 分制门禁评分与防泄密检查后落盘交付 |
+| **阶段一：确定性底座与全局规划** | `siggi_corpus_loader` + `run_macro_recon` + `node_siggi_ingest_and_planner` | 🛡️ 解析本地一手资料与宏观双引擎侦察入库<br>🧠 1 次旗舰大脑规划正交业务赛道与独立竞品生态任务 | 业务赛道与竞品生态物理拆轨，禁止静默降级吞错 |
+| **阶段二：分赛道并发深挖与核验** | `node_parallel_track_researcher` + `clean_sector_dossier` / `clean_competitive_dossier` | 🛡️ 并发检索与全文抓取 + 零假挂靠证据清洗<br>🧠 全旗舰大脑并发提纯 `SectorDossier` / `CompetitiveEcosystemDossier` | 单源 Schema 强约束 0–100 标尺；无有效证据条目直接剔除并留痕 |
+| **阶段三：确定性测算与全局裁决** | `market_and_roi_calculator` + `node_size_screen_and_arbitrate` | 🛡️ 细分累加 `[MKT-CALC]` + 保比例 `[ROI-CALC]` 淘汰伪需求<br>🧠 **1 次旗舰全局裁决**合并重复场景、统一排序并产出四类买方阻力矩阵 | 以 1 次全局旗舰裁决取代 10 次 `flash` STORM + 10 场 `flash` Elo；锁定只读事实锚点总表 |
+| **阶段四：双版本撰写与全量真审计** | `synthesizer` + `node_full_text_critic` + `distill_executive_edition` + `run_deterministic_full_audit` | 🛡️ 卷宗精准证据路由 + 全量单/组合引用与数值硬审计 + Zero-LLM 第 05 卷 + 防泄密<br>🧠 5 卷原始详版撰写 → 100% 全文分卷复核/CRAG 修订（≤2 轮）→ 5 卷高密度高管版提纯 | 零 `[:2200]`/`[:5500]` 截断；砍掉 100 分花瓶 Judge，改为客观硬门禁 |
+
+## 二、 OMG UML 2.5 行为状态机图
+
+```mermaid
+stateDiagram-v2
+    [*] --> 事实装载与正交规划中 : / 初始化运行任务
+
+    state 阶段一_确定性底座与全局规划 {
+        事实装载与正交规划中 : entry / 解析奥地利一手技术资料并执行中英文宏观侦察入库\ndo / 旗舰大脑划分 5 条正交业务赛道与 1 条独立竞品生态任务\nexit / 导出单源契约并固化调研计划
+    }
+
+    阶段一_确定性底座与全局规划 --> 并发检索与全旗舰提纯中 : 调研计划已固化
+
+    state 阶段二_分赛道并发深挖与证据核验 {
+        并发检索与全旗舰提纯中 : entry / 并发执行中英文双引擎检索及网页全文抓取入库\ndo / 全旗舰大脑分赛道提纯业务档案与独立竞品防爆小屋生态\nexit / 严格校验 0–100 标尺并剔除无据条目（零静默假挂靠）
+    }
+
+    阶段二_分赛道并发深挖与证据核验 --> 双核测算与全局裁决中 : 各赛道核验完成
+
+    state 阶段三_确定性测算与全局商业裁决 {
+        双核测算与全局裁决中 : entry / 确定性引擎按细分赛道与三轨累加测算市场规模并保留原始四项收益结构\ndo / 单次旗舰大脑合并重复场景、全局统一排序并产出四类买方阻力矩阵\nexit / 锁定只读事实锚点总表并按卷精准路由证据包
+    }
+
+    阶段三_确定性测算与全局商业裁决 --> 原始详版五卷并发撰写中 : 事实锚点总表已锁定
+
+    state 阶段四_双版本撰写与全量真审计门禁 {
+        原始详版五卷并发撰写中 : entry / 按五卷主题精准注入证据包与只读事实锚点总表\ndo / 旗舰大脑并发撰写第 00–04 卷原始详版
+        全量硬审计与分卷全文复核中 : entry / 程序全量扫描单条与组合引用编号\ndo / 独立复核大脑分卷读取 100% 全文核验事实与数字
+
+        state 审计判定 <<choice>>
+
+        原始详版五卷并发撰写中 --> 全量硬审计与分卷全文复核中 : 五卷初稿已生成
+        全量硬审计与分卷全文复核中 --> 审计判定 : 审计结论已产出
+
+        审计判定 --> 定向补检与完整修订中 : [存在错误或缺口 且 修订次数 < 2] / 修订次数 + 1
+        定向补检与完整修订中 : entry / 按需执行精准联网补检并归档\ndo / 传入待修卷宗 100% 完整原稿执行定向修订
+        定向补检与完整修订中 --> 全量硬审计与分卷全文复核中 : 修订稿已回填
+
+        审计判定 --> 高密度高管版五卷提纯中 : [全量硬审计与分卷复核全部通过]
+        审计判定 --> 高密度高管版五卷提纯中 : [else：达到修订上限(2次)] / 标记未闭环风险清单
+
+        高密度高管版五卷提纯中 : do / 旗舰大脑并发提纯 5 卷高密度高管版（2500–5500 字/卷，锁定同一事实表）
+        高密度高管版五卷提纯中 --> 确定性双版本审计门禁与落盘中 : 高管版五卷已提纯
+
+        确定性双版本审计门禁与落盘中 : entry / 全量硬审计十卷成品并零改写渲染第 05 卷证据索引\nentry / 执行全套产物密钥防泄露扫描\ndo / 落盘原始详版五卷、高管版五卷、证据索引与客观遥测报告
+    }
+
+    确定性双版本审计门禁与落盘中 --> [*] : / 输出双版本十卷与遥测
+```
+
+完整矢量工程图见 [02_CLEAN_WORKFLOW_TOPOLOGY.svg](./02_CLEAN_WORKFLOW_TOPOLOGY.svg)（同步导出至 `research_outputs/07_WORKFLOW_EXECUTION_TOPOLOGY.svg`）。

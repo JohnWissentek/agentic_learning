@@ -1,46 +1,51 @@
-"""Stage 2 ([MKT-CALC]+[ROI-CALC] Funnel), Stage 3 (4-Persona STORM) & Stage 4 (Swiss Elo)."""
+"""Stage 2: Deterministic [MKT-CALC]+[ROI-CALC] Funnel + Single Flagship Global Portfolio Arbitrator.
+
+Replaces legacy 10x flash STORM panels + 10x flash Swiss Elo matches with ONE unified
+flagship arbitration pass that deduplicates overlapping wedges, ranks globally on a single
+0-100 scale, and produces a zero-truncation 4-persona x delivery-track buyer matrix.
+"""
 
 from __future__ import annotations
 
-import asyncio
+import json
 from datetime import datetime, timezone
 from typing import Any
 
-from pydantic import BaseModel, Field
-
 from vf_ccus_workflow.nodes.deps import RuntimeDeps
-from vf_ccus_workflow.prompts import ELO_PAIRWISE_SYSTEM, STORM_SYSTEM
+from vf_ccus_workflow.prompts import GLOBAL_PORTFOLIO_ARBITRATOR_SYSTEM
 from vf_ccus_workflow.schemas import (
     ChinaCCUSProjectItem,
+    ChinaMarketSizingSummary,
     CommercialWedgeCandidate,
     CompetitorProfile,
-    EloMatchRecord,
     EvaluatedWedge,
+    PACIntegratorProfile,
+    PortfolioArbitrationOutput,
     SegmentSizingInput,
-    WedgeStormMemo,
     WorkflowState,
 )
 from vf_ccus_workflow.tools.market_and_roi_calculator import (
     compute_china_tam_sam_som,
+    format_eliminated_table,
+    format_market_sizing_table,
+    format_roi_table,
     screen_wedge_pool,
 )
-
-
-class EloPairDecision(BaseModel):
-    winner_id: str
-    rationale: str = Field(min_length=10)
 
 
 def aggregate_catalogs_and_screen(
     dossiers: list[dict[str, Any]],
     *,
+    competitive_dossiers: list[dict[str, Any]] | None = None,
     discovery_scope: dict[str, Any],
     contract: dict[str, Any],
     profile: str,
 ) -> dict[str, Any]:
-    """Deterministic Stage 2 aggregation of projects, competitors, [MKT-CALC], and [ROI-CALC] funnel."""
+    """Deterministic Stage 2 aggregation of projects, competitors, PAC integrators, [MKT-CALC], and [ROI-CALC]."""
     proj_map: dict[str, ChinaCCUSProjectItem] = {}
     comp_map: dict[str, CompetitorProfile] = {}
+    pac_map: dict[str, PACIntegratorProfile] = {}
+    barriers: list[str] = []
     sizing_list: list[SegmentSizingInput] = []
     wedges: list[CommercialWedgeCandidate] = []
 
@@ -56,16 +61,32 @@ def aggregate_catalogs_and_screen(
         for w in d.get("wedges", []):
             wedges.append(CommercialWedgeCandidate.model_validate(w))
 
-    asp_map = (discovery_scope.get("china_market_sizing_guardrails", {}) or {}).get(
-        "asp_by_track_cny_wan", {}
+    for cd in competitive_dossiers or []:
+        for c in cd.get("competitors", []):
+            comp = CompetitorProfile.model_validate(c)
+            comp_map.setdefault(comp.vendor_name.strip(), comp)
+        for pac in cd.get("pac_integrators", []):
+            p_obj = PACIntegratorProfile.model_validate(pac)
+            pac_map.setdefault(p_obj.company_name.strip(), p_obj)
+        for b in cd.get("design_institute_spec_barriers", []):
+            b_str = str(b).strip()
+            if b_str and b_str not in barriers:
+                barriers.append(b_str)
+
+    sizing_cfg = discovery_scope.get("china_market_sizing_guardrails", {}) or {}
+    market_summary = compute_china_tam_sam_som(
+        sizing_list,
+        asp_map=sizing_cfg.get("asp_by_track_cny_wan"),
+        scenario_multipliers=sizing_cfg.get("scenario_multipliers"),
+        win_rate_multipliers=sizing_cfg.get("win_rate_multipliers"),
     )
-    market_summary = compute_china_tam_sam_som(sizing_list, asp_map=asp_map)
 
     funnel_cfg = contract.get("discovery_funnel", {}) or {}
+    # Allow slightly wider pre-arbitration pool so GlobalPortfolioArbitrator can deduplicate cleanly
     target_total = int(
-        funnel_cfg.get("finalist_shortlist_flagship", 10)
+        funnel_cfg.get("finalist_shortlist_flagship", 8) + 4
         if profile == "flagship"
-        else funnel_cfg.get("finalist_shortlist_fast", 6)
+        else funnel_cfg.get("finalist_shortlist_fast", 5) + 3
     )
     max_cons_pb = float(funnel_cfg.get("max_conservative_payback_months", 42.0))
     guardrails = discovery_scope.get("wedge_roi_guardrails", {}) or {}
@@ -80,172 +101,254 @@ def aggregate_catalogs_and_screen(
     return {
         "projects": [p.model_dump() for p in proj_map.values()],
         "competitors": [c.model_dump() for c in comp_map.values()],
+        "pac_integrators": [p.model_dump() for p in pac_map.values()],
+        "design_institute_barriers": barriers,
         "market_sizing_summary": market_summary.model_dump(),
         "shortlist": [e.model_dump() for e in shortlist],
         "eliminated": [el.model_dump() for el in eliminated],
     }
 
 
-def _expected_score(elo_a: float, elo_b: float) -> float:
-    return 1.0 / (1.0 + 10.0 ** ((elo_b - elo_a) / 400.0))
+def apply_portfolio_arbitration(
+    shortlist_dicts: list[dict[str, Any]],
+    arbitration: PortfolioArbitrationOutput,
+    *,
+    max_finalists: int = 8,
+) -> list[dict[str, Any]]:
+    """Deterministically apply GlobalPortfolioArbitrator deduplication & unified ranking."""
+    by_id: dict[str, EvaluatedWedge] = {}
+    for item in shortlist_dicts:
+        ev = EvaluatedWedge.model_validate(item)
+        by_id[ev.seed.wedge_id] = ev
+
+    ranked_output: list[EvaluatedWedge] = []
+    consumed_ids: set[str] = set()
+
+    for dec in sorted(arbitration.deduped_ranked_wedges, key=lambda x: x.final_rank):
+        canon_id = dec.canonical_wedge_id.strip()
+        valid_merged = [
+            mid for mid in dec.merged_from_wedge_ids if mid in by_id and mid not in consumed_ids
+        ]
+        # If the arbitrator invented a new merged alias (e.g. W_T1_PIPE_EOR_QAS) while listing
+        # valid source IDs in merged_from_wedge_ids, anchor to valid_merged[0] instead of dropping!
+        if canon_id in by_id and canon_id not in consumed_ids:
+            anchor_id = canon_id
+        elif valid_merged:
+            anchor_id = valid_merged[0]
+        else:
+            continue
+
+        ev = by_id[anchor_id]
+        merged_ids = list(dict.fromkeys([anchor_id, *valid_merged]))
+        consumed_ids.update(merged_ids)
+
+        # Merge verified evidence_ids from merged duplicate wedges
+        merged_ev_ids = list(dict.fromkeys(eid for mid in merged_ids for eid in by_id[mid].seed.evidence_ids))
+        updated_seed = ev.seed.model_copy(update={"evidence_ids": merged_ev_ids})
+        ranked_output.append(
+            ev.model_copy(
+                update={
+                    "seed": updated_seed,
+                    "global_priority_score": round(dec.global_priority_score, 2),
+                    "merged_from_wedge_ids": merged_ids,
+                    "ranking_rationale": dec.ranking_rationale,
+                }
+            )
+        )
+
+    # Fallback: preserve any unconsumed survivors only if arbitration returned fewer items than expected
+    if not ranked_output:
+        ranked_output = list(by_id.values())
+
+    ranked_output = ranked_output[:max_finalists]
+    for idx, ev in enumerate(ranked_output, start=1):
+        ev.composite_rank = idx
+    return [e.model_dump() for e in ranked_output]
 
 
-def update_elo(elo_a: float, elo_b: float, a_won: bool, k: float = 32.0) -> tuple[float, float]:
-    exp_a = _expected_score(elo_a, elo_b)
-    score_a = 1.0 if a_won else 0.0
-    score_b = 1.0 - score_a
-    return round(elo_a + k * (score_a - exp_a), 2), round(elo_b + k * (score_b - (1.0 - exp_a)), 2)
+def build_executive_fact_sheet(
+    *,
+    market_sizing_summary: dict[str, Any],
+    evaluated_wedges: list[dict[str, Any]],
+    eliminated_wedges: list[dict[str, Any]],
+    arbitration: dict[str, Any],
+    projects: list[dict[str, Any]],
+    competitors: list[dict[str, Any]],
+    pac_integrators: list[dict[str, Any]],
+    design_institute_barriers: list[str],
+) -> str:
+    """Build the single read-only Executive Fact Sheet shared verbatim by all 5 Full & Executive volumes."""
+    mkt = ChinaMarketSizingSummary.model_validate(market_sizing_summary)
+    mkt_md = format_market_sizing_table(mkt)
+    roi_md = format_roi_table(evaluated_wedges)
+    elim_md = format_eliminated_table(eliminated_wedges)
+
+    buyer_matrix = arbitration.get("track_buyer_matrix", [])
+    thesis = arbitration.get("executive_synthesis_thesis", "")
+    matrix_lines = ["### 买方委员会四角色 × 交付轨道综合阻力与破局矩阵（全量零截断）", ""]
+    for card in buyer_matrix:
+        matrix_lines.append(
+            f"#### {card.get('scenario_group', '')} (`{card.get('delivery_track', '')}`)"
+        )
+        for pc in card.get("persona_critiques", []):
+            matrix_lines.append(
+                f"- **{pc.get('persona_role')}** [{pc.get('verdict')}]: "
+                f"核心关切={pc.get('primary_concern')} | 采购/规范壁垒={pc.get('procurement_or_spec_barrier')} | "
+                f"V&F破局钩子={pc.get('vf_winning_hook')}"
+            )
+        matrix_lines.append(f"- **GTM共识启示**：{card.get('consensus_gtm_implication', '')}\n")
+
+    proj_lines = [
+        "### 已核验中国项目图谱 (Verified Projects)",
+        "| 项目名称 | 业主/EPC | 区域 | 赛道 | 规模 | 2026状态 | 交付轨道 | 依据ID |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+    ]
+    for p in projects:
+        evs = ", ".join(p.get("evidence_ids", [])[:5])
+        proj_lines.append(
+            f"| {p.get('project_name')} | {p.get('owner_and_epc')} | {p.get('province_or_region')} | "
+            f"{p.get('sector')} | {p.get('capacity_mtpa_or_scale')} | {p.get('status_2026')} | "
+            f"`{p.get('recommended_delivery_track')}` | {evs} |"
+        )
+
+    comp_lines = [
+        "### 已核验国内外竞品图谱 (Verified Competitors)",
+        "| 厂商 | 类别 | 核验型号/技术 | 相对V&F核心盲区 | V&F制胜策略 | 依据ID |",
+        "| :--- | :--- | :--- | :--- | :--- | :--- |",
+    ]
+    for c in competitors:
+        evs = ", ".join(c.get("evidence_ids", [])[:5])
+        comp_lines.append(
+            f"| {c.get('vendor_name')} | {c.get('origin_category')} | {c.get('verified_models_and_tech')} | "
+            f"{c.get('blind_spots_vs_vf_imr_ms')} | {c.get('win_strategy_for_vf')} | {evs} |"
+        )
+
+    pac_block = json.dumps(
+        {
+            "pac_integrators": pac_integrators,
+            "design_institute_barriers": design_institute_barriers,
+        },
+        ensure_ascii=False,
+    )
+
+    return (
+        f"## 全局裁决核心论点\n{thesis}\n\n"
+        f"{mkt_md}\n\n"
+        f"{roi_md}\n\n"
+        f"{elim_md}\n\n"
+        + "\n".join(matrix_lines)
+        + "\n"
+        + "\n".join(proj_lines)
+        + "\n\n"
+        + "\n".join(comp_lines)
+        + "\n\n### 本土防爆分析小屋 PAC 集成商与设计院 Spec-in 壁垒\n"
+        + pac_block
+    )
 
 
-async def node_size_screen_and_storm(
+async def node_size_screen_and_arbitrate(
     state: WorkflowState, deps: RuntimeDeps
 ) -> dict[str, Any]:
-    """Stage 2 Deterministic [MKT-CALC]+[ROI-CALC] Funnel -> Stage 3 4-Persona Chinese Buyer STORM."""
+    """Stage 2: Deterministic [MKT-CALC]+[ROI-CALC] Funnel -> Single Flagship Global Portfolio Arbitrator."""
     profile = state.get("profile", "flagship")
     agg = aggregate_catalogs_and_screen(
         state.get("track_dossiers", []),
+        competitive_dossiers=state.get("competitive_dossiers", []),
         discovery_scope=deps.settings.discovery_scope,
         contract=deps.settings.contract,
         profile=profile,
     )
-    shortlist = [EvaluatedWedge.model_validate(x) for x in agg["shortlist"]]
-    tier = "producer" if profile == "flagship" else "fast"
+    shortlist = agg["shortlist"]
 
-    async def _interrogate(ev: EvaluatedWedge) -> EvaluatedWedge:
-        w = ev.seed
-        base_r = ev.roi
-        cons_r = ev.roi_range.conservative if ev.roi_range else base_r
-        prompt = (
-            f"Wedge ID: {w.wedge_id} | Track: {w.track_id} | Sector: {w.sector} | Horizon: {w.horizon}\n"
-            f"Title: {w.title}\n"
-            f"Delivery Track: {w.delivery_track} | SKU & Localization: {w.recommended_vf_sku_and_localization}\n"
-            f"Chemical Pain Point & IMR Advantage: {w.chemical_pain_point_and_imr_advantage}\n"
-            f"Competing Alternatives: {w.key_competing_alternatives}\n"
-            f"Named CN Customers: {', '.join(w.named_china_benchmark_customers)}\n"
-            f"[ROI-CALC] Baseline: CAPEX=¥{base_r.capex_cny:,.0f}, NetCF=¥{base_r.net_annual_cashflow_cny:,.0f}/yr, "
-            f"Payback={base_r.payback_months}m, 5Y IRR={base_r.irr_5yr_pct}%, 5Y NPV=¥{base_r.npv_5yr_cny:,.0f}\n"
-            f"[ROI-CALC] Conservative: CAPEX=¥{cons_r.capex_cny:,.0f}, Payback={cons_r.payback_months}m\n\n"
-            "Evaluate rigorously across ALL 4 Chinese buyer personas."
+    funnel_cfg = deps.settings.contract.get("discovery_funnel", {}) or {}
+    max_finalists = int(
+        funnel_cfg.get("finalist_shortlist_flagship", 8)
+        if profile == "flagship"
+        else funnel_cfg.get("finalist_shortlist_fast", 5)
+    )
+
+    candidate_cards = []
+    for item in shortlist:
+        s = item["seed"]
+        r = item["roi"]
+        cons = (item.get("roi_range") or {}).get("conservative") or r
+        candidate_cards.append(
+            {
+                "wedge_id": s["wedge_id"],
+                "track_id": s["track_id"],
+                "sector": s["sector"],
+                "horizon": s["horizon"],
+                "delivery_track": s["delivery_track"],
+                "title": s["title"],
+                "china_priority_score": s["china_priority_score"],
+                "vf_moat_score": s["vf_moat_score"],
+                "weighted_pillar_score": item["weighted_pillar_score"],
+                "pain_point": s["chemical_pain_point_and_imr_advantage"],
+                "sku": s["recommended_vf_sku_and_localization"],
+                "roi_baseline": {
+                    "capex_wan": round(r["capex_cny"] / 10000, 1),
+                    "payback_months": r["payback_months"],
+                    "irr_5yr_pct": r["irr_5yr_pct"],
+                    "npv_5yr_wan": round(r["npv_5yr_cny"] / 10000, 1),
+                    "conservative_payback_months": cons["payback_months"],
+                },
+                "evidence_ids": s["evidence_ids"],
+            }
         )
-        async with deps.semaphore:
-            memo = await deps.llm.complete_structured(
-                tier=tier,
-                node=f"storm_{w.wedge_id}",
-                system_prompt=STORM_SYSTEM,
-                user_prompt=prompt,
-                schema=WedgeStormMemo,
-                max_tokens=2800,
-            )
-        memo = memo.model_copy(update={"wedge_id": w.wedge_id})
-        return ev.model_copy(update={"storm_memo": memo})
 
-    interrogated = list(await asyncio.gather(*[_interrogate(e) for e in shortlist]))
-    memos_map = {
-        e.seed.wedge_id: e.storm_memo.model_dump()
-        for e in interrogated
-        if e.storm_memo is not None
-    }
+    prompt = (
+        f"Perform global deduplication, unified 0-100 ranking (top {max_finalists} non-overlapping canonical wedges), "
+        f"and a consolidated 4-persona Chinese buyer resistance matrix across delivery tracks.\n\n"
+        f"=== SURVIVING CANDIDATE WEDGES (WITH DETERMINISTIC [ROI-CALC]) ===\n"
+        f"{json.dumps(candidate_cards, ensure_ascii=False, indent=2)}\n\n"
+        f"=== COMPETITIVE & PAC CONTEXT ===\n"
+        f"{json.dumps({'competitors': agg['competitors'][:12], 'pac_integrators': agg['pac_integrators'], 'barriers': agg['design_institute_barriers']}, ensure_ascii=False, indent=2)}"
+    )
+
+    arbitration = await deps.llm.complete_structured(
+        tier="producer",
+        node="global_portfolio_arbitrator",
+        system_prompt=GLOBAL_PORTFOLIO_ARBITRATOR_SYSTEM,
+        user_prompt=prompt,
+        schema=PortfolioArbitrationOutput,
+        max_tokens=5600,
+    )
+
+    final_wedges = apply_portfolio_arbitration(
+        shortlist, arbitration, max_finalists=max_finalists
+    )
+    arb_dict = arbitration.model_dump()
+    fact_sheet = build_executive_fact_sheet(
+        market_sizing_summary=agg["market_sizing_summary"],
+        evaluated_wedges=final_wedges,
+        eliminated_wedges=agg["eliminated"],
+        arbitration=arb_dict,
+        projects=agg["projects"],
+        competitors=agg["competitors"],
+        pac_integrators=agg["pac_integrators"],
+        design_institute_barriers=agg["design_institute_barriers"],
+    )
 
     return {
         "china_projects_catalog": agg["projects"],
         "competitors_catalog": agg["competitors"],
+        "pac_integrators_catalog": agg["pac_integrators"],
+        "design_institute_barriers": agg["design_institute_barriers"],
         "market_sizing_summary": agg["market_sizing_summary"],
-        "evaluated_wedges": [e.model_dump() for e in interrogated],
+        "evaluated_wedges": final_wedges,
         "eliminated_wedges": agg["eliminated"],
-        "storm_memos": memos_map,
+        "portfolio_arbitration": arb_dict,
+        "executive_fact_sheet": fact_sheet,
         "telemetry_events": [
             {
                 "ts": datetime.now(timezone.utc).isoformat(),
-                "node": "size_screen_and_storm",
-                "shortlist_count": len(interrogated),
+                "node": "size_screen_and_arbitrate",
+                "pre_dedup_shortlist": len(shortlist),
+                "post_dedup_finalists": len(final_wedges),
                 "eliminated_count": len(agg["eliminated"]),
                 "projects_cataloged": len(agg["projects"]),
                 "competitors_cataloged": len(agg["competitors"]),
-            }
-        ],
-    }
-
-
-async def node_swiss_elo_ranker(state: WorkflowState, deps: RuntimeDeps) -> dict[str, Any]:
-    """Stage 4: Swiss-System Pairwise Elo Tournament across shortlisted wedges."""
-    profile = state.get("profile", "flagship")
-    evaluated = [EvaluatedWedge.model_validate(x) for x in state.get("evaluated_wedges", [])]
-    for ev in evaluated:
-        ev.elo_rating = round(1500.0 + (ev.weighted_pillar_score - 75.0) * 4.0, 2)
-
-    rounds = 2 if profile == "flagship" else 1
-    tier = "producer" if profile == "flagship" else "fast"
-    elo_records: list[EloMatchRecord] = []
-
-    def _card(label: str, ev: EvaluatedWedge) -> str:
-        s = ev.seed
-        return (
-            f"[{label}: {s.wedge_id}] {s.title}\n"
-            f"- Sector/Track/Horizon: {s.sector} / {s.delivery_track} / {s.horizon}\n"
-            f"- Priority={s.china_priority_score} | V&F Moat={s.vf_moat_score} | Pillar={ev.weighted_pillar_score}\n"
-            f"- Physics Moat: {s.chemical_pain_point_and_imr_advantage}\n"
-            f"- [ROI-CALC] Baseline CAPEX=¥{ev.roi.capex_cny/10000:.1f}万, "
-            f"Payback={ev.roi.payback_months}m, IRR={ev.roi.irr_5yr_pct}%"
-        )
-
-    for r_idx in range(1, rounds + 1):
-        evaluated.sort(key=lambda x: x.elo_rating, reverse=True)
-        pairs = [(evaluated[i], evaluated[i + 1]) for i in range(0, len(evaluated) - 1, 2)]
-
-        async def _judge(a: EvaluatedWedge, b: EvaluatedWedge):
-            prompt = (
-                f"{_card('Option A', a)}\n\n{_card('Option B', b)}\n\n"
-                f'Pick `winner_id` equal to "{a.seed.wedge_id}" or "{b.seed.wedge_id}".'
-            )
-            async with deps.semaphore:
-                dec = await deps.llm.complete_structured(
-                    tier=tier,
-                    node=f"elo_r{r_idx}",
-                    system_prompt=ELO_PAIRWISE_SYSTEM,
-                    user_prompt=prompt,
-                    schema=EloPairDecision,
-                    max_tokens=700,
-                )
-            return a, b, dec
-
-        outcomes = await asyncio.gather(*[_judge(a, b) for a, b in pairs])
-        for a, b, dec in outcomes:
-            a_won = dec.winner_id.strip() != b.seed.wedge_id
-            w_id = a.seed.wedge_id if a_won else b.seed.wedge_id
-            new_a, new_b = update_elo(a.elo_rating, b.elo_rating, a_won)
-            a.elo_rating, b.elo_rating = new_a, new_b
-            elo_records.append(
-                EloMatchRecord(
-                    round_idx=r_idx,
-                    wedge_a_id=a.seed.wedge_id,
-                    wedge_b_id=b.seed.wedge_id,
-                    winner_id=w_id,
-                    rationale=dec.rationale,
-                    elo_a_after=new_a,
-                    elo_b_after=new_b,
-                )
-            )
-
-    if evaluated:
-        elos = [e.elo_rating for e in evaluated]
-        lo, hi = min(elos), max(elos)
-        span = max(1.0, hi - lo)
-        evaluated.sort(
-            key=lambda e: 0.55 * e.weighted_pillar_score
-            + 0.45 * (60.0 + ((e.elo_rating - lo) / span) * 38.0),
-            reverse=True,
-        )
-        for idx, item in enumerate(evaluated, start=1):
-            item.composite_rank = idx
-
-    return {
-        "evaluated_wedges": [e.model_dump() for e in evaluated],
-        "elo_matches": [m.model_dump() for m in elo_records],
-        "telemetry_events": [
-            {
-                "ts": datetime.now(timezone.utc).isoformat(),
-                "node": "swiss_elo_ranker",
-                "matches_played": len(elo_records),
+                "pac_integrators_cataloged": len(agg["pac_integrators"]),
             }
         ],
     }

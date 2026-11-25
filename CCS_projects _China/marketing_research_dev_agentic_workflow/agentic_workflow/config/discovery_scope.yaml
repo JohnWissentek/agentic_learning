@@ -46,6 +46,10 @@ china_market_sizing_guardrails:
     conservative: 0.70
     baseline: 1.00
     optimistic: 1.35
+  win_rate_multipliers:
+    conservative: 0.75
+    baseline: 1.00
+    optimistic: 1.22
 
 wedge_roi_guardrails:
   S1_pipeline_ship_eor:

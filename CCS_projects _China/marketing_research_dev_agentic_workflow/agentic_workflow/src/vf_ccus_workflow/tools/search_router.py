@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import time
 from typing import Any, Literal
 
@@ -10,6 +11,8 @@ import httpx
 
 from vf_ccus_workflow.config import CostLedger, WorkflowSettings
 from vf_ccus_workflow.schemas import EvidenceSearchHit, GeoScope
+
+logger = logging.getLogger(__name__)
 
 
 class MetasoAPIError(RuntimeError):
@@ -333,6 +336,14 @@ class DualEngineSearchRouter:
                         ok=bool(text),
                     )
                     return text[:8000]
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Jina reader failed for %s (track=%s): %s", url, track_id, exc)
+            self.ledger.record_search(
+                kind="jina_reader",
+                track_id=track_id,
+                query=url,
+                hits=0,
+                latency_ms=int((time.perf_counter() - t1) * 1000),
+                ok=False,
+            )
         return ""
