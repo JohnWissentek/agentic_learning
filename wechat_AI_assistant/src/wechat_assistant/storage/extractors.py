@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import io
+import logging
 import tempfile
 import zipfile
 from pathlib import Path
@@ -12,6 +13,9 @@ from typing import Any
 from docx import Document
 from openpyxl import load_workbook
 from pypdf import PdfReader
+
+logger = logging.getLogger("uvicorn.error")
+_MAX_RAW_READ_BYTES = 25 * 1024 * 1024
 
 _MEDIA_SUFFIXES = {
     ".amr",
@@ -124,7 +128,8 @@ def _extract_zip_pages(p: Path, *, depth: int) -> list[dict[str, Any]]:
         if "encrypted" in str(exc).lower() or "password" in str(exc).lower():
             return [{"page": 1, "text": f"[加密压缩包无法自动提取正文（原件已归档，请补充说明）: {p.name}]"}]
         return [{"page": 1, "text": f"[压缩包暂无法解析（原件已归档）: {p.name}]"}]
-    except Exception:
+    except Exception as exc:
+        logger.warning("ZIP extraction failed for %s: %s", p.name, type(exc).__name__)
         return [{"page": 1, "text": f"[压缩包暂无法解析（原件已归档）: {p.name}]"}]
 
     return pages or [{"page": 1, "text": f"[压缩包内未提取到文本（原件已归档）: {p.name}]"}]
@@ -152,7 +157,8 @@ def extract_document_pages(file_path: str | Path, *, _zip_depth: int = 0) -> lis
                     }
                 ]
             return pages
-        except Exception:
+        except Exception as exc:
+            logger.warning("PDF extraction failed for %s: %s", p.name, type(exc).__name__)
             return [{"page": 1, "text": f"[PDF 暂无法解析正文（原件已归档，请补充说明）: {p.name}]"}]
 
     if suffix == ".docx":
@@ -165,7 +171,8 @@ def extract_document_pages(file_path: str | Path, *, _zip_depth: int = 0) -> lis
                     if any(cells):
                         lines.append(" | ".join(cells))
             return [{"page": 1, "text": "\n".join(lines)}]
-        except Exception:
+        except Exception as exc:
+            logger.warning("DOCX extraction failed for %s: %s", p.name, type(exc).__name__)
             return [{"page": 1, "text": f"[Word 文档暂无法解析正文（可能已加密或格式损坏，原件已归档）: {p.name}]"}]
 
     if suffix in {".xlsx", ".xlsm"}:
@@ -184,7 +191,8 @@ def extract_document_pages(file_path: str | Path, *, _zip_depth: int = 0) -> lis
                 return pages
             finally:
                 wb.close()
-        except Exception:
+        except Exception as exc:
+            logger.warning("Excel extraction failed for %s: %s", p.name, type(exc).__name__)
             return [{"page": 1, "text": f"[Excel 表格暂无法解析正文（可能已加密或格式损坏，原件已归档）: {p.name}]"}]
 
     if suffix == ".zip":
@@ -193,6 +201,15 @@ def extract_document_pages(file_path: str | Path, *, _zip_depth: int = 0) -> lis
     if suffix in _MEDIA_SUFFIXES:
         return [{"page": 1, "text": f"[Media attachment: {p.name}]"}]
 
+    file_size = p.stat().st_size if p.exists() else 0
+    if file_size > _MAX_RAW_READ_BYTES:
+        size_mb = round(file_size / (1024 * 1024), 1)
+        return [
+            {
+                "page": 1,
+                "text": f"[超大附件（{suffix or '未知格式'}，{size_mb} MB，超出自动提取上限），原件已归档，请补充说明]: {p.name}",
+            }
+        ]
     raw_bytes = p.read_bytes()
     if suffix in {".csv", ".tsv"}:
         decoded = _decode_text(raw_bytes)

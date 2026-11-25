@@ -4,15 +4,15 @@
 
 ---
 
-## 总成绩单（2026-11-25 11:35 `/goal` 清库冷启动与盲审闭环最终核验）
+## 总成绩单（2026-11-25 v3.0 Model-First 方法论盲审修订与真模型 E2E 最终核验）
 
 | 维度 | 指标 | 实测结果 |
 | :--- | :--- | :--- |
-| **全仓自动化测试套件** | `uv run pytest -W error::ResourceWarning -v` | ✅ **105 passed, 0 failed**（13.25s，Exit Code `0`，含原有 51 + Slice 1 14 + Slice 2 19 + v2.0 11 + 清库冷启动与盲审修复 10） |
-| **两轮独立盲审隐患清零** | `adversarial-code-auditor` 两轮累计 | ✅ 首轮 6 P0 + 6 P1 + 3 P2 + 二轮 v2.0 盲审 **5 P0 + 8 P1**，**100% 闭环修复** |
-| **黄金样本实弹轨迹体检** | `scripts/replay_golden_traces.py`（`-W error::ResourceWarning`） | ✅ **14/14 全部通过**，0 未关闭数据库连接警告 |
-| **阿里云 `firematrix` 清库冷启动** | 完整热备 + 清空旧测试库 + 保留白名单/游标 + 冷启动 | ✅ `wechat-agent` = **`active`**，`healthz` = **`200 OK`**，生产库 0 脏数据，`COLD_START_DB_SCHEMA_OK=True` |
-| **阿里云直连香港邮箱实弹探针** | `scripts/probe_04_mail_readonly.py`（生产机现场实跑） | ✅ `mail_read` = **`200 OK`**（`john.xu@palmarytech.com`），`sendMail` = **`403 Forbidden`**（物理只读防线） |
+| **全仓自动化测试套件** | `uv run pytest -v --tb=short` | ✅ **125 passed, 0 failed**（Exit Code `0`，含 v3.0 单脑契约 7 条 + **Model-First 盲审 P0/P1 防回归契约 9 条**） |
+| **三轮独立盲审隐患清零** | `adversarial-code-auditor` 三轮累计 | ✅ 首轮 6 P0 + 6 P1 + 3 P2 + 二轮 v2.0 5 P0 + 8 P1 + **三轮 Model-First 方法论盲审 5 P0 + 6 P1**，**100% 闭环修复** |
+| **离线黄金样本轨迹体检** | `scripts/replay_golden_traces.py`（`-W error::ResourceWarning`） | ✅ **14/14 全部通过**，0 未关闭数据库连接警告 |
+| **真实百炼大模型 E2E 实弹** | `scripts/e2e_live_flagship_brain.py`（真实 `qwen3.8-max`） | ✅ **8/8 全部通过**（五彩湾 2 轮、否定句防误改、复合 3 操作 2.68s、相对日期 1.59s、闭卷查档、Outlook 边界注入防御，0 次路由/0 次二审/0 失败） |
+| **阿里云 `firematrix` 生产探针** | `scripts/probe_04_mail_readonly.py`（此前已验） | ✅ `mail_read` = **`200 OK`**，`sendMail` = **`403 Forbidden`**（本次最新修订待同步部署至 `firematrix`） |
 
 ---
 
@@ -28,3 +28,5 @@
 | `05` | [05-阿里云生产部署与端到端实测验收报告.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/05-阿里云生产部署与端到端实测验收报告.md) | 阿里云 `firematrix` 备份、同步、香港 Outlook 实弹探针、重启健康检查与日志清零实证 |
 | `06` | [06-TaskCard-v2扁平任务卡与邮件角色推断TDD记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/06-TaskCard-v2扁平任务卡与邮件角色推断TDD记录.md) | v2.0 扁平单层任务卡、邮件 `From/To/Cc` 角色推断与会话串线、早报 v2.0 与微信快捷口令（11 红 → 95 绿） |
 | `07` | [07-全仓盲审P0P1修复与清库冷启动TDD验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/07-全仓盲审P0P1修复与清库冷启动TDD验收记录.md) | `/goal` 二轮全仓盲审 5 P0 + 8 P1 闭环修复、10 组冷启动与防注入红灯测试（10 红 → 105 绿）及阿里云备份清库冷启动验收 |
+| `08` | [08-v3.0单脑旗舰Agent架构重构TDD验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/08-v3.0单脑旗舰Agent架构重构TDD验收记录.md) | v3.0 单脑旗舰 Agent（Model-First 方案 A）黑盒契约测试（7 红 → 116 绿）、14/14 黄金轨迹与阿里云生产验收 |
+| `09` | [09-v3.0方法论全仓盲审P0P1修复与真模型E2E实弹验收记录.md](file:///Users/john/Desktop/agentic_learning/wechat_AI_assistant/TDD_record/09-v3.0方法论全仓盲审P0P1修复与真模型E2E实弹验收记录.md) | 对照《大模型优先 + 确定性底盘》方法论全仓独立盲审（5 P0 + 6 P1 闭环修复）、9 红 → 125 绿 TDD 及 8/8 真实百炼 `qwen3.8-max` 端到端 E2E 实弹验收 |

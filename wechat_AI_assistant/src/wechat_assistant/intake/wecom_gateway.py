@@ -25,6 +25,7 @@ from wechat_assistant.config import Settings, redact_secrets
 
 
 logger = logging.getLogger("uvicorn.error")
+_MAX_MEDIA_BYTES = 25 * 1024 * 1024
 
 
 def compute_signature(token: str, timestamp: str, nonce: str, msg_encrypt: str) -> str:
@@ -218,8 +219,9 @@ class WeComGateway:
         touser = self.settings.wecom_app_owner_userid or "@all"
         token = await self.get_access_token()
         data: dict[str, Any] = {"errcode": 0}
+        safe_content = redact_secrets(content, self.settings)
         async with httpx.AsyncClient(timeout=15.0) as client:
-            for part in self._split_chunks(content, limit=1800):
+            for part in self._split_chunks(safe_content, limit=1800):
                 for attempt in range(2):
                     resp = await client.post(
                         "https://qyapi.weixin.qq.com/cgi-bin/message/send",
@@ -249,8 +251,9 @@ class WeComGateway:
     async def send_kf_text(self, *, touser: str, open_kfid: str, content: str) -> None:
         token = await self.get_access_token()
         kfid = open_kfid or self.settings.wecom_kf_open_kfid
+        safe_content = redact_secrets(content, self.settings)
         async with httpx.AsyncClient(timeout=15.0) as client:
-            for part in self._split_chunks(content, limit=1800):
+            for part in self._split_chunks(safe_content, limit=1800):
                 resp = await client.post(
                     "https://qyapi.weixin.qq.com/cgi-bin/kf/send_msg",
                     params={"access_token": token},
@@ -261,12 +264,25 @@ class WeComGateway:
                         "text": {"content": part},
                     },
                 )
+                status_code = int(getattr(resp, "status_code", 200) or 200)
                 try:
                     data = resp.json()
-                except Exception:
-                    data = {}
-                if data.get("errcode", 0) != 0:
-                    logger.warning("kf/send_msg errcode=%s, falling back to app push", data.get("errcode"))
+                    if not isinstance(data, dict):
+                        raise ValueError("non-dict JSON")
+                except Exception as exc:
+                    logger.warning(
+                        "kf/send_msg invalid JSON (status=%s, err=%s), falling back to app push",
+                        status_code,
+                        type(exc).__name__,
+                    )
+                    await self.send_app_push(part)
+                    continue
+                if status_code >= 400 or int(data.get("errcode", 0) or 0) != 0:
+                    logger.warning(
+                        "kf/send_msg failed status=%s errcode=%s, falling back to app push",
+                        status_code,
+                        data.get("errcode"),
+                    )
                     await self.send_app_push(part)
 
     @staticmethod
@@ -392,11 +408,28 @@ class WeComGateway:
             return None
         token = await self.get_access_token()
         async with httpx.AsyncClient(timeout=45.0) as client:
-            r = await client.get(
-                "https://qyapi.weixin.qq.com/cgi-bin/media/get",
-                params={"access_token": token, "media_id": media_id},
-            )
-            if r.headers.get("content-type", "").startswith("application/json"):
+            r = None
+            for attempt in range(2):
+                r = await client.get(
+                    "https://qyapi.weixin.qq.com/cgi-bin/media/get",
+                    params={"access_token": token, "media_id": media_id},
+                )
+                if r.headers.get("content-type", "").startswith("application/json"):
+                    try:
+                        err_data = r.json()
+                        errcode = int(err_data.get("errcode", 0) or 0)
+                    except Exception:
+                        errcode = -1
+                    if errcode in (40014, 42001) and attempt == 0:
+                        logger.warning("WeCom media/get token expired (errcode=%s), refreshing", errcode)
+                        await self.invalidate_access_token()
+                        token = await self.get_access_token()
+                        continue
+                    logger.warning("WeCom media/get failed for media_id=%s errcode=%s", media_id[:16], errcode)
+                    return None
+                break
+            if r is None or len(r.content) > _MAX_MEDIA_BYTES:
+                logger.warning("WeCom media/get exceeded max size (%s bytes) or empty", len(r.content) if r else 0)
                 return None
             disp = r.headers.get("content-disposition", "")
             m = re.search(r'filename="?([^";]+)"?', disp)
@@ -593,14 +626,23 @@ class WeComGateway:
         if cursor:
             req_body["cursor"] = cursor
 
+        res: dict[str, Any] = {}
         async with httpx.AsyncClient(timeout=20.0) as client:
-            res = (
-                await client.post(
+            for attempt in range(2):
+                resp = await client.post(
                     "https://qyapi.weixin.qq.com/cgi-bin/kf/sync_msg",
                     params={"access_token": token},
                     json=req_body,
                 )
-            ).json()
+                resp.raise_for_status()
+                res = resp.json()
+                errcode = int(res.get("errcode", 0) or 0)
+                if errcode in (40014, 42001) and attempt == 0:
+                    logger.warning("WeCom kf/sync_msg token expired (errcode=%s), refreshing", errcode)
+                    await self.invalidate_access_token()
+                    token = await self.get_access_token()
+                    continue
+                break
 
         if res.get("errcode", 0) != 0:
             logger.warning("WeCom kf/sync_msg failed: errcode=%s", res.get("errcode"))

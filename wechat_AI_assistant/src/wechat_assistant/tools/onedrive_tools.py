@@ -13,7 +13,7 @@ import httpx
 import msal
 import requests
 
-from wechat_assistant.config import Settings
+from wechat_assistant.config import Settings, today_local
 from wechat_assistant.schemas import ListType
 from wechat_assistant.storage.db import Database
 
@@ -70,7 +70,8 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
             except ValueError:
                 span_col = "已完成"
         deliv = (it.get("deliverable") or "").strip()
-        title_cell = f"{it['title']}" + (f"<br>成果：{deliv}" if deliv and deliv != it["title"] else "")
+        src_lbl = {"outlook": "Outlook", "web": "驾驶舱"}.get(str(it.get("source_channel") or "wechat").lower(), "微信")
+        title_cell = f"[{src_lbl}] {it['title']}" + (f"<br>成果：{deliv}" if deliv and deliv != it["title"] else "")
         role_cell = f"{it['owner']} / {it.get('assignee') or it['owner']} / {it.get('external_partner') or '无'}"
         lines_01.append(
             f"| {it['id']} | **{it['priority']}** | {status_icon} | {title_cell} | {it['project_name']}（{it['work_domain']}） | {role_cell} | {span} | {span_col} |"
@@ -123,7 +124,7 @@ def render_lists_markdown(db: Database) -> dict[str, str]:
         try:
             from datetime import date as _d
             w_s = _d.fromisoformat((it["planned_start_at"] or it["created_at"])[:10])
-            w_days = max(0, (_d.today() - w_s).days)
+            w_days = max(0, (today_local() - w_s).days)
         except ValueError:
             w_days = 0
         lines_04.append(

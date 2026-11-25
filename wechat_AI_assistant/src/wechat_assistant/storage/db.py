@@ -12,15 +12,16 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from wechat_assistant.config import now_local, today_local
 from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel, TaskTimelineUpdate
 
 
 def _now_str() -> str:
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return now_local().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def _today_str() -> str:
-    return date.today().isoformat()
+    return today_local().isoformat()
 
 
 def _parse_iso_date(val: str | None) -> date | None:
@@ -61,7 +62,7 @@ def compute_priority_score(priority: str, planned_end_at: str | None, list_type:
     base = {"P0": 100.0, "P1": 60.0, "P2": 20.0}.get(priority, 40.0)
     due = _parse_iso_date(planned_end_at)
     if due is not None:
-        days_left = (due - date.today()).days
+        days_left = (due - today_local()).days
         if days_left <= 0:
             base += 40.0
         elif days_left <= 2:
@@ -148,6 +149,7 @@ class Database:
                     external_partner TEXT DEFAULT '无',
                     chairman_role TEXT DEFAULT 'owner',
                     blocker_note TEXT DEFAULT '',
+                    source_channel TEXT DEFAULT 'wechat',
                     planned_start_at TEXT DEFAULT '',
                     planned_end_at TEXT DEFAULT '',
                     actual_start_at TEXT DEFAULT '',
@@ -316,6 +318,7 @@ class Database:
                 ("ceo_evaluation", "TEXT DEFAULT '[]'"),
                 ("mail_conversation_ids", "TEXT DEFAULT '[]'"),
                 ("missing_required_fields", "TEXT DEFAULT '[]'"),
+                ("source_channel", "TEXT DEFAULT 'wechat'"),
             )
             for col_name, col_def in v2_migrations:
                 if col_name not in existing_cols:
@@ -618,6 +621,7 @@ class Database:
         item.setdefault("external_partner", "无")
         item.setdefault("chairman_role", "owner")
         item.setdefault("blocker_note", "")
+        item["source_channel"] = (str(item.get("source_channel") or "").strip().lower() or "wechat")
         if timeline is not None:
             item["timeline"] = timeline
         return item
@@ -897,12 +901,12 @@ class Database:
                     INSERT INTO list_items (
                         list_type, project_id, project_name, work_domain, title,
                         deliverable, acceptance_criteria, milestone_stage,
-                        owner, assignee, external_partner, chairman_role, blocker_note,
+                        owner, assignee, external_partner, chairman_role, blocker_note, source_channel,
                         planned_start_at, planned_end_at, estimated_hours, priority, priority_score,
                         status, stage, source_ids_json, onedrive_doc_paths_json,
                         comments, ceo_evaluation, mail_conversation_ids, missing_required_fields,
                         created_at, updated_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'todo', ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'todo', ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         act.list_type.value,
@@ -918,6 +922,7 @@ class Database:
                         act.external_partner or "无",
                         act.chairman_role,
                         act.blocker_note,
+                        (act.source_channel or "wechat"),
                         act.planned_start_at,
                         act.planned_end_at,
                         round(float(act.estimated_hours), 2),
@@ -1093,7 +1098,7 @@ class Database:
                 return False, "当前没有可撤销的近期落盘记录。"
 
             created_dt = datetime.fromisoformat(str(row["created_at"]).strip())
-            if datetime.now() - created_dt > timedelta(hours=max_age_hours):
+            if now_local().replace(tzinfo=None) - created_dt > timedelta(hours=max_age_hours):
                 return False, f"最近一次操作已超过 {max_age_hours} 小时撤销窗口。"
 
             snap = _safe_json_dict(row["snapshot_json"])
@@ -1253,10 +1258,18 @@ class Database:
 
     def upsert_episode_summary(self, thread_id: str, summary_text: str, last_turn_id: int) -> None:
         now = _now_str()
+        target_id = int(last_turn_id)
         with self._lock, self._connect() as conn:
+            cur = conn.execute(
+                "SELECT MAX(last_turn_id) AS max_id FROM episode_summaries WHERE thread_id = ?",
+                (thread_id,),
+            ).fetchone()
+            existing_max = int(cur["max_id"]) if cur and cur["max_id"] is not None else 0
+            if target_id < existing_max:
+                return  # Monotonic optimistic lock: never let stale background write overwrite newer summary
             conn.execute(
                 "INSERT INTO episode_summaries (thread_id, summary_text, last_turn_id, updated_at) VALUES (?, ?, ?, ?)",
-                (thread_id, summary_text.strip()[:1200], int(last_turn_id), now),
+                (thread_id, summary_text.strip()[:1200], target_id, now),
             )
 
     def get_turns_since(self, thread_id: str = "owner", after_id: int = 0, limit: int = 30) -> list[dict[str, Any]]:
@@ -1374,9 +1387,9 @@ class Database:
                     _parse_iso_date(row["actual_start_at"])
                     or _parse_iso_date(row["planned_start_at"])
                     or _parse_iso_date(row["created_at"])
-                    or date.today()
+                    or today_local()
                 )
-                end_d = _parse_iso_date(row["actual_end_at"]) or date.today()
+                end_d = _parse_iso_date(row["actual_end_at"]) or today_local()
                 out = self._hydrate_item_row(row)
                 out["actual_span_days"] = max(1, (end_d - start_d).days + 1)
                 out["already_done"] = True
@@ -1384,8 +1397,8 @@ class Database:
 
             hours = round(float(actual_hours if actual_hours is not None else row["estimated_hours"]), 2)
             start_str = row["actual_start_at"] or now
-            start_d = _parse_iso_date(row["actual_start_at"]) or _parse_iso_date(row["planned_start_at"]) or _parse_iso_date(row["created_at"]) or date.today()
-            span_days = max(1, (date.today() - start_d).days + 1)
+            start_d = _parse_iso_date(row["actual_start_at"]) or _parse_iso_date(row["planned_start_at"]) or _parse_iso_date(row["created_at"]) or today_local()
+            span_days = max(1, (today_local() - start_d).days + 1)
             conn.execute(
                 """
                 UPDATE list_items
@@ -1409,7 +1422,7 @@ class Database:
                 """,
                 (
                     json.dumps([row["work_domain"], row["project_name"]], ensure_ascii=False),
-                    f"同类事项「{row['title'][:40]}」实际完成跨度 {span_days} 天（{start_d.isoformat()} ~ {date.today().isoformat()}）",
+                    f"同类事项「{row['title'][:40]}」实际完成跨度 {span_days} 天（{start_d.isoformat()} ~ {today_local().isoformat()}）",
                     float(span_days),
                     now,
                 ),
@@ -1432,6 +1445,7 @@ class Database:
             "external_partner",
             "chairman_role",
             "blocker_note",
+            "source_channel",
             "planned_start_at",
             "planned_end_at",
             "estimated_hours",
@@ -1567,7 +1581,7 @@ class Database:
         daily_capacity: float = 6.0,
     ) -> dict[str, Any]:
         """Calculate daily net effort hours booked without counting external wait days."""
-        base = _parse_iso_date(start_date) or date.today()
+        base = _parse_iso_date(start_date) or today_local()
         buckets: dict[str, dict[str, Any]] = {}
         for offset in range(days):
             d_str = (base + timedelta(days=offset)).isoformat()
@@ -1656,7 +1670,7 @@ class Database:
         workload = self.get_daily_workload(days=14, daily_capacity=daily_capacity)
         domains = self.get_domain_analytics()
         waiting = [i for i in items if i["list_type"] == ListType.WAITING_FOR.value and i["status"] != "done"]
-        today = date.today()
+        today = today_local()
         done_spans: list[int] = []
         for it in items:
             it["timeline"] = self.get_task_timeline(int(it["id"]))

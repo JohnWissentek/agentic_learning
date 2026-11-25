@@ -88,11 +88,11 @@ def test_cockpit_permanent_url_shortcut(tmp_path):
         magic_link_factory=lambda: "https://assistant.fire-matrix.com/",
     )
     res = eng.handle_incoming_turn("看板")
-    assert "node:guardrail_router" in res["trajectory"]
-    assert "node:direct_reply" in res["trajectory"]
-    assert "tool:operational_override=open_cockpit" in res["trajectory"]
+    assert "node:context_intake" in res["trajectory"]
+    assert "exec:open_cockpit" in res["trajectory"]
+    assert "tool:emergency_button=open_cockpit" in res["trajectory"]
     assert "https://assistant.fire-matrix.com/" in res["reply_text"]
-    assert db.count_model_calls() == 1
+    assert db.count_model_calls() == 0
     eng.close()
 
 
@@ -122,7 +122,7 @@ def test_critic_rejects_conflated_waiting_hours_and_fabricated_numbers(tmp_path)
         tool_outputs_text="",
     )
     assert any("净工时误填为 80.0h" in i for i in issues)
-    assert any("999999" in i for i in issues)
+    assert any("个人净工时 80.0h 过大" in i for i in issues)
 
 
 def test_bounded_reflection_loop_revises_rejected_proposal(tmp_path):
@@ -161,7 +161,7 @@ def test_bounded_reflection_loop_revises_rejected_proposal(tmp_path):
     eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=gw)
     res = eng.handle_incoming_turn("供应商打样10天，验收只需我0.5小时", external_msg_id="loop_1")
     assert producer_attempts["n"] == 2
-    assert "critic:deterministic_reject" in res["trajectory"]
+    assert "guard:objective_reject" in res["trajectory"]
     assert "0.5h" in res["reply_text"]
     eng.close()
 
@@ -182,11 +182,21 @@ def test_hitl_restart_recovery_checkin_and_undo(tmp_path):
     od = _DummyOneDrive()
 
     def handler(kwargs, call_idx):
-        model = kwargs["model"]
-        if model == "qwen3.8-flash":
-            return json.dumps({"intent": "work_triage", "confidence": 0.95, "needs_deep_research": False, "summary": "合同审阅"})
-        if model == "qwen3.8-max":
+        user_msg = kwargs["messages"][-1]["content"] if kwargs.get("messages") else ""
+        latest = user_msg.split("【本次最新输入】")[-1].strip()
+        if latest == "开始 1":
             return json.dumps({
+                "mode": "direct_ops",
+                "status_changes": [{"task_id": 1, "action": "start"}],
+            })
+        if latest.startswith("完成 1"):
+            return json.dumps({
+                "mode": "direct_ops",
+                "status_changes": [{"task_id": 1, "action": "complete", "actual_hours": 2.0}],
+            })
+        return json.dumps({
+            "mode": "propose",
+            "proposal": {
                 "headline": "审阅帕莫瑞合同",
                 "executive_summary": "审阅合同预计净投入 1.5h，周五前完成。",
                 "actions": [{
@@ -203,8 +213,8 @@ def test_hitl_restart_recovery_checkin_and_undo(tmp_path):
                 }],
                 "referenced_numbers": ["1.5"],
                 "citations": [],
-            })
-        return json.dumps({"passed": True, "numeric_fidelity_ok": True, "schedule_reasonable": True, "issues": [], "fix_instructions": ""})
+            },
+        })
 
     gw = DashScopeLLMGateway(settings, client=SimpleNamespace(chat=SimpleNamespace(completions=_ScriptedCompletions(handler))))
     eng1 = ChiefOfStaffEngine(settings=settings, db=db, gateway=gw, onedrive=od, checkpoints_path=tmp_path / "ckpt.db")
@@ -218,7 +228,7 @@ def test_hitl_restart_recovery_checkin_and_undo(tmp_path):
     eng2 = ChiefOfStaffEngine(settings=settings, db=db2, gateway=gw, onedrive=od, checkpoints_path=tmp_path / "ckpt.db")
     commit_res = eng2.handle_incoming_turn("1")
     assert "已确认落盘" in commit_res["reply_text"]
-    assert db2.count_model_calls() == calls_before + 1  # confirm now passes through the router once
+    assert db2.count_model_calls() == calls_before  # exact "1" button executes with 0 LLM calls
     assert "审阅帕莫瑞技术合同" in od.synced_boards["01_今日与行动待办.md"]
 
     # Check-in start & complete
@@ -251,13 +261,16 @@ def test_grounded_qa_with_page_citation_and_honest_refusal(tmp_path):
     )
 
     def handler(kwargs, _idx):
-        model = kwargs["model"]
-        if model == "qwen3.8-flash":
-            return json.dumps({"intent": "quick_query", "confidence": 0.99, "needs_deep_research": False, "summary": "查参数"})
+        user_msg = kwargs["messages"][-1]["content"]
+        if "火星基地" in user_msg:
+            return json.dumps({
+                "mode": "reply",
+                "reply_text": "未查到相关历史记录或文档依据（为保障准确率，绝不凭猜测作答）。",
+            })
+        assert "0.0095" in user_msg
         return json.dumps({
-            "found": True,
-            "answer": "根据 Calibration_Spec_2026.pdf 第 4 页，补偿系数已调整为 0.0095。",
-            "citations": ["Calibration_Spec_2026.pdf 第 4 页"],
+            "mode": "reply",
+            "reply_text": "根据 Calibration_Spec_2026.pdf 第 4 页，补偿系数已调整为 0.0095。",
         })
 
     gw = DashScopeLLMGateway(settings, client=SimpleNamespace(chat=SimpleNamespace(completions=_ScriptedCompletions(handler))))
@@ -493,62 +506,26 @@ def test_continuous_multi_turn_qa_revision_and_natural_confirm(tmp_path):
     settings = _make_settings(tmp_path)
     db = Database(tmp_path / "app.db")
     od = _DummyOneDrive()
-    router_prompts: list[str] = []
+    brain_prompts: list[str] = []
 
     def handler(kwargs, _idx):
-        model = kwargs["model"]
-        user_msg = kwargs["messages"][-2]["content"]
-        if model == "qwen3.8-flash":
-            router_prompts.append(user_msg)
-            latest_msg = user_msg.split("【用户最新输入】")[-1]
-            if "为什么排明天" in latest_msg:
-                return json.dumps({
-                    "intent": "quick_query",
-                    "confidence": 0.96,
-                    "needs_deep_research": False,
-                    "resolved_intent_text": "为什么待确认卡片排在明天而不是今天",
-                    "search_queries": ["帕莫瑞评审"],
-                    "summary": "追问排期依据",
-                })
-            if "0.5小时就行" in latest_msg:
-                return json.dumps({
-                    "intent": "revise_pending",
-                    "confidence": 0.96,
-                    "needs_deep_research": False,
-                    "resolved_intent_text": "将待确认卡片改期为下周五 2026-11-27，预计净工时 0.5h",
-                    "search_queries": [],
-                    "summary": "自然语言修改待确认卡",
-                })
-            if "按这个落盘" in latest_msg:
-                return json.dumps({
-                    "intent": "confirm_pending",
-                    "confidence": 0.98,
-                    "needs_deep_research": False,
-                    "resolved_intent_text": "确认提交当前待确认卡片 #2 落盘",
-                    "search_queries": [],
-                    "summary": "自然语言确认落盘",
-                })
+        user_msg = kwargs["messages"][-1]["content"]
+        brain_prompts.append(user_msg)
+        latest_msg = user_msg.split("【本次最新输入】")[-1]
+        if "为什么排明天" in latest_msg:
+            assert "待确认卡片 #1" in user_msg
             return json.dumps({
-                "intent": "work_triage",
-                "confidence": 0.95,
-                "needs_deep_research": False,
-                "resolved_intent_text": "安排帕莫瑞客户方案评审，预计1.5h",
-                "search_queries": ["帕莫瑞"],
-                "summary": "新建分拣提案",
+                "mode": "reply",
+                "reply_text": "待确认卡片 #1 当前排在明天 2026-11-18，净工时 1.5h。",
             })
-
-        if model == "qwen3.8-max":
-            if "问题：" in user_msg:
-                assert "待确认卡片 #1" in user_msg
-                return json.dumps({
-                    "found": True,
-                    "answer": "待确认卡片 #1 当前排在明天 2026-11-18，净工时 1.5h。",
-                    "citations": ["待确认卡片 #1"],
-                })
-            is_revised = "0.5h" in user_msg or "2026-11-27" in user_msg
-            hrs = 0.5 if is_revised else 1.5
-            end_d = "2026-11-27" if is_revised else "2026-11-18"
-            return json.dumps({
+        if "按这个落盘" in latest_msg:
+            return json.dumps({"mode": "confirm_pending"})
+        is_revised = "0.5小时就行" in latest_msg or "2026-11-27" in latest_msg
+        hrs = 0.5 if is_revised else 1.5
+        end_d = "2026-11-27" if is_revised else "2026-11-18"
+        return json.dumps({
+            "mode": "propose",
+            "proposal": {
                 "headline": "帕莫瑞评审（调整版）" if is_revised else "帕莫瑞方案评审",
                 "executive_summary": f"已按净工时 {hrs}h 排期至 {end_d}。",
                 "actions": [{
@@ -565,9 +542,8 @@ def test_continuous_multi_turn_qa_revision_and_natural_confirm(tmp_path):
                 }],
                 "referenced_numbers": [str(hrs)],
                 "citations": [],
-            })
-
-        return json.dumps({"passed": True, "numeric_fidelity_ok": True, "schedule_reasonable": True, "issues": [], "fix_instructions": ""})
+            },
+        })
 
     gw = DashScopeLLMGateway(settings, client=SimpleNamespace(chat=SimpleNamespace(completions=_ScriptedCompletions(handler))))
     eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=gw, onedrive=od)
@@ -579,7 +555,7 @@ def test_continuous_multi_turn_qa_revision_and_natural_confirm(tmp_path):
     r2 = eng.handle_incoming_turn("为什么排明天？", external_msg_id="mt_2")
     assert "待确认卡片 #1" in r2["reply_text"]
     assert db.get_latest_pending_proposal("owner")["id"] == 1
-    assert "明天安排帕莫瑞方案评审" in router_prompts[-1]
+    assert "明天安排帕莫瑞方案评审" in brain_prompts[-1]
 
     # Natural revision without literal "改：" prefix
     r3 = eng.handle_incoming_turn("改成下周五，0.5小时就行", external_msg_id="mt_3")
@@ -623,7 +599,7 @@ def test_discontinuous_long_horizon_context_recall(tmp_path):
 
     def handler(kwargs, _idx):
         model = kwargs["model"]
-        user_msg = kwargs["messages"][-2]["content"]
+        user_msg = kwargs["messages"][-1]["content"]
         if model == "qwen3.8-flash":
             return json.dumps({
                 "intent": "quick_query",
@@ -726,39 +702,26 @@ def test_market_research_task_does_not_auto_search(tmp_path):
     """PMO/secretary mode logs market-research tasks without triggering external web search."""
     class _ForceResearchFlagGateway:
         def generate_structured(self, tier, messages, schema_cls, **kwargs):
-            name = schema_cls.__name__
-            if name == "IntentRoute":
-                # Even if an LLM sets needs_deep_research=True on a PMO task, code guard must block it
-                obj = schema_cls(
-                    intent="work_triage",
-                    confidence=0.95,
-                    summary="记录市场调研任务",
-                    resolved_intent_text="下月底前完成华东市场调研，下周约王经理开会并联系张总",
-                    needs_deep_research=True,
-                    search_queries=["华东市场调研"],
-                )
-            elif name == "TriageProposal":
-                from wechat_assistant.schemas import ActionMutation
-                obj = schema_cls(
-                    headline="记录华东市场调研与会议安排",
-                    executive_summary="记录市场调研项目、会议及干系人跟踪",
-                    project_name="华东市场调研",
-                    work_domain="客户销售",
-                    actions=[
-                        ActionMutation(
-                            title="与王经理开启动碰头会并联系张总调研需求",
-                            list_type="project_action",
-                            project_name="华东市场调研",
-                            work_domain="客户销售",
-                            owner="董事长",
-                            planned_start_at="2026-11-18",
-                            planned_end_at="2026-11-25",
-                            priority="P1",
-                        )
-                    ],
-                )
-            else:
-                obj = schema_cls(passed=True, numeric_fidelity_ok=True, schedule_reasonable=True)
+            from wechat_assistant.schemas import ActionMutation, TriageProposal
+            proposal = TriageProposal(
+                headline="记录华东市场调研与会议安排",
+                executive_summary="记录市场调研项目、会议及干系人跟踪",
+                project_name="华东市场调研",
+                work_domain="客户销售",
+                actions=[
+                    ActionMutation(
+                        title="与王经理开启动碰头会并联系张总调研需求",
+                        list_type="project_action",
+                        project_name="华东市场调研",
+                        work_domain="客户销售",
+                        owner="董事长",
+                        planned_start_at="2026-11-18",
+                        planned_end_at="2026-11-25",
+                        priority="P1",
+                    )
+                ],
+            )
+            obj = schema_cls(mode="propose", proposal=proposal)
             rec = SimpleNamespace(
                 tier=tier,
                 model=tier,
@@ -778,7 +741,7 @@ def test_market_research_task_does_not_auto_search(tmp_path):
         external_msg_id="pmo_no_search_1",
     )
     assert "tool:search_public_tech_intel" not in res["trajectory"]
-    assert "node:hitl_preview_gate" in res["trajectory"]
+    assert "exec:hitl_preview" in res["trajectory"]
 
 
 def test_evening_digest_checkin_and_batch_progress_update(tmp_path):
@@ -788,11 +751,14 @@ def test_evening_digest_checkin_and_batch_progress_update(tmp_path):
 
     class _BatchMutateGateway:
         def generate_structured(self, tier, messages, schema_cls, **kwargs):
+            from wechat_assistant.schemas import TaskStatusChange
+
             obj = schema_cls(
-                intent="mutate_existing_item",
-                confidence=0.95,
-                summary="批量刷新进度",
-                resolved_intent_text="#1 做完了，#2 开始了",
+                mode="direct_ops",
+                status_changes=[
+                    TaskStatusChange(task_id=1, action="complete"),
+                    TaskStatusChange(task_id=2, action="start"),
+                ],
             )
             rec = SimpleNamespace(
                 tier=tier,
@@ -965,11 +931,8 @@ def test_clarify_or_unsupported_and_graceful_error_recovery(tmp_path):
     class _LowConfGateway:
         def generate_structured(self, tier, messages, schema_cls, **kwargs):
             obj = schema_cls(
-                intent="work_triage",
-                confidence=0.40,
-                summary="意图模糊",
-                resolved_intent_text="帮我订张明天去上海的机票",
-                clarify_question="我主要负责待办、项目与档案管理，暂不支持代订机票。",
+                mode="reply",
+                reply_text="我主要负责待办、项目与档案管理，暂不支持代订机票。",
             )
             rec = SimpleNamespace(
                 tier=tier,
@@ -986,7 +949,7 @@ def test_clarify_or_unsupported_and_graceful_error_recovery(tmp_path):
     db = Database(tmp_path / "app.db")
     eng = ChiefOfStaffEngine(settings=settings, db=db, gateway=_LowConfGateway())
     res = eng.handle_incoming_turn("帮我订张明天去上海的机票", external_msg_id="clarify_1")
-    assert "node:clarify_or_unsupported" in res["trajectory"]
+    assert "exec:reply" in res["trajectory"]
     assert "暂不支持代订机票" in res["reply_text"]
     assert len(db.list_items(include_done=True)) == 0
 

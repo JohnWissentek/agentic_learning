@@ -982,7 +982,7 @@ def test_decision_card_strips_duplicate_confirm_prefix_and_renders_v2_sections()
 
 
 def test_wechat_shortcuts_append_ceo_evaluation_comment_progress_and_view_timeline(tmp_path: Path) -> None:
-    """[正常+禁令] 路由模型 503 宕机时，微信快捷口令（评价/备注/进展/查沟通记录）仍 0 模型调用准确分流落库与查询。"""
+    """[正常+禁令] Model-First 旗舰单脑准确分流 CEO 评价/补充备注/进展时间轴与查询，且评价与备注严格字段隔离。"""
     settings = _make_settings(tmp_path)
     db = Database(tmp_path / "app.db")
 
@@ -1007,11 +1007,26 @@ def test_wechat_shortcuts_append_ceo_evaluation_comment_progress_and_view_timeli
     )
     assert seed["inserted_item_ids"] == [1]
 
-    # Simulate router & all LLM endpoints returning 503 outage
-    def broken_llm(kwargs: dict[str, Any], _idx: int) -> str:
-        raise RuntimeError("503")
+    def flagship_llm(kwargs: dict[str, Any], _idx: int) -> str:
+        latest = kwargs["messages"][-1]["content"].split("【本次最新输入】")[-1].strip()
+        if "评价" in latest:
+            return json.dumps({
+                "mode": "direct_ops",
+                "note_appends": [{"task_id": 1, "kind": "ceo_evaluation", "content": "王楠推进偏慢，本周必须发出点表"}],
+            })
+        if "备注" in latest:
+            return json.dumps({
+                "mode": "direct_ops",
+                "note_appends": [{"task_id": 1, "kind": "comment", "content": "现场同意简化为点表+逻辑描述"}],
+            })
+        if "进展" in latest:
+            return json.dumps({
+                "mode": "direct_ops",
+                "note_appends": [{"task_id": 1, "kind": "progress", "content": "已发点表给韩工等签字"}],
+            })
+        return json.dumps({"mode": "direct_ops", "view_timeline_ids": [1]})
 
-    completions = _ScriptedCompletions(broken_llm)
+    completions = _ScriptedCompletions(flagship_llm)
     gw = DashScopeLLMGateway(settings, client=SimpleNamespace(chat=SimpleNamespace(completions=completions)))
     engine = ChiefOfStaffEngine(
         settings=settings,
@@ -1060,8 +1075,8 @@ def test_wechat_shortcuts_append_ceo_evaluation_comment_progress_and_view_timeli
         )
         assert "已发点表给韩工等签字" in res_view["reply_text"]
 
-        # Invariant: ZERO LLM calls across all 4 shortcuts
-        assert len(completions.calls) == 0
+        # Model-First invariant: all 4 routed cleanly through producer_model (0 fast/critic calls)
+        assert [c["model"] for c in completions.calls] == [settings.producer_model] * 4
     finally:
         engine.close()
 

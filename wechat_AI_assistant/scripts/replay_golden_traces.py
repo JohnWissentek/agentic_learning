@@ -127,14 +127,14 @@ def run_all_golden_samples() -> list[dict[str, str]]:
     with tempfile.TemporaryDirectory() as td:
         base = Path(td)
 
-        # G01: WeCom shortcut "看板" (even if router fails!)
+        # G01: WeCom shortcut "看板" (even if flagship LLM fails!)
         def router_down(kw, _i):
             raise RuntimeError("DashScope 503 outage")
 
         eng1, _, _, _ = _mk_engine(base / "g01", router_down)
         r = eng1.handle_incoming_turn("看板")
-        ok = "https://assistant.fire-matrix.com/" in r["reply_text"] and "node:direct_reply" in r["trajectory"]
-        rec("G01", "企微对话", "路由模型宕机时发「看板」", " -> ".join(r["trajectory"]), "直出驾驶舱链接，零报错", ok)
+        ok = "https://assistant.fire-matrix.com/" in r["reply_text"] and "exec:open_cockpit" in r["trajectory"]
+        rec("G01", "企微对话", "大模型宕机时发「看板」", " -> ".join(r["trajectory"]), "0模型直出驾驶舱链接，零报错", ok)
         eng1.close()
 
         # G02: Empty/whitespace WeCom message -> 0 LLM calls
@@ -174,11 +174,18 @@ def run_all_golden_samples() -> list[dict[str, str]]:
 
         # G05: Pure PMO delegation to 张工 -> card displays owner + confirm -> OneDrive 503 resilience
         def pmo_llm(kw, _i):
-            m = kw["model"]
-            if m == "qwen3.8-flash":
-                return json.dumps({"intent": "work_triage", "confidence": 0.96, "summary": "交办张工测算V&F关税"})
-            if m == "qwen3.8-max":
+            latest = kw["messages"][-1]["content"].split("【本次最新输入】")[-1].strip()
+            if "#1 做完了" in latest:
                 return json.dumps({
+                    "mode": "direct_ops",
+                    "status_changes": [
+                        {"task_id": 1, "action": "complete"},
+                        {"task_id": 999, "action": "start"},
+                    ],
+                })
+            return json.dumps({
+                "mode": "propose",
+                "proposal": {
                     "headline": "交办张工核算 V&F 关税方案",
                     "executive_summary": "安排张工于周五前完成 V&F 进口关税测算并回报。",
                     "actions": [{
@@ -195,14 +202,14 @@ def run_all_golden_samples() -> list[dict[str, str]]:
                     }],
                     "referenced_numbers": [],
                     "citations": [],
-                })
-            return json.dumps({"passed": True, "numeric_fidelity_ok": True, "schedule_reasonable": True, "issues": [], "fix_instructions": ""})
+                },
+            })
 
         od5 = _StubOneDrive(fail_sync=True)
-        eng5, db5, _, _ = _mk_engine(base / "g05", pmo_llm, od=od5)
+        eng5, db5, llm5, _ = _mk_engine(base / "g05", pmo_llm, od=od5)
         r5a = eng5.handle_incoming_turn("让张工周五前把 V&F 进口关税测算出来发我")
-        ok5a = r5a["proposal_id"] is not None and "负责人：张工" in r5a["reply_text"]
-        rec("G05", "PMO 交办", "「让张工周五前把 V&F 关税算出来」", " -> ".join(r5a["trajectory"]), f"出卡 #{r5a['proposal_id']}，清晰标注责任人=张工", ok5a)
+        ok5a = r5a["proposal_id"] is not None and "负责人：张工" in r5a["reply_text"] and llm5.calls == ["qwen3.8-max"]
+        rec("G05", "PMO 交办", "「让张工周五前把 V&F 关税算出来」", " -> ".join(r5a["trajectory"]), f"单脑1次调用出卡 #{r5a['proposal_id']}，清晰标注责任人=张工", ok5a)
 
         # G06: Confirm card #1 under OneDrive 503 outage -> SQLite commits truthfully + double confirm blocked
         r5b = eng5.handle_incoming_turn("1")
@@ -221,13 +228,11 @@ def run_all_golden_samples() -> list[dict[str, str]]:
         rec("G08", "安全撤销", "24 小时内回复「撤销」", " -> ".join(r8["trajectory"]), "完整回滚至 0 条记录并提示云端稍后同步", ok8)
         eng5.close()
 
-        # G09: Critic 2-loop cap with reversed date -> explicit warning on card
+        # G09: Objective guard 2-loop cap with reversed date -> explicit warning on card (0 second critic LLM)
         def bad_date_llm(kw, _i):
-            m = kw["model"]
-            if m == "qwen3.8-flash":
-                return json.dumps({"intent": "work_triage", "confidence": 0.95, "summary": "排期"})
-            if m == "qwen3.8-max":
-                return json.dumps({
+            return json.dumps({
+                "mode": "propose",
+                "proposal": {
                     "headline": "倒挂日期异常测试",
                     "executive_summary": "测试模型持续输出倒挂日期的熔断告警。",
                     "actions": [{
@@ -244,13 +249,18 @@ def run_all_golden_samples() -> list[dict[str, str]]:
                     }],
                     "referenced_numbers": [],
                     "citations": [],
-                })
-            return json.dumps({"passed": True, "numeric_fidelity_ok": True, "schedule_reasonable": True, "issues": [], "fix_instructions": ""})
+                },
+            })
 
-        eng9, _, _, _ = _mk_engine(base / "g09", bad_date_llm)
+        eng9, _, llm9, _ = _mk_engine(base / "g09", bad_date_llm)
         r9 = eng9.handle_incoming_turn("安排帕莫瑞测试")
-        ok9 = "审计待人工复核点" in r9["reply_text"] and "早于开始日期" in r9["reply_text"] and r9["trajectory"].count("critic:deterministic_reject") == 2
-        rec("G09", "异构审计", "模型连续 2 轮输出倒挂日期", "drafter->critic(x2)->hitl_preview_gate", "2 轮硬熔断 + 卡片红字暴露人工复核点", ok9)
+        ok9 = (
+            "审计待人工复核点" in r9["reply_text"]
+            and "早于开始日期" in r9["reply_text"]
+            and r9["trajectory"].count("guard:objective_reject") == 2
+            and "deepseek-v4-pro" not in llm9.calls
+        )
+        rec("G09", "客观底盘护栏", "模型连续 2 轮输出倒挂日期", "flagship_brain->guard(x2)->exec:hitl_preview", "单脑自纠2轮硬熔断 + 卡片暴露核对提示（0次二审模型）", ok9)
         eng9.close()
 
         # G10: Pre-router attachment ingestion for quick_query + corrupt docx graceful fallback
@@ -260,10 +270,11 @@ def run_all_golden_samples() -> list[dict[str, str]]:
         ok10 = len(pages10) == 1 and "暂无法解析正文" in pages10[0]["text"]
         rec("G10", "附件容错", "损坏/加密 Word 附件上传解析", "extract_document_pages -> safe_fallback", "零崩溃，返回原件已归档友好提示", ok10)
 
-        # G11: Hourly mail window — 2 inbox + 1 sent with "请确认" -> 0 router calls, 1 card, waiting hint
+        # G11: Hourly mail window — 2 inbox + 1 sent with "请确认" -> 1 flagship call, 0 fast/critic, 1 card, waiting hint
         def mail_llm(kw, _i):
-            if kw["model"] == "qwen3.8-max":
-                return json.dumps({
+            return json.dumps({
+                "mode": "propose",
+                "proposal": {
                     "headline": "汇总 V&F 与 Tera 本小时邮件",
                     "executive_summary": "汇总本小时 2 封客户与同事来信，建议今日内回复 V&F 报价。",
                     "actions": [{
@@ -280,8 +291,8 @@ def run_all_golden_samples() -> list[dict[str, str]]:
                     }],
                     "referenced_numbers": [],
                     "citations": [],
-                })
-            return json.dumps({"passed": True, "numeric_fidelity_ok": True, "schedule_reasonable": True, "issues": [], "fix_instructions": ""})
+                },
+            })
 
         eng11, db11, llm11, od11 = _mk_engine(base / "g11", mail_llm)
         db11.set_mail_watermark("inbox", "2026-11-24T02:00:00Z")

@@ -196,14 +196,31 @@ def _critic_pass_json() -> str:
 
 
 def test_clean_slate_cold_start_empty_db_safety(tmp_path: Path) -> None:
-    """[边界/禁令] 全新空库冷启动：早报安全兜底、查不存在任务不误导、空内容快捷指令0 LLM拦截、撤销安全、Web timeline 404。"""
+    """[边界/禁令] 全新空库冷启动：早报安全兜底、查不存在任务不误导、空内容备注拦截、离线撤销0 LLM、Web timeline 404。"""
     settings = _make_settings(tmp_path)
     db = Database(tmp_path / "empty.db")
     od = _DummyOneDrive()
-    outage_llm = _Outage503Completions()
+
+    class _ColdStartLLM:
+        def __init__(self) -> None:
+            self.calls: list[dict[str, Any]] = []
+
+        def create(self, **kwargs: Any) -> Any:
+            self.calls.append(kwargs)
+            latest = kwargs["messages"][-1]["content"].split("【本次最新输入】")[-1].strip()
+            if "沟通记录" in latest:
+                payload = {"mode": "direct_ops", "view_timeline_ids": [1]}
+            else:
+                payload = {"mode": "reply", "reply_text": "请补充具体要记录的内容，本次未写入空白记录。"}
+            return SimpleNamespace(
+                usage=SimpleNamespace(prompt_tokens=10, completion_tokens=10, completion_tokens_details=None),
+                choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(payload, ensure_ascii=False), tool_calls=None, reasoning_content=""))],
+            )
+
+    llm = _ColdStartLLM()
     gw = DashScopeLLMGateway(
         settings,
-        client=SimpleNamespace(chat=SimpleNamespace(completions=outage_llm)),
+        client=SimpleNamespace(chat=SimpleNamespace(completions=llm)),
     )
     eng = ChiefOfStaffEngine(
         settings=settings,
@@ -223,9 +240,8 @@ def test_clean_slate_cold_start_empty_db_safety(tmp_path: Path) -> None:
         assert "在途任务：0 项" in digest
         assert "暂无未完成在途任务" in digest
 
-        # 2) Query timeline of non-existent task #1 -> 0 LLM calls, explicit not-found
+        # 2) Query timeline of non-existent task #1 -> explicit not-found (never misleading)
         res_tl = eng.handle_incoming_turn("查 #1 沟通记录", external_msg_id="cold-tl-1")
-        assert len(outage_llm.calls) == 0, "查 #1 沟通记录 must NOT call LLM"
         reply_tl = res_tl["reply_text"]
         assert ("未找到" in reply_tl or "不存在" in reply_tl), (
             f"Expected explicit not-found message for missing #1, got: {reply_tl!r}"
@@ -234,18 +250,19 @@ def test_clean_slate_cold_start_empty_db_safety(tmp_path: Path) -> None:
             f"Must NOT mislead user into thinking #1 exists with empty timeline: {reply_tl!r}"
         )
 
-        # 3) Empty-content note/progress shortcuts -> 0 LLM calls, no crash, friendly prompt
+        # 3) Empty-content note/progress utterances -> no crash, friendly prompt, nothing written
         for idx, cmd in enumerate(("评价 #1：", "备注 #1：", "#1 进展："), start=1):
             res_note = eng.handle_incoming_turn(cmd, external_msg_id=f"cold-empty-note-{idx}")
-            assert len(outage_llm.calls) == 0, f"{cmd!r} must NOT call LLM"
             reply_note = res_note["reply_text"]
             assert any(tok in reply_note for tok in ("填写", "内容", "为空", "补充", "请输入", "请提供")), (
                 f"Expected friendly prompt asking for non-empty content for {cmd!r}, got: {reply_note!r}"
             )
             assert "已追加" not in reply_note and "已记录" not in reply_note
 
-        # 4) Undo on empty DB -> no crash, friendly message
+        # 4) Offline Undo on empty DB -> 0 LLM calls, no crash, friendly message
+        calls_before_undo = len(llm.calls)
         res_undo = eng.handle_incoming_turn("撤销", external_msg_id="cold-undo-1")
+        assert len(llm.calls) == calls_before_undo, "Offline '撤销' button must use 0 LLM calls"
         reply_undo = res_undo["reply_text"]
         assert "撤销" in reply_undo and any(tok in reply_undo for tok in ("无", "没有", "暂无")), (
             f"Expected friendly no-undo-available reply, got: {reply_undo!r}"
@@ -664,14 +681,33 @@ async def test_pure_fyi_mail_batch_does_not_create_pending_proposal_or_block_nex
 
 
 def test_wechat_shortcut_update_deadline_and_assignee_never_completes_task(tmp_path: Path) -> None:
-    """[正常/边界/禁令] LLM 503 宕机时，微信快捷改截止日与改实施人 0 次调用、清缺失必填、绝不误标 done、且拦截非法日期。"""
+    """[正常/边界/禁令] Model-First 旗舰主脑改截止日与改实施人：清缺失必填、绝不误标 done、且底盘确定性拦截非法日期 2026-02-30。"""
     settings = _make_settings(tmp_path)
     db = Database(tmp_path / "shortcut.db")
     od = _DummyOneDrive()
-    outage_llm = _Outage503Completions()
+
+    class _UpdateLLM:
+        def __init__(self) -> None:
+            self.calls: list[dict[str, Any]] = []
+
+        def create(self, **kwargs: Any) -> Any:
+            self.calls.append(kwargs)
+            latest = kwargs["messages"][-1]["content"].split("【本次最新输入】")[-1].strip()
+            if "2026-12-05" in latest:
+                payload = {"mode": "direct_ops", "field_updates": [{"task_id": 1, "planned_end_at": "2026-12-05"}]}
+            elif "王楠" in latest:
+                payload = {"mode": "direct_ops", "field_updates": [{"task_id": 1, "assignee": "王楠"}]}
+            else:
+                payload = {"mode": "direct_ops", "field_updates": [{"task_id": 1, "planned_end_at": "2026-02-30"}]}
+            return SimpleNamespace(
+                usage=SimpleNamespace(prompt_tokens=10, completion_tokens=10, completion_tokens_details=None),
+                choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(payload, ensure_ascii=False), tool_calls=None, reasoning_content=""))],
+            )
+
+    llm = _UpdateLLM()
     gw = DashScopeLLMGateway(
         settings,
-        client=SimpleNamespace(chat=SimpleNamespace(completions=outage_llm)),
+        client=SimpleNamespace(chat=SimpleNamespace(completions=llm)),
     )
     eng = ChiefOfStaffEngine(
         settings=settings,
@@ -703,39 +739,38 @@ def test_wechat_shortcut_update_deadline_and_assignee_never_completes_task(tmp_p
         )
         assert seed["inserted_item_ids"] == [1]
 
-        # 1) Update deadline via shortcut
+        # 1) Update deadline via flagship_brain -> direct_ops
         res_due = eng.handle_incoming_turn("#1 截止改到 2026-12-05", external_msg_id="sc-due-1")
-        assert len(outage_llm.calls) == 0, "#1 截止改到 ... must use 0 LLM calls"
+        assert len(llm.calls) == 1 and llm.calls[-1]["model"] == settings.producer_model
         item1 = next(it for it in db.list_items(include_done=True) if it["id"] == 1)
         assert item1["planned_end_at"] == "2026-12-05", f"Expected planned_end_at updated, got: {item1}"
         assert "planned_end_at" not in item1["missing_required_fields"], (
             f"planned_end_at should be cleared from missing_required_fields: {item1['missing_required_fields']}"
         )
         assert item1["status"] == "todo", (
-            f"Deadline update MUST NOT falsely mark task done! status={item1['status']!r}, reply={res_due['reply']!r}"
+            f"Deadline update MUST NOT falsely mark task done! status={item1['status']!r}, reply={res_due['reply_text']!r}"
         )
 
-        # 2) Update assignee via shortcut
+        # 2) Update assignee via flagship_brain -> direct_ops
         res_who = eng.handle_incoming_turn("#1 实施人改为 王楠", external_msg_id="sc-who-2")
-        assert len(outage_llm.calls) == 0, "#1 实施人改为 ... must use 0 LLM calls"
+        assert len(llm.calls) == 2 and llm.calls[-1]["model"] == settings.producer_model
         item1 = next(it for it in db.list_items(include_done=True) if it["id"] == 1)
         assert item1["assignee"] == "王楠", f"Expected assignee updated to 王楠, got: {item1}"
         assert "assignee" not in item1["missing_required_fields"], (
             f"assignee should be cleared from missing_required_fields: {item1['missing_required_fields']}"
         )
         assert item1["status"] == "todo", (
-            f"Assignee update MUST NOT change task status! status={item1['status']!r}, reply={res_who['reply']!r}"
+            f"Assignee update MUST NOT change task status! status={item1['status']!r}, reply={res_who['reply_text']!r}"
         )
 
-        # 3) Invalid calendar date (2026-02-30) -> rejected without corrupting field
+        # 3) Invalid calendar date (2026-02-30) -> deterministically rejected by executor without corrupting DB
         res_bad = eng.handle_incoming_turn("#1 截止改到 2026-02-30", external_msg_id="sc-bad-3")
-        assert len(outage_llm.calls) == 0, "Invalid date validation must happen deterministically (0 LLM calls)"
         item1 = next(it for it in db.list_items(include_done=True) if it["id"] == 1)
         assert item1["planned_end_at"] == "2026-12-05", (
             f"Invalid date 2026-02-30 corrupted planned_end_at to {item1['planned_end_at']!r}"
         )
         assert any(tok in res_bad["reply_text"] for tok in ("无效", "非法", "格式", "不正确", "日期")), (
-            f"Expected explicit invalid-date error message, got: {res_bad['reply']!r}"
+            f"Expected explicit invalid-date error message, got: {res_bad['reply_text']!r}"
         )
     finally:
         eng.close()

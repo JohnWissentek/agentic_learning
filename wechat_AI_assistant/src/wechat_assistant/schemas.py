@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class WorkDomain(str, Enum):
@@ -127,6 +127,7 @@ class ActionMutation(BaseModel):
     estimated_hours: float = Field(default=0.0, ge=0.0, le=200.0)
     priority: PriorityLevel = PriorityLevel.P1
     blocker_note: str = Field(default="", max_length=300)
+    source_channel: Literal["wechat", "outlook", "web"] = "wechat"
     linked_files: list[str] = Field(default_factory=list)
     mail_conversation_ids: list[str] = Field(default_factory=list)
     timeline: list[TimelineEntry] = Field(default_factory=list)
@@ -209,10 +210,101 @@ class TriageProposal(BaseModel):
 
 
 class CriticVerdict(BaseModel):
-    """Heterogeneous critic-tier audit verdict (`deepseek-v4-pro`)."""
+    """Legacy audit verdict schema kept for backward compatibility."""
 
     passed: bool
     numeric_fidelity_ok: bool = True
     schedule_reasonable: bool = True
     issues: list[str] = Field(default_factory=list)
     fix_instructions: str = ""
+
+
+class TaskFieldUpdate(BaseModel):
+    """Direct structured modification to an existing persisted task card."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    task_id: int
+    planned_end_at: str | None = None
+    planned_start_at: str | None = None
+    assignee: str | None = None
+    owner: str | None = None
+    external_partner: str | None = None
+    deliverable: str | None = None
+    milestone_stage: str | None = None
+    blocker_note: str | None = None
+    priority: PriorityLevel | None = None
+    project_name: str | None = None
+
+
+class TaskNoteAppend(BaseModel):
+    """Append a CEO evaluation, objective comment, or progress timeline entry to an existing task."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    task_id: int
+    kind: Literal["ceo_evaluation", "comment", "progress"]
+    content: str = Field(min_length=1, max_length=500)
+
+
+class TaskStatusChange(BaseModel):
+    """Mark an existing task started (`in_progress`) or completed (`done`)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    task_id: int
+    action: Literal["start", "complete"]
+    actual_hours: float | None = None
+
+
+class AgentDecision(BaseModel):
+    """v3.0 Single-Brain Flagship Agent unified output contract (Model-First, Plan A).
+
+    A single flagship LLM turn (`qwen3.8-max`) natively handles:
+    - creating/revising task proposals (with optional `confirm_and_commit=True` 1-step commit),
+    - confirming/discarding pending proposals,
+    - executing compound direct operations on existing tasks (field updates, notes, status check-ins, timeline, undo),
+    - grounded Q&A or executive conversation, cockpit/workload lookups.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    mode: Literal[
+        "propose",
+        "confirm_pending",
+        "discard_pending",
+        "direct_ops",
+        "reply",
+        "open_cockpit",
+        "show_workload",
+    ] = "reply"
+    proposal: TriageProposal | None = None
+    confirm_and_commit: bool = False
+    ideas_only: bool = False
+    field_updates: list[TaskFieldUpdate] = Field(default_factory=list)
+    note_appends: list[TaskNoteAppend] = Field(default_factory=list)
+    status_changes: list[TaskStatusChange] = Field(default_factory=list)
+    view_timeline_ids: list[int] = Field(default_factory=list)
+    undo_last: bool = False
+    reply_text: str = Field(default="", max_length=2500)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_legacy_shapes(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        if "mode" in data:
+            return data
+        # Backward compatibility: direct TriageProposal payload
+        if "headline" in data and ("actions" in data or "new_tasks" in data or "task_updates" in data or "fyi_notices" in data):
+            return {"mode": "propose", "proposal": data}
+        # Backward compatibility: direct Q&A or conversational reply payload
+        if "answer" in data:
+            return {"mode": "reply", "reply_text": str(data.get("answer") or "")}
+        if "reply" in data:
+            return {"mode": "reply", "reply_text": str(data.get("reply") or "")}
+        if "reply_text" in data:
+            return {"mode": "reply", "reply_text": str(data.get("reply_text") or "")}
+        if any(k in data for k in ("field_updates", "note_appends", "status_changes", "view_timeline_ids", "undo_last")):
+            return {"mode": "direct_ops", **data}
+        raise ValueError("AgentDecision JSON must specify 'mode' or recognized decision fields")

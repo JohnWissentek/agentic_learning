@@ -20,7 +20,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from wechat_assistant.config import DashScopeLLMGateway, Settings
+from wechat_assistant.config import DashScopeLLMGateway, Settings, now_local
 from wechat_assistant.graph import ChiefOfStaffEngine
 from wechat_assistant.intake.mail_poller import mail_hourly_scheduler_loop
 from wechat_assistant.intake.wecom_gateway import WeComGateway
@@ -56,6 +56,7 @@ class ItemUpdateBody(BaseModel):
     assignee: str | None = Field(default=None, max_length=80)
     external_partner: str | None = Field(default=None, max_length=120)
     blocker_note: str | None = Field(default=None, max_length=300)
+    source_channel: Literal["wechat", "outlook", "web"] | None = None
     planned_start_at: str | None = None
     planned_end_at: str | None = None
     estimated_hours: float | None = Field(default=None, ge=0.0, le=200.0)
@@ -88,6 +89,7 @@ class ItemCreateBody(BaseModel):
     assignee: str = ""
     external_partner: str = "无"
     blocker_note: str = Field(default="", max_length=300)
+    source_channel: Literal["wechat", "outlook", "web"] = "web"
     planned_start_at: str | None = None
     planned_end_at: str | None = None
     estimated_hours: float = Field(default=0.0, ge=0.0, le=200.0)
@@ -238,11 +240,13 @@ def build_daily_digest_message(ov: dict[str, Any], kind: str, magic_url: str) ->
                 pass
 
     ch_map = {"wechat": "微信", "mail_in": "邮件", "mail_out": "发件", "web": "驾驶舱"}
+    src_map = {"wechat": "微信", "outlook": "Outlook", "web": "驾驶舱"}
     status_map = {"todo": "待办", "in_progress": "进行中", "done": "已完成"}
 
     card_blocks: list[str] = []
     for it in open_items[:8]:
         st_lbl = "等待外部" if it.get("list_type") == ListType.WAITING_FOR.value else status_map.get(it.get("status", "todo"), "待办")
+        src_lbl = src_map.get(str(it.get("source_channel") or "wechat").lower(), "微信")
         deliverable = (it.get("deliverable") or "").strip() or it["title"]
         stage_lbl = (it.get("milestone_stage") or "已启动").strip()
         owner = (it.get("owner") or "本人").strip()
@@ -273,7 +277,7 @@ def build_daily_digest_message(ov: dict[str, Any], kind: str, magic_url: str) ->
         sched_line = f"{ps_str or '-'} → {pe_str or '【待补齐】'}" + (f"（{span_notes}）" if span_notes else "")
 
         block_lines = [
-            f"【任务 #{it['id']}】{it['title']}（归属：{it.get('project_name', '日常事务')} / {it.get('work_domain', '')}｜{it.get('priority', 'P1')}｜{st_lbl}）",
+            f"【任务 #{it['id']}】{it['title']}（归属：{it.get('project_name', '日常事务')} / {it.get('work_domain', '')}｜{it.get('priority', 'P1')}｜{st_lbl}｜来源：{src_lbl}）",
             f"1）目标与交付成果：{deliverable}",
         ]
         timeline = list(it.get("timeline") or [])
@@ -356,21 +360,20 @@ def build_daily_digest_message(ov: dict[str, Any], kind: str, magic_url: str) ->
 
 
 async def _daily_digest_scheduler(engine: ChiefOfStaffEngine, gateway: WeComGateway) -> None:
-    sent_marks: set[str] = set()
     morning = os.environ.get("DAILY_MORNING_DIGEST", "08:30").strip()
     evening = os.environ.get("DAILY_EVENING_DIGEST", "18:00").strip()
     while True:
         try:
-            now = datetime.now()
+            now = now_local()
             hm = now.strftime("%H:%M")
-            day_key = f"{now.strftime('%Y-%m-%d')}:{hm}"
-            if now.weekday() < 5 and hm in {morning, evening} and day_key not in sent_marks:
+            day_key = f"digest:{now.strftime('%Y-%m-%d')}:{hm}"
+            if now.weekday() < 5 and hm in {morning, evening} and not engine.db.is_external_seen(day_key):
                 kind = "🌅 早间工作报告" if hm == morning else "🌆 晚间复盘简报"
                 ov = engine.db.dashboard_overview(engine.settings.daily_capacity_hours)
                 magic_url = engine.magic_link_factory()
                 msg = build_daily_digest_message(ov, kind, magic_url)
                 await gateway.send_app_push(msg)
-                sent_marks.add(day_key)
+                engine.db.mark_external_seen(day_key, source="daily_digest")
                 # Persist digest into dialogue history so follow-up replies ("#3做完了") resolve cleanly
                 engine.db.append_conversation_turn(
                     thread_id="owner",
@@ -378,8 +381,6 @@ async def _daily_digest_scheduler(engine: ChiefOfStaffEngine, gateway: WeComGate
                     content=msg,
                     intent="digest:morning" if hm == morning else "digest:evening_checkin",
                 )
-                if len(sent_marks) > 32:
-                    sent_marks = {day_key}
         except Exception as exc:
             logging.getLogger("uvicorn.error").warning("Daily digest scheduler error: %s", type(exc).__name__)
         await asyncio.sleep(30)
@@ -548,7 +549,7 @@ def create_app(
 
     @app.get("/healthz")
     async def healthz():
-        return {"status": "ok", "service": "wechat-ai-assistant", "version": "0.1.0"}
+        return {"status": "ok", "service": "wechat-ai-assistant", "version": "3.0.0"}
 
     # --- WeCom callback routes ---
 
@@ -657,7 +658,7 @@ def create_app(
 
     @app.post("/api/items", dependencies=[Depends(require_session)])
     async def create_item_api(body: ItemCreateBody):
-        today_str = datetime.now().strftime("%Y-%m-%d")
+        today_str = now_local().strftime("%Y-%m-%d")
         start_d = body.planned_start_at if body.planned_start_at else today_str
         end_d = start_d if body.planned_end_at is None else body.planned_end_at
         act = ActionMutation(
@@ -672,6 +673,7 @@ def create_app(
             assignee=body.assignee.strip(),
             external_partner=body.external_partner.strip() or "无",
             blocker_note=body.blocker_note.strip(),
+            source_channel=body.source_channel,
             planned_start_at=start_d,
             planned_end_at=end_d,
             estimated_hours=body.estimated_hours,

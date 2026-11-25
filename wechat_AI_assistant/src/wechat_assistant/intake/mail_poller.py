@@ -16,7 +16,7 @@ import httpx
 import msal
 import requests
 
-from wechat_assistant.config import Settings, redact_secrets
+from wechat_assistant.config import APP_TZ, Settings, now_local as app_now_local, redact_secrets
 from wechat_assistant.storage.db import Database
 from wechat_assistant.tools.onedrive_tools import OneDrive21VianetClient
 
@@ -91,6 +91,17 @@ def _extract_email_body_text(msg: dict[str, Any], *, max_chars: int = 2500) -> s
     return (msg.get("bodyPreview") or "").strip()[:max_chars]
 
 
+_BOUNDARY_TAG_RE = re.compile(
+    r"\[/?(?:SYSTEM_TRUSTED_MAIL_META|UNTRUSTED_EXTERNAL_DATA)\]",
+    flags=re.IGNORECASE,
+)
+
+
+def _sanitize_untrusted_boundary_tags(text: str) -> str:
+    """Neutralize spoofed boundary tags inside untrusted external email fields."""
+    return _BOUNDARY_TAG_RE.sub("〔已过滤边界标签〕", text or "")
+
+
 def wrap_untrusted_email(
     subject: str,
     sender: str,
@@ -104,19 +115,23 @@ def wrap_untrusted_email(
     matched_task: dict[str, Any] | None = None,
     mail_ref: str = "",
 ) -> str:
-    """Keep trusted system mail metadata OUTSIDE `[UNTRUSTED_EXTERNAL_DATA]`, wrapping only untrusted content."""
+    """Keep trusted system mail metadata OUTSIDE `[UNTRUSTED_EXTERNAL_DATA]`, wrapping only sanitized untrusted content."""
+    clean_sender = _sanitize_untrusted_boundary_tags(sender)
+    clean_subject = _sanitize_untrusted_boundary_tags(subject)
+    clean_body = _sanitize_untrusted_boundary_tags(body_preview[:2500])
+
     meta_lines: list[str] = ["[SYSTEM_TRUSTED_MAIL_META]"]
     if mail_ref:
         meta_lines.append(f"邮件编号：{mail_ref}")
-    meta_lines.append(f"发件人(From)：{sender}")
+    meta_lines.append(f"发件人(From)：{clean_sender}")
     if to_addrs:
-        meta_lines.append(f"主送(To)：{', '.join(to_addrs)}")
+        meta_lines.append(f"主送(To)：{', '.join(_sanitize_untrusted_boundary_tags(a) for a in to_addrs)}")
     if cc_addrs:
-        meta_lines.append(f"抄送(Cc)：{', '.join(cc_addrs)}")
+        meta_lines.append(f"抄送(Cc)：{', '.join(_sanitize_untrusted_boundary_tags(a) for a in cc_addrs)}")
     if timestamp:
         meta_lines.append(f"时间：{timestamp}")
     if conversation_id:
-        meta_lines.append(f"会话号(conversationId)：{conversation_id}")
+        meta_lines.append(f"会话号(conversationId)：{_sanitize_untrusted_boundary_tags(conversation_id)}")
     if role_hint:
         meta_lines.append(
             f"角色推断提示：chairman_role={role_hint.get('chairman_role')}｜"
@@ -127,15 +142,15 @@ def wrap_untrusted_email(
         )
     if matched_task:
         meta_lines.append(
-            f"已绑定在途任务：#{matched_task['id']}《{matched_task.get('title', '')}》"
+            f"已绑定在途任务：#{matched_task['id']}《{_sanitize_untrusted_boundary_tags(str(matched_task.get('title', '')))}》"
             "（同一邮件会话，请优先通过 task_updates 追加时间轴，不要新建重复任务卡）"
         )
     meta_lines.append("[/SYSTEM_TRUSTED_MAIL_META]")
 
     untrusted_lines = [
         "[UNTRUSTED_EXTERNAL_DATA]",
-        f"邮件主题：{subject}",
-        f"正文内容：{body_preview[:2500]}",
+        f"邮件主题：{clean_subject}",
+        f"正文内容：{clean_body}",
         "[/UNTRUSTED_EXTERNAL_DATA]",
     ]
     return "\n".join(meta_lines + untrusted_lines)
@@ -183,9 +198,9 @@ def active_mail_slot(now_local: datetime) -> str | None:
 
 def _ensure_aware_local(now_local: datetime | None) -> datetime:
     if now_local is None:
-        return datetime.now().astimezone()
+        return app_now_local()
     if now_local.tzinfo is None:
-        return now_local.astimezone()
+        return now_local.replace(tzinfo=APP_TZ)
     return now_local
 
 
@@ -943,7 +958,7 @@ async def mail_hourly_scheduler_loop(
 
     while True:
         try:
-            now_local = datetime.now().astimezone()
+            now_local = app_now_local()
             slot = active_mail_slot(now_local)
             if slot is not None:
                 slot_key = f"{now_local.strftime('%Y-%m-%d')}:{slot}"

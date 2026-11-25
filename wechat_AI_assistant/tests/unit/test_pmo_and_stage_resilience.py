@@ -112,53 +112,33 @@ def test_decision_card_displays_owner_for_pmo_delegation(tmp_path: Path) -> None
 
 
 def test_critic_max_loops_unpassed_exposes_warning_on_card(tmp_path: Path) -> None:
-    """[边界] 当异构审计模型连续达到最大反思轮数仍未通过并强制放行至确认门禁时，微信确认卡应显式包含未通过的审计问题警告，且绝不静默隐藏风险。"""
+    """[边界] 当旗舰大脑连续达到最大自纠轮数仍未通过客观硬护栏（如倒挂日期）并放行至预览门禁时，微信确认卡应显式包含未通过的警告，且绝不静默隐藏风险。"""
     settings = _make_settings(tmp_path)
     assert settings.max_reflection_loops == 2
     db = Database(tmp_path / "app.db")
-    critic_calls = {"n": 0}
+    brain_calls = {"n": 0}
 
     def handler(kwargs, _idx):
-        model = kwargs["model"]
-        if model == "qwen3.8-flash":
-            return json.dumps(
-                {
-                    "intent": "work_triage",
-                    "confidence": 0.95,
-                    "needs_deep_research": False,
-                    "summary": "核对传感器交期",
-                },
-                ensure_ascii=False,
-            )
-        if model == "qwen3.8-max":
-            return TriageProposal(
-                headline="帕莫瑞传感器交期核对",
-                executive_summary="安排传感器交期核对，预计本人投入 1.0h。",
-                actions=[
-                    ActionMutation(
-                        list_type=ListType.PROJECT_ACTION,
-                        work_domain=WorkDomain.DELIVERY,
-                        project_name="帕莫瑞交付",
-                        title="核对帕莫瑞传感器交期",
-                        owner="本人",
-                        planned_start_at="2026-11-24",
-                        planned_end_at="2026-11-26",
-                        estimated_hours=1.0,
-                        priority=PriorityLevel.P1,
-                        onedrive_target_dir="01_项目归档/帕莫瑞交付",
-                    )
-                ],
-                referenced_numbers=["1.0"],
-                citations=[],
-            ).model_dump_json()
-
-        critic_calls["n"] += 1
-        return CriticVerdict(
-            passed=False,
-            numeric_fidelity_ok=True,
-            schedule_reasonable=False,
-            issues=["关键交期与原文不符"],
-            fix_instructions="核对交期",
+        brain_calls["n"] += 1
+        return TriageProposal(
+            headline="帕莫瑞传感器交期核对",
+            executive_summary="安排传感器交期核对，预计本人投入 1.0h。",
+            actions=[
+                ActionMutation(
+                    list_type=ListType.PROJECT_ACTION,
+                    work_domain=WorkDomain.DELIVERY,
+                    project_name="帕莫瑞交付",
+                    title="核对帕莫瑞传感器交期",
+                    owner="本人",
+                    planned_start_at="2026-11-28",
+                    planned_end_at="2026-11-24",  # Reversed date -> triggers objective chassis guard twice
+                    estimated_hours=1.0,
+                    priority=PriorityLevel.P1,
+                    onedrive_target_dir="01_项目归档/帕莫瑞交付",
+                )
+            ],
+            referenced_numbers=["1.0"],
+            citations=[],
         ).model_dump_json()
 
     gw = DashScopeLLMGateway(
@@ -170,9 +150,10 @@ def test_critic_max_loops_unpassed_exposes_warning_on_card(tmp_path: Path) -> No
         "核对帕莫瑞传感器交期，预计本人投入 1.0 小时",
         external_msg_id="critic_warn_1",
     )
-    assert critic_calls["n"] >= 2
-    assert "node:hitl_preview_gate" in res["trajectory"]
-    assert "关键交期与原文不符" in res["reply_text"]
+    assert brain_calls["n"] == 2
+    assert "guard:objective_reject" in res["trajectory"]
+    assert "exec:hitl_preview" in res["trajectory"]
+    assert "早于开始日期" in res["reply_text"]
     eng.close()
 
 
@@ -554,62 +535,36 @@ def test_stage5_onedrive_outage_still_commits_sqlite_truthfully(tmp_path: Path) 
     od = _OutageOneDrive()
 
     def handler(kwargs, _idx):
-        model = kwargs["model"]
-        user_msg = kwargs["messages"][-2]["content"] if len(kwargs.get("messages", [])) >= 2 else ""
-        if model == "qwen3.8-flash":
-            latest = user_msg.split("【用户最新输入】")[-1].strip()
-            if latest == "1":
-                return json.dumps(
-                    {
-                        "intent": "confirm_pending",
-                        "confidence": 0.99,
-                        "needs_deep_research": False,
-                        "summary": "确认落盘",
-                    },
-                    ensure_ascii=False,
-                )
-            if latest.startswith("完成"):
-                return json.dumps(
-                    {
-                        "intent": "checkin",
-                        "confidence": 0.99,
-                        "needs_deep_research": False,
-                        "target_item_id": 1,
-                        "summary": "完成打卡",
-                    },
-                    ensure_ascii=False,
-                )
+        user_msg = kwargs["messages"][-1]["content"] if kwargs.get("messages") else ""
+        latest = user_msg.split("【本次最新输入】")[-1].strip()
+        if latest.startswith("完成"):
             return json.dumps(
                 {
-                    "intent": "work_triage",
-                    "confidence": 0.96,
-                    "needs_deep_research": False,
-                    "summary": "审阅技术协议",
+                    "mode": "direct_ops",
+                    "status_changes": [{"task_id": 1, "action": "complete"}],
                 },
                 ensure_ascii=False,
             )
-        if model == "qwen3.8-max":
-            return TriageProposal(
-                headline="审阅帕莫瑞技术协议",
-                executive_summary="周五前完成帕莫瑞技术协议审阅，预计净工时 1.5h。",
-                actions=[
-                    ActionMutation(
-                        list_type=ListType.PROJECT_ACTION,
-                        work_domain=WorkDomain.SALES,
-                        project_name="帕莫瑞交付",
-                        title="审阅帕莫瑞技术协议",
-                        owner="本人",
-                        planned_start_at="2026-11-24",
-                        planned_end_at="2026-11-27",
-                        estimated_hours=1.5,
-                        priority=PriorityLevel.P0,
-                        onedrive_target_dir="01_项目归档/帕莫瑞交付",
-                    )
-                ],
-                referenced_numbers=["1.5"],
-                citations=[],
-            ).model_dump_json()
-        return CriticVerdict(passed=True, numeric_fidelity_ok=True, schedule_reasonable=True).model_dump_json()
+        return TriageProposal(
+            headline="审阅帕莫瑞技术协议",
+            executive_summary="周五前完成帕莫瑞技术协议审阅，预计净工时 1.5h。",
+            actions=[
+                ActionMutation(
+                    list_type=ListType.PROJECT_ACTION,
+                    work_domain=WorkDomain.SALES,
+                    project_name="帕莫瑞交付",
+                    title="审阅帕莫瑞技术协议",
+                    owner="本人",
+                    planned_start_at="2026-11-24",
+                    planned_end_at="2026-11-27",
+                    estimated_hours=1.5,
+                    priority=PriorityLevel.P0,
+                    onedrive_target_dir="01_项目归档/帕莫瑞交付",
+                )
+            ],
+            referenced_numbers=["1.5"],
+            citations=[],
+        ).model_dump_json()
 
     gw = DashScopeLLMGateway(
         settings,

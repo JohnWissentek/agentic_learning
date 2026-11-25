@@ -148,6 +148,12 @@
         },
         "work_domain": { "$ref": "#/$defs/WorkDomain" },
         "list_type": { "$ref": "#/$defs/ListType" },
+        "source_channel": {
+          "type": "string",
+          "enum": ["wechat", "outlook", "web"],
+          "default": "wechat",
+          "description": "任务来源渠道：wechat（微信） / outlook（Outlook 邮件） / web（驾驶舱网页）"
+        },
         "priority": { "$ref": "#/$defs/PriorityLevel" },
         "status": { "$ref": "#/$defs/TaskStatus" },
         "deliverable": {

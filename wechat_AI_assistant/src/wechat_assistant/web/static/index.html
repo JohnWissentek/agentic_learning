@@ -573,6 +573,32 @@
       font-variant-numeric: tabular-nums;
       flex-shrink: 0;
     }
+    .source-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 999px;
+      line-height: 1.45;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .source-badge.src-wechat {
+      background: #e6f7ee;
+      color: #098648;
+      border: 1px solid #b8e8cf;
+    }
+    .source-badge.src-outlook {
+      background: #e8f2ff;
+      color: #0b5ed7;
+      border: 1px solid #b9d7ff;
+    }
+    .source-badge.src-web {
+      background: #f3ecff;
+      color: #6b38d4;
+      border: 1px solid #d9c4ff;
+    }
     .inline-text-input {
       border: 1px solid transparent;
       background: transparent;
@@ -1198,6 +1224,12 @@
             <option value="P1">High (P1)</option>
             <option value="P2">Normal (P2)</option>
           </select>
+          <select id="filter-source" class="filter-select" onchange="renderActiveView()">
+            <option value="">All Sources (全部来源)</option>
+            <option value="wechat">微信 (WeChat)</option>
+            <option value="outlook">Outlook 邮件</option>
+            <option value="web">驾驶舱 (Web)</option>
+          </select>
           <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);cursor:pointer;">
             <input type="checkbox" id="toggle-done" checked onchange="renderActiveView()" /> Show Completed
           </label>
@@ -1246,6 +1278,16 @@
       P1: { label: "High", color: "#401694" },
       P2: { label: "Normal", color: "#579bfc" }
     };
+
+    const SOURCE_MAP = {
+      wechat:  { label: "微信",   cls: "src-wechat",  title: "来源：微信" },
+      outlook: { label: "Outlook", cls: "src-outlook", title: "来源：Outlook 邮件" },
+      web:     { label: "驾驶舱", cls: "src-web",     title: "来源：Web 驾驶舱" }
+    };
+
+    function sourceMeta(ch) {
+      return SOURCE_MAP[(ch || "wechat").toLowerCase()] || SOURCE_MAP.wechat;
+    }
 
     const GROUPS = [
       { key: "active", listTypeDefault: "next_action", title: "Active Actions", color: "#579bfc" },
@@ -1428,13 +1470,16 @@
       const q = (document.getElementById("filter-search")?.value || "").trim().toLowerCase();
       const dom = document.getElementById("filter-domain")?.value || "";
       const prio = document.getElementById("filter-prio")?.value || "";
+      const srcFilter = document.getElementById("filter-source")?.value || "";
       const showDone = document.getElementById("toggle-done")?.checked ?? true;
       return all.filter(i => {
         if (!showDone && i.status === "done") return false;
         if (dom && i.work_domain !== dom) return false;
         if (prio && i.priority !== prio) return false;
+        const itemSrc = (i.source_channel || "wechat").toLowerCase();
+        if (srcFilter && itemSrc !== srcFilter) return false;
         if (q) {
-          const hay = `${i.title} ${i.project_name} ${i.owner} ${i.assignee || ""} ${i.external_partner || ""} ${i.deliverable || ""} ${i.blocker_note || ""} ${domainMeta(i.work_domain).label}`.toLowerCase();
+          const hay = `${i.title} ${i.project_name} ${i.owner} ${i.assignee || ""} ${i.external_partner || ""} ${i.deliverable || ""} ${i.blocker_note || ""} ${sourceMeta(i.source_channel).label} ${itemSrc} ${domainMeta(i.work_domain).label}`.toLowerCase();
           if (!hay.includes(q)) return false;
         }
         return true;
@@ -1526,6 +1571,7 @@
           const st = statusMeta(item);
           const pr = prioMeta(item.priority);
           const dm = domainMeta(item.work_domain);
+          const src = sourceMeta(item.source_channel);
           const own = displayOwner(item.owner);
           const proj = displayProject(item.project_name);
           const isIdea = item.list_type === "idea" && item.status !== "done";
@@ -1538,6 +1584,7 @@
               <div class="cell cell-left">
                 <div class="item-title-wrap">
                   <span class="item-id-badge">#${item.id}</span>
+                  <span class="source-badge ${src.cls}" title="${escHtml(src.title)}">${escHtml(src.label)}</span>
                   <input class="inline-text-input" value="${escHtml(item.title)}" onchange="patchField(${item.id}, 'title', this.value)" />
                   <div class="row-actions ${isIdea ? "always-show" : ""}">
                     ${isIdea ? `<button class="mini-pill-btn" onclick="openPromoteModal(${item.id})">Promote</button>` : ""}

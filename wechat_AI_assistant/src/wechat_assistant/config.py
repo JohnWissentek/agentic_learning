@@ -1,4 +1,4 @@
-"""Runtime configuration, secret leak guard, cost ledger, and DashScope 3-tier LLM gateway."""
+"""Runtime configuration, Shanghai timezone helpers, secret leak guard, cost ledger, and DashScope LLM gateway."""
 
 from __future__ import annotations
 
@@ -8,12 +8,27 @@ import re
 import threading
 import time
 from dataclasses import dataclass, field
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Callable, Literal, TypeVar
+from zoneinfo import ZoneInfo
 
 from dotenv import dotenv_values
 from openai import OpenAI
 from pydantic import BaseModel
+
+APP_TZ = ZoneInfo(os.environ.get("APP_TIMEZONE", "Asia/Shanghai"))
+
+
+def now_local() -> datetime:
+    """Return current timezone-aware datetime in `APP_TZ` (default Asia/Shanghai)."""
+    return datetime.now(APP_TZ)
+
+
+def today_local() -> date:
+    """Return current calendar date in `APP_TZ` (default Asia/Shanghai)."""
+    return now_local().date()
+
 
 TierName = Literal["fast", "producer", "critic"]
 TModel = TypeVar("TModel", bound=BaseModel)
@@ -332,8 +347,15 @@ class DashScopeLLMGateway:
         history = list(messages)
         prompt_tok = comp_tok = reason_tok = 0
         reasoning_text = ""
+        max_rounds = 5
 
-        for _ in range(5):
+        for round_idx in range(max_rounds):
+            is_final_round = round_idx == max_rounds - 1
+            if is_final_round and tools and round_idx > 0:
+                history.append({
+                    "role": "user",
+                    "content": "工具查询轮次已达上限，请立即基于已获取的工具结果输出最终严格 JSON 对象，不要再调用工具。",
+                })
             kwargs: dict[str, Any] = {
                 "model": model,
                 "messages": history,
@@ -342,7 +364,7 @@ class DashScopeLLMGateway:
             }
             if not enable_thinking and any(k in model.lower() for k in ("qwen3", "deepseek")):
                 kwargs["extra_body"] = {"enable_thinking": False}
-            if tools:
+            if tools and not is_final_round:
                 kwargs["tools"] = tools
 
             resp = self.client.chat.completions.create(**kwargs)
@@ -360,7 +382,7 @@ class DashScopeLLMGateway:
                 reasoning_text = rc
 
             tool_calls = getattr(msg, "tool_calls", None) or []
-            if tool_calls and tool_executor is not None:
+            if tool_calls and tool_executor is not None and not is_final_round:
                 history.append({
                     "role": "assistant",
                     "content": msg.content or "",
@@ -383,7 +405,13 @@ class DashScopeLLMGateway:
                             args = {}
                     except json.JSONDecodeError:
                         args = {}
-                    result = tool_executor(tc.function.name, args)
+                    try:
+                        result = tool_executor(tc.function.name, args)
+                    except Exception as tool_exc:
+                        result = json.dumps(
+                            {"error": f"工具执行异常: {type(tool_exc).__name__}"},
+                            ensure_ascii=False,
+                        )
                     assert_no_secrets_leaked(result, self.settings)
                     history.append({
                         "role": "tool",
@@ -412,16 +440,18 @@ class DashScopeLLMGateway:
         """Invoke primary tier model with backoff & automatic fallback to backup model."""
         primary, fallback = self.settings.model_pair(tier)
         use_thinking = tier == "critic" and os.environ.get("ENABLE_CRITIC_THINKING", "false").lower() == "true"
-        effective_max_tokens = max(max_tokens, 4096 if use_thinking else 1536)
+        effective_max_tokens = max(max_tokens, 4096) if use_thinking else max_tokens
         schema_json = json.dumps(response_model.model_json_schema(), ensure_ascii=False)
-        enriched_messages = list(messages)
-        enriched_messages.append({
-            "role": "system",
-            "content": (
-                "请严格只输出一个符合以下 JSON Schema 的 JSON 对象，不要包含额外解释文本：\n"
-                f"{schema_json}"
-            ),
-        })
+        schema_instruction = (
+            "\n\n【严格 JSON 输出契约】请严格只输出一个符合以下 JSON Schema 的 JSON 对象，不要包含额外解释文本：\n"
+            f"{schema_json}"
+        )
+        # Keep system role strictly at index 0 (never append trailing system after user)
+        enriched_messages = [dict(m) for m in messages]
+        if enriched_messages and enriched_messages[0].get("role") == "system":
+            enriched_messages[0]["content"] = str(enriched_messages[0].get("content") or "") + schema_instruction
+        else:
+            enriched_messages.insert(0, {"role": "system", "content": schema_instruction.strip()})
 
         last_exc: Exception | None = None
         candidates = [(primary, False), (fallback, True)] if fallback and fallback != primary else [(primary, False)]

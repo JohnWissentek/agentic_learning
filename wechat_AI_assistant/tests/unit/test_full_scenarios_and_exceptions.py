@@ -217,31 +217,21 @@ def test_same_day_turns_without_external_msg_id_never_leak_state(tmp_path: Path)
         第 2 张卡的 project_action 必须完整落盘，绝不可继承上一轮 pending_ideas_only=True。
     """
 
-    # --- 子场景 (a): user_correction 不泄漏到下一轮普通查询 ---
+    # --- 子场景 (a): 上一轮修正不泄漏到下一轮普通查询 ---
     def handler_a(kwargs: dict[str, Any], _idx: int) -> str:
-        model = kwargs["model"]
-        sys_msgs = "\n".join(str(m.get("content", "")) for m in kwargs.get("messages", []))
-        if model == "qwen3.8-flash":
-            if "ConversationalReply" in sys_msgs or "reply_text" in sys_msgs:
-                return json.dumps({"reply_text": "您当前有 1 项待确认事项，其余待办已整理完毕。"})
+        user_msg = "\n".join(str(m.get("content", "")) for m in kwargs.get("messages", []))
+        latest_msg = user_msg.split("【本次最新输入】")[-1]
+        if "最近有什么待办" in latest_msg:
             return json.dumps({
-                "intent": "conversational_chat",
-                "confidence": 0.95,
-                "summary": "普通待办查询",
+                "mode": "reply",
+                "reply_text": "您当前有 1 项待确认事项，其余待办已整理完毕。",
             })
-        if model == "qwen3.8-max":
-            return json.dumps(
-                _proposal_dict_with_actions(
-                    [_action_dict(title="延迟到下周的交付评审", start="2026-12-01", end="2026-12-04")],
-                    headline="已按要求顺延至下周",
-                )
-            )
         return json.dumps({
-            "passed": True,
-            "numeric_fidelity_ok": True,
-            "schedule_reasonable": True,
-            "issues": [],
-            "fix_instructions": "",
+            "mode": "propose",
+            "proposal": _proposal_dict_with_actions(
+                [_action_dict(title="延迟到下周的交付评审", start="2026-12-01", end="2026-12-04")],
+                headline="已按要求顺延至下周",
+            ),
         })
 
     eng_a, db_a, comp_a, _ = _make_engine(tmp_path / "case_a", handler_a)
@@ -262,9 +252,10 @@ def test_same_day_turns_without_external_msg_id_never_leak_state(tmp_path: Path)
         turn2_calls = comp_a.calls[calls_before_query:]
         turn2_models = [c["model"] for c in turn2_calls]
 
-        assert "qwen3.8-flash" in turn2_models, "普通查询必须正常调用 fast_model 进行路由，不得被上一轮修正状态劫持"
+        assert "qwen3.8-max" in turn2_models, "普通查询必须由旗舰单脑正常作答，不得被上一轮修正状态劫持"
+        assert "qwen3.8-flash" not in turn2_models
         assert query_res["proposal_id"] is None
-        assert "node:producer_drafter" not in query_res["trajectory"]
+        assert "exec:reply" in query_res["trajectory"]
     finally:
         eng_a.close()
 
@@ -722,12 +713,27 @@ def test_batch_checkin_reports_missing_ids_and_prevents_hours_misparse(tmp_path:
     """批量打卡须准确回报无效 ID；无编号的「完成 1.5h」绝不可误杀 #1；重复 complete_item 不重复写 span_baseline。"""
 
     def handler(kwargs: dict[str, Any], _idx: int) -> str:
+        user_msg = kwargs["messages"][-1]["content"] if kwargs.get("messages") else ""
+        latest = user_msg.split("【本次最新输入】")[-1].strip()
+        if "#1 做完了" in latest:
+            return json.dumps({
+                "mode": "direct_ops",
+                "status_changes": [
+                    {"task_id": 1, "action": "complete"},
+                    {"task_id": 999, "action": "start"},
+                ],
+            })
+        if "#998 做完了" in latest:
+            return json.dumps({
+                "mode": "direct_ops",
+                "status_changes": [
+                    {"task_id": 998, "action": "complete"},
+                    {"task_id": 999, "action": "start"},
+                ],
+            })
         return json.dumps({
-            "intent": "checkin",
-            "confidence": 0.95,
-            "target_item_id": None,
-            "actual_hours": 1.5,
-            "summary": "完成 1.5h 但未提供编号",
+            "mode": "reply",
+            "reply_text": "请指明要打卡的任务编号（例如：完成 #2 1.5h），或发送「负荷」查看编号列表。",
         })
 
     eng, db, _, _ = _make_engine(tmp_path, handler)
@@ -1090,10 +1096,12 @@ def test_deterministic_critic_rejects_invalid_or_reversed_dates_and_llm_critic_g
         res = eng.handle_incoming_turn("按前面说的报价给帕莫瑞安排跟进任务")
         assert res["reply_text"]
 
-        critic_calls = [c for c in completions.calls if c["model"] == "deepseek-v4-pro"]
-        assert len(critic_calls) >= 1, "work_triage 流程必须调用异构 critic_model (deepseek-v4-pro)"
-        critic_payload = "\n".join(str(m.get("content", "")) for m in critic_calls[-1]["messages"])
-        assert "38500" in critic_payload, "发给异构 Critic 的上下文必须包含历史对话中的关键数字 38500"
+        brain_calls = [c for c in completions.calls if c["model"] == "qwen3.8-max"]
+        assert len(brain_calls) == 1, "v3.0 单脑模式仅调用 1 次旗舰模型且不调用二审大模型"
+        assert not [c for c in completions.calls if c["model"] == "deepseek-v4-pro"]
+        brain_payload = "\n".join(str(m.get("content", "")) for m in brain_calls[-1]["messages"])
+        assert "38500" in brain_payload, "发给旗舰单脑的上下文必须包含历史对话中的关键数字 38500"
+        assert res["proposal_id"] is not None
     finally:
         eng.close()
 

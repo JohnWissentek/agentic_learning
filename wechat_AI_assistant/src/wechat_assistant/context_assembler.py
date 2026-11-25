@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+from wechat_assistant.config import now_local
 from wechat_assistant.storage.db import Database
 from wechat_assistant.tools.memory_tools import hybrid_search
 
@@ -57,7 +58,6 @@ _STOP_TOKENS = {
     "请问",
     "帮我",
     "安排",
-    "一下",
 }
 
 
@@ -155,7 +155,7 @@ class ContextAssembler:
         recent_turns = self.db.get_recent_conversation_turns(thread_id=thread_id, limit=30)
         recent_ids = {int(t["id"]) for t in recent_turns}
 
-        now_dt = datetime.now()
+        now_dt = now_local().replace(tzinfo=None)
         dialogue_lines: list[str] = []
         prev_dt: datetime | None = None
         for turn in recent_turns:
@@ -286,7 +286,7 @@ class ContextAssembler:
     def render_for_router(self, ctx: AssembledContext, current_text: str) -> str:
         proj_block = f"【相关项目上下文卡】\n{ctx.project_context_text}\n\n" if ctx.project_context_text else ""
         return (
-            f"【当前时间戳】{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            f"【当前时间戳】{now_local().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
             f"【跨天滚动会话摘要】\n{ctx.rolling_summary_text}\n\n"
             f"{proj_block}"
             f"【近期对话流与时间间隔】\n{ctx.recent_dialogue_text}\n\n"
