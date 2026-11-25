@@ -5,7 +5,7 @@ description: 当设计、开发、重构或调试任何基于大语言模型（L
 
 # 智能体工作流架构准则：大模型优先 + 确定性底盘（Model-First Guardrails）
 
-本准则源于《Agentic Design Patterns》“够用即止”思想与 `wechat_AI_assistant` v2.0→v3.0 实战复盘（详版方法论见 `agentic_design_patterns/07_智能体工作流开发方法论_大模型优先与确定性底盘边界.md`）。
+本准则源于《Agentic Design Patterns》“够用即止”思想、《Learning LangChain》Agent/Loop 架构、2025–2026 业界 **Loop Engineering / Harness Engineering** 共识，以及 `wechat_AI_assistant` 与 `power_semiconductor_opportunities` 实战复盘（详版方法论见 `agentic_design_patterns/07_智能体工作流开发方法论_大模型优先与确定性底盘边界.md` 与姊妹篇 `agentic_design_patterns/08_智能体动态推理_循环工程与驾驭工程实战指南.md`）。
 
 > **重要声明（防僵化豁免条款）**：本准则是面向现代前沿大模型（强原生 Tool Calling + Structured Output）的**工程默认起点（Default Prior）**，而非不可突破的死教条。若具体项目存在高并发成本约束、工具数超过 12–15 个、长链路固定专业 SOP 或强合规审计要求，Agent 应主动向用户说明量化依据与权衡方案，**经用户确认后可按需升级至多阶段链（Ch.1）、级联路由（Ch.2）、并行化（Ch.3）、反思（Ch.4）或多智能体（Ch.7）**。
 
@@ -20,6 +20,7 @@ description: 当设计、开发、重构或调试任何基于大语言模型（L
    - **安全与门禁**：身份白名单、只读边界、外部不可信数据物理分框（如 `[SYSTEM_TRUSTED_*]` 与 `[UNTRUSTED_EXTERNAL_DATA]` 分离）、高危写操作人类确认令牌（HITL Token）、密钥零泄露脱敏。
    - **客观事实供给**：在调用模型前，由确定性代码一次性装配好日历锚点表（昨天/今天星期几/本周/下周）、数据库实时真值快照与渠道可信元数据；长 ID（如邮件 `conversationId`）采用短编号映射并由代码自动回填，不考模型心算与默写。
    - **精确执行与展示**：原子事务写库与可撤销快照、幂等防重、精确算术/日期工具、极简模板排版渲染（隔离内部校验日志、Schema 字段名与工具名，绝不向最终用户泄露技术黑话）。
+   - **Loop 与 Harness 骨架**：ReAct/修复循环由极简确定性转盘驱动（锁死 `max_steps` 与重试上限 `<= 2` 轮），出口接客观机器验钞机（单测、全语料引用/财务对账、Schema 强校验），不通过则带精确报错自动退回修复；多情境探索遵守“最多发散 2 层 + 中途硬剪枝 + 同桌闭卷收敛”。
 
 ---
 
