@@ -818,29 +818,29 @@ async def test_existing_pending_card_defers_inbox_but_still_sends_sent_list(
             fetch_folder=fake_fetch,
         )
 
-        # Triage NOT invoked; existing card #1 untouched (read-only digest may run safely without mutating DB)
-        assert len(turn_calls) == 0
-        pending = db.get_latest_pending_proposal("owner")
-        assert pending is not None and pending["id"] == 1
+        # Plan A parallel queue: triage runs immediately without blocking; old card #1 stays pending alongside new card #2
+        assert len(turn_calls) == 1
+        pending_ids = [p["id"] for p in db.list_pending_proposals("owner")]
+        assert pending_ids == [1, 2]
         assert "【收件逐封明细（共 2 封）】" in pushes[0]
         assert "发件人：" in pushes[0] and "sales@vandf.com" in pushes[0]
         assert "主要内容：" in pushes[0] and "建议处理：【" in pushes[0]
 
-        # Deferred inbox emails NOT marked seen & inbox watermark NOT advanced
-        assert db.is_external_seen("<def-1@vandf.com>") is False
-        assert db.is_external_seen("<def-2@tera-instruments.com>") is False
-        assert _parse_utc(db.get_mail_watermark("inbox")) == datetime(2026, 11, 24, 2, 0, 0, tzinfo=timezone.utc)
+        # Processed inbox emails ARE marked seen & inbox watermark advances (no repeat spam next hour!)
+        assert db.is_external_seen("<def-1@vandf.com>") is True
+        assert db.is_external_seen("<def-2@tera-instruments.com>") is True
+        assert _parse_utc(db.get_mail_watermark("inbox")) == datetime(2026, 11, 24, 3, 0, 0, tzinfo=timezone.utc)
 
         # Sent email IS marked seen & sent watermark IS advanced
         assert db.is_external_seen("<sent-def-1@wissentek.com>") is True
         assert _parse_utc(db.get_mail_watermark("sent")) == datetime(2026, 11, 24, 3, 0, 0, tzinfo=timezone.utc)
 
-        # Single push mentions deferred inbox subjects, card #1, and sent list
+        # Single push includes 6-element inbox digest, new card #2, old card #1 queue reminder, and sent list
         assert len(pushes) == 1
         msg = pushes[0]
         assert "V&F 报价更新" in msg
         assert "Tera 交期" in msg
-        assert "#1" in msg
+        assert "#1" in msg and "#2" in msg
         assert "你发出 1 封（不建卡）" in msg
         assert "support@tera-instruments.com" in msg
         assert "Re: Spectrometer delivery" in msg

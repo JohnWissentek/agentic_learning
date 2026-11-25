@@ -27,6 +27,7 @@ from wechat_assistant.intake.wecom_gateway import WeComGateway
 from wechat_assistant.schemas import ActionMutation, ListType, PriorityLevel, WorkDomain
 from wechat_assistant.storage.db import Database
 from wechat_assistant.tools.onedrive_tools import OneDrive21VianetClient
+from wechat_assistant.tools.schedule_tools import calc_business_date
 
 COOKIE_NAME = "chairman_cockpit_session"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -660,7 +661,12 @@ def create_app(
     async def create_item_api(body: ItemCreateBody):
         today_str = now_local().strftime("%Y-%m-%d")
         start_d = body.planned_start_at if body.planned_start_at else today_str
-        end_d = start_d if body.planned_end_at is None else body.planned_end_at
+        raw_end = (body.planned_end_at or "").strip() if body.planned_end_at is not None else ""
+        if raw_end:
+            end_d = raw_end
+        else:
+            base_d = start_d if start_d > today_str else today_str
+            end_d = calc_business_date(base_d, 3)
         act = ActionMutation(
             list_type=body.list_type,
             work_domain=body.work_domain,
@@ -678,7 +684,7 @@ def create_app(
             planned_end_at=end_d,
             estimated_hours=body.estimated_hours,
             priority=body.priority,
-            missing_required_fields=(["planned_end_at"] if end_d == "" else []),
+            missing_required_fields=[],
         )
         res = store.apply_proposal_atomic(
             proposal_id=None,

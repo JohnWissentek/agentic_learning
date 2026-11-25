@@ -735,8 +735,33 @@ _QUOTE_CUT_RE = re.compile(
 )
 
 
-def _format_recipient_list(msg: dict[str, Any], field: str) -> str:
-    """Format Graph recipient list deterministically as readable `Name(email)` or `email`."""
+def _format_person_display(
+    ea: dict[str, Any],
+    *,
+    internal_domains: tuple[str, ...] = (),
+) -> str:
+    """Render concise person display: `Name` for internal colleagues, `Name(domain)` or `email` for externals."""
+    addr = (ea.get("address") or "").strip()
+    name = (ea.get("name") or "").strip()
+    if name and addr and name.lower() != addr.lower():
+        local_part, _, raw_domain = addr.partition("@")
+        domain = raw_domain.lower()
+        norm_internal = tuple(d.strip().lower().lstrip(".") for d in internal_domains if d and d.strip())
+        if domain and any(domain == d or domain.endswith(f".{d}") for d in norm_internal):
+            return name
+        if local_part and name.lower() == local_part.lower():
+            return addr
+        return f"{name}({domain})" if domain else name
+    return addr or name
+
+
+def _format_recipient_list(
+    msg: dict[str, Any],
+    field: str,
+    *,
+    internal_domains: tuple[str, ...] = (),
+) -> str:
+    """Format Graph recipient list concisely and deterministically (`无` when empty)."""
     entries: list[str] = []
     seen: set[str] = set()
     for rec in msg.get(field) or []:
@@ -747,20 +772,19 @@ def _format_recipient_list(msg: dict[str, Any], field: str) -> str:
         if not key or key in seen:
             continue
         seen.add(key)
-        if name and addr and name.lower() != addr.lower():
-            entries.append(f"{name}({addr})")
-        else:
-            entries.append(addr or name)
+        disp = _format_person_display(ea, internal_domains=internal_domains)
+        if disp:
+            entries.append(disp)
     return "、".join(entries) if entries else "无"
 
 
-def _format_sender_display(msg: dict[str, Any]) -> str:
+def _format_sender_display(
+    msg: dict[str, Any],
+    *,
+    internal_domains: tuple[str, ...] = (),
+) -> str:
     ea = (msg.get("from") or {}).get("emailAddress") or {}
-    addr = (ea.get("address") or "").strip()
-    name = (ea.get("name") or "").strip()
-    if name and addr and name.lower() != addr.lower():
-        return f"{name}({addr})"
-    return addr or name or "未知发件人"
+    return _format_person_display(ea, internal_domains=internal_domains) or "未知发件人"
 
 
 def _extract_clean_mail_snippet(msg: dict[str, Any], max_chars: int = 140) -> str:
@@ -831,16 +855,17 @@ def format_mail_digest_section(
         ref = str(d.get("mail_ref") or f"MAIL-{idx_d}").strip().upper()
         digest_by_ref[ref] = d
 
-    lines: list[str] = [f"【收件逐封明细（共 {len(inbox_batch)} 封）】"]
+    heading = f"【收件逐封明细（共 {len(inbox_batch)} 封）】"
+    email_blocks: list[str] = []
     for idx, msg in enumerate(inbox_batch, 1):
         ref_key = f"MAIL-{idx}"
         subj = (msg.get("subject") or "（无主题）").strip()
         dt_utc = _msg_time_utc(msg, "receivedDateTime")
         hhmm = dt_utc.astimezone(local_tz).strftime("%H:%M") if dt_utc.year > 1 else ""
         time_tag = f"（{hhmm}）" if hhmm else ""
-        sender_disp = _format_sender_display(msg)
-        to_disp = _format_recipient_list(msg, "toRecipients")
-        cc_disp = _format_recipient_list(msg, "ccRecipients")
+        sender_disp = _format_sender_display(msg, internal_domains=internal_domains)
+        to_disp = _format_recipient_list(msg, "toRecipients", internal_domains=internal_domains)
+        cc_disp = _format_recipient_list(msg, "ccRecipients", internal_domains=internal_domains)
 
         role_hint = infer_email_role_hint(msg, self_email=self_email, internal_domains=internal_domains)
         conv_id = str(msg.get("conversationId") or "").strip()
@@ -861,11 +886,16 @@ def format_mail_digest_section(
             main_content = _extract_clean_mail_snippet(msg, max_chars=140)
             act_type, act_advice = _deterministic_action_advice(msg, role_hint=role_hint, matched_task=matched_task)
 
-        lines.append(f"{idx}. 《{subj}》{time_tag}")
-        lines.append(f"   • 发件人：{sender_disp} ｜ 主送：{to_disp} ｜ 抄送：{cc_disp}")
-        lines.append(f"   • 主要内容：{main_content}")
-        lines.append(f"   • 建议处理：【{act_type}】{act_advice}")
-    return "\n".join(lines)
+        block_lines = [
+            f"{idx}. 《{subj}》{time_tag}",
+            f"   • 发件人：{sender_disp} ｜ 主送：{to_disp} ｜ 抄送：{cc_disp}",
+            f"   • 主要内容：{main_content}",
+            f"   • 建议处理：【{act_type}】{act_advice}",
+        ]
+        if idx == 1:
+            block_lines.insert(0, heading)
+        email_blocks.append("\n".join(block_lines))
+    return "\n\n".join(email_blocks) if email_blocks else heading
 
 
 def _record_sent_mail_timeline_matches(
@@ -1018,7 +1048,7 @@ async def run_mail_window_once(
         db.set_mail_watermark("sent", sent_target_wm)
         return {"ok": True, "pushed": True, "domains": domains, "sent_count": len(sent_batch)}
 
-    # Case 2 & 3: Check pending proposal and optionally run batched triage under engine._turn_lock
+    # Case 2 (Plan A parallel pending-card queue): ALWAYS run batched triage without blocking on older pending cards!
     batch_prompt = _build_inbox_batch_prompt(
         inbox_batch,
         sent_lines,
@@ -1030,43 +1060,48 @@ async def run_mail_window_once(
     )
     batch_ext_id = f"mail_batch:{local_now.strftime('%Y-%m-%d')}:{slot_label}:{_msg_ext_id(inbox_batch[0])}"
 
-    def _check_and_maybe_triage() -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+    def _run_batched_triage() -> tuple[dict[str, Any] | None, str | None]:
         with engine._turn_lock:
-            existing_pending = db.get_latest_pending_proposal("owner")
-            if existing_pending is not None:
-                return existing_pending, None
-            reply = engine.handle_incoming_turn(
-                batch_prompt,
-                sender="mail:hourly_batch",
-                external_msg_id=batch_ext_id,
-                thread_id="owner",
-                force_work_triage=True,
-            )
-            return None, reply
+            try:
+                reply = engine.handle_incoming_turn(
+                    batch_prompt,
+                    sender="mail:hourly_batch",
+                    external_msg_id=batch_ext_id,
+                    thread_id="owner",
+                    force_work_triage=True,
+                )
+                traj = reply.get("trajectory") or []
+                err_steps = [str(s) for s in traj if str(s).startswith("error:")]
+                if err_steps:
+                    return None, err_steps[0].split(":", 1)[1]
+                return reply, None
+            except Exception as exc:
+                logger.warning(
+                    "Hourly mail batch LLM triage degraded to deterministic digest: %s",
+                    redact_secrets(f"{type(exc).__name__}: {exc}", settings),
+                )
+                return None, type(exc).__name__
 
-    existing_pending, triage_reply = await asyncio.to_thread(_check_and_maybe_triage)
+    triage_reply, llm_err = await asyncio.to_thread(_run_batched_triage)
 
-    # Case 2: Deferred due to existing pending card -> STILL render standardized 6-field per-email digest!
-    if existing_pending is not None:
-        readonly_digests = await asyncio.to_thread(_summarize_mail_batch_readonly, engine, batch_prompt)
+    # Graceful 503 degradation: still push deterministic 6-element digest, keep inbox unseen for next-slot card retry
+    if triage_reply is None:
         digest_block = format_mail_digest_section(
             inbox_batch,
             local_tz=local_now.tzinfo,
             self_email=settings.mail_user,
             internal_domains=internal_domains,
             db=db,
-            llm_digests=readonly_digests,
+            llm_digests=None,
         )
         header_line = f"{header}｜收件 {len(inbox_batch)} 封" + (f" · 发件 {len(sent_batch)} 封" if sent_batch else "")
-        defer_prefix = (
+        degraded_prefix = (
             f"{header_line}\n\n"
             f"{digest_block}\n\n"
             "━━━━━━━━━━━━━━━━━━━━\n"
-            f"⚠️ 确认卡 #{existing_pending['id']} 还没回复，本班暂不生成新确认卡"
-            f"（以上收件已逐封提炼要点；处理完 #{existing_pending['id']} 后，下一班自动深度分析立卡）。\n"
-            "👉 回复 1 确认落盘 ｜ 0 作废 ｜ 或直接发自然语言调整当前确认卡"
+            "⚠️ 大模型接口暂不可用，以上收件已先按原文提炼 6 要素明细；下一班服务恢复后将自动补齐任务确认卡。"
         )
-        msg_text = _compose_push_with_sent_cap(defer_prefix, sent_lines)
+        msg_text = _compose_push_with_sent_cap(degraded_prefix, sent_lines)
         await send_push(msg_text)
         _record_sent_mail_timeline_matches(db, matched_sent_pairs, local_now.tzinfo, settings.mail_user)
         for ext_id in inbox_skipped_ids + sent_skipped_ids + [_msg_ext_id(m) for m in sent_batch]:
@@ -1075,13 +1110,13 @@ async def run_mail_window_once(
         return {
             "ok": True,
             "pushed": True,
-            "deferred_inbox": True,
+            "llm_degraded": True,
+            "error": llm_err,
             "domains": domains,
             "sent_count": len(sent_batch),
         }
 
-    # Case 3: Fresh batched triage completed; render standardized 6-field per-email digest + decision card
-    assert triage_reply is not None
+    # Normal Plan A path: standardized 6-element per-email digest + parallel decision card (or pure FYI)
     created_pid = triage_reply.get("proposal_id")
     llm_digests: list[dict[str, Any]] | None = None
     if isinstance(triage_reply.get("mail_digests"), list) and triage_reply["mail_digests"]:
@@ -1093,7 +1128,7 @@ async def run_mail_window_once(
             if isinstance(prop_dict, dict) and isinstance(prop_dict.get("mail_digests"), list):
                 llm_digests = prop_dict["mail_digests"]
     if llm_digests is None and created_pid is not None:
-        saved_pending = db.get_latest_pending_proposal("owner")
+        saved_pending = db.get_pending_proposal(int(created_pid), thread_id="owner") or db.get_latest_pending_proposal("owner")
         if saved_pending and isinstance(saved_pending.get("proposal"), dict):
             md = saved_pending["proposal"].get("mail_digests")
             if isinstance(md, list):

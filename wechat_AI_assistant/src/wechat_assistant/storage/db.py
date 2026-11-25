@@ -1161,6 +1161,13 @@ class Database:
 
     # --- Pending HITL proposals (F8 crash-recovery) ---
 
+    def _hydrate_pending_row(self, row: sqlite3.Row) -> dict[str, Any]:
+        out = dict(row)
+        out["proposal"] = _safe_json_dict(out.get("proposal_json"))
+        out["source_ids"] = _safe_json_list(out.get("source_ids_json"))
+        out["pending_files"] = _safe_json_list(out.get("pending_files_json"))
+        return out
+
     def save_pending_proposal(
         self,
         *,
@@ -1168,12 +1175,20 @@ class Database:
         proposal_dict: dict[str, Any],
         source_ids: list[int],
         pending_files: list[dict[str, Any]] | None = None,
+        replace_proposal_id: int | None = None,
+        supersede_existing: bool = False,
     ) -> int:
         with self._lock, self._connect() as conn:
-            conn.execute(
-                "UPDATE pending_proposals SET status = 'superseded' WHERE thread_id = ? AND status = 'pending'",
-                (thread_id,),
-            )
+            if replace_proposal_id is not None:
+                conn.execute(
+                    "UPDATE pending_proposals SET status = 'superseded' WHERE id = ? AND thread_id = ? AND status = 'pending'",
+                    (int(replace_proposal_id), thread_id),
+                )
+            elif supersede_existing:
+                conn.execute(
+                    "UPDATE pending_proposals SET status = 'superseded' WHERE thread_id = ? AND status = 'pending'",
+                    (thread_id,),
+                )
             cur = conn.execute(
                 """
                 INSERT INTO pending_proposals (thread_id, proposal_json, source_ids_json, pending_files_json, status, created_at)
@@ -1189,6 +1204,44 @@ class Database:
             )
             return int(cur.lastrowid)
 
+    def get_pending_proposal(
+        self,
+        proposal_id: int,
+        *,
+        thread_id: str | None = None,
+    ) -> dict[str, Any] | None:
+        with self._lock, self._connect() as conn:
+            if thread_id:
+                row = conn.execute(
+                    "SELECT * FROM pending_proposals WHERE id = ? AND thread_id = ? AND status = 'pending' LIMIT 1",
+                    (int(proposal_id), thread_id),
+                ).fetchone()
+            else:
+                row = conn.execute(
+                    "SELECT * FROM pending_proposals WHERE id = ? AND status = 'pending' LIMIT 1",
+                    (int(proposal_id),),
+                ).fetchone()
+            return self._hydrate_pending_row(row) if row else None
+
+    def list_pending_proposals(
+        self,
+        thread_id: str | None = None,
+        *,
+        limit: int = 20,
+    ) -> list[dict[str, Any]]:
+        with self._lock, self._connect() as conn:
+            if thread_id:
+                rows = conn.execute(
+                    "SELECT * FROM pending_proposals WHERE thread_id = ? AND status = 'pending' ORDER BY id ASC LIMIT ?",
+                    (thread_id, int(limit)),
+                ).fetchall()
+            else:
+                rows = conn.execute(
+                    "SELECT * FROM pending_proposals WHERE status = 'pending' ORDER BY id ASC LIMIT ?",
+                    (int(limit),),
+                ).fetchall()
+            return [self._hydrate_pending_row(r) for r in rows]
+
     def get_latest_pending_proposal(self, thread_id: str | None = None) -> dict[str, Any] | None:
         with self._lock, self._connect() as conn:
             if thread_id:
@@ -1200,13 +1253,7 @@ class Database:
                 row = conn.execute(
                     "SELECT * FROM pending_proposals WHERE status = 'pending' ORDER BY id DESC LIMIT 1"
                 ).fetchone()
-            if not row:
-                return None
-            out = dict(row)
-            out["proposal"] = _safe_json_dict(out.get("proposal_json"))
-            out["source_ids"] = _safe_json_list(out.get("source_ids_json"))
-            out["pending_files"] = _safe_json_list(out.get("pending_files_json"))
-            return out
+            return self._hydrate_pending_row(row) if row else None
 
     def cancel_pending_proposal(self, proposal_id: int) -> bool:
         with self._lock, self._connect() as conn:

@@ -307,6 +307,8 @@ class AgentDecision(BaseModel):
     proposal: TriageProposal | None = None
     confirm_and_commit: bool = False
     ideas_only: bool = False
+    target_proposal_ids: list[int] = Field(default_factory=list)
+    replace_proposal_id: int | None = None
     field_updates: list[TaskFieldUpdate] = Field(default_factory=list)
     note_appends: list[TaskNoteAppend] = Field(default_factory=list)
     status_changes: list[TaskStatusChange] = Field(default_factory=list)

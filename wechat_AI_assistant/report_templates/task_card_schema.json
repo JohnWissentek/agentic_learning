@@ -216,7 +216,7 @@
         },
         "planned_end_at": {
           "type": "string",
-          "description": "【必填｜4）目标截止时间】YYYY-MM-DD；用户/邮件未提供时填 \"\"（严禁瞎猜当天），并写入 missing_required_fields"
+          "description": "【必填｜4）目标截止时间】YYYY-MM-DD；用户/邮件未明确指定时默认设为任务建立日后 3 个工作日（自动跳过周末），不再留空提示缺失"
         },
         "blocker_note": {
           "type": "string",

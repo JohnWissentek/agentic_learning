@@ -343,7 +343,7 @@ def run_all_golden_samples() -> list[dict[str, str]]:
         )
         rec("G11", "香港邮箱", "11:00 班：1白名单收件 + 1广告 + 1发件(请确认)", "mail_window -> force_work_triage -> 1 push", "0 次路由调用、1 张卡 + 发件标「可能在等对方」、广告静默过滤", ok11)
 
-        # G12: Next slot with pending card still open -> inbox deferred, sent still delivered
+        # G12: Next slot with pending card still open -> Plan A parallel card #2 created, #1 preserved, i3 marked seen
         inbox12 = [{
             "id": "i3", "internetMessageId": "<i3@budi.de>", "subject": "Budi 新订单确认",
             "from": {"emailAddress": {"address": "buyer@budi.de"}},
@@ -362,8 +362,14 @@ def run_all_golden_samples() -> list[dict[str, str]]:
             settings=eng11.settings, db=db11, od_client=od11, engine=eng11, send_push=_p12,
             now_local=datetime(2026, 11, 24, 12, 0, tzinfo=SHANGHAI), domains_path=dom_path, fetch_folder=_f12,
         ))
-        ok12 = len(pushes12) == 1 and "还没回复" in pushes12[0] and not db11.is_external_seen("<i3@budi.de>")
-        rec("G12", "香港邮箱", "12:00 班：上张卡未回复时来新收件", "turn_lock -> pending_deferral", "不覆盖旧卡、提醒主题、保留未 seen 待下班处理", ok12)
+        ok12 = (
+            len(pushes12) == 1
+            and [p["id"] for p in db11.list_pending_proposals("owner")] == [1, 2]
+            and "📋 确认 #2｜" in pushes12[0]
+            and "#1" in pushes12[0]
+            and db11.is_external_seen("<i3@budi.de>")
+        )
+        rec("G12", "香港邮箱", "12:00 班：旧卡 #1 未回复时来新收件（方案 A 并行队列）", "mail_window -> parallel_card(#2) + queue_hint(#1)", "不阻塞不覆盖 #1，并行新建 #2 并推进水位防重复推送", ok12)
         eng11.close()
 
         # G13: Quiet hours (Saturday & 22:00) -> None

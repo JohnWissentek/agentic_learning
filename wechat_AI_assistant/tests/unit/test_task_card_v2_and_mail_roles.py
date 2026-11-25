@@ -1267,7 +1267,10 @@ def test_web_api_supports_v2_task_card_fields_notes_and_timeline(tmp_path: Path)
             assert card["deliverable"] == "产出可采购的国产替代 BOM 清单并完成样机测试通过"
             assert card["assignee"] == "李文颖"
             assert card["external_partner"] == "无"
-            assert card["planned_end_at"] == ""
+            from wechat_assistant.config import today_local
+            from wechat_assistant.tools.schedule_tools import calc_business_date
+            expected_default_end = calc_business_date(max(today_local().isoformat(), "2026-11-25"), 3)
+            assert card["planned_end_at"] == expected_default_end
             assert "排除金属屏蔽盖，只替换板级高价值进口 IC" in _notes_blob(card["comments"])
             assert "研发重点，本周给出首批备选 IC" in _notes_blob(card["ceo_evaluation"])
             assert "已完成绿创商城第一批国产器件参数核对" in json.dumps(card["timeline"], ensure_ascii=False)

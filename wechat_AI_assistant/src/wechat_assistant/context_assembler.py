@@ -133,6 +133,7 @@ class AssembledContext:
     recent_turns: list[dict[str, Any]] = field(default_factory=list)
     recent_turn_ids: set[int] = field(default_factory=set)
     pending_proposal: dict[str, Any] | None = None
+    pending_proposals: list[dict[str, Any]] = field(default_factory=list)
     pending_is_fresh: bool = False
     rolling_summary_text: str = "（暂无跨天滚动摘要）"
     project_context_text: str = ""
@@ -190,35 +191,43 @@ class ContextAssembler:
             if len(anchor_entities) >= 6:
                 break
 
-        pending = self.db.get_latest_pending_proposal(thread_id)
+        all_pending = self.db.list_pending_proposals(thread_id, limit=10)
+        pending = all_pending[-1] if all_pending else None
         pending_fresh = False
         pending_text = "（当前无待确认卡片）"
-        if pending:
-            p_dt = _parse_ts(pending.get("created_at"))
+        if all_pending:
+            p_dt = _parse_ts(pending.get("created_at")) if pending else None
             age_min = ((now_dt - p_dt).total_seconds() / 60.0) if p_dt else 0.0
             pending_fresh = age_min <= self.FRESH_PENDING_MINUTES
-            prop = pending.get("proposal") or {}
-            act_lines = [
-                f"  - [{a.get('priority')}][{a.get('list_type')}] {a.get('project_name')}: {a.get('title')} "
-                f"(负责人:{a.get('owner')}, 实施人:{a.get('assignee') or a.get('owner')}, "
-                f"周期 {a.get('planned_start_at')}~{a.get('planned_end_at') or '待补齐'})"
-                for a in prop.get("actions", [])[:6]
-            ]
-            for upd in prop.get("task_updates", [])[:6]:
-                tl = upd.get("timeline_entry") or {}
-                act_lines.append(
-                    f"  - [归入已有任务 #{upd.get('target_task_id')}] {upd.get('target_task_title', '')}: "
-                    f"{tl.get('summary', '')}"
+            card_blocks: list[str] = []
+            for p_item in all_pending:
+                item_dt = _parse_ts(p_item.get("created_at"))
+                item_age = ((now_dt - item_dt).total_seconds() / 60.0) if item_dt else 0.0
+                item_fresh = item_age <= self.FRESH_PENDING_MINUTES
+                prop = p_item.get("proposal") or {}
+                act_lines = [
+                    f"  - [{a.get('priority')}][{a.get('list_type')}] {a.get('project_name')}: {a.get('title')} "
+                    f"(负责人:{a.get('owner')}, 实施人:{a.get('assignee') or a.get('owner')}, "
+                    f"周期 {a.get('planned_start_at')}~{a.get('planned_end_at') or '待补齐'})"
+                    for a in prop.get("actions", [])[:6]
+                ]
+                for upd in prop.get("task_updates", [])[:6]:
+                    tl = upd.get("timeline_entry") or {}
+                    act_lines.append(
+                        f"  - [归入已有任务 #{upd.get('target_task_id')}] {upd.get('target_task_title', '')}: "
+                        f"{tl.get('summary', '')}"
+                    )
+                for fyi in prop.get("fyi_notices", [])[:4]:
+                    act_lines.append(f"  - [抄送知会] {fyi.get('summary', '')}")
+                is_latest_tag = "｜最新默认" if (pending and p_item["id"] == pending["id"]) else ""
+                card_blocks.append(
+                    f"待确认卡片 #{p_item['id']}（生成于 {p_item.get('created_at')}，距今约 {max(0, int(item_age))} 分钟，"
+                    f"{'仍在当前连续讨论窗口内' if item_fresh else '已隔较长时间'}{is_latest_tag}）：\n"
+                    f"- 标题：{prop.get('headline', '')}\n"
+                    f"- 摘要：{prop.get('executive_summary', '')}\n"
+                    + ("\n".join(act_lines) if act_lines else "  - （无明细动作）")
                 )
-            for fyi in prop.get("fyi_notices", [])[:4]:
-                act_lines.append(f"  - [抄送知会] {fyi.get('summary', '')}")
-            pending_text = (
-                f"待确认卡片 #{pending['id']}（生成于 {pending.get('created_at')}，距今约 {max(0, int(age_min))} 分钟，"
-                f"{'仍在当前连续讨论窗口内' if pending_fresh else '已隔较长时间'}）：\n"
-                f"- 标题：{prop.get('headline', '')}\n"
-                f"- 摘要：{prop.get('executive_summary', '')}\n"
-                + ("\n".join(act_lines) if act_lines else "  - （无明细动作）")
-            )
+            pending_text = "\n\n".join(card_blocks)
 
         projects = self.db.list_projects()
         all_open_items = self.db.list_items(include_done=False)
@@ -274,6 +283,7 @@ class ContextAssembler:
             recent_turns=recent_turns,
             recent_turn_ids=recent_ids,
             pending_proposal=pending,
+            pending_proposals=all_pending,
             pending_is_fresh=pending_fresh,
             rolling_summary_text=rolling_summary_text,
             project_context_text=project_context_text,

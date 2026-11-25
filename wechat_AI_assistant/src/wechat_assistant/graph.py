@@ -109,11 +109,12 @@ def build_calendar_anchor_text(today: date | None = None) -> str:
         for i in range(7)
     )
     next_biz = calc_business_date(d.isoformat(), 1)
+    default_end_3biz = calc_business_date(d.isoformat(), 3)
     return (
         f"昨天={yesterday.isoformat()}（{_WEEKDAY_CN[yesterday.weekday()]}）｜"
         f"今天={d.isoformat()}（{_WEEKDAY_CN[d.weekday()]}）｜"
         f"明天={tomorrow.isoformat()}（{_WEEKDAY_CN[tomorrow.weekday()]}）｜"
-        f"下一工作日={next_biz}\n"
+        f"下一工作日={next_biz}｜新任务默认截止（建立后3个工作日）={default_end_3biz}\n"
         f"本周日历：{this_week}\n"
         f"下周日历：{next_week}"
     )
@@ -889,15 +890,16 @@ class ChiefOfStaffEngine:
                 {"role": "user", "content": user_prompt},
             ],
             AgentDecision,
-            tools=tools,
-            tool_executor=tool_exec,
-            max_tokens=2048,
+            tools=None if is_mail_origin else tools,
+            tool_executor=None if is_mail_origin else tool_exec,
+            max_tokens=3072,
         )
         self._record_latest_call(rec)
 
         guard_issues: list[str] = []
         if decision.mode == "propose" and decision.proposal is not None:
             prop = _backfill_mail_conversation_ids(decision.proposal, raw_input)
+            default_end_str = calc_business_date(today_str, 3)
             for act in prop.actions:
                 if is_mail_origin:
                     act.source_channel = "outlook"
@@ -907,6 +909,21 @@ class ChiefOfStaffEngine:
                     # WeChat delegation from Chairman is never an Outlook CC-observer
                     if act.chairman_role == "cc_observer":
                         act.chairman_role = "owner"
+                # Default deadline policy: +3 business days after task creation (or future start date)
+                start_clean = (act.planned_start_at or "").strip()
+                if not start_clean:
+                    act.planned_start_at = today_str
+                    start_clean = today_str
+                if not (act.planned_end_at or "").strip():
+                    base_d = start_clean[:10] if len(start_clean) >= 10 and start_clean[:10] > today_str else today_str
+                    try:
+                        act.planned_end_at = calc_business_date(base_d, 3)
+                    except ValueError:
+                        act.planned_end_at = default_end_str
+                if act.missing_required_fields and (act.planned_end_at or "").strip():
+                    act.missing_required_fields = [
+                        f for f in act.missing_required_fields if f != "planned_end_at"
+                    ]
             decision.proposal = prop
 
             guard_issues = objective_proposal_guard(
@@ -1101,21 +1118,76 @@ class ChiefOfStaffEngine:
             assert_no_secrets_leaked(reply, self.settings)
             return {"reply_text": reply, "proposal_id": None, "trajectory": traj + ["exec:show_workload"]}
 
+        def _format_remaining_pending_hint(other_pending: list[dict[str, Any]]) -> str:
+            if not other_pending:
+                return ""
+            labels: list[str] = []
+            for p_it in other_pending[:5]:
+                hl = str((p_it.get("proposal") or {}).get("headline") or "未命名事项").strip()
+                if len(hl) > 22:
+                    hl = hl[:21] + "…"
+                labels.append(f"#{p_it['id']}（《{hl}》）")
+            suffix = f" 等 {len(other_pending)} 张" if len(other_pending) > 5 else ""
+            return (
+                f"📌 另有 {len(other_pending)} 张待确认卡片：{'、'.join(labels)}{suffix}\n"
+                "👉 可直接回复「确认 #编号」「作废 #编号」或「全部确认」"
+            )
+
         if decision.mode == "confirm_pending":
-            pending = self.db.get_latest_pending_proposal(thread_id)
-            if not pending:
-                return {"reply_text": "当前没有待确认的提案卡片。", "proposal_id": None, "trajectory": traj + ["exec:confirm_pending"]}
-            msg = self.commit_pending_proposal(pending, ideas_only=bool(decision.ideas_only))
+            req_ids: list[int] = []
+            for raw_id in decision.target_proposal_ids or []:
+                pid_int = int(raw_id)
+                if pid_int not in req_ids:
+                    req_ids.append(pid_int)
+            if req_ids:
+                parts: list[str] = []
+                for pid_int in req_ids:
+                    target = self.db.get_pending_proposal(pid_int, thread_id=thread_id)
+                    if not target:
+                        parts.append(f"⚠️ 未找到待确认卡片 #{pid_int}（可能已确认或已作废）。")
+                    else:
+                        parts.append(self.commit_pending_proposal(target, ideas_only=bool(decision.ideas_only)))
+                msg = "\n\n".join(parts)
+            else:
+                pending = self.db.get_latest_pending_proposal(thread_id)
+                if not pending:
+                    return {"reply_text": "当前没有待确认的提案卡片。", "proposal_id": None, "trajectory": traj + ["exec:confirm_pending"]}
+                msg = self.commit_pending_proposal(pending, ideas_only=bool(decision.ideas_only))
+            remaining = self.db.list_pending_proposals(thread_id)
+            rem_hint = _format_remaining_pending_hint(remaining)
+            if rem_hint:
+                msg = f"{msg}\n\n{rem_hint}"
             assert_no_secrets_leaked(msg, self.settings)
             return {"reply_text": msg, "proposal_id": None, "trajectory": traj + ["exec:confirm_pending"]}
 
         if decision.mode == "discard_pending":
-            pending = self.db.get_latest_pending_proposal(thread_id)
-            if not pending:
-                return {"reply_text": "当前没有可作废的待确认卡片。", "proposal_id": None, "trajectory": traj + ["exec:discard_pending"]}
-            self.db.cancel_pending_proposal(int(pending["id"]))
-            self._cleanup_pending_files(pending.get("pending_files") or [])
-            msg = f"🗑️ 已作废待确认卡片 #{pending['id']}，未写入任何清单。"
+            req_ids = []
+            for raw_id in decision.target_proposal_ids or []:
+                pid_int = int(raw_id)
+                if pid_int not in req_ids:
+                    req_ids.append(pid_int)
+            if req_ids:
+                parts = []
+                for pid_int in req_ids:
+                    target = self.db.get_pending_proposal(pid_int, thread_id=thread_id)
+                    if not target:
+                        parts.append(f"⚠️ 未找到可作废的待确认卡片 #{pid_int}。")
+                    else:
+                        self.db.cancel_pending_proposal(pid_int)
+                        self._cleanup_pending_files(target.get("pending_files") or [])
+                        parts.append(f"🗑️ 已作废待确认卡片 #{pid_int}，未写入任何清单。")
+                msg = "\n".join(parts)
+            else:
+                pending = self.db.get_latest_pending_proposal(thread_id)
+                if not pending:
+                    return {"reply_text": "当前没有可作废的待确认卡片。", "proposal_id": None, "trajectory": traj + ["exec:discard_pending"]}
+                self.db.cancel_pending_proposal(int(pending["id"]))
+                self._cleanup_pending_files(pending.get("pending_files") or [])
+                msg = f"🗑️ 已作废待确认卡片 #{pending['id']}，未写入任何清单。"
+            remaining = self.db.list_pending_proposals(thread_id)
+            rem_hint = _format_remaining_pending_hint(remaining)
+            if rem_hint:
+                msg = f"{msg}\n\n{rem_hint}"
             assert_no_secrets_leaked(msg, self.settings)
             return {
                 "reply_text": msg,
@@ -1140,16 +1212,26 @@ class ChiefOfStaffEngine:
                     "trajectory": traj + ["exec:pure_fyi_no_card"],
                 }
 
-            # Carry over attachments/source_ids when revising an existing pending proposal
-            existing_pending = self.db.get_latest_pending_proposal(thread_id)
+            # Plan A parallel queue: mail batches NEVER overwrite existing cards; WeChat only supersedes targeted card
+            replace_id: int | None = None
+            if not is_mail_origin:
+                if decision.replace_proposal_id is not None:
+                    replace_id = int(decision.replace_proposal_id)
+                elif decision.confirm_and_commit:
+                    latest_p = self.db.get_latest_pending_proposal(thread_id)
+                    if latest_p is not None:
+                        replace_id = int(latest_p["id"])
+
             merged_source_ids = list(state.get("source_ids") or [])
             merged_files = list(state.get("attachments") or [])
-            if existing_pending and not is_mail_origin:
-                for sid in existing_pending.get("source_ids") or []:
-                    if sid not in merged_source_ids:
-                        merged_source_ids.append(sid)
-                if not merged_files:
-                    merged_files = list(existing_pending.get("pending_files") or [])
+            if replace_id is not None:
+                target_existing = self.db.get_pending_proposal(replace_id, thread_id=thread_id)
+                if target_existing:
+                    for sid in target_existing.get("source_ids") or []:
+                        if sid not in merged_source_ids:
+                            merged_source_ids.append(sid)
+                    if not merged_files:
+                        merged_files = list(target_existing.get("pending_files") or [])
 
             # Safety invariant: NEVER commit if objective chassis guard still reports issues!
             if decision.confirm_and_commit and guard_issues:
@@ -1170,12 +1252,18 @@ class ChiefOfStaffEngine:
                 proposal_dict=proposal.model_dump(mode="json"),
                 source_ids=merged_source_ids,
                 pending_files=merged_files,
+                replace_proposal_id=replace_id,
+                supersede_existing=False,
             )
 
             if decision.confirm_and_commit and not guard_issues:
-                fresh_pending = self.db.get_latest_pending_proposal(thread_id)
+                fresh_pending = self.db.get_pending_proposal(pid, thread_id=thread_id)
                 assert fresh_pending is not None
                 msg = self.commit_pending_proposal(fresh_pending, ideas_only=bool(decision.ideas_only))
+                remaining = self.db.list_pending_proposals(thread_id)
+                rem_hint = _format_remaining_pending_hint(remaining)
+                if rem_hint:
+                    msg = f"{msg}\n\n{rem_hint}"
                 assert_no_secrets_leaked(msg, self.settings)
                 return {
                     "proposal_id": pid,
@@ -1189,6 +1277,10 @@ class ChiefOfStaffEngine:
                 critic_issues=guard_issues or None,
                 is_mail_batch=is_mail_origin,
             )
+            other_pending = [p for p in self.db.list_pending_proposals(thread_id) if int(p["id"]) != pid]
+            other_hint = _format_remaining_pending_hint(other_pending)
+            if other_hint:
+                card_text = f"{card_text}\n\n{other_hint}"
             assert_no_secrets_leaked(card_text, self.settings)
             return {
                 "proposal_id": pid,

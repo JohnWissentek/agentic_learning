@@ -212,16 +212,32 @@ class WeComGateway:
             self._token_value = ""
             self._token_exp = 0.0
 
+    WECOM_APP_CHUNK_BYTES = 1100
+    WECOM_APP_CHUNK_CHARS = 650
+    WECOM_APP_CHUNK_DELAY_SECONDS = 0.6
+
     async def send_app_push(self, content: str) -> dict[str, Any]:
-        """Push proactive text notification via self-built App (`工作助理`) -> WeChat Plugin."""
+        """Push proactive text notification via self-built App (`工作助理`) -> WeChat Plugin.
+
+        Uses WeChat-Plugin-safe UTF-8 byte & char budgets, atomic block-level chunking
+        (never splits a whole email across messages), page numbers when multi-part,
+        and inter-chunk pacing to prevent silent bridge drops.
+        """
         if not (self.settings.wecom_corp_id and self.settings.wecom_app_agent_id and self.settings.wecom_app_secret):
             return {"skipped": True, "reason": "missing_wecom_app_config"}
         touser = self.settings.wecom_app_owner_userid or "@all"
         token = await self.get_access_token()
         data: dict[str, Any] = {"errcode": 0}
         safe_content = redact_secrets(content, self.settings)
+        chunks = self._split_chunks(
+            safe_content,
+            limit=self.WECOM_APP_CHUNK_BYTES,
+            max_chars=self.WECOM_APP_CHUNK_CHARS,
+        )
+        total = len(chunks)
         async with httpx.AsyncClient(timeout=15.0) as client:
-            for part in self._split_chunks(safe_content, limit=1800):
+            for idx, raw_part in enumerate(chunks, 1):
+                part = f"【{idx}/{total}】\n{raw_part}" if total > 1 else raw_part
                 for attempt in range(2):
                     resp = await client.post(
                         "https://qyapi.weixin.qq.com/cgi-bin/message/send",
@@ -245,7 +261,16 @@ class WeComGateway:
                         raise RuntimeError(
                             f"WeCom message/send failed: errcode={errcode} errmsg={data.get('errmsg', '')}"
                         )
+                    logger.info(
+                        "WeCom app push chunk %d/%d ok (%d chars, %d bytes)",
+                        idx,
+                        total,
+                        len(part),
+                        len(part.encode("utf-8")),
+                    )
                     break
+                if idx < total:
+                    await asyncio.sleep(self.WECOM_APP_CHUNK_DELAY_SECONDS)
         return data
 
     async def send_kf_text(self, *, touser: str, open_kfid: str, content: str) -> None:
@@ -286,41 +311,70 @@ class WeComGateway:
                     await self.send_app_push(part)
 
     @staticmethod
-    def _split_chunks(text: str, limit: int = 1800) -> list[str]:
-        """Split text into chunks strictly <= `limit` UTF-8 bytes (WeCom limit is 2048 bytes)."""
-        if len(text.encode("utf-8")) <= limit:
+    def _split_chunks(
+        text: str,
+        limit: int = 1800,
+        *,
+        max_chars: int | None = None,
+    ) -> list[str]:
+        """Split text into chunks strictly <= `limit` UTF-8 bytes (and optional `max_chars`).
+
+        Preserves paragraph/email atomicity: splits on blank-line (`\\n\\n`) boundaries first so
+        individual emails or cards are NEVER cut in half across two messages, falling back to
+        line/character splitting only if a single indivisible block itself exceeds the budget.
+        """
+
+        def _fits(s: str) -> bool:
+            return len(s.encode("utf-8")) <= limit and (max_chars is None or len(s) <= max_chars)
+
+        if _fits(text):
             return [text]
 
+        def _split_oversized_block(block: str) -> list[str]:
+            parts: list[str] = []
+            cur = ""
+            for line in block.splitlines(keepends=True):
+                if not _fits(line):
+                    if cur:
+                        parts.append(cur.rstrip())
+                        cur = ""
+                    piece = ""
+                    for ch in line:
+                        if not _fits(piece + ch) and piece:
+                            parts.append(piece.rstrip())
+                            piece = ""
+                        piece += ch
+                    if piece:
+                        parts.append(piece.rstrip())
+                    continue
+                if cur and not _fits(cur + line):
+                    parts.append(cur.rstrip())
+                    cur = ""
+                cur += line
+            if cur:
+                parts.append(cur.rstrip())
+            return parts
+
+        blocks = [b.strip("\n") for b in text.split("\n\n") if b.strip()]
         chunks: list[str] = []
         cur = ""
-        cur_bytes = 0
-        for line in text.splitlines(keepends=True):
-            line_bytes = len(line.encode("utf-8"))
-            if line_bytes > limit:
+        for block in blocks:
+            if not _fits(block):
                 if cur:
                     chunks.append(cur.rstrip())
-                    cur, cur_bytes = "", 0
-                piece = ""
-                piece_bytes = 0
-                for ch in line:
-                    cb = len(ch.encode("utf-8"))
-                    if piece_bytes + cb > limit and piece:
-                        chunks.append(piece.rstrip())
-                        piece, piece_bytes = "", 0
-                    piece += ch
-                    piece_bytes += cb
-                if piece:
-                    chunks.append(piece.rstrip())
+                    cur = ""
+                chunks.extend(_split_oversized_block(block))
                 continue
-
-            if cur_bytes + line_bytes > limit and cur:
-                chunks.append(cur.rstrip())
-                cur, cur_bytes = "", 0
-            cur += line
-            cur_bytes += line_bytes
+            candidate = f"{cur}\n\n{block}" if cur else block
+            if _fits(candidate):
+                cur = candidate
+            else:
+                if cur:
+                    chunks.append(cur.rstrip())
+                cur = block
         if cur:
             chunks.append(cur.rstrip())
-        return chunks or [text[: limit // 3]]
+        return chunks or [text[: max(1, limit // 3)]]
 
     async def _transcribe_audio_dashscope(self, local_path: str | Path) -> str:
         """Transcribe downloaded WeCom/KF voice bytes directly via DashScope `qwen3-asr-flash`."""
