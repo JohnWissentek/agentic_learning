@@ -1481,9 +1481,12 @@ class ChiefOfStaffEngine:
             intent=out.get("intent", "reply"),
             proposal_id=out.get("proposal_id"),
         )
+        dec_dict = out.get("decision") if isinstance(out.get("decision"), dict) else {}
+        prop_dict = dec_dict.get("proposal") if isinstance(dec_dict.get("proposal"), dict) else {}
         return {
             "reply_text": out["reply_text"],
             "proposal_id": out.get("proposal_id"),
             "source_ids": out.get("source_ids", []),
             "trajectory": out.get("trajectory", []),
+            "mail_digests": list(prop_dict.get("mail_digests") or []),
         }

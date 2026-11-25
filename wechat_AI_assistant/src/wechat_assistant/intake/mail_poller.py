@@ -17,6 +17,8 @@ import msal
 import requests
 
 from wechat_assistant.config import APP_TZ, Settings, now_local as app_now_local, redact_secrets
+from wechat_assistant.prompts.system_prompts import MAIL_DIGEST_ONLY_PROMPT
+from wechat_assistant.schemas import MailBatchDigest
 from wechat_assistant.storage.db import Database
 from wechat_assistant.tools.onedrive_tools import OneDrive21VianetClient
 
@@ -598,11 +600,37 @@ def _format_sent_line(
     dt_utc = _msg_time_utc(msg, "sentDateTime")
     hhmm = dt_utc.astimezone(local_tz).strftime("%H:%M") if dt_utc.year > 1 else "--:--"
     recipient = _pick_sent_recipient(msg, self_email)
+    cc_addrs = _extract_field_addresses(msg, "ccRecipients")
+    cc_tag = f"（抄送：{', '.join(cc_addrs)}）" if cc_addrs else ""
     subj = (msg.get("subject") or "（无主题）").strip()
     preview = msg.get("bodyPreview") or ""
     bound_tag = f"｜已自动归入 #{matched_task_id}" if matched_task_id is not None else ""
     hint = "｜可能在等对方" if needs_reply_hint(subj, preview) else ""
-    return f"- {hhmm} 发给 {recipient}｜{subj}{bound_tag}{hint}"
+    return f"- {hhmm} 发给 {recipient}{cc_tag}｜{subj}{bound_tag}{hint}"
+
+
+def _summarize_mail_batch_readonly(engine: Any, batch_prompt: str) -> list[dict[str, Any]]:
+    """Ask flagship brain for a read-only per-email digest without touching pending_proposals or DB."""
+    gateway = getattr(engine, "gateway", None)
+    if gateway is None:
+        return []
+    try:
+        digest_obj, rec = gateway.generate_structured(
+            "producer",
+            [
+                {"role": "system", "content": MAIL_DIGEST_ONLY_PROMPT},
+                {"role": "user", "content": batch_prompt},
+            ],
+            MailBatchDigest,
+            max_tokens=1536,
+        )
+        record_fn = getattr(engine, "_record_latest_call", None)
+        if callable(record_fn):
+            record_fn(rec)
+        return [it.model_dump(mode="json") for it in digest_obj.items]
+    except Exception as exc:
+        logger.warning("Read-only mail batch digest fallback to deterministic summary: %s", type(exc).__name__)
+        return []
 
 
 def _split_card_footer(prefix: str) -> tuple[str, str]:
@@ -699,6 +727,145 @@ def _build_inbox_batch_prompt(
             + sent_wrapped
         )
     return "\n\n".join(blocks)
+
+
+_QUOTE_CUT_RE = re.compile(
+    r"(?:\n\s*-{3,}\s*(?:Original Message|原始邮件|Forwarded message).*$|\n\s*From:\s.*$|\n\s*发件人[:：]\s.*$|\n\s*On\s.+wrote:\s*$)",
+    flags=re.IGNORECASE | re.DOTALL,
+)
+
+
+def _format_recipient_list(msg: dict[str, Any], field: str) -> str:
+    """Format Graph recipient list deterministically as readable `Name(email)` or `email`."""
+    entries: list[str] = []
+    seen: set[str] = set()
+    for rec in msg.get(field) or []:
+        ea = rec.get("emailAddress") or {}
+        addr = (ea.get("address") or "").strip()
+        name = (ea.get("name") or "").strip()
+        key = addr.lower() or name.lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        if name and addr and name.lower() != addr.lower():
+            entries.append(f"{name}({addr})")
+        else:
+            entries.append(addr or name)
+    return "、".join(entries) if entries else "无"
+
+
+def _format_sender_display(msg: dict[str, Any]) -> str:
+    ea = (msg.get("from") or {}).get("emailAddress") or {}
+    addr = (ea.get("address") or "").strip()
+    name = (ea.get("name") or "").strip()
+    if name and addr and name.lower() != addr.lower():
+        return f"{name}({addr})"
+    return addr or name or "未知发件人"
+
+
+def _extract_clean_mail_snippet(msg: dict[str, Any], max_chars: int = 140) -> str:
+    """Extract concise non-quoted body summary deterministically for fallback/deferred mail digest."""
+    raw = _extract_email_body_text(msg, max_chars=1200)
+    cut = _QUOTE_CUT_RE.sub("", raw).strip()
+    compact = re.sub(r"\s+", " ", cut).strip()
+    if not compact:
+        compact = "（正文为空，请查看原件或附件）"
+    elif len(compact) > max_chars:
+        compact = compact[: max_chars - 1].rstrip() + "…"
+    if msg.get("hasAttachments"):
+        compact = f"{compact} [含附件]"
+    return compact
+
+
+def _deterministic_action_advice(
+    msg: dict[str, Any],
+    *,
+    role_hint: dict[str, Any],
+    matched_task: dict[str, Any] | None,
+) -> tuple[str, str]:
+    """Return `(action_type, action_advice)` deterministically from mail headers, body cues & task match."""
+    subj = (msg.get("subject") or "").strip()
+    body = _extract_email_body_text(msg, max_chars=800)
+    role = role_hint.get("chairman_role") or "owner"
+    colleague = role_hint.get("suggested_assignee") or role_hint.get("suggested_owner") or "相关同事"
+    asks_reply = needs_reply_hint(subj, body) or any(
+        kw in body for kw in ("请审阅", "请批复", "请确认", "请回复", "是否可行", "请指示", "请拍板")
+    )
+
+    if matched_task is not None:
+        tid = matched_task["id"]
+        title = str(matched_task.get("title") or "")[:24]
+        if role == "cc_observer":
+            return f"归入已有任务 #{tid}", f"已匹配在途任务 #{tid}《{title}》，您仅抄送，由 {colleague} 跟进并追加时间轴。"
+        if asks_reply:
+            return f"归入已有任务 #{tid}·需回复", f"已匹配在途任务 #{tid}《{title}》，建议回复对方并同步追加进展。"
+        return f"归入已有任务 #{tid}", f"已匹配在途任务 #{tid}《{title}》，建议追加往来沟通时间轴持续跟踪。"
+
+    if role == "cc_observer":
+        return "团队跟进(仅抄送)", f"您仅被抄送，建议由 {colleague} 负责跟进处理，您知情监督即可。"
+    if role == "approver":
+        return "需回复/批复", f"内部同事（{colleague}）向您请示/汇报，建议审阅后给出批复意见并跟踪后续执行。"
+    if asks_reply:
+        return "需回复并跟踪", "对方明确期待回复/确认，建议尽快答复并视情况建卡跟踪截止日。"
+    return "需查收跟进", "主送给您，建议查阅正文/附件后决定直接回复或建卡跟进。"
+
+
+def format_mail_digest_section(
+    inbox_batch: list[dict[str, Any]],
+    *,
+    local_tz: Any,
+    self_email: str,
+    internal_domains: tuple[str, ...],
+    db: Database | None = None,
+    llm_digests: list[dict[str, Any]] | None = None,
+) -> str:
+    """Render standardized 6-element per-email digest for EVERY email in the hourly batch.
+
+    Fields guaranteed for every single email:
+    1. 标题 (Title)  2. 发件人 (From)  3. 主送 (To)  4. 抄送 (Cc)  5. 主要内容  6. 建议处理
+    """
+    digest_by_ref: dict[str, dict[str, Any]] = {}
+    for idx_d, d in enumerate(llm_digests or [], 1):
+        if not isinstance(d, dict):
+            continue
+        ref = str(d.get("mail_ref") or f"MAIL-{idx_d}").strip().upper()
+        digest_by_ref[ref] = d
+
+    lines: list[str] = [f"【收件逐封明细（共 {len(inbox_batch)} 封）】"]
+    for idx, msg in enumerate(inbox_batch, 1):
+        ref_key = f"MAIL-{idx}"
+        subj = (msg.get("subject") or "（无主题）").strip()
+        dt_utc = _msg_time_utc(msg, "receivedDateTime")
+        hhmm = dt_utc.astimezone(local_tz).strftime("%H:%M") if dt_utc.year > 1 else ""
+        time_tag = f"（{hhmm}）" if hhmm else ""
+        sender_disp = _format_sender_display(msg)
+        to_disp = _format_recipient_list(msg, "toRecipients")
+        cc_disp = _format_recipient_list(msg, "ccRecipients")
+
+        role_hint = infer_email_role_hint(msg, self_email=self_email, internal_domains=internal_domains)
+        conv_id = str(msg.get("conversationId") or "").strip()
+        matched_task = db.find_task_by_mail_conversation_id(conv_id) if (db is not None and conv_id) else None
+
+        llm_d = digest_by_ref.get(ref_key)
+        if llm_d and str(llm_d.get("main_content") or "").strip():
+            main_content = str(llm_d["main_content"]).strip()
+            if msg.get("hasAttachments") and "附件" not in main_content:
+                main_content = f"{main_content} [含附件]"
+            act_type = str(llm_d.get("action_type") or "").strip()
+            act_advice = str(llm_d.get("suggested_action") or llm_d.get("action_advice") or "").strip()
+            if not act_type or not act_advice:
+                fb_type, fb_advice = _deterministic_action_advice(msg, role_hint=role_hint, matched_task=matched_task)
+                act_type = act_type or fb_type
+                act_advice = act_advice or fb_advice
+        else:
+            main_content = _extract_clean_mail_snippet(msg, max_chars=140)
+            act_type, act_advice = _deterministic_action_advice(msg, role_hint=role_hint, matched_task=matched_task)
+
+        lines.append(f"{idx}. 《{subj}》{time_tag}")
+        lines.append(f"   • 发件人：{sender_disp} ｜ 主送：{to_disp} ｜ 抄送：{cc_disp}")
+        lines.append(f"   • 主要内容：{main_content}")
+        lines.append(f"   • 建议处理：【{act_type}】{act_advice}")
+    return "\n".join(lines)
 
 
 def _record_sent_mail_timeline_matches(
@@ -879,14 +1046,25 @@ async def run_mail_window_once(
 
     existing_pending, triage_reply = await asyncio.to_thread(_check_and_maybe_triage)
 
-    # Case 2: Deferred due to existing pending card
+    # Case 2: Deferred due to existing pending card -> STILL render standardized 6-field per-email digest!
     if existing_pending is not None:
-        subjects = [(m.get("subject") or "（无主题）").strip() for m in inbox_batch]
+        readonly_digests = await asyncio.to_thread(_summarize_mail_batch_readonly, engine, batch_prompt)
+        digest_block = format_mail_digest_section(
+            inbox_batch,
+            local_tz=local_now.tzinfo,
+            self_email=settings.mail_user,
+            internal_domains=internal_domains,
+            db=db,
+            llm_digests=readonly_digests,
+        )
+        header_line = f"{header}｜收件 {len(inbox_batch)} 封" + (f" · 发件 {len(sent_batch)} 封" if sent_batch else "")
         defer_prefix = (
-            f"{header}\n"
-            f"这小时有 {len(inbox_batch)} 封收件：{'；'.join(subjects)}。\n"
-            f"确认卡 #{existing_pending['id']} 还没回复，本班不生成新卡。"
-            "回复 1、2 或「改：…」之后，下一班再分析这些收件。"
+            f"{header_line}\n\n"
+            f"{digest_block}\n\n"
+            "━━━━━━━━━━━━━━━━━━━━\n"
+            f"⚠️ 确认卡 #{existing_pending['id']} 还没回复，本班暂不生成新确认卡"
+            f"（以上收件已逐封提炼要点；处理完 #{existing_pending['id']} 后，下一班自动深度分析立卡）。\n"
+            "👉 回复 1 确认落盘 ｜ 0 作废 ｜ 或直接发自然语言调整当前确认卡"
         )
         msg_text = _compose_push_with_sent_cap(defer_prefix, sent_lines)
         await send_push(msg_text)
@@ -902,11 +1080,40 @@ async def run_mail_window_once(
             "sent_count": len(sent_batch),
         }
 
-    # Case 3: Fresh batched triage completed; push and commit watermarks/seen atomically on push success
+    # Case 3: Fresh batched triage completed; render standardized 6-field per-email digest + decision card
     assert triage_reply is not None
     created_pid = triage_reply.get("proposal_id")
+    llm_digests: list[dict[str, Any]] | None = None
+    if isinstance(triage_reply.get("mail_digests"), list) and triage_reply["mail_digests"]:
+        llm_digests = triage_reply["mail_digests"]
+    if llm_digests is None:
+        dec_dict = triage_reply.get("decision")
+        if isinstance(dec_dict, dict):
+            prop_dict = dec_dict.get("proposal")
+            if isinstance(prop_dict, dict) and isinstance(prop_dict.get("mail_digests"), list):
+                llm_digests = prop_dict["mail_digests"]
+    if llm_digests is None and created_pid is not None:
+        saved_pending = db.get_latest_pending_proposal("owner")
+        if saved_pending and isinstance(saved_pending.get("proposal"), dict):
+            md = saved_pending["proposal"].get("mail_digests")
+            if isinstance(md, list):
+                llm_digests = md
+
+    digest_block = format_mail_digest_section(
+        inbox_batch,
+        local_tz=local_now.tzinfo,
+        self_email=settings.mail_user,
+        internal_domains=internal_domains,
+        db=db,
+        llm_digests=llm_digests,
+    )
     card_body = (triage_reply.get("reply_text") or "").strip()
-    prefix = f"{header}\n\n{card_body}" if card_body else header
+    header_line = f"{header}｜收件 {len(inbox_batch)} 封" + (f" · 发件 {len(sent_batch)} 封" if sent_batch else "")
+    prefix = (
+        f"{header_line}\n\n{digest_block}\n\n━━━━━━━━━━━━━━━━━━━━\n{card_body}"
+        if card_body
+        else f"{header_line}\n\n{digest_block}"
+    )
     msg_text = _compose_push_with_sent_cap(prefix, sent_lines)
 
     try:

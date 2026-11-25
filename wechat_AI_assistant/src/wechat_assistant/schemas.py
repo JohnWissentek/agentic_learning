@@ -191,6 +191,31 @@ class FyiNotice(BaseModel):
     mail_conversation_id: str = ""
 
 
+class MailDigestItem(BaseModel):
+    """Per-email executive digest item paired deterministically with Graph headers (`MAIL-k`)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    mail_ref: str = Field(min_length=1, max_length=32, description="邮件短编号，如 MAIL-1")
+    main_content: str = Field(min_length=1, max_length=220, description="1~2 句精炼主要内容")
+    action_type: Literal[
+        "需您回复",
+        "需建卡跟进",
+        "归入已有任务",
+        "团队跟进(您仅抄送)",
+        "纯知会免处理",
+    ] = "需建卡跟进"
+    suggested_action: str = Field(min_length=1, max_length=180, description="一句话具体处理建议")
+
+
+class MailBatchDigest(BaseModel):
+    """Read-only per-email digest batch (used when deferring new confirmation card creation)."""
+
+    model_config = ConfigDict(extra="ignore")
+
+    items: list[MailDigestItem] = Field(default_factory=list)
+
+
 class TriageProposal(BaseModel):
     """Unified Path-4 structured Chief-of-Staff proposal shared by WeChat and hourly mail batches."""
 
@@ -204,6 +229,7 @@ class TriageProposal(BaseModel):
     )
     task_updates: list[TaskTimelineUpdate] = Field(default_factory=list)
     fyi_notices: list[FyiNotice] = Field(default_factory=list)
+    mail_digests: list[MailDigestItem] = Field(default_factory=list)
     referenced_numbers: list[str] = Field(default_factory=list)
     citations: list[str] = Field(default_factory=list)
     overload_warning: str | None = None

@@ -818,11 +818,13 @@ async def test_existing_pending_card_defers_inbox_but_still_sends_sent_list(
             fetch_folder=fake_fetch,
         )
 
-        # Triage NOT invoked; existing card #1 untouched
+        # Triage NOT invoked; existing card #1 untouched (read-only digest may run safely without mutating DB)
         assert len(turn_calls) == 0
-        assert len(completions.calls) == 0
         pending = db.get_latest_pending_proposal("owner")
         assert pending is not None and pending["id"] == 1
+        assert "【收件逐封明细（共 2 封）】" in pushes[0]
+        assert "发件人：" in pushes[0] and "sales@vandf.com" in pushes[0]
+        assert "主要内容：" in pushes[0] and "建议处理：【" in pushes[0]
 
         # Deferred inbox emails NOT marked seen & inbox watermark NOT advanced
         assert db.is_external_seen("<def-1@vandf.com>") is False
