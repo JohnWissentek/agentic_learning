@@ -52,9 +52,24 @@ def _irr_bisection(cashflows: list[float]) -> float:
     return ((low + high) / 2.0) * 100.0
 
 
-def compute_roi_metrics(inputs: ROIInputs) -> ROIMetrics:
-    """Compute Payback Months, 3-yr ROI %, 5-yr NPV, IRR %, and SAM/SOM."""
-    yield_gain_saving = inputs.annual_output_value_cny * (inputs.yield_gain_pct / 100.0)
+def compute_roi_metrics(
+    inputs: ROIInputs,
+    *,
+    commercial_status: str | None = None,
+) -> ROIMetrics:
+    """Compute calibrated industrial Payback Months, 3-yr ROI %, 5-yr NPV, IRR %, and SAM/SOM.
+
+    Industrial CFO calibration (V4.0):
+    - `yield_gain_saving` applies `unit_margin_or_scrap_ratio` and `instrument_attribution_share`
+      instead of treating 100% of gross line revenue uplift as pure net profit.
+    - Year-1 cashflow accounts for `first_year_ramp_factor` (6-12m factory qualification ramp).
+    """
+    yield_gain_saving = (
+        inputs.annual_output_value_cny
+        * (inputs.yield_gain_pct / 100.0)
+        * inputs.unit_margin_or_scrap_ratio
+        * inputs.instrument_attribution_share
+    )
     annual_gross_benefit = (
         yield_gain_saving
         + inputs.annual_scrap_saving_cny
@@ -62,14 +77,19 @@ def compute_roi_metrics(inputs: ROIInputs) -> ROIMetrics:
         + inputs.annual_consumable_ehs_saving_cny
     )
     net_annual_cf = annual_gross_benefit - inputs.annual_opex_cny
+    year1_net_cf = annual_gross_benefit * inputs.first_year_ramp_factor - inputs.annual_opex_cny
 
-    if net_annual_cf > 0:
-        payback_months = (inputs.capex_cny / net_annual_cf) * 12.0
-    else:
+    if net_annual_cf <= 0:
         payback_months = 999.0
+    elif year1_net_cf >= inputs.capex_cny:
+        payback_months = (inputs.capex_cny / year1_net_cf) * 12.0
+    else:
+        remaining_after_y1 = inputs.capex_cny - year1_net_cf
+        payback_months = 12.0 + (remaining_after_y1 / net_annual_cf) * 12.0
 
-    roi_3yr_pct = ((net_annual_cf * 3.0 - inputs.capex_cny) / inputs.capex_cny) * 100.0
-    cashflows = [-inputs.capex_cny] + [net_annual_cf] * 5
+    cum_3yr_cf = year1_net_cf + net_annual_cf * 2.0
+    roi_3yr_pct = ((cum_3yr_cf - inputs.capex_cny) / inputs.capex_cny) * 100.0
+    cashflows = [-inputs.capex_cny, year1_net_cf] + [net_annual_cf] * 4
     npv_5yr = _npv(inputs.wacc, cashflows)
     irr_5yr_pct = _irr_bisection(cashflows)
 
@@ -82,11 +102,19 @@ def compute_roi_metrics(inputs: ROIInputs) -> ROIMetrics:
     else:
         tier = "Tier-D (>42m Long Horizon)"
 
-    # Conservative SAM/SOM ratios anchored to inline inspection penetration curves
-    china_sam = inputs.market_tam_china_cny_100m * 0.42
-    china_som = china_sam * 0.16
-    global_sam = inputs.market_tam_global_usd_m * 0.38
-    global_som = global_sam * 0.12
+    # Explicit commercial-status penetration assumptions (transparent & auditable)
+    penetration_map = {
+        "overseas_only_cn_blank": (0.45, 0.18, 0.36, 0.10),
+        "global_and_cn_true_blank": (0.35, 0.20, 0.35, 0.15),
+        "global_and_cn_commercialized": (0.48, 0.10, 0.42, 0.08),
+    }
+    cn_sam_r, cn_som_r, gl_sam_r, gl_som_r = penetration_map.get(
+        commercial_status or "", (0.42, 0.16, 0.38, 0.12)
+    )
+    china_sam = inputs.market_tam_china_cny_100m * cn_sam_r
+    china_som = china_sam * cn_som_r
+    global_sam = inputs.market_tam_global_usd_m * gl_sam_r
+    global_som = global_sam * gl_som_r
 
     return ROIMetrics(
         capex_cny=round(inputs.capex_cny, 2),
@@ -215,6 +243,21 @@ def clamp_roi_range_inputs(
         market_tam_global_usd_m=_clamp_val(rng.market_tam_global_usd_m, gl_lo_b, gl_hi_b),
         parameter_basis=rng.parameter_basis,
         wacc=rng.wacc,
+        unit_margin_or_scrap_ratio=_clamp_val(
+            rng.unit_margin_or_scrap_ratio,
+            guard.get("unit_margin_or_scrap_ratio_min", 0.05),
+            guard.get("unit_margin_or_scrap_ratio_max", 0.80),
+        ),
+        instrument_attribution_share=_clamp_val(
+            rng.instrument_attribution_share,
+            guard.get("instrument_attribution_share_min", 0.05),
+            guard.get("instrument_attribution_share_max", 1.0),
+        ),
+        first_year_ramp_factor=_clamp_val(
+            rng.first_year_ramp_factor,
+            guard.get("first_year_ramp_factor_min", 0.20),
+            guard.get("first_year_ramp_factor_max", 1.0),
+        ),
     )
 
 
@@ -244,11 +287,18 @@ def derive_range_inputs_from_seed(
             market_tam_global_usd_m=base.market_tam_global_usd_m,
             parameter_basis="derived ±25% from baseline parameters",
             wacc=base.wacc,
+            unit_margin_or_scrap_ratio=base.unit_margin_or_scrap_ratio,
+            instrument_attribution_share=base.instrument_attribution_share,
+            first_year_ramp_factor=base.first_year_ramp_factor,
         )
     return clamp_roi_range_inputs(rng, seed.sector, guardrails)
 
 
-def compute_range_roi_metrics(rng: ROIRangeInputs) -> RangeROIMetrics:
+def compute_range_roi_metrics(
+    rng: ROIRangeInputs,
+    *,
+    commercial_status: str | None = None,
+) -> RangeROIMetrics:
     """Compute conservative / baseline / optimistic ROI envelopes deterministically."""
     conservative_inputs = ROIInputs(
         capex_cny=rng.capex_cny_high,
@@ -261,6 +311,9 @@ def compute_range_roi_metrics(rng: ROIRangeInputs) -> RangeROIMetrics:
         market_tam_china_cny_100m=rng.market_tam_china_cny_100m,
         market_tam_global_usd_m=rng.market_tam_global_usd_m,
         wacc=rng.wacc,
+        unit_margin_or_scrap_ratio=rng.unit_margin_or_scrap_ratio,
+        instrument_attribution_share=rng.instrument_attribution_share,
+        first_year_ramp_factor=max(0.20, round(rng.first_year_ramp_factor * 0.85, 3)),
     )
     optimistic_inputs = ROIInputs(
         capex_cny=rng.capex_cny_low,
@@ -273,11 +326,14 @@ def compute_range_roi_metrics(rng: ROIRangeInputs) -> RangeROIMetrics:
         market_tam_china_cny_100m=rng.market_tam_china_cny_100m,
         market_tam_global_usd_m=rng.market_tam_global_usd_m,
         wacc=rng.wacc,
+        unit_margin_or_scrap_ratio=rng.unit_margin_or_scrap_ratio,
+        instrument_attribution_share=rng.instrument_attribution_share,
+        first_year_ramp_factor=min(1.0, round(rng.first_year_ramp_factor * 1.15, 3)),
     )
     return RangeROIMetrics(
-        conservative=compute_roi_metrics(conservative_inputs),
-        baseline=compute_roi_metrics(rng.to_baseline_inputs()),
-        optimistic=compute_roi_metrics(optimistic_inputs),
+        conservative=compute_roi_metrics(conservative_inputs, commercial_status=commercial_status),
+        baseline=compute_roi_metrics(rng.to_baseline_inputs(), commercial_status=commercial_status),
+        optimistic=compute_roi_metrics(optimistic_inputs, commercial_status=commercial_status),
         parameter_basis=rng.parameter_basis,
     )
 
@@ -324,7 +380,9 @@ def screen_candidate_pool(
                 "roi_inputs": clamped_rng.to_baseline_inputs(),
             }
         )
-        roi_range = compute_range_roi_metrics(clamped_rng)
+        roi_range = compute_range_roi_metrics(
+            clamped_rng, commercial_status=clean_seed.commercial_status
+        )
         roi = roi_range.baseline
         w_score = compute_weighted_pillar_score(
             roi=roi,

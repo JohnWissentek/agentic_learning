@@ -163,12 +163,20 @@ def test_unwrap_stringified_json_and_schema_validators() -> None:
     )
     assert persona.persona_role == "CFO / Procurement ROI Gatekeeper"
 
+    with pytest.raises(Exception):
+        CritiqueVerdict(
+            decision="REV_NEEDED",  # type: ignore[arg-type]
+            overall_confidence=75.0,
+            summary="补齐S3碳化硅证据",
+            gap_queries=["SiC 晶圆级动态 KGD 测试 中国产线"],
+        )
+
     verdict = CritiqueVerdict(
-        decision="REV_NEEDED",
+        decision="needs_more_evidence",
         overall_confidence=75.0,
         summary="补齐S3碳化硅证据",
         gap_queries=["SiC 晶圆级动态 KGD 测试 中国产线"],
     )
-    assert verdict.decision == "pass"
+    assert verdict.decision == "needs_more_evidence"
     assert verdict.gap_queries[0]["track_id"] == "S3"
     assert verdict.gap_queries[0]["query"] == "SiC 晶圆级动态 KGD 测试 中国产线"

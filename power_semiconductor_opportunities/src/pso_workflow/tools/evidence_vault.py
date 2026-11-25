@@ -181,12 +181,21 @@ class EvidenceVault:
             )
 
     def _next_ev_id(self, geo_scope: str) -> str:
-        prefix = f"EV-{geo_scope}-"
+        prefix = "EV-CN-" if geo_scope == "CN" else "EV-GL-"
         cur = self._conn.execute(
             "SELECT COUNT(*) AS cnt FROM evidences WHERE geo_scope = ?", (geo_scope,)
         )
         n = int(cur.fetchone()["cnt"]) + 1
-        return f"{prefix}{n:03d}"
+        candidate = f"{prefix}{n:03d}"
+        while (
+            self._conn.execute(
+                "SELECT 1 FROM evidences WHERE ev_id = ?", (candidate,)
+            ).fetchone()
+            is not None
+        ):
+            n += 1
+            candidate = f"{prefix}{n:03d}"
+        return candidate
 
     def log_query(
         self, *, track_id: str, engine: str, geo_scope: str, query: str, hits_count: int

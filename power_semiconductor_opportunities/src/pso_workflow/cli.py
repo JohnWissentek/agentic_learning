@@ -14,7 +14,12 @@ from typing import Any
 from rich.console import Console
 from rich.table import Table
 
-from pso_workflow.config import CostLedger, DashScopeLLMGateway, WorkflowSettings
+from pso_workflow.config import (
+    SEARCH_UNIT_COST_CNY,
+    CostLedger,
+    DashScopeLLMGateway,
+    WorkflowSettings,
+)
 from pso_workflow.graph import (
     build_workflow_graph,
     create_async_checkpointer_ctx,
@@ -23,6 +28,11 @@ from pso_workflow.graph import (
 from pso_workflow.nodes.critic_and_judge import deterministic_contract_checks
 from pso_workflow.nodes.deps import RuntimeDeps
 from pso_workflow.nodes.planner import _format_recon_context, _normalize_discovered_tracks, run_macro_recon
+from pso_workflow.nodes.portfolio_reviewer import (
+    apply_portfolio_reviews_and_rank,
+    build_global_ranking_prompt,
+    build_sector_portfolio_prompt,
+)
 from pso_workflow.nodes.researcher import (
     _clean_discovered_dossier,
     _collect_queries_for_track,
@@ -31,24 +41,38 @@ from pso_workflow.nodes.researcher import (
 )
 from pso_workflow.nodes.storm_and_rank import _update_elo
 from pso_workflow.nodes.synthesizer import (
+    build_deterministic_tables,
+    build_volume_specs,
     format_commercial_whitespace_and_ai_table,
     format_discovery_and_funnel_summary,
     format_dossiers,
     format_roi_table,
     format_vault_snippets,
+    inject_deterministic_tables,
     render_evidence_index,
 )
-from pso_workflow.prompts import JUDGE_SYSTEM
+from pso_workflow.prompts import (
+    FALSIFICATION_REVIEW_SYSTEM,
+    GLOBAL_PORTFOLIO_RANK_SYSTEM,
+    JUDGE_SYSTEM,
+    PORTFOLIO_COMMITTEE_SYSTEM,
+    RECON_DISCOVERY_SYSTEM,
+    RESEARCHER_V2_SYSTEM,
+    SYNTHESIZER_SYSTEM,
+)
 from pso_workflow.schemas import (
     DiscoveryPlan,
     EliminatedCandidate,
     EvaluatedOpportunity,
+    GlobalPortfolioRanking,
     JudgeRubricScores,
     OpportunityStormMemo,
     ROIInputs,
+    SectorPortfolioReview,
     TechOpportunitySeed,
     TrackDossier,
 )
+from pso_workflow.tools.audit_guard import run_full_objective_audit
 from pso_workflow.tools.evidence_vault import EvidenceVault
 from pso_workflow.tools.roi_calculator import (
     compute_roi_metrics,
@@ -1132,6 +1156,603 @@ def _cmd_finalize_v2(
         vault.close()
 
 
+def _compute_real_search_cost_from_vault(vault: EvidenceVault) -> dict[str, Any]:
+    """Compute real paid search API spend from SQLite `query_log` and fulltext reads (never hardcoded 0.0)."""
+    rows = vault._conn.execute(
+        "SELECT engine, COUNT(*) AS cnt FROM query_log GROUP BY engine"
+    ).fetchall()
+    by_engine = {str(r["engine"]): int(r["cnt"]) for r in rows}
+    metaso_q = by_engine.get("metaso", 0)
+    serper_q = by_engine.get("serper", 0)
+    fulltext_cnt = int(
+        vault._conn.execute("SELECT COUNT(*) FROM evidences WHERE length(full_markdown) > 200").fetchone()[0]
+    )
+    search_cost = (
+        metaso_q * SEARCH_UNIT_COST_CNY["metaso_search"]
+        + serper_q * SEARCH_UNIT_COST_CNY["serper_search"]
+        + fulltext_cnt * SEARCH_UNIT_COST_CNY["metaso_reader"]
+    )
+    return {
+        "metaso_queries": metaso_q,
+        "serper_queries": serper_q,
+        "fulltext_reads": fulltext_cnt,
+        "total_queries_logged": sum(by_engine.values()),
+        "search_cost_cny": round(search_cost, 4),
+    }
+
+
+async def _cmd_falsify_search(
+    settings: WorkflowSettings,
+    *,
+    dossiers_file: str,
+    vault_db: str,
+    output_file: str,
+    max_queries_per_track: int = 4,
+) -> int:
+    """Stage 1b (V4): Run bounded falsification searches for claimed commercial blanks."""
+    d_path = _resolve_cli_path(settings, dossiers_file)
+    out_path = _resolve_cli_path(settings, output_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    raw_payload = json.loads(d_path.read_text(encoding="utf-8"))
+    raw_dossiers = raw_payload.get("dossiers", []) if isinstance(raw_payload, dict) else list(raw_payload)
+
+    deps = _make_v2_deps(settings, vault_db)
+    try:
+        tasks_out: list[dict[str, Any]] = []
+        for item in raw_dossiers:
+            td = TrackDossier.model_validate(item)
+            existing_recs = deps.vault.list_by_track(td.track_id)
+            cleaned_td = _clean_discovered_dossier(
+                llm_dossier=td,
+                track_id=td.track_id,
+                sector=td.sector,
+                records=existing_recs,
+            )
+            blank_opps = [
+                o
+                for o in cleaned_td.opportunities
+                if o.commercial_status in ("global_and_cn_true_blank", "overseas_only_cn_blank")
+            ]
+            if not blank_opps:
+                tasks_out.append(
+                    {
+                        "track_id": td.track_id,
+                        "sector": td.sector,
+                        "needs_falsification": False,
+                        "initial_dossier": cleaned_td.model_dump(),
+                        "queries_executed": [],
+                        "newly_added_ev_ids": [],
+                        "falsify_prompt": "",
+                    }
+                )
+                continue
+
+            planned: list[tuple[str, str]] = []
+            seen_keys: set[str] = set()
+            for opp in blank_opps:
+                for q_item in opp.falsification_queries:
+                    q_str = str(q_item.get("query", "")).strip()
+                    if not q_str:
+                        continue
+                    geo = "GLOBAL" if str(q_item.get("geo_scope", "CN")).upper() in ("GLOBAL", "GL") else "CN"
+                    key = f"{geo}:{q_str}"
+                    if key not in seen_keys and len(planned) < max_queries_per_track:
+                        seen_keys.add(key)
+                        planned.append((geo, q_str))
+            if not planned:
+                for opp in blank_opps:
+                    for geo, q_str in (
+                        ("CN", f"中国 {opp.title} 在线检测 商业化 厂商 型号 中标 2025 2026"),
+                        ("GLOBAL", f"{opp.title} inline metrology commercial vendor product datasheet model 2025 2026"),
+                    ):
+                        key = f"{geo}:{q_str}"
+                        if key not in seen_keys and len(planned) < max_queries_per_track:
+                            seen_keys.add(key)
+                            planned.append((geo, q_str))
+
+            before_ids = {r.ev_id for r in existing_recs}
+
+            async def _exec_one(tid: str, geo: str, q_str: str) -> None:
+                async with deps.semaphore:
+                    hits = await deps.search_router.search_track(
+                        track_id=tid,
+                        geo_scope="GLOBAL" if geo == "GLOBAL" else "CN",
+                        query=q_str,
+                        mode="webpage" if geo == "CN" else "search",
+                        num_results=4,
+                    )
+                deps.vault.log_query(
+                    track_id=tid,
+                    engine="metaso" if geo == "CN" else "serper",
+                    geo_scope=geo,
+                    query=q_str,
+                    hits_count=len(hits),
+                )
+                for h in hits:
+                    deps.vault.upsert_hit(track_id=tid, hit=h)
+
+            await asyncio.gather(
+                *[_exec_one(td.track_id, geo, q_str) for geo, q_str in planned],
+                return_exceptions=True,
+            )
+            updated_recs = deps.vault.list_by_track(td.track_id)
+            newly_added = [r for r in updated_recs if r.ev_id not in before_ids]
+            prioritized = newly_added + [r for r in updated_recs if r.ev_id in before_ids]
+            f_ctx = _format_evidence_context(prioritized, max_items=26, label=f"FALSIFICATION_{td.track_id}")
+            blank_lines = "\n".join(
+                f"- `{o.opp_id}` ({o.commercial_status}): {o.title} | GL={o.global_vendors_and_products} | CN={o.china_vendors_and_products}"
+                for o in blank_opps
+            )
+            prompt = (
+                f"{FALSIFICATION_REVIEW_SYSTEM}\n\n"
+                f"Track ID: {td.track_id} | Sector: {td.sector} | Track Name: {td.track_name}\n"
+                f"Falsification Queries Executed ({len(planned)}):\n"
+                + "\n".join(f"  - [{g}] {q}" for g, q in planned)
+                + f"\n\nInitial Claimed Blanks:\n{blank_lines}\n\n"
+                f"Initial TrackDossier JSON:\n{cleaned_td.model_dump_json(indent=2)}\n\n"
+                f"Retrieved EvidenceVault Records (Newly added: {[r.ev_id for r in newly_added]}):\n{f_ctx}\n\n"
+                f"Update `commercial_status` honestly if real vendors were found, or record `falsification_audit_note`. "
+                f"Cite ONLY authentic EV IDs from above."
+            )
+            tasks_out.append(
+                {
+                    "track_id": td.track_id,
+                    "sector": td.sector,
+                    "needs_falsification": True,
+                    "initial_dossier": cleaned_td.model_dump(),
+                    "queries_executed": [{"geo_scope": g, "query": q} for g, q in planned],
+                    "newly_added_ev_ids": [r.ev_id for r in newly_added],
+                    "falsify_prompt": prompt,
+                }
+            )
+
+        out_path.write_text(
+            json.dumps(
+                {
+                    "vault_stats": deps.vault.stats(),
+                    "tracks": tasks_out,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        console.print(
+            f"[green]Stage 1b falsification search complete:[/green] tracks={len(tasks_out)}, "
+            f"needs_review={sum(1 for t in tasks_out if t['needs_falsification'])}, file={out_path}"
+        )
+        return 0
+    finally:
+        deps.vault.close()
+
+
+def _cmd_prepare_portfolio(
+    settings: WorkflowSettings,
+    *,
+    screened_file: str,
+    vault_db: str,
+    output_file: str,
+) -> int:
+    """Stage 3 (V4): Export holistic sector buying-committee prompts shared with LangGraph core."""
+    s_path = _resolve_cli_path(settings, screened_file)
+    out_path = _resolve_cli_path(settings, output_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    screened = json.loads(s_path.read_text(encoding="utf-8"))
+    pool = [EvaluatedOpportunity.model_validate(e) for e in screened.get("shortlist", [])]
+
+    vault = EvidenceVault(settings.resolve_vault_path(vault_db))
+    try:
+        all_records = vault.list_all()
+        grouped: dict[str, list[EvaluatedOpportunity]] = {}
+        for ev in pool:
+            grouped.setdefault(ev.seed.sector, []).append(ev)
+
+        sector_tasks = [
+            {
+                "sector": sec,
+                "opp_ids": [e.seed.opp_id for e in opps],
+                "system_prompt": PORTFOLIO_COMMITTEE_SYSTEM,
+                "user_prompt": build_sector_portfolio_prompt(
+                    "semiconductor" if sec == "semiconductor" else "power_energy",
+                    opps,
+                    all_records,
+                ),
+            }
+            for sec, opps in grouped.items()
+        ]
+        out_path.write_text(
+            json.dumps(
+                {
+                    "sector_tasks": sector_tasks,
+                    "global_system_prompt": GLOBAL_PORTFOLIO_RANK_SYSTEM,
+                    "needs_global_ranking": len(sector_tasks) > 1,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+        console.print(
+            f"[green]Stage 3 portfolio prompts prepared:[/green] sectors={len(sector_tasks)}, file={out_path}"
+        )
+        return 0
+    finally:
+        vault.close()
+
+
+def _cmd_prepare_synthesis(
+    settings: WorkflowSettings,
+    *,
+    screened_file: str,
+    portfolio_file: str,
+    plan_file: str,
+    vault_db: str,
+    output_file: str,
+) -> int:
+    """Stage 4 (V4): Apply portfolio ranking & export single-core volume prompts + locked tables."""
+    s_path = _resolve_cli_path(settings, screened_file)
+    p_path = _resolve_cli_path(settings, portfolio_file)
+    pl_path = _resolve_cli_path(settings, plan_file)
+    out_path = _resolve_cli_path(settings, output_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    screened = json.loads(s_path.read_text(encoding="utf-8"))
+    portfolio_raw = json.loads(p_path.read_text(encoding="utf-8"))
+    plan_data = json.loads(pl_path.read_text(encoding="utf-8"))
+
+    pool = [EvaluatedOpportunity.model_validate(e) for e in screened.get("shortlist", [])]
+    sector_reviews = {
+        sec: SectorPortfolioReview.model_validate(rev)
+        for sec, rev in (portfolio_raw.get("sector_reviews") or {}).items()
+    }
+    raw_global = portfolio_raw.get("global_portfolio_ranking")
+    global_ranking = GlobalPortfolioRanking.model_validate(raw_global) if raw_global else None
+
+    ranked_pool, storm_memos, normalized_global = apply_portfolio_reviews_and_rank(
+        pool, sector_reviews, global_ranking
+    )
+    ranked_dicts = [e.model_dump() for e in ranked_pool]
+    eliminated = list(screened.get("eliminated_candidates", []))
+    raw_count = int(screened.get("raw_candidates_count", len(ranked_dicts) + len(eliminated)))
+    dossiers = list(screened.get("cleaned_dossiers", []))
+
+    vault = EvidenceVault(settings.resolve_vault_path(vault_db))
+    try:
+        all_records = vault.list_all()
+        tables = build_deterministic_tables(
+            plan=plan_data,
+            evaluated=ranked_dicts,
+            raw_candidates_count=raw_count,
+            eliminated_candidates=eliminated,
+        )
+        specs = build_volume_specs(
+            plan=plan_data,
+            dossiers=dossiers,
+            evaluated=ranked_dicts,
+            elo_matches=[],
+            all_records=all_records,
+            raw_candidates_count=raw_count,
+            eliminated_candidates=eliminated,
+        )
+        global_rank_prompt = (
+            build_global_ranking_prompt(sector_reviews, {e.seed.opp_id: e for e in pool})
+            if len(sector_reviews) > 1
+            else ""
+        )
+        payload = {
+            "ranked_shortlist": ranked_dicts,
+            "storm_memos": storm_memos,
+            "global_portfolio_ranking": normalized_global,
+            "global_rank_prompt": global_rank_prompt,
+            "synthesizer_system_prompt": SYNTHESIZER_SYSTEM,
+            "tables": tables,
+            "volumes_spec": [
+                {"filename": fn, "role": lbl, "prompt": pr}
+                for fn, lbl, pr in specs
+            ],
+        }
+        out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        console.print(
+            f"[green]Stage 4 synthesis bundle prepared:[/green] ranked={len(ranked_dicts)}, volumes={len(specs)}, file={out_path}"
+        )
+        return 0
+    finally:
+        vault.close()
+
+
+def _inline_pydantic_schema(model_cls: type) -> dict[str, Any]:
+    """Flatten Pydantic v2 JSON Schema (zero $defs/$ref) for Antigravity `run_workflow`."""
+    raw = model_cls.model_json_schema()
+    defs = raw.pop("$defs", {})
+
+    def _resolve(node: Any) -> Any:
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return _resolve(dict(defs[node["$ref"].split("/")[-1]]))
+            if "anyOf" in node:
+                non_null = [x for x in node["anyOf"] if x != {"type": "null"}]
+                return _resolve(non_null[0]) if non_null else {"type": "string"}
+            return {
+                k: _resolve(v)
+                for k, v in node.items()
+                if k not in ("default", "title", "additionalProperties")
+            }
+        if isinstance(node, list):
+            return [_resolve(x) for x in node]
+        return node
+
+    return _resolve(raw)
+
+
+def _cmd_export_v4_schemas(settings: WorkflowSettings, *, output_file: str) -> int:
+    """Export single-core V4 flat JSON schemas & prompts so stdlib-only workflow shells stay DRY."""
+    out_path = _resolve_cli_path(settings, output_file)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    dp_schema = _inline_pydantic_schema(DiscoveryPlan)
+    dp_item = dp_schema["properties"]["track_plans"]["items"]
+    dp_item["required"] = sorted(
+        set(dp_item.get("required", []))
+        | {
+            "is_emerging_or_cross_cutting",
+            "emergence_rationale",
+            "recon_evidence_ids",
+            "manufacturing_stages",
+            "cn_queries",
+            "global_queries",
+            "cn_vendor_queries",
+            "global_vendor_queries",
+        }
+    )
+
+    td_schema = _inline_pydantic_schema(TrackDossier)
+    opp_item = td_schema["properties"]["opportunities"]["items"]
+    opp_item["required"] = sorted(
+        set(opp_item.get("required", []))
+        | {
+            "commercial_status",
+            "global_vendors_and_products",
+            "china_vendors_and_products",
+            "white_space_and_entry_wedge",
+            "ai_computational_sensing_and_co_design",
+            "ai_rd_acceleration_and_edge_deployment",
+            "estimated_rd_months_ai_vs_legacy",
+            "hardware_bom_localization_and_gtm_form",
+            "evidence_ids",
+            "roi_range_inputs",
+            "falsification_queries",
+            "falsification_audit_note",
+        }
+    )
+    # Remove redundant roi_inputs from exported TrackDossier schema so agent always populates roi_range_inputs
+    opp_item["properties"].pop("roi_inputs", None)
+
+    payload = {
+        "schemas": {
+            "DiscoveryPlan": dp_schema,
+            "TrackDossier": td_schema,
+            "SectorPortfolioReview": _inline_pydantic_schema(SectorPortfolioReview),
+            "GlobalPortfolioRanking": _inline_pydantic_schema(GlobalPortfolioRanking),
+        },
+        "prompts": {
+            "RECON_DISCOVERY_SYSTEM": RECON_DISCOVERY_SYSTEM,
+            "RESEARCHER_V2_SYSTEM": RESEARCHER_V2_SYSTEM,
+        },
+    }
+    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    console.print(f"[green]Exported single-core V4 schemas & prompts:[/green] {out_path}")
+    return 0
+
+
+def _cmd_finalize_v4(
+    settings: WorkflowSettings,
+    *,
+    bundle_file: str,
+    vault_db: str,
+    output_dir: str,
+) -> int:
+    """Stage 5 (V4): Deterministic table injection, 100% full-corpus hard audit, real search cost & compilation."""
+    b_path = _resolve_cli_path(settings, bundle_file)
+    out_path = _resolve_cli_path(settings, output_dir)
+    out_path.mkdir(parents=True, exist_ok=True)
+    bundle = json.loads(b_path.read_text(encoding="utf-8"))
+
+    vault_path = settings.resolve_vault_path(vault_db)
+    vault = EvidenceVault(vault_path)
+    try:
+        all_records = vault.list_all()
+        valid_ev_ids = {r.ev_id for r in all_records}
+        vault_stats = vault.stats()
+        search_cost_info = _compute_real_search_cost_from_vault(vault)
+
+        evaluated = [EvaluatedOpportunity.model_validate(e) for e in bundle.get("shortlist", [])]
+        storm_memos = bundle.get("storm_memos", {}) or {}
+        for idx, ev in enumerate(evaluated, start=1):
+            if ev.storm_memo is None and ev.seed.opp_id in storm_memos:
+                ev.storm_memo = OpportunityStormMemo.model_validate(storm_memos[ev.seed.opp_id])
+            if ev.composite_rank <= 0:
+                ev.composite_rank = idx
+
+        eval_dicts = [e.model_dump() for e in evaluated]
+        plan_data = bundle.get("discovery_plan", {}) or {}
+        eliminated = [
+            EliminatedCandidate.model_validate(el).model_dump()
+            for el in bundle.get("eliminated_candidates", [])
+        ]
+        raw_count = int(bundle.get("raw_candidates_count", 0)) or (len(evaluated) + len(eliminated))
+
+        tables = build_deterministic_tables(
+            plan=plan_data,
+            evaluated=eval_dicts,
+            raw_candidates_count=raw_count,
+            eliminated_candidates=eliminated,
+        )
+
+        raw_volumes = dict(bundle.get("volumes") or {})
+        drafts: dict[str, str] = {}
+        for k, v in raw_volumes.items():
+            if str(k).startswith(("00_", "01_", "02_", "03_", "04_")):
+                injected = inject_deterministic_tables(
+                    filename=str(k),
+                    llm_markdown=str(v).strip() + "\n",
+                    tables=tables,
+                )
+                drafts[str(k)] = injected.strip() + "\n"
+
+        drafts["05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"] = render_evidence_index(
+            all_records, db_label=f"data/{vault_path.name}"
+        )
+
+        target_tracks = len(plan_data.get("track_plans", [])) or None
+        objective_audit = run_full_objective_audit(
+            vault_stats=vault_stats,
+            valid_ev_ids=valid_ev_ids,
+            drafts=drafts,
+            evaluated_opps=eval_dicts,
+            contract=settings.contract,
+            target_tracks=target_tracks,
+        )
+
+        pass_threshold = float(settings.contract.get("quality_gates", {}).get("stage_gate_pass_score", 85))
+        raw_rubric = bundle.get("judge_rubric")
+        if raw_rubric:
+            rubric = JudgeRubricScores.model_validate(raw_rubric)
+            exact_sum = round(
+                rubric.china_first_then_global_depth
+                + rubric.dual_horizon_3_5y_vs_5_10y_rigor
+                + rubric.pain_point_and_physics_specificity
+                + rubric.roi_and_industrial_upgrade_value
+                + rubric.citation_grounding_and_prose,
+                2,
+            )
+            rubric = rubric.model_copy(update={"total_score": exact_sum})
+            rubric_passed = exact_sum >= pass_threshold
+            rubric_dump = rubric.model_dump()
+        else:
+            exact_sum = 100.0 if objective_audit["passed"] else 0.0
+            rubric_passed = True
+            rubric_dump = {
+                "mode": "objective_hard_audit_only",
+                "total_score": exact_sum,
+                "executive_verdict": (
+                    "全量客观硬审计 100% 通过" if objective_audit["passed"] else "存在客观硬缺陷，已拦截"
+                ),
+            }
+
+        stage_passed = bool(objective_audit["passed"] and rubric_passed)
+
+        written_files: list[str] = []
+        for fname, content in sorted(drafts.items()):
+            target = out_path / fname
+            target.write_text(content, encoding="utf-8")
+            written_files.append(str(target))
+
+        ws_breakdown = {
+            "global_and_cn_commercialized": sum(
+                1 for e in evaluated if e.seed.commercial_status == "global_and_cn_commercialized"
+            ),
+            "overseas_only_cn_blank": sum(
+                1 for e in evaluated if e.seed.commercial_status == "overseas_only_cn_blank"
+            ),
+            "global_and_cn_true_blank": sum(
+                1 for e in evaluated if e.seed.commercial_status == "global_and_cn_true_blank"
+            ),
+        }
+        llm_cost_cny = float(bundle.get("llm_cost_cny", 0.0))
+        search_cost_cny = float(search_cost_info["search_cost_cny"])
+
+        scorecard = {
+            "run_id": bundle.get("run_id", f"v4-native-{uuid.uuid4().hex[:8]}"),
+            "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+            "workflow_version": "V4.0_MODEL_FIRST_FALSIFIED_DISCOVERY",
+            "profile": bundle.get("profile", "flagship"),
+            "sector_filter": bundle.get("sector_filter", "all"),
+            "llm_engine": bundle.get("llm_engine", "antigravity_native:pro"),
+            "stage_gate_passed": stage_passed,
+            "pass_threshold": pass_threshold,
+            "objective_audit": objective_audit,
+            "deterministic_contract_checks": objective_audit,
+            "discovered_tracks": [
+                {
+                    "track_id": t.get("track_id"),
+                    "sector": t.get("sector"),
+                    "name": t.get("name"),
+                    "is_emerging_or_cross_cutting": t.get("is_emerging_or_cross_cutting", False),
+                    "emergence_rationale": t.get("emergence_rationale", ""),
+                    "recon_evidence_ids": t.get("recon_evidence_ids", []),
+                }
+                for t in plan_data.get("track_plans", [])
+            ],
+            "commercial_whitespace_breakdown": ws_breakdown,
+            "discovery_funnel_summary": {
+                "recon_evidence_count": len(vault.list_by_track("RECON")),
+                "raw_candidates_count": raw_count,
+                "shortlist_count": len(evaluated),
+                "eliminated_count": len(eliminated),
+                "eliminated_candidates": eliminated,
+            },
+            "judge_rubric": rubric_dump,
+            "evidence_vault_stats": vault_stats,
+            "portfolio_reviews": bundle.get("portfolio_reviews", {}),
+            "global_portfolio_ranking": bundle.get("global_portfolio_ranking", {}),
+            "evaluated_opportunities_top16": [
+                {
+                    "rank": e.composite_rank,
+                    "opp_id": e.seed.opp_id,
+                    "track_id": e.seed.track_id,
+                    "sector": e.seed.sector,
+                    "horizon": e.seed.horizon,
+                    "portfolio_role": e.seed.portfolio_role,
+                    "title": e.seed.title,
+                    "commercial_status": e.seed.commercial_status,
+                    "falsification_audit_note": e.seed.falsification_audit_note,
+                    "global_vendors_and_products": e.seed.global_vendors_and_products,
+                    "china_vendors_and_products": e.seed.china_vendors_and_products,
+                    "white_space_and_entry_wedge": e.seed.white_space_and_entry_wedge,
+                    "estimated_rd_months_ai_vs_legacy": e.seed.estimated_rd_months_ai_vs_legacy,
+                    "weighted_pillar_score": e.weighted_pillar_score,
+                    "optimistic_payback_months": e.roi_range.optimistic.payback_months if e.roi_range else e.roi.payback_months,
+                    "baseline_payback_months": e.roi.payback_months,
+                    "conservative_payback_months": e.roi_range.conservative.payback_months if e.roi_range else e.roi.payback_months,
+                    "irr_5yr_pct": e.roi.irr_5yr_pct,
+                    "npv_5yr_cny": e.roi.npv_5yr_cny,
+                    "payback_tier": e.roi.payback_tier,
+                }
+                for e in evaluated
+            ],
+            "critique_loops_executed": int(bundle.get("critique_loops_executed", 0)),
+            "critique_history": bundle.get("critique_history", []),
+            "cost_and_token_telemetry": {
+                "billing_mode": "Antigravity IDE Native Frontier Quota + Paid Search APIs (.env.ai_search)",
+                "llm_engine": bundle.get("llm_engine", "antigravity_native:pro"),
+                "llm_cost_cny": round(llm_cost_cny, 4),
+                "search_cost_cny": search_cost_cny,
+                "total_cost_cny": round(llm_cost_cny + search_cost_cny, 4),
+                "search_breakdown": search_cost_info,
+                "native_agent_invocations": bundle.get("native_agent_invocations", {}),
+                "search_queries_in_vault": search_cost_info["total_queries_logged"],
+            },
+        }
+        sc_path = out_path / "06_EVALUATION_SCORECARD_AND_COST_TELEMETRY.json"
+        sc_path.write_text(json.dumps(scorecard, ensure_ascii=False, indent=2), encoding="utf-8")
+        written_files.append(str(sc_path))
+
+        console.print(
+            f"[bold green]V4.0 Model-First Discovery Finalized![/bold green]\n"
+            f"- Engine: {scorecard['llm_engine']} | Stage-Gate: {stage_passed} | "
+            f"Objective Audit: {objective_audit['passed']} (broken_cites={len(objective_audit['broken_citation_ids'])}, "
+            f"roi_mismatches={len(objective_audit['roi_mismatches'])})\n"
+            f"- Funnel: raw={raw_count} -> shortlist={len(evaluated)} (eliminated={len(eliminated)}) | "
+            f"White-Space={ws_breakdown}\n"
+            f"- Evidences: total={vault_stats.get('total')} (CN={vault_stats.get('cn_count')}, GLOBAL={vault_stats.get('global_count')}) | "
+            f"Search Cost: ¥{search_cost_cny:.2f} CNY\n"
+            f"- Deliverables written: {len(written_files)} -> {out_path}"
+        )
+        return 0 if stage_passed else 1
+    finally:
+        vault.close()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="pso-research",
@@ -1183,15 +1804,41 @@ def main() -> None:
     p_fv2.add_argument("--vault-db", default="evidence_vault_v3.db")
     p_fv2.add_argument("--output-dir", default="outputs/v3_commercial_ai_grounded_2026_2036")
 
-    p_fv3 = sub.add_parser("finalize-v3", help="[V3] Stage 7 deterministic Elo replay, Judge checks & 7 deliverables")
+    p_fv3 = sub.add_parser("finalize-v3", help="[V3 Compat] Stage 7 deterministic Elo replay, Judge checks & 7 deliverables")
     p_fv3.add_argument("--bundle", default="data/v3_native_outputs_bundle.json")
     p_fv3.add_argument("--vault-db", default="evidence_vault_v3.db")
     p_fv3.add_argument("--output-dir", default="outputs/v3_commercial_ai_grounded_2026_2036")
 
+    p_fal = sub.add_parser("falsify-search", help="[V4] Stage 1b bounded falsification search for claimed commercial blanks")
+    p_fal.add_argument("--dossiers", default="data/v4_raw_dossiers.json")
+    p_fal.add_argument("--vault-db", default="evidence_vault_v4.db")
+    p_fal.add_argument("--output", default="data/v4_falsify_context.json")
+    p_fal.add_argument("--max-queries", type=int, default=4)
+
+    p_port = sub.add_parser("prepare-portfolio", help="[V4] Stage 3 export holistic sector buying-committee prompts")
+    p_port.add_argument("--screened", default="data/v4_screened_shortlist.json")
+    p_port.add_argument("--vault-db", default="evidence_vault_v4.db")
+    p_port.add_argument("--output", default="data/v4_portfolio_prompts.json")
+
+    p_syn = sub.add_parser("prepare-synthesis", help="[V4] Stage 4 apply portfolio ranking & export single-core volume prompts")
+    p_syn.add_argument("--screened", default="data/v4_screened_shortlist.json")
+    p_syn.add_argument("--portfolio", default="data/v4_portfolio_results.json")
+    p_syn.add_argument("--plan", default="data/v4_discovery_plan.json")
+    p_syn.add_argument("--vault-db", default="evidence_vault_v4.db")
+    p_syn.add_argument("--output", default="data/v4_synthesis_bundle.json")
+
+    p_exp = sub.add_parser("export-v4-schemas", help="[V4] Export single-core flat JSON schemas & prompts for stdlib shells")
+    p_exp.add_argument("--output", default="data/v4_runtime_schemas.json")
+
+    p_fv4 = sub.add_parser("finalize-v4", help="[V4] Stage 5 deterministic table injection, full-corpus hard audit & compilation")
+    p_fv4.add_argument("--bundle", default="data/v4_native_outputs_bundle.json")
+    p_fv4.add_argument("--vault-db", default="evidence_vault_v4.db")
+    p_fv4.add_argument("--output-dir", default="outputs/v4_model_first_grounded_2026_2036")
+
     p_run = sub.add_parser("run", help="Execute complete LangGraph opportunity discovery workflow")
     p_run.add_argument("--sector", choices=["all", "power", "semiconductor"], default="all")
     p_run.add_argument("--profile", choices=["flagship", "fast"], default="flagship")
-    p_run.add_argument("--output-dir", default="outputs/v3_commercial_ai_grounded_2026_2036")
+    p_run.add_argument("--output-dir", default="outputs/v4_model_first_grounded_2026_2036")
     p_run.add_argument("--thread-id", default=f"pso-{uuid.uuid4().hex[:8]}")
     p_run.add_argument("--hitl", action="store_true", help="Enable Ch 13 HITL interrupt before search fan-out")
 
@@ -1250,6 +1897,41 @@ def main() -> None:
         )
     elif args.command in ("finalize-v2", "finalize-v3"):
         rc = _cmd_finalize_v2(
+            settings,
+            bundle_file=args.bundle,
+            vault_db=args.vault_db,
+            output_dir=args.output_dir,
+        )
+    elif args.command == "falsify-search":
+        rc = asyncio.run(
+            _cmd_falsify_search(
+                settings,
+                dossiers_file=args.dossiers,
+                vault_db=args.vault_db,
+                output_file=args.output,
+                max_queries_per_track=args.max_queries,
+            )
+        )
+    elif args.command == "prepare-portfolio":
+        rc = _cmd_prepare_portfolio(
+            settings,
+            screened_file=args.screened,
+            vault_db=args.vault_db,
+            output_file=args.output,
+        )
+    elif args.command == "prepare-synthesis":
+        rc = _cmd_prepare_synthesis(
+            settings,
+            screened_file=args.screened,
+            portfolio_file=args.portfolio,
+            plan_file=args.plan,
+            vault_db=args.vault_db,
+            output_file=args.output,
+        )
+    elif args.command == "export-v4-schemas":
+        rc = _cmd_export_v4_schemas(settings, output_file=args.output)
+    elif args.command == "finalize-v4":
+        rc = _cmd_finalize_v4(
             settings,
             bundle_file=args.bundle,
             vault_db=args.vault_db,

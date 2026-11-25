@@ -3,12 +3,14 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from datetime import datetime, timezone
 from typing import Any
 
 from pso_workflow.nodes.deps import RuntimeDeps
 from pso_workflow.prompts import SYNTHESIZER_SYSTEM
 from pso_workflow.schemas import EvidenceRecord, WorkflowState
+from pso_workflow.tools.audit_guard import wrap_untrusted_evidence
 
 
 COMMERCIAL_STATUS_LABELS: dict[str, str] = {
@@ -16,6 +18,114 @@ COMMERCIAL_STATUS_LABELS: dict[str, str] = {
     "overseas_only_cn_blank": "海外成熟在售 / 国内整机空白（卡脖子首发替代）",
     "global_and_cn_true_blank": "海内外均无成熟在线整机（全球首发新物种空白）",
 }
+
+_VOLUME_REQUIRED_TABLES: dict[str, tuple[str, ...]] = {
+    "00_": ("COMMERCIAL_MASTER", "ROI_MASTER", "FUNNEL_AUDIT"),
+    "01_": ("COMMERCIAL_POWER", "ROI_POWER"),
+    "02_": ("COMMERCIAL_SEMI", "ROI_SEMI"),
+    "03_": ("FUNNEL_AUDIT", "ROI_MASTER"),
+    "04_": (),
+}
+
+_TABLE_TITLES: dict[str, str] = {
+    "COMMERCIAL_MASTER": "全行业海内外在售厂商、商业空白与 AI 软硬协同总表",
+    "ROI_MASTER": "全行业 Top 决选三情景确定性 `[ROI-CALC]` 财务总表",
+    "FUNNEL_AUDIT": "Stage 0 动态赛道与 Stage 2 确定性漏斗淘汰审计",
+    "COMMERCIAL_POWER": "电力能源行业商用厂商、产品空白与 AI 软硬协同矩阵",
+    "ROI_POWER": "电力能源行业三情景确定性 `[ROI-CALC]` 财务主表",
+    "COMMERCIAL_SEMI": "半导体制造行业商用厂商、产品空白与 AI 软硬协同矩阵",
+    "ROI_SEMI": "半导体制造行业三情景确定性 `[ROI-CALC]` 财务主表",
+}
+
+_PLACEHOLDER_RE = re.compile(r"<!--\s*TABLE:([A-Z0-9_]+)\s*-->")
+
+
+def inject_deterministic_tables(
+    *,
+    filename: str,
+    llm_markdown: str,
+    tables: dict[str, str],
+) -> str:
+    """Deterministically inject locked Python tables via HTML placeholders (or append cleanly if omitted)."""
+    injected_keys: set[str] = set()
+
+    def _replace(match: re.Match[str]) -> str:
+        key = match.group(1).strip()
+        if key in tables:
+            injected_keys.add(key)
+            return tables[key]
+        return ""
+
+    rendered = _PLACEHOLDER_RE.sub(_replace, llm_markdown or "")
+
+    prefix = str(filename)[:3]
+    required = _VOLUME_REQUIRED_TABLES.get(prefix, ())
+    missing_blocks: list[str] = []
+    for req_key in required:
+        if req_key not in injected_keys and req_key in tables and tables[req_key].strip():
+            title = _TABLE_TITLES.get(req_key, req_key)
+            missing_blocks.append(f"### {title}\n\n{tables[req_key]}")
+
+    if missing_blocks:
+        rendered = (
+            rendered.rstrip()
+            + "\n\n---\n\n## 附录：确定性数据主表（Python `[ROI-CALC]` / EvidenceVault 直出）\n\n"
+            + "\n\n".join(missing_blocks)
+            + "\n"
+        )
+    return rendered
+
+
+def format_playbook_digest(evaluated_opps: list[dict[str, Any]]) -> str:
+    """Format compact full-coverage digest of ALL shortlisted opportunities with zero slice truncation."""
+    if not evaluated_opps:
+        return "(No shortlisted opportunities available.)"
+    lines: list[str] = []
+    for item in evaluated_opps:
+        s = item.get("seed") or {}
+        r = item.get("roi") or {}
+        rr = item.get("roi_range") or {}
+        opt_pb = (rr.get("optimistic") or {}).get("payback_months", r.get("payback_months", 0))
+        cons_pb = (rr.get("conservative") or {}).get("payback_months", r.get("payback_months", 0))
+        oid = s.get("opp_id", "")
+        evs = ", ".join(f"[{e}]" for e in (s.get("evidence_ids") or [])[:4])
+        lines.append(
+            f"- #{item.get('composite_rank', 0)} `{oid}` ({s.get('sector')} | {s.get('track_id')} | "
+            f"{s.get('horizon')} | role={s.get('portfolio_role') or 'n/a'} | "
+            f"status={s.get('commercial_status', 'overseas_only_cn_blank')}): **{s.get('title', '')}**\n"
+            f"  - [ROI-CALC] CAPEX=¥{float(r.get('capex_cny', 0))/10000:.1f}万 | "
+            f"Payback(Opt/Base/Cons)={opt_pb}/{r.get('payback_months', 0)}/{cons_pb}月 | IRR={r.get('irr_5yr_pct', 0)}%\n"
+            f"  - 切入楔子: {str(s.get('white_space_and_entry_wedge', ''))[:160]}\n"
+            f"  - AI算力换硬件: {str(s.get('ai_computational_sensing_and_co_design', ''))[:160]}\n"
+            f"  - AI研发与断网部署: {str(s.get('ai_rd_acceleration_and_edge_deployment', ''))[:160]} "
+            f"({s.get('estimated_rd_months_ai_vs_legacy', '')})\n"
+            f"  - BOM与GTM形态: {str(s.get('hardware_bom_localization_and_gtm_form', ''))[:140]} | 证据: {evs}"
+        )
+    return "\n".join(lines)
+
+
+def build_deterministic_tables(
+    *,
+    plan: dict[str, Any],
+    evaluated: list[dict[str, Any]],
+    raw_candidates_count: int,
+    eliminated_candidates: list[dict[str, Any]],
+) -> dict[str, str]:
+    """Build all locked deterministic Markdown tables shared by LangGraph & IDE single-core runner."""
+    return {
+        "ROI_MASTER": format_roi_table(evaluated),
+        "ROI_POWER": format_roi_table(evaluated, sector="power_energy"),
+        "ROI_SEMI": format_roi_table(evaluated, sector="semiconductor"),
+        "COMMERCIAL_MASTER": format_commercial_whitespace_and_ai_table(evaluated),
+        "COMMERCIAL_POWER": format_commercial_whitespace_and_ai_table(evaluated, sector="power_energy"),
+        "COMMERCIAL_SEMI": format_commercial_whitespace_and_ai_table(evaluated, sector="semiconductor"),
+        "FUNNEL_AUDIT": format_discovery_and_funnel_summary(
+            plan=plan,
+            raw_count=raw_candidates_count or len(evaluated) + len(eliminated_candidates),
+            shortlist_count=len(evaluated),
+            eliminated=eliminated_candidates,
+        ),
+    }
 
 
 def format_commercial_whitespace_and_ai_table(
@@ -246,16 +356,24 @@ def build_volume_specs(
     critique_note: str = "",
 ) -> list[tuple[str, str, str]]:
     """Build exact grounded V3 prompts for Volumes 00-04 cleanly shared by LangGraph & CLI."""
-    roi_all_table = format_roi_table(evaluated)
-    roi_power_table = format_roi_table(evaluated, sector="power_energy")
-    roi_semi_table = format_roi_table(evaluated, sector="semiconductor")
+    tables = build_deterministic_tables(
+        plan=plan,
+        evaluated=evaluated,
+        raw_candidates_count=raw_candidates_count,
+        eliminated_candidates=eliminated_candidates,
+    )
+    roi_all_table = tables["ROI_MASTER"]
+    roi_power_table = tables["ROI_POWER"]
+    roi_semi_table = tables["ROI_SEMI"]
 
-    comm_all_table = format_commercial_whitespace_and_ai_table(evaluated)
-    comm_power_table = format_commercial_whitespace_and_ai_table(evaluated, sector="power_energy")
-    comm_semi_table = format_commercial_whitespace_and_ai_table(evaluated, sector="semiconductor")
+    comm_all_table = tables["COMMERCIAL_MASTER"]
+    comm_power_table = tables["COMMERCIAL_POWER"]
+    comm_semi_table = tables["COMMERCIAL_SEMI"]
+    discovery_funnel_md = tables["FUNNEL_AUDIT"]
 
     power_dossiers = format_dossiers(dossiers, sector="power_energy")
     semi_dossiers = format_dossiers(dossiers, sector="semiconductor")
+    playbook_digest = format_playbook_digest(evaluated)
 
     storm_all = format_storm_digest(evaluated)
     storm_power = format_storm_digest(evaluated, sector="power_energy")
@@ -264,9 +382,18 @@ def build_volume_specs(
     power_tids = {d["track_id"] for d in dossiers if d.get("sector") == "power_energy"} | {"RECON"}
     semi_tids = {d["track_id"] for d in dossiers if d.get("sector") == "semiconductor"} | {"RECON"}
 
-    vault_power = format_vault_snippets(all_records, tracks=power_tids, limit=34)
-    vault_semi = format_vault_snippets(all_records, tracks=semi_tids, limit=34)
-    vault_all = format_vault_snippets(all_records, tracks=None, limit=42)
+    vault_power = wrap_untrusted_evidence(
+        format_vault_snippets(all_records, tracks=power_tids, limit=34),
+        label="SYNTH_POWER_EVIDENCE",
+    )
+    vault_semi = wrap_untrusted_evidence(
+        format_vault_snippets(all_records, tracks=semi_tids, limit=34),
+        label="SYNTH_SEMI_EVIDENCE",
+    )
+    vault_all = wrap_untrusted_evidence(
+        format_vault_snippets(all_records, tracks=None, limit=42),
+        label="SYNTH_ALL_EVIDENCE",
+    )
 
     power_track_labels = ", ".join(
         f"{d['track_id']}({d['track_name']})" for d in dossiers if d.get("sector") == "power_energy"
@@ -274,13 +401,6 @@ def build_volume_specs(
     semi_track_labels = ", ".join(
         f"{d['track_id']}({d['track_name']})" for d in dossiers if d.get("sector") == "semiconductor"
     ) or "半导体制造动态赛道"
-
-    discovery_funnel_md = format_discovery_and_funnel_summary(
-        plan=plan,
-        raw_count=raw_candidates_count or len(evaluated) + len(eliminated_candidates),
-        shortlist_count=len(evaluated),
-        eliminated=eliminated_candidates,
-    )
 
     elo_summary = "\n".join(
         f"- Round {m['round_idx']}: `{m['opp_a_id']}` vs `{m['opp_b_id']}` -> Winner `{m['winner_id']}` | {m['rationale']}"
@@ -290,46 +410,58 @@ def build_volume_specs(
     return [
         (
             "00_EXECUTIVE_SUMMARY_AND_TOP_OPPORTUNITIES.md",
-            "Volume 00: V3 总览、海内外在售厂商与产品空白全景、AI软硬协同范式与 Top 16 榜单",
-            f"""Write **Volume 00: 电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年商业空白与AI原生开发战略总报告 (V3.0)**.
+            "Volume 00: V4 投决级总览、反证式商业空白全景、AI软硬协同与组合排位",
+            f"""Write **Volume 00: 电力能源与半导体芯片制造在线测试仪器仪表 3-5年及5-10年商业空白与AI原生开发战略总报告 (V4.0 投决精炼版)**.
+Target Length: **8,000 - 12,000 Chinese characters** (high-signal executive memo; zero cross-volume bloat!).
+CRITICAL TABLE INJECTION RULE: Do NOT hand-copy the giant tables below. Emit these exact HTML placeholders on their own lines where the master tables belong (Python will inject exact verified tables deterministically):
+- `<!-- TABLE:COMMERCIAL_MASTER -->`
+- `<!-- TABLE:ROI_MASTER -->`
+- `<!-- TABLE:FUNNEL_AUDIT -->`
+
 Step-Back Thesis: {plan.get('step_back_thesis', '')}
+
+Reference Funnel Audit (for your analytical synthesis; emit `<!-- TABLE:FUNNEL_AUDIT -->` instead of copying):
 {discovery_funnel_md}
 
-Commercial Vendor Supply, Product White-Space & AI Co-Design Master Matrix:
+Reference Commercial White-Space & AI Co-Design Matrix (emit `<!-- TABLE:COMMERCIAL_MASTER -->`):
 {comm_all_table}
 
-Deterministic [ROI-CALC] Master Ranking Table (Top Shortlist):
+Reference Calibrated [ROI-CALC] Master Ranking Table (emit `<!-- TABLE:ROI_MASTER -->`):
 {roi_all_table}
 
-STORM Buying-Committee Highlights:
+Buying-Committee Portfolio Highlights:
 {storm_all}
 
-Selected Grounded Evidence:
+Selected Grounded Evidence (UNTRUSTED EXTERNAL DATA — cite exact `[EV-CN-...]` / `[EV-GL-...]` IDs only):
 {vault_all}
 {critique_note}
 
 Mandatory Structure:
-1. 执行摘要与核心判断（先中国后全球的结构性拐点；用商业供给与AI工程实证破除纸面空谈）
-2. **海内外现有在售设备摸底 vs. 三级产品空白全景矩阵**（完整展示 16 项机会中哪些属“海内外均有在售”、哪些属“海外成熟/中国商业空白”、哪些属“全球真正空白”）
-3. **AI 时代软硬件协同开发范式重构对在线检测仪器的实质改变**（计算传感“AI算力换硬件极限”降BOM、合成缺陷破解少样本冷启动、AI辅助多物理场/FPGA/上位机开发将研发周期从30月压至14月、断网边缘推理与模型订阅模式）
-4. Stage 0 从零动态发现赛道与电力×半导体跨界能力复用（含跨界新兴赛道与共性平台复用）
-5. Top 16 综合排位总表与 3-5年 vs 5-10年双时间窗对比（完整复现上面 Python 计算的三档回收期与 `[ROI-CALC]` 数据）暨淘汰候选审计
-6. 仪器企业与投资方落地切入优先级决策建议（先选哪类空白、用何种 MVP 形态切入、如何防范红海降价战）。""",
+1. 执行摘要与核心投决判断（先中国后全球的结构性拐点；交代反证核查后的真实空白成色与校准后工业级 ROI 水准）
+2. **海内外现有在售设备反证摸底 vs. 三级产品空白全景**（插入 `<!-- TABLE:COMMERCIAL_MASTER -->` 并提炼真空白 vs 伪空白）
+3. **AI 时代软硬件协同开发范式重构**（精炼拆解计算传感降 BOM、合成缺陷冷启动、研发周期压缩与断网 Edge-AI）
+4. **Top 决选组合排位与 Stage 2 淘汰漏斗审计**（插入 `<!-- TABLE:ROI_MASTER -->` 与 `<!-- TABLE:FUNNEL_AUDIT -->`）
+5. 仪器企业与投资方 12–18 个月落地切入优先级决策建议。""",
         ),
         (
             "01_POWER_ENERGY_ONLINE_TESTING_OPPORTUNITIES.md",
-            "Volume 01: 电力能源行业动态赛道商业格局、产品空白与AI软硬方案深度研报",
-            f"""Write **Volume 01: 电力能源行业动态发现赛道（{power_track_labels}）3-5年及5-10年在线测试仪器商业落地与技术研报 (V3.0)**.
-Power Commercial White-Space & AI Co-Design Matrix:
+            "Volume 01: 电力能源行业动态赛道商业格局、反证空白与AI软硬方案深度研报",
+            f"""Write **Volume 01: 电力能源行业动态发现赛道（{power_track_labels}）3-5年及5-10年在线测试仪器商业落地与技术研报 (V4.0)**.
+Target Length: **14,000 - 20,000 Chinese characters** (crisp, non-repetitive, engineering-grounded).
+CRITICAL TABLE INJECTION RULE: Emit these exact placeholders on their own lines instead of re-typing the tables:
+- `<!-- TABLE:COMMERCIAL_POWER -->`
+- `<!-- TABLE:ROI_POWER -->`
+
+Reference Power Commercial Matrix (emit `<!-- TABLE:COMMERCIAL_POWER -->`):
 {comm_power_table}
 
-Power Deterministic [ROI-CALC] Table:
+Reference Power Calibrated [ROI-CALC] Table (emit `<!-- TABLE:ROI_POWER -->`):
 {roi_power_table}
 
 Power Track Dossiers:
 {power_dossiers}
 
-STORM Buyer Interrogation:
+Buying-Committee Stress-Test:
 {storm_power}
 
 Power Evidence Snippets:
@@ -338,24 +470,29 @@ Power Evidence Snippets:
 
 Mandatory Structure (cover EVERY dynamically discovered Power track above in full practical depth):
 - 第一节：中国市场产业痛点、在售设备招标格局与国产替代缺口（引用 `[EV-CN-...]`）
-- 第二节：全球市场（欧美日中等地区标杆厂商如 Omicron/ABB/Keysight/Hioki 等在售型号及空白界定）（引用 `[EV-GL-...]`）
-- 第三节：3-5年高ROI机会 vs 5-10年全球空白新物种（针对每项机会写清：商业空白级别 + 竞品切入楔子 + AI 计算传感/FPGA边缘协同硬件形态 + 良率/降本/环保/三档ROI `[ROI-CALC]` 量化支撑）
+- 第二节：全球市场标杆厂商在售型号与反证式空白界定（引用 `[EV-GL-...]`，插入 `<!-- TABLE:COMMERCIAL_POWER -->`）
+- 第三节：3-5年高ROI机会 vs 5-10年全球空白新物种（插入 `<!-- TABLE:ROI_POWER -->`，逐项写清物理机理、反证结论、AI软硬协同与校准后三档 `[ROI-CALC]`）
 - 第四节：电厂/电池厂/智算中心买方四角色阻力、零样本冷启动破局与 Spec-in 方案。""",
         ),
         (
             "02_SEMICONDUCTOR_ONLINE_TESTING_OPPORTUNITIES.md",
-            "Volume 02: 半导体芯片制造动态赛道商业格局、产品空白与AI软硬方案深度研报",
-            f"""Write **Volume 02: 半导体芯片制造行业动态发现赛道（{semi_track_labels}）3-5年及5-10年在线量检测设备商业落地与技术研报 (V3.0)**.
-Semiconductor Commercial White-Space & AI Co-Design Matrix:
+            "Volume 02: 半导体芯片制造动态赛道商业格局、反证空白与AI软硬方案深度研报",
+            f"""Write **Volume 02: 半导体芯片制造行业动态发现赛道（{semi_track_labels}）3-5年及5-10年在线量检测设备商业落地与技术研报 (V4.0)**.
+Target Length: **14,000 - 20,000 Chinese characters** (crisp, non-repetitive, fab-floor realistic).
+CRITICAL TABLE INJECTION RULE: Emit these exact placeholders on their own lines instead of re-typing the tables:
+- `<!-- TABLE:COMMERCIAL_SEMI -->`
+- `<!-- TABLE:ROI_SEMI -->`
+
+Reference Semiconductor Commercial Matrix (emit `<!-- TABLE:COMMERCIAL_SEMI -->`):
 {comm_semi_table}
 
-Semiconductor Deterministic [ROI-CALC] Table:
+Reference Semiconductor Calibrated [ROI-CALC] Table (emit `<!-- TABLE:ROI_SEMI -->`):
 {roi_semi_table}
 
 Semiconductor Track Dossiers:
 {semi_dossiers}
 
-STORM Buyer Interrogation:
+Buying-Committee Stress-Test:
 {storm_semi}
 
 Semiconductor Evidence Snippets:
@@ -364,62 +501,56 @@ Semiconductor Evidence Snippets:
 
 Mandatory Structure (cover EVERY dynamically discovered Semiconductor track above in full practical depth):
 - 第一节：中国晶圆厂/功率产线/封测厂良率痛点、海外龙头垄断型号与国产商业化缺口（引用 `[EV-CN-...]`）
-- 第二节：全球 KLA/Onto/Camtek/Lasertec/Bruker/Horiba/Inficon 等在售产品矩阵 vs 真正的全球在线量测空白（引用 `[EV-GL-...]`）
-- 第三节：3-5年国产首发替代 vs 5-10年全球空白新物种（针对每项机会写清：物理限界 + AI 逆散射/超分辨补偿国产中端器件 + 断网 FPGA+NPU EFEM 集成 + 四大支柱与三档 `[ROI-CALC]`）
+- 第二节：全球 KLA/Onto/Camtek/Lasertec/Bruker/Horiba/Inficon 等在售产品矩阵 vs 经反证确认的全球在线量测空白（引用 `[EV-GL-...]`，插入 `<!-- TABLE:COMMERCIAL_SEMI -->`）
+- 第三节：3-5年国产首发替代 vs 5-10年全球空白新物种（插入 `<!-- TABLE:ROI_SEMI -->`，逐项写清物理限界、AI计算传感、断网 EFEM 集成与校准后三档 `[ROI-CALC]`）
 - 第四节：晶圆厂工艺总工、Golden-Tool 对齐与 CFO 门禁壁垒破解方案。""",
         ),
         (
             "03_ROI_FINANCIAL_MODEL_AND_ELO_RANKING.md",
-            "Volume 03: 三情景产线ROI、仪器商业经济性与Elo排位报告",
-            f"""Write **Volume 03: 制造端三情景 `[ROI-CALC]` 量化模型、不同商业空白毛利与AI研发经济性暨 Elo 排位报告 (V3.0)**.
+            "Volume 03: 工业校准三情景产线ROI、淘汰审计与买方组合排位报告",
+            f"""Write **Volume 03: 制造端工业校准三情景 `[ROI-CALC]` 量化模型、漏斗淘汰审计与行业买方组合排位报告 (V4.0)**.
+Target Length: **10,000 - 15,000 Chinese characters**.
+CRITICAL TABLE INJECTION RULE: Emit these exact placeholders on their own lines:
+- `<!-- TABLE:FUNNEL_AUDIT -->`
+- `<!-- TABLE:ROI_MASTER -->`
+
+Reference Funnel Audit (emit `<!-- TABLE:FUNNEL_AUDIT -->`):
 {discovery_funnel_md}
 
-Commercial White-Space & R&D Cycle Comparison:
-{comm_all_table}
-
-Master Deterministic [ROI-CALC] Table (Optimistic / Baseline / Conservative):
+Reference Calibrated [ROI-CALC] Table (emit `<!-- TABLE:ROI_MASTER -->`):
 {roi_all_table}
 
-Pairwise Elo Tournament Match Log:
-{elo_summary}
-
-STORM CFO & Procurement Gatekeeper Findings:
+Buying-Committee Portfolio & CFO Findings:
 {storm_all}
+
+Legacy Pairwise Log (if any):
+{elo_summary}
 {critique_note}
 
 Mandatory Structure:
-1. 生产制造端三情景区间 ROI 建模方法论（参数区间提取 + 保守压力情景 + 10% WACC 公式）
-2. 完整入围机会的 `[ROI-CALC]` 乐观/基准/保守三档财务指标汇总与敏感性分析（明确 Tier-A/B/C）
-3. **仪器研制商视角商业经济性对照（海内外均在售红海 vs 国内空白国产首发 vs 全球空白新物种的毛利、BOM 国产化降幅与 AI 把 30 个月研发压至 14 个月的回本优势）**
-4. Stage 2 漏斗淘汰审计（含商业空白级别对比）与 AI Co-Scientist Elo 锦标赛排位暨一页纸算账模板。""",
+1. 生产制造端 V4.0 工业校准三情景 ROI 建模方法论（清晰说明毛利/报废归因系数、单机良率归因上限、首年导入爬坡系数与 10% WACC 公式，破除“产值直乘 100% 净利”失真）
+2. 完整入围机会的 `[ROI-CALC]` 乐观/基准/保守三档财务敏感性分析（插入 `<!-- TABLE:ROI_MASTER -->`）
+3. 仪器研制商视角商业经济性对照（红海升级 vs 国产首发替代 vs 全球空白新物种的毛利、BOM 降幅与 AI 研发周期压缩回本优势）
+4. Stage 2 漏斗淘汰审计（插入 `<!-- TABLE:FUNNEL_AUDIT -->`）与买方委员会组合排位决策模板。""",
         ),
         (
             "04_PRODUCT_TECH_AND_UPGRADE_STRATEGY_PLAYBOOK.md",
             "Volume 04: AI 时代在线测试仪器软硬件协同研发与商业化落地执行手册 (Playbook)",
-            f"""Write **Volume 04: AI 时代在线测试仪器软硬件协同研发、工程落脚点与三级 GTM 商业化执行手册 (V3.0 Playbook)**.
-Commercial White-Space & AI Co-Design Matrix:
-{comm_all_table}
+            f"""Write **Volume 04: AI 时代在线测试仪器软硬件协同研发、供应链国产化与三级 GTM 商业化执行手册 (V4.0 Playbook)**.
+Target Length: **12,000 - 16,000 Chinese characters**.
+FULL ZERO-TRUNCATION PORTFOLIO COVERAGE (covers ALL shortlisted opportunities cleanly):
+{playbook_digest}
 
-Master Ranking & Physics Context:
-{roi_all_table}
-
-Dossiers Summary:
-{power_dossiers[:3600]}
-{semi_dossiers[:3600]}
-
-STORM Engineering Tweaks:
+Buying-Committee Engineering Tweaks:
 {storm_all}
 {critique_note}
 
 Mandatory Structure (FOCUS ON PRACTICAL BUILDABILITY IN THE AI ERA):
-1. **计算传感核心方法论：“AI 算力换硬件物理极限”工程架构**（按光谱/质谱/光学/超声/高频电学平台拆解如何用 PINNs/逆散射/超分辨与国产成熟核心部件绕开海外禁运件并压降 BOM 30%-60%）
-2. **AI 时代仪器研发生命周期新范式（30–48个月 → 10–18个月）**（AI 多物理场代理仿真 + 物理数字孪生合成缺陷工厂解决冷启动 + AI 辅助 FPGA RTL/高速采集驱动/SECS-GEM/IEC61850 上位机生成）
-3. **Fab 与电网断网安全域 Edge-AI 工程落地五道坎**（FPGA+NPU 毫秒级确定性推理、Golden-Tool 自校准防漂移、原位防爆/超净旁路免停线设计、误报率 SLA 兜底与合规）
-4. **可落地的产品形态与“商业化三级抓手”（Wedge Strategy）**：
-   - 外挂式 AI 传感吊舱 / 旁路测试模块（Retrofit Pod，低风险快速进厂收费）
-   - 独立在线国产替代整机（对准 `overseas_only_cn_blank` 抢占集采/扩产订单）
-   - 全球首发 AI 原位 OEM 模组（嵌入工艺机台腔体 + 工艺模型库年度订阅与国际合规认证出海）
-5. 未来 12–18 个月 MVP 研制里程碑与资源配置清单。""",
+1. **计算传感核心方法论：“AI 算力换硬件物理极限”工程架构**（按光谱/质谱/光学/超声/高频电学平台拆解如何用 PINNs/逆散射/超分辨与国产成熟部件绕开禁运件并压降 BOM 30%-60%）
+2. **AI 时代仪器研发生命周期新范式（30–48个月 → 10–18个月）**（AI 多物理场代理仿真 + 合成缺陷工厂解决冷启动 + AI 辅助 FPGA RTL/驱动/SECS-GEM/IEC61850 上位机生成）
+3. **Fab 与电网断网安全域 Edge-AI 工程落地五道坎**（FPGA+NPU 毫秒级确定性推理、Golden-Tool 自校准、原位防爆/超净旁路免停线设计、误报率 SLA 兜底）
+4. **可落地的产品形态与“商业化三级抓手”**（外挂式 AI 传感吊舱 Retrofit Pod / 独立国产替代整机 / 全球首发原位 OEM 模组 + 模型库订阅）
+5. **全量入围机会（覆盖上述全部 ID）的国产 BOM 替代路线与未来 12–18 个月 MVP 立项里程碑**。""",
         ),
     ]
 
@@ -488,11 +619,20 @@ async def node_grounded_report_synthesizer(
         if narrowed:
             target_specs = narrowed
 
+    tables = build_deterministic_tables(
+        plan=plan,
+        evaluated=evaluated,
+        raw_candidates_count=raw_count,
+        eliminated_candidates=eliminated,
+    )
     generated_pairs = await asyncio.gather(
         *[_gen_volume(fn, lbl, pr) for fn, lbl, pr in target_specs]
     )
-    updated_drafts = dict(generated_pairs)
-    db_name = deps.settings.vault_db_name or "evidence_vault_v3.db"
+    updated_drafts = {
+        fn: inject_deterministic_tables(filename=fn, llm_markdown=md, tables=tables)
+        for fn, md in generated_pairs
+    }
+    db_name = deps.settings.vault_db_name or "evidence_vault_v4.db"
     updated_drafts["05_VERIFIED_EVIDENCE_CITATIONS_INDEX.md"] = render_evidence_index(
         all_records, db_label=f"data/{db_name}"
     )

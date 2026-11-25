@@ -1,0 +1,264 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="pso-v4-uml25" name="PSO V4.0 UML 2.5 状态机图">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="2320" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="&lt;b&gt;电力能源与半导体在线测试仪器机会发现工作流 V4.0 — OMG UML 2.5 行为状态机图&lt;/b&gt;&lt;br/&gt;架构原则：大模型优先（琥珀框＝旗舰大脑推理）+ 确定性底盘（蓝框＝检索/算账/主表注入，红框＝全量硬审计）&lt;br/&gt;图元规范：● 初始伪状态 ｜ ◉ 终止状态 ｜ ◇ 互斥完备选择伪状态（含 [else]）｜ 所有回环均显式证明有界次数上限" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#f1f5f9;strokeColor=#64748b;fontSize=12;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=8;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="40" y="24" width="1840" height="84" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="665" y="140" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="阶段一：宏观广谱侦察与动态赛道立题" style="swimlane;startSize=36;rounded=1;arcSize=5;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#0f172a;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="220" width="1200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="" style="ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="4">
+          <mxGeometry x="30" y="108" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="执行宏观双语侦察" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#ffffff;strokeColor=#1e40af;strokeWidth=2;fontSize=14;fontColor=#1e3a8a;" vertex="1" parent="4">
+          <mxGeometry x="110" y="60" width="430" height="128" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="entry / 装载研究契约与行业经济边界护栏&lt;br/&gt;do / 并发检索中国与全球最新产线痛点及厂商动态并去重入库&lt;br/&gt;exit / 以不可信外部数据边界框物理封装侦察证据" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="6">
+          <mxGeometry y="32" width="430" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="动态聚类生成候选赛道" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fffbeb;strokeColor=#d97706;strokeWidth=2;fontSize=14;fontColor=#92400e;" vertex="1" parent="4">
+          <mxGeometry x="630" y="60" width="430" height="128" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="do / 旗舰大脑基于实时证据从零归纳正交与交叉赛道&lt;br/&gt;exit / 输出各赛道产线痛点与商用厂商双路检索词" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="8">
+          <mxGeometry y="32" width="430" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="4">
+          <mxGeometry x="1120" y="106" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="4" source="5" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="侦察完成" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="4" source="6" target="8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="4" source="8" target="10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="/ 初始化独立证据库与费用台账" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="3" target="4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#b45309;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="662" y="490" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="赛道清单就绪" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="4" target="15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="等待人工审定赛道" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fff1f2;strokeColor=#be123c;strokeWidth=2;fontSize=14;fontColor=#881337;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="446" width="480" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="entry / 落盘待审赛道清单并展示侦察证据依据&lt;br/&gt;do / 挂起等待业务决策者批准或微调赛道方向" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="17">
+          <mxGeometry y="32" width="480" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="1583" y="640" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="[已开启人工审定门禁]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="15" target="17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="收到中止指令 [未批准] / 保留快照退出" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="17" target="19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="阶段二：多赛道并发取证与有界反证核查（消除伪空白）" style="swimlane;startSize=36;rounded=1;arcSize=5;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#0f172a;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="620" width="1200" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="" style="ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="22">
+          <mxGeometry x="30" y="118" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="并发双路检索与高权威深抓" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#ffffff;strokeColor=#1e40af;strokeWidth=2;fontSize=14;fontColor=#1e3a8a;" vertex="1" parent="22">
+          <mxGeometry x="100" y="72" width="340" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="do / 8条赛道并行执行痛点+商用厂商检索与网页全文深抓&lt;br/&gt;exit / 统一编号入库并以不可信外部数据框隔离封装" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="24">
+          <mxGeometry y="32" width="340" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="旗舰大脑提炼候选与空白初判" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fffbeb;strokeColor=#d97706;strokeWidth=2;fontSize=14;fontColor=#92400e;" vertex="1" parent="22">
+          <mxGeometry x="500" y="72" width="360" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="do / 零种子涌现候选机会、初判商用空白级别与工业ROI区间&lt;br/&gt;exit / 为每个疑似空白生成定向厂商反证检索词" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="26">
+          <mxGeometry y="32" width="360" height="92" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#b45309;strokeWidth=2;" vertex="1" parent="22">
+          <mxGeometry x="930" y="116" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="执行定向反证核查" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fffbeb;strokeColor=#d97706;strokeWidth=2;fontSize=14;fontColor=#92400e;" vertex="1" parent="22">
+          <mxGeometry x="500" y="232" width="460" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="do / 追搜龙头厂商业型号与中标记录，由旗舰大脑复核降级或确认真空白&lt;br/&gt;exit / 写入反证审计说明与真实入库编号" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="29">
+          <mxGeometry y="32" width="460" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="赛道档案零造假封盘" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fff1f2;strokeColor=#be123c;strokeWidth=2;fontSize=14;fontColor=#881337;" vertex="1" parent="22">
+          <mxGeometry x="1010" y="232" width="168" height="102" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="do / 严禁伪造回填证据编号，无真实证据的候选留空待淘汰" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="31">
+          <mxGeometry y="32" width="168" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="22">
+          <mxGeometry x="1130" y="116" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="23" target="24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="证据装配就绪" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="24" target="26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="36" value="初判完成" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="26" target="28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37" value="[存在疑似空白 且 反证轮次 &lt; 1] / 反证轮次 + 1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#b45309;fontSize=12;fontColor=#92400e;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="28" target="29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="38" value="反证证据入库" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#b45309;fontSize=12;fontColor=#92400e;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="29" target="26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="39" value="[无待反证项 或 反证轮次 &gt;= 1 / else]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="28" target="31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="40" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="22" source="31" target="33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="41" value="[未开启人工审定门禁 或 else]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="15" target="22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="42" value="收到批准指令 [已批准] / 锁定赛道" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="17" target="22">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1400" y="600" />
+              <mxPoint x="1050" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="43" value="阶段三：工业校准财务漏斗与行业级买方组合评审（2-3次统筹替代32次碎片调用）" style="swimlane;startSize=36;rounded=1;arcSize=5;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#0f172a;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1040" width="1200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="44" value="" style="ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="43">
+          <mxGeometry x="30" y="112" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="45" value="校准财务建模与硬门禁筛除" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#ffffff;strokeColor=#1e40af;strokeWidth=2;fontSize=14;fontColor=#1e3a8a;" vertex="1" parent="43">
+          <mxGeometry x="110" y="62" width="440" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="46" value="do / 引入行业毛利归因、单机归因与首年爬坡计算三情景回收期&lt;br/&gt;exit / 硬淘汰无实证、负现金流及保守回收期超42月候选" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="45">
+          <mxGeometry y="32" width="440" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="47" value="行业级买方委员会拷问与组合排位" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fffbeb;strokeColor=#d97706;strokeWidth=2;fontSize=14;fontColor=#92400e;" vertex="1" parent="43">
+          <mxGeometry x="630" y="62" width="440" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="48" value="do / 电力与半导体分组统筹审视全量候选、真实证据与三情景财务&lt;br/&gt;exit / 输出四角色压力测试备忘录与零丢弃全局组合排位" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="47">
+          <mxGeometry y="32" width="440" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="49" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="43">
+          <mxGeometry x="1130" y="110" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="50" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="43" source="44" target="45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="51" value="短名单与淘汰审计就绪" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="43" source="45" target="47">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="43" source="47" target="49">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="53" value="全部赛道档案汇合" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="22" target="43">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="54" value="阶段四：确定性主表注入与五卷投决级精炼研报并行合成" style="swimlane;startSize=36;rounded=1;arcSize=5;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#0f172a;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1320" width="1200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="55" value="" style="ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="54">
+          <mxGeometry x="30" y="112" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="56" value="确定性渲染只读数据主表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#ffffff;strokeColor=#1e40af;strokeWidth=2;fontSize=14;fontColor=#1e3a8a;" vertex="1" parent="54">
+          <mxGeometry x="110" y="62" width="440" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="57" value="do / 程序直出零误差财务总表、商用空白总表、淘汰表与证据总索引&lt;br/&gt;exit / 锁定只读表格模块，禁止大模型手抄数字表" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="56">
+          <mxGeometry y="32" width="440" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="58" value="并发撰写五卷投决精炼正文" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fffbeb;strokeColor=#d97706;strokeWidth=2;fontSize=14;fontColor=#92400e;" vertex="1" parent="54">
+          <mxGeometry x="630" y="62" width="440" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="59" value="do / 旗舰大脑聚焦物理机理、反证结论与落地路线，按6-9万字控篇成稿&lt;br/&gt;exit / 程序按占位符确定性注入全部只读数据主表" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="58">
+          <mxGeometry y="32" width="440" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="60" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="54">
+          <mxGeometry x="1130" y="110" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="61" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="54" source="55" target="56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="62" value="只读主表已锁定" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="54" source="56" target="58">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="63" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="54" source="58" target="60">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="64" value="组合排位就绪" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="43" target="54">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="65" value="阶段五：全量零截断客观硬审计与有界按需核修" style="swimlane;startSize=36;rounded=1;arcSize=5;fillColor=#f8fafc;strokeColor=#475569;strokeWidth=2;fontSize=15;fontStyle=1;fontColor=#0f172a;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1600" width="1200" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="66" value="" style="ellipse;html=1;shape=startState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="65">
+          <mxGeometry x="30" y="112" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="67" value="全量确定性客观硬审计" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fff1f2;strokeColor=#be123c;strokeWidth=2;fontSize=14;fontColor=#881337;" vertex="1" parent="65">
+          <mxGeometry x="100" y="68" width="430" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="68" value="do / 零截断扫描全量正文：核验每条引用入库存在、财务数字零漂移、&lt;br/&gt;     赛道真覆盖（不含侦察桶）与全仓零密钥泄露" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="67">
+          <mxGeometry y="32" width="430" height="88" as="geometry" />
+        </mxCell>
+        <mxCell id="69" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fffbeb;strokeColor=#b45309;strokeWidth=2;" vertex="1" parent="65">
+          <mxGeometry x="610" y="110" width="36" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="70" value="定向局部核修" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#fffbeb;strokeColor=#d97706;strokeWidth=2;fontSize=14;fontColor=#92400e;" vertex="1" parent="65">
+          <mxGeometry x="180" y="228" width="460" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="71" value="do / 仅对检出引用断链或数字漂移的分卷执行增量修补&lt;br/&gt;exit / 重新注入确定性主表并交回硬审计复验" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="70">
+          <mxGeometry y="32" width="460" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="72" value="编译交付包与真实费用台账" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeLast=1;collapsible=0;marginBottom=0;rounded=1;arcSize=12;fillColor=#ffffff;strokeColor=#1e40af;strokeWidth=2;fontSize=14;fontColor=#1e3a8a;" vertex="1" parent="65">
+          <mxGeometry x="760" y="68" width="340" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="73" value="do / 写入五卷研报、全量证据总索引、客观审计计分卡与真实检索费用明细" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=6;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;fontSize=12;fontColor=#1e293b;" vertex="1" parent="72">
+          <mxGeometry y="32" width="340" height="88" as="geometry" />
+        </mxCell>
+        <mxCell id="74" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="65">
+          <mxGeometry x="1140" y="111" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="75" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="65" source="66" target="67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="76" value="审计结论产出" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="65" source="67" target="69">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="77" value="[存在硬缺陷 且 核修轮次 &lt; 1] / 核修轮次 + 1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#b45309;fontSize=12;fontColor=#92400e;labelBackgroundColor=#ffffff;" edge="1" parent="65" source="69" target="70">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="78" value="修补完成" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#b45309;fontSize=12;fontColor=#92400e;labelBackgroundColor=#ffffff;" edge="1" parent="65" source="70" target="67">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="79" value="[硬审计全通过 或 核修轮次 &gt;= 1 / else]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="65" source="69" target="72">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="80" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="65" source="72" target="74">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="81" value="五卷主表注入完成" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="54" target="65">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="82" value="" style="ellipse;html=1;shape=endState;fillColor=#0f172a;strokeColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry x="663" y="2020" width="34" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="83" value="全套交付物落盘完成" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;endSize=10;strokeWidth=2;strokeColor=#334155;fontSize=12;fontColor=#0f172a;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="65" target="82">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="84" value="&lt;b&gt;V3.0 → V4.0 核心工程演进对照&lt;/b&gt;&lt;br/&gt;1. &lt;b&gt;大脑升格与精简&lt;/b&gt;：取消弱小模型挖掘；32次碎片买方/对战调用收敛为 2-3 次行业组合统筹评审（总调用降幅 ~55%）&lt;br/&gt;2. &lt;b&gt;反证式空白核查&lt;/b&gt;：疑似空白必须触发有界厂商反证追搜，从「没搜到」升级为「反证确认」&lt;br/&gt;3. &lt;b&gt;工业财务校准&lt;/b&gt;：引入毛利归因、单机归因与首年爬坡，根治 12 天回本与 500% IRR 顶格失真&lt;br/&gt;4. &lt;b&gt;零截断硬审计&lt;/b&gt;：统一 EV-CN/EV-GL 编号并 100% 校验入库存在性、ROI 零漂移与非恒真赛道覆盖&lt;br/&gt;5. &lt;b&gt;单内核薄双壳&lt;/b&gt;：IDE 脚本由 1,184 行瘦身至 306 行，与终端无头工作流 100% 同源无漂移" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;size=14;fillColor=#f1f5f9;strokeColor=#64748b;fontSize=12;align=left;verticalAlign=top;spacingLeft=10;spacingRight=10;spacingTop=8;fontColor=#334155;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="780" width="480" height="340" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

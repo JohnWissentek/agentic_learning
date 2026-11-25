@@ -27,9 +27,8 @@ from pso_workflow.nodes import (
     node_heterogeneous_critic,
     node_hitl_approval_gate,
     node_input_guardrail_and_planner,
-    node_palms_roi_and_elo_ranker,
+    node_sector_portfolio_reviewer,
     node_stage_gate_judge_and_compiler,
-    node_storm_persona_interrogator,
     node_track_researcher,
     route_after_critic,
 )
@@ -68,11 +67,8 @@ def build_workflow_graph(
     async def _screener(state: WorkflowState) -> dict[str, Any]:
         return await node_deterministic_funnel_screener(state, deps)
 
-    async def _storm(state: WorkflowState) -> dict[str, Any]:
-        return await node_storm_persona_interrogator(state, deps)
-
-    async def _ranker(state: WorkflowState) -> dict[str, Any]:
-        return await node_palms_roi_and_elo_ranker(state, deps)
+    async def _portfolio(state: WorkflowState) -> dict[str, Any]:
+        return await node_sector_portfolio_reviewer(state, deps)
 
     async def _synth(state: WorkflowState) -> dict[str, Any]:
         return await node_grounded_report_synthesizer(state, deps)
@@ -91,8 +87,7 @@ def build_workflow_graph(
     builder.add_node("hitl_approval_gate", _hitl)
     builder.add_node("track_researcher", _researcher)
     builder.add_node("deterministic_funnel_screener", _screener)
-    builder.add_node("storm_persona_interrogator", _storm)
-    builder.add_node("palms_roi_and_elo_ranker", _ranker)
+    builder.add_node("sector_portfolio_reviewer", _portfolio)
     builder.add_node("grounded_report_synthesizer", _synth)
     builder.add_node("heterogeneous_critic", _critic)
     builder.add_node("corrective_rag_refill", _refill)
@@ -102,9 +97,8 @@ def build_workflow_graph(
     builder.add_edge("input_guardrail_and_planner", "hitl_approval_gate")
     builder.add_conditional_edges("hitl_approval_gate", _fan_out_tracks, ["track_researcher"])
     builder.add_edge("track_researcher", "deterministic_funnel_screener")
-    builder.add_edge("deterministic_funnel_screener", "storm_persona_interrogator")
-    builder.add_edge("storm_persona_interrogator", "palms_roi_and_elo_ranker")
-    builder.add_edge("palms_roi_and_elo_ranker", "grounded_report_synthesizer")
+    builder.add_edge("deterministic_funnel_screener", "sector_portfolio_reviewer")
+    builder.add_edge("sector_portfolio_reviewer", "grounded_report_synthesizer")
     builder.add_edge("grounded_report_synthesizer", "heterogeneous_critic")
     builder.add_conditional_edges(
         "heterogeneous_critic",

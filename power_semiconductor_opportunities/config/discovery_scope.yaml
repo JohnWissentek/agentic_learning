@@ -119,6 +119,12 @@ sector_roi_guardrails:
     market_tam_china_cny_100m_max: 150.0
     market_tam_global_usd_m_min: 20.0
     market_tam_global_usd_m_max: 5000.0
+    unit_margin_or_scrap_ratio_min: 0.12
+    unit_margin_or_scrap_ratio_max: 0.45
+    instrument_attribution_share_min: 0.15
+    instrument_attribution_share_max: 0.65
+    first_year_ramp_factor_min: 0.35
+    first_year_ramp_factor_max: 0.80
   semiconductor:
     capex_cny_min: 300000.0
     capex_cny_max: 60000000.0
@@ -132,3 +138,9 @@ sector_roi_guardrails:
     market_tam_china_cny_100m_max: 200.0
     market_tam_global_usd_m_min: 30.0
     market_tam_global_usd_m_max: 8000.0
+    unit_margin_or_scrap_ratio_min: 0.25
+    unit_margin_or_scrap_ratio_max: 0.65
+    instrument_attribution_share_min: 0.15
+    instrument_attribution_share_max: 0.60
+    first_year_ramp_factor_min: 0.30
+    first_year_ramp_factor_max: 0.70

@@ -20,7 +20,7 @@ def test_compute_roi_metrics_exact_math() -> None:
         capex_cny=1_200_000,
         annual_opex_cny=100_000,
         annual_output_value_cny=300_000_000,
-        yield_gain_pct=0.40,  # 1,200,000 / yr
+        yield_gain_pct=0.40,  # 300M * 0.4% * 0.30 * 0.35 = 126,000 / yr (calibrated V4)
         annual_scrap_saving_cny=300_000,
         annual_downtime_saving_cny=200_000,
         annual_consumable_ehs_saving_cny=100_000,
@@ -29,15 +29,15 @@ def test_compute_roi_metrics_exact_math() -> None:
         wacc=0.10,
     )
     m = compute_roi_metrics(inputs)
-    assert m.yield_gain_saving_cny == pytest.approx(1_200_000.0)
-    assert m.annual_gross_benefit_cny == pytest.approx(1_800_000.0)
-    assert m.net_annual_cashflow_cny == pytest.approx(1_700_000.0)
-    # 1,200,000 / 1,700,000 * 12 = 8.47 -> 8.5 months
-    assert m.payback_months == pytest.approx(8.5)
-    assert m.payback_tier == "Tier-A (<=12m Ultra-High ROI)"
-    assert m.roi_3yr_pct == pytest.approx(325.0)
-    assert m.npv_5yr_cny > 5_000_000.0
-    assert m.irr_5yr_pct > 100.0
+    assert m.yield_gain_saving_cny == pytest.approx(126_000.0)
+    assert m.annual_gross_benefit_cny == pytest.approx(726_000.0)
+    assert m.net_annual_cashflow_cny == pytest.approx(626_000.0)
+    # Year 1 net CF = 726,000 * 0.50 - 100,000 = 263,000; remaining 937,000 / 626,000 * 12 + 12 = 30.0m
+    assert m.payback_months == pytest.approx(30.0)
+    assert m.payback_tier == "Tier-C (24-42m Strategic Upgrade)"
+    assert m.roi_3yr_pct == pytest.approx(26.2, abs=0.2)
+    assert m.npv_5yr_cny > 700_000.0
+    assert 20.0 < m.irr_5yr_pct < 60.0
     assert m.china_sam_cny_100m == pytest.approx(12.6)
     assert m.global_som_5_10y_usd_m == pytest.approx(41.04)
 
@@ -80,7 +80,7 @@ def test_weighted_pillar_score_bounds() -> None:
         horizon="3-5y",
         evidence_count=6,
     )
-    assert 85.0 <= score <= 99.5
+    assert 75.0 <= score <= 99.5
 
 
 def test_clamp_and_compute_range_roi_metrics() -> None:
@@ -150,9 +150,9 @@ def _make_seed(
             yield_gain_pct_high=yield_base * 1.25,
             annual_output_value_cny=output_val,
             annual_opex_cny=capex_base * 0.08,
-            annual_scrap_saving_cny=250_000.0,
-            annual_downtime_saving_cny=150_000.0,
-            annual_consumable_ehs_saving_cny=50_000.0,
+            annual_scrap_saving_cny=500_000.0,
+            annual_downtime_saving_cny=300_000.0,
+            annual_consumable_ehs_saving_cny=120_000.0,
             market_tam_china_cny_100m=18.0,
             market_tam_global_usd_m=420.0,
             parameter_basis="unit test synthetic range",
@@ -195,8 +195,9 @@ def test_screen_candidate_pool_funnel_and_elimination() -> None:
                 track_id=f"DP{(i - 1) % 4 + 1}",
                 sector="power_energy",
                 capex_base=900_000.0 + i * 180_000.0,
-                yield_base=0.80 - i * 0.04,
+                yield_base=1.10 - i * 0.04,
                 evidence_ids=["EV-CN-001", "EV-GL-001"],
+                output_val=900_000_000.0,
             )
         )
         cands.append(
@@ -205,9 +206,9 @@ def test_screen_candidate_pool_funnel_and_elimination() -> None:
                 track_id=f"DS{(i - 1) % 4 + 1}",
                 sector="semiconductor",
                 capex_base=1_400_000.0 + i * 200_000.0,
-                yield_base=0.75 - i * 0.03,
+                yield_base=1.05 - i * 0.03,
                 evidence_ids=["EV-CN-002", "EV-GL-002"],
-                output_val=420_000_000.0,
+                output_val=1_200_000_000.0,
             )
         )
 

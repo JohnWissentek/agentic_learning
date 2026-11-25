@@ -1,74 +1,98 @@
-# 智能体工作流架构与《Agentic Design Patterns》全模式映射图
+# V4.0 智能体工作流架构：大模型优先 + 确定性底盘（OMG UML 2.5 状态机标准）
 
-本工作流严格以仓库内 [《Agentic Design Patterns》中文精解分册](../../agentic_design_patterns/全书摘要分册/README.md) 的 21 个核心模式与 Appendices A/C/G 工程实践为基础进行模式编织（Pattern Composition, PDF P416），并针对**电力能源与半导体芯片制造在线测试仪器仪表**这一强物理约束、重资本 ROI 驱动的工业赛道进行了深度工程化。
+> 本架构基于 [07_智能体工作流开发方法论_大模型优先与确定性底盘边界.md](../../agentic_design_patterns/07_智能体工作流开发方法论_大模型优先与确定性底盘边界.md) 完成 V3.0 → V4.0 结构性重构：
+> - **正当升档保留**：并行 8 赛道取证与 5 卷合成（Ch.3）、清晰五阶段专业研报主线（Ch.1）、双引擎联网证据库与校准版 Python PALMs 算账底盘；
+> - **砍掉模式堆砌**：全面取消弱小模型降智挖掘，取消 16 次孤立买方拷问 + 16 次 2 轮噪声两两对战（32 次调用合并为 2–3 次行业级组合评审），取消只看 3% 截断摘要的同源 98 分自夸审查，改由 **100% 全量客观硬审计 + 最多 1 轮按需定向核修** 守护真值。
 
 ---
 
-## 1. 端到端系统拓扑架构（LangGraph StateGraph + Pattern Composition）
+## 一、 V4.0 行为状态机全景图（OMG UML 2.5 `stateDiagram-v2`）
 
 ```mermaid
-flowchart TD
-    Start(["用户启动指令：行业范围 / 3-5y & 5-10y / 中国优先→全球"]) --> N1
+stateDiagram-v2
+    [*] --> 宏观广谱侦察与赛道立题 : / 装载研究契约与行业范围，初始化独立证据库
 
-    subgraph P1 ["阶段一：护栏契约校准与退一步规划 (Ch 6 + Ch 13 + Ch 18 + App A)"]
-        N1["Node 1: input_guardrail_and_planner<br/>校验契约边界，应用 Step-Back Prompting 拆解 8 大正交赛道<br/>（可选挂起 interrupt HITL 审批大纲）"]
-    end
+    state 宏观广谱侦察与赛道立题 {
+        [*] --> 执行宏观双语侦察
+        执行宏观双语侦察 : entry / 读取宏观探测词与行业经济护栏
+        执行宏观双语侦察 : do / 并发检索中国与全球最新产线痛点及厂商动态并去重入库
+        执行宏观双语侦察 : exit / 以不可信外部数据边界框物理封装侦察证据
+        执行宏观双语侦察 --> 动态聚类生成候选赛道 : 侦察证据入库完成
+        动态聚类生成候选赛道 : do / 旗舰大脑基于实时证据从零归纳正交与交叉赛道并规划双路检索词
+        动态聚类生成候选赛道 --> [*]
+    }
 
-    N1 -->|"LangGraph Send API 动态并发扇出 (Ch 3)"| FanOut(("8 路并发轨道"))
+    state 是否需要人工审定赛道 <<choice>>
+    宏观广谱侦察与赛道立题 --> 是否需要人工审定赛道 : 动态赛道清单已生成
+    是否需要人工审定赛道 --> 等待人工审定赛道 : [已开启人工审定门禁]
+    是否需要人工审定赛道 --> 多赛道并发取证与反证核查 : [未开启人工审定门禁]
+    是否需要人工审定赛道 --> 多赛道并发取证与反证核查 : [else]
 
-    subgraph P2 ["阶段二：双引擎 Agentic RAG 与共享证据库 (Ch 2 + Ch 3 + Ch 5 + Ch 8 + Ch 14)"]
-        direction LR
-        T1["Track P1: 储能/动力/固态电池"]
-        T2["Track P2: 光伏钙钛矿/绿氢电解槽"]
-        T3["Track P3: 特高压/SF6替代/海缆"]
-        T4["Track P4: 调峰燃烧/CCUS分析"]
-        T5["Track S1: Fab AMC/UPW/电子特气"]
-        T6["Track S2: 前道纳米光学/X射线量测"]
-        T7["Track S3: SiC/GaN 衬底外延与动态KGD"]
-        T8["Track S4: 3D Chiplet/HBM/混合键合"]
-    end
+    等待人工审定赛道 : entry / 保存待审赛道清单并展示侦察证据依据
+    等待人工审定赛道 : do / 挂起等待业务决策者确认或微调赛道方向
+    等待人工审定赛道 --> 多赛道并发取证与反证核查 : 收到人工批准指令 [已批准] / 锁定最终赛道清单
+    等待人工审定赛道 --> [*] : 收到人工中止指令 [未批准] / 保留侦察快照并安全退出
 
-    FanOut --> T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8
-    T1 & T2 & T3 & T4 & T5 & T6 & T7 & T8 -->|"写入 SQLite EvidenceVault (Ch 8)"| N3
+    state 多赛道并发取证与反证核查 {
+        [*] --> 赛道首轮双路检索与深抓
+        赛道首轮双路检索与深抓 : do / 多赛道并行执行痛点与商用厂商检索，高权威网页深抓全文入库
+        赛道首轮双路检索与深抓 --> 旗舰大脑提炼候选与空白初判 : 证据按不可信边界框装配完成
+        state 是否存在疑似空白需反证 <<choice>>
+        旗舰大脑提炼候选与空白初判 --> 是否存在疑似空白需反证 : 候选机会与初步空白定级产出
+        是否存在疑似空白需反证 --> 执行定向反证核查 : [存在疑似空白 且 反证轮次 < 1] / 反证轮次 + 1
+        执行定向反证核查 : do / 针对疑似空白定向追搜龙头厂商型号与中标记录，由旗舰大脑复核降级或确认真空白
+        执行定向反证核查 --> 旗舰大脑提炼候选与空白初判 : 反证证据补充入库
+        是否存在疑似空白需反证 --> 赛道档案零造假封盘 : [无待反证项 或 反证轮次 >= 1]
+        是否存在疑似空白需反证 --> 赛道档案零造假封盘 : [else]
+        赛道档案零造假封盘 : exit / 严禁伪造回填证据编号，无真实证据支撑的候选保持空引用待淘汰
+        赛道档案零造假封盘 --> [*]
+    }
 
-    subgraph P3 ["阶段三：STORM 多视角烤问与 PALMs/Elo 决策引擎 (Ch 7 + Ch 17 + Ch 20 + Ch 21)"]
-        N3["Node 3: storm_persona_interrogator<br/>4 类工业买方人设拷问（产线良率VP / 工艺量测总工 / EHS环保总监 / CFO采购守门人）"]
-        N3 --> N4["Node 4: palms_roi_and_elo_ranker<br/>Python 确定性 ROI 计算器（投资回收期/NPV/IRR）+ 两两 Elo 锦标赛排序"]
-    end
+    多赛道并发取证与反证核查 --> 校准财务算账与组合决策评审 : 全部赛道档案汇合
 
-    subgraph P4 ["阶段四：严格闭卷合成与异构 Producer-Critic 闭环 (Ch 1 + Ch 4 + Ch 11 + Ch 12 + Ch 16)"]
-        N4 --> N5["Node 5: grounded_report_synthesizer (qwen3.8-max)<br/>分卷生成 5 份带 [EV-...] 溯源与 [ROI-CALC] 的独立报告"]
-        N5 --> N6["Node 6: heterogeneous_critic (deepseek-v4-pro)<br/>异构推理模型按 SMART 契约核查：物理机理/中国→全球顺序/ROI与引用真伪"]
-        N6 -->|"needs_more_evidence & loop < max"| C1["Node 6b: corrective_rag_refill<br/>触发定向补搜与证据入库"]
-        C1 --> N5
-        N6 -->|"needs_rewrite & loop < max"| N5
-    end
+    state 校准财务算账与组合决策评审 {
+        [*] --> 工业校准财务建模与漏斗筛除
+        工业校准财务建模与漏斗筛除 : do / 按行业毛利归因、单机归因上限与首年导入爬坡计算三情景回收期，硬淘汰无证据及超42月候选
+        工业校准财务建模与漏斗筛除 --> 行业级买方委员会拷问与组合排位 : 决选短名单与淘汰审计表产出
+        行业级买方委员会拷问与组合排位 : do / 电力与半导体分组由旗舰大脑统筹审视全部候选、真实证据与三情景财务，完成四角色压力测试与跨行业总排位
+        行业级买方委员会拷问与组合排位 --> [*]
+    }
 
-    N6 -->|"PASS 或达到循环硬上限"| N7["Node 7: stage_gate_judge_and_compiler<br/>Ch 19 形式化契约校验 + LLM-as-a-Judge 100分门禁 + 全链路成本审计输出"]
-    N7 --> Out(["输出 7 份高水准交付物 (outputs/...)"])
+    校准财务算账与组合决策评审 --> 分卷精炼研报并行合成 : 最终排位与买方评审备忘录就绪
+
+    state 分卷精炼研报并行合成 {
+        [*] --> 确定性渲染只读数据主表
+        确定性渲染只读数据主表 : do / 由程序生成零误差财务总表、商用空白对照表、淘汰审计表与全量证据总索引
+        确定性渲染只读数据主表 --> 并发撰写五卷投决级正文 : 只读数据主表已锁定
+        并发撰写五卷投决级正文 : do / 旗舰大脑聚焦物理机理、反证结论与落地路线，按精炼篇幅并行成稿并由程序确定性注入主表
+        并发撰写五卷投决级正文 --> [*]
+    }
+
+    分卷精炼研报并行合成 --> 全量客观硬审计与按需核修 : 五卷主表注入完成
+
+    state 全量客观硬审计与按需核修 {
+        [*] --> 全量确定性客观硬审计
+        全量确定性客观硬审计 : do / 零截断扫描全量正文，校验每条引用真实入库、财务数字零漂移、赛道真覆盖与零密钥泄露
+        state 硬审计是否通过 <<choice>>
+        全量确定性客观硬审计 --> 硬审计是否通过 : 确定性硬审计报告产出
+        硬审计是否通过 --> 定向局部核修 : [存在硬缺陷 且 核修轮次 < 1] / 核修轮次 + 1
+        定向局部核修 : do / 仅针对存在断链或数字漂移的分卷执行增量修补并保留确定性主表占位
+        定向局部核修 --> 全量确定性客观硬审计 : 局部修订完成
+        硬审计是否通过 --> 编译最终交付包与真实费用台账 : [硬审计全通过 或 核修轮次 >= 1]
+        硬审计是否通过 --> 编译最终交付包与真实费用台账 : [else]
+        编译最终交付包与真实费用台账 : exit / 写入五卷精炼研报、证据总索引、客观硬审计计分卡及真实检索费用明细
+        编译最终交付包与真实费用台账 --> [*]
+    }
+
+    全量客观硬审计与按需核修 --> [*] : 全套交付物落盘完成
 ```
 
 ---
 
-## 2. 《Agentic Design Patterns》全模式落地映射总表
+## 二、 「大脑 vs 底盘」绝对职责二分表（V4.0 单内核架构）
 
-| 书内章节与模式 | 在本工作流中的具体工程实现 | 核心文件位置 |
+| 归属 | 核心职责 | 单一真源位置 |
 | :--- | :--- | :--- |
-| **Ch 1: Prompt Chaining** | 5 卷深度研报采用分卷结构化流水线生成，每卷严格绑定前序 Pydantic 结构化产出，彻底避免单次超长输出被截断。 | `nodes/synthesizer.py` |
-| **Ch 2: Routing** | 三重路由：① 中国(`CN`)优先路由至 **秘塔 Metaso**，全球(`GLOBAL`)优先路由至 **Serper**；② `Critic` 节点基于图状态路由至 `corrective_rag_refill`、`rewrite` 或 `stage_gate_judge`；③ 三级模型成本路由。 | `tools/search_router.py`<br>`graph.py` |
-| **Ch 3: Parallelization** | 利用 LangGraph `Send` API 并发扇出 8 个垂直赛道研究员（`asyncio.Semaphore` 限流防封），并在汇聚前贯彻**严格闭卷综合铁律（Strict Grounded Merger）**。 | `graph.py`<br>`nodes/researcher.py` |
-| **Ch 4: Reflection** | **异构 Producer-Critic 架构**：生成模型（`qwen3.8-max`）与审查模型（`deepseek-v4-pro` 推理模型）解耦，消除同源模型“自吹自擂”偏见。 | `nodes/critic.py` |
-| **Ch 5: Tool Use** | 封装 `MetasoClient`、 `SerperClient`、`JinaReaderFallback` 及确定性 Python 财务算账工具 `roi_calculator.py`。 | `tools/` |
-| **Ch 6: Planning** | 首节点执行 **Step-Back 领域规划**，从物理/化学失效机理出发反推在线测量点，生成 8 赛道双时空（3-5y / 5-10y）子任务矩阵。 | `nodes/planner.py` |
-| **Ch 7: Multi-Agent Collaboration** | 融合 `stanford-oval/storm` 四角色工业采购委员会拷问（良率副总、工艺量测总工、EHS 总监、CFO），暴露真实产线痛点与落地阻力。 | `nodes/storm.py` |
-| **Ch 8: Memory Management** | ① `langgraph-checkpoint-sqlite` 实现断点续跑与时间旅行调试；② `data/evidence_vault.db` 作为持久化结构化证据记忆库实现跨运行 URL 去重。 | `tools/evidence_vault.py`<br>`graph.py` |
-| **Ch 11: Goal Setting & Monitoring** | `config/research_contract.yaml` 固化 SMART 量化指标（最低证据数、中国证据占比、8 赛道全覆盖、强制 ROI 校验）。 | `config/research_contract.yaml`<br>`nodes/judge.py` |
-| **Ch 12: Exception Handling & Recovery** | 指数退避重试、`errCode` 显式拦截（HTTP 200 下拦截 Metaso `2005/1000`）、引擎互备切换、Markdown Reader 降级至 `r.jina.ai`、模型超时回退。 | `config.py`<br>`tools/search_router.py` |
-| **Ch 13: Human-in-the-Loop (HITL)** | 支持 `--hitl` 运行模式及 `langgraph.json` 图调试，在并发深搜前和最终交付前提供检查点确认能力（默认自动跑通以支持批处理）。 | `graph.py` |
-| **Ch 14: Knowledge Retrieval (Agentic RAG)** | 在检索链路加入信源权威分级（`T1-T4`）、正文抽提决策、事实去重入库，以及 Critic 触发的 **Corrective RAG** 知识盲区定向补搜。 | `tools/evidence_vault.py`<br>`nodes/researcher.py` |
-| **Ch 16: Resource-Aware Optimization** | `FAST (qwen3.8-flash)` 负责高并发压缩、`PRODUCER (qwen3.8-max)` 负责深度合成、`CRITIC (deepseek-v4-pro)` 负责严苛审查，并记录细粒度 Token 与人民币/Credits 成本账本。 | `config.py` |
-| **Ch 17: Reasoning Techniques (PALMs)** | 所有 CAPEX、OPEX、良率收益、投资回收期（Payback Months）、5 年 NPV、IRR 全部由 **PALMs 原则**交由确定性 Python 代码计算，大模型不得心算编造。 | `tools/roi_calculator.py` |
-| **Ch 18: Guardrails & Safety** | 输入域边界检查、Pydantic `model_validate_json` 强类型边界解析、Prompt 零明文密钥铁律、输出密文泄露自动化扫描测试。 | `schemas.py`<br>`tests/test_search_and_vault.py` |
-| **Ch 19: Evaluation & Monitoring** | **Formalized Contractor + LLM-as-a-Judge + 三层自动化测试**：输出独立 100 分制 Stage-Gate 审计分与遥测报告；`pytest` 覆盖工具契约、财务数学与全图轨迹。 | `nodes/judge.py`<br>`tests/` |
-| **Ch 20 & Ch 21: Prioritization & Discovery** | 结合加权评分矩阵与 **AI Co-Scientist Elo 锦标赛两两对战**，在多个高潜技术方向中客观收敛出最具投资回报率与产业升级杠杆的 Top 机会榜。 | `nodes/ranker.py` |
-| **Appendix A & G: Prompt & IDE Engineering** | 集成 **Step-Back**、**Factored Cognition（轨道隔离）**、**英文内部推理 + 麦肯锡级中文表达**，并提供 Antigravity IDE 原生 `run_workflow` 协同脚本。 | `prompts/templates.py`<br>`ide_workflows/` |
+| **🧠 旗舰大脑（零弱模型降智）** | Stage 0 动态赛道聚类、Stage 1 赛道机会挖掘与反证复核、Stage 3 行业级买方委员会统筹拷问与组合排位、Stage 4 五卷高密度战略洞见撰写 | [prompts/templates.py](../src/pso_workflow/prompts/templates.py)<br>[nodes/researcher.py](../src/pso_workflow/nodes/researcher.py)<br>[nodes/portfolio_reviewer.py](../src/pso_workflow/nodes/portfolio_reviewer.py) |
+| **🛡️ 确定性底盘（红区铁板）** | ① Metaso + Serper + Jina 双擎检索与真实费用台账；② SQLite `EvidenceVault`（统一 `EV-CN-`/`EV-GL-` 编号并兼容旧 `EV-GLOBAL-`）；③ 校准版工业 PALMs 财务引擎（含毛利归因、单机归因与首年爬坡）；④ 外部网页 `[UNTRUSTED_EXTERNAL_DATA_START/END]` 物理分框；⑤ 确定性主表占位符注入；⑥ 零截断全量引用存在性/ROI 一致性/赛道真覆盖硬审计 | [schemas.py](../src/pso_workflow/schemas.py)<br>[tools/evidence_vault.py](../src/pso_workflow/tools/evidence_vault.py)<br>[tools/roi_calculator.py](../src/pso_workflow/tools/roi_calculator.py)<br>[tools/audit_guard.py](../src/pso_workflow/tools/audit_guard.py)<br>[nodes/synthesizer.py](../src/pso_workflow/nodes/synthesizer.py) |
+| **🔌 单内核薄双外壳** | IDE 原生运行器（306 行）与终端无头 CLI 100% 共享上述内核，零重复 Schema、零权重漂移 | [ide_workflows/antigravity_run_workflow.py](../ide_workflows/antigravity_run_workflow.py)<br>[src/pso_workflow/graph.py](../src/pso_workflow/graph.py)<br>[src/pso_workflow/cli.py](../src/pso_workflow/cli.py) |

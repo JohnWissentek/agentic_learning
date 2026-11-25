@@ -8,10 +8,12 @@ from .critic_and_judge import (
 )
 from .deps import RuntimeDeps
 from .planner import node_hitl_approval_gate, node_input_guardrail_and_planner, run_macro_recon
+from .portfolio_reviewer import node_sector_portfolio_reviewer
 from .researcher import (
     node_corrective_rag_refill,
     node_deterministic_funnel_screener,
     node_track_researcher,
+    run_blank_falsification_check,
 )
 from .storm_and_rank import (
     node_palms_roi_and_elo_ranker,
@@ -29,10 +31,12 @@ __all__ = [
     "node_hitl_approval_gate",
     "node_input_guardrail_and_planner",
     "node_palms_roi_and_elo_ranker",
+    "node_sector_portfolio_reviewer",
     "node_stage_gate_judge_and_compiler",
     "node_storm_persona_interrogator",
     "node_track_researcher",
     "render_evidence_index",
     "route_after_critic",
+    "run_blank_falsification_check",
     "run_macro_recon",
 ]

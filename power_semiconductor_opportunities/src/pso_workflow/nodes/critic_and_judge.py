@@ -11,13 +11,10 @@ from typing import Any, Literal
 from pso_workflow.nodes.deps import RuntimeDeps
 from pso_workflow.prompts import CRITIC_SYSTEM, JUDGE_SYSTEM
 from pso_workflow.schemas import CritiqueVerdict, JudgeRubricScores, WorkflowState
-
-
-def _extract_citation_ids(texts: list[str]) -> set[str]:
-    found: set[str] = set()
-    for t in texts:
-        found.update(re.findall(r"EV-(?:CN|GL)-\d{3,4}", t))
-    return found
+from pso_workflow.tools.audit_guard import (
+    extract_citation_ids as _extract_citation_ids,
+    run_full_objective_audit,
+)
 
 
 def deterministic_contract_checks(
@@ -26,53 +23,40 @@ def deterministic_contract_checks(
     drafts: dict[str, str],
     evaluated_opps: list[dict[str, Any]],
     contract: dict[str, Any],
+    valid_ev_ids: set[str] | None = None,
+    target_tracks: int | None = None,
 ) -> dict[str, Any]:
-    """Ch 19 Formalized Contractor deterministic compliance checks."""
-    gates = contract.get("quality_gates", {})
-    min_ev = int(gates.get("min_total_evidences", 48))
-    min_cn_ratio = float(gates.get("min_china_evidence_ratio", 0.45))
-    min_tracks = int(gates.get("min_tracks_covered", 8))
-
-    # Count research tracks excluding Stage 0 RECON bucket when computing coverage
-    by_track = vault_stats.get("by_track", {}) or {}
-    research_tracks = {k for k in by_track if k != "RECON"}
-    tracks_covered = len(research_tracks) if research_tracks else len(by_track)
-    effective_min_ev = min_ev if tracks_covered >= 6 else max(16, min_ev // 2)
-
+    """Ch 19 Formalized Contractor objective compliance checks (delegated to audit_guard)."""
     main_texts = [
         v for k, v in drafts.items() if k.startswith(("00_", "01_", "02_", "03_", "04_"))
     ]
     cited_ids = _extract_citation_ids(main_texts)
-    roi_tags = sum(t.count("[ROI-CALC]") for t in main_texts)
-    has_cn_and_global = all(
+    effective_valid_ids = valid_ev_ids if valid_ev_ids is not None else cited_ids
+    audit = run_full_objective_audit(
+        vault_stats=vault_stats,
+        valid_ev_ids=effective_valid_ids,
+        drafts=drafts,
+        evaluated_opps=evaluated_opps,
+        contract=contract,
+        target_tracks=target_tracks,
+    )
+    joined_main = "\n".join(main_texts)
+    audit["china_first_global_second_present"] = all(
         ("中国" in t and ("全球" in t or "欧美" in t or "海外" in t))
         for t in main_texts[:3]
     )
-    has_dual_horizon = all(("3-5" in t or "3–5" in t) and ("5-10" in t or "5–10" in t) for t in main_texts[:3])
-    joined_main = "\n".join(main_texts)
-    has_commercial_whitespace = (
-        ("在售" in joined_main or "厂商" in joined_main)
-        and ("空白" in joined_main)
+    audit["dual_horizon_present"] = all(
+        ("3-5" in t or "3–5" in t) and ("5-10" in t or "5–10" in t)
+        for t in main_texts[:3]
     )
-    has_ai_paradigm = (
+    audit["commercial_whitespace_grounded"] = (
+        ("在售" in joined_main or "厂商" in joined_main) and ("空白" in joined_main)
+    )
+    audit["ai_native_paradigm_present"] = (
         ("AI" in joined_main)
         and any(k in joined_main for k in ("计算传感", "软硬", "合成数据", "边缘", "FPGA", "PINN"))
     )
-
-    checks = {
-        "total_evidences_pass": vault_stats.get("total", 0) >= effective_min_ev,
-        "china_ratio_pass": vault_stats.get("cn_ratio", 0.0) >= min_cn_ratio,
-        "tracks_covered_pass": tracks_covered >= min(min_tracks, tracks_covered or 1),
-        "opportunities_ranked_count": len(evaluated_opps),
-        "citations_used_count": len(cited_ids),
-        "roi_calc_tags_count": roi_tags,
-        "china_first_global_second_present": has_cn_and_global,
-        "dual_horizon_present": has_dual_horizon,
-        "commercial_whitespace_grounded": has_commercial_whitespace,
-        "ai_native_paradigm_present": has_ai_paradigm,
-        "all_5_volumes_non_empty": len(main_texts) == 5 and all(len(t) > 500 for t in main_texts),
-    }
-    return checks
+    return audit
 
 
 def _build_dynamic_fallback_gap_queries(state: WorkflowState) -> list[dict[str, str]]:
@@ -126,11 +110,15 @@ async def node_heterogeneous_critic(
     loop_count = int(state.get("loop_count", 0))
     max_loops = int(state.get("max_loops", deps.settings.max_reflection_loops))
 
+    valid_ev_ids = {r.ev_id for r in deps.vault.list_all()}
+    target_tracks = len(plan.get("track_plans", [])) or None
     det_checks = deterministic_contract_checks(
         vault_stats=vault_stats,
         drafts=drafts,
         evaluated_opps=evaluated,
         contract=deps.settings.contract,
+        valid_ev_ids=valid_ev_ids,
+        target_tracks=target_tracks,
     )
 
     tracks_summary = ", ".join(
@@ -164,13 +152,25 @@ async def node_heterogeneous_critic(
         max_tokens=8192,
     )
 
-    # Enforce deterministic evidence floor: if vault total is critically low and loop remains, force refill
+    # Enforce deterministic evidence floor & objective hard audit gate
     if not det_checks["total_evidences_pass"] and verdict.decision == "pass" and loop_count < max_loops:
         verdict = verdict.model_copy(
             update={
                 "decision": "needs_more_evidence",
                 "summary": f"证据总量({vault_stats.get('total')})低于合同要求，自动触发定向补搜。",
                 "gap_queries": verdict.gap_queries or _build_dynamic_fallback_gap_queries(state),
+            }
+        )
+    elif (
+        (not det_checks.get("all_citations_valid", True) or not det_checks.get("roi_consistency_pass", True))
+        and verdict.decision == "pass"
+        and loop_count < max_loops
+    ):
+        verdict = verdict.model_copy(
+            update={
+                "decision": "needs_rewrite",
+                "summary": "全量确定性硬审计发现引用断链或财务数字漂移，强制退回定向核修："
+                + "；".join(det_checks.get("hard_failures", [])),
             }
         )
 
@@ -224,14 +224,19 @@ async def node_stage_gate_judge_and_compiler(
     drafts = state.get("draft_reports") or {}
     vault_stats = deps.vault.stats()
     evaluated = state.get("evaluated_opportunities", [])
+    plan = state.get("research_plan", {}) or {}
     out_dir = Path(state.get("output_dir") or deps.settings.default_output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    valid_ev_ids = {r.ev_id for r in deps.vault.list_all()}
+    target_tracks = len(plan.get("track_plans", [])) or None
     det_checks = deterministic_contract_checks(
         vault_stats=vault_stats,
         drafts=drafts,
         evaluated_opps=evaluated,
         contract=deps.settings.contract,
+        valid_ev_ids=valid_ev_ids,
+        target_tracks=target_tracks,
     )
 
     sample_excerpts = "\n\n".join(
@@ -275,7 +280,6 @@ async def node_stage_gate_judge_and_compiler(
         target.write_text(content, encoding="utf-8")
         written_files.append(str(target))
 
-    plan = state.get("research_plan", {}) or {}
     eliminated = state.get("eliminated_candidates", []) or []
     raw_count = int(state.get("raw_candidates_count", 0)) or (len(evaluated) + len(eliminated))
     cost_summary = deps.ledger.summary()
@@ -291,10 +295,16 @@ async def node_stage_gate_judge_and_compiler(
     scorecard = {
         "run_id": state.get("run_id", ""),
         "completed_at_utc": datetime.now(timezone.utc).isoformat(),
-        "workflow_version": "V3.0_COMMERCIAL_WHITESPACE_AND_AI_CO_DESIGN",
+        "workflow_version": "V4.0_MODEL_FIRST_FALSIFIED_DISCOVERY",
         "profile": state.get("profile", "flagship"),
         "sector_filter": state.get("sector_filter", "all"),
-        "stage_gate_passed": exact_sum >= pass_threshold and det_checks["all_5_volumes_non_empty"],
+        "stage_gate_passed": bool(
+            exact_sum >= pass_threshold
+            and det_checks["all_5_volumes_non_empty"]
+            and det_checks.get("all_citations_valid", True)
+            and det_checks.get("roi_consistency_pass", True)
+        ),
+        "objective_audit": det_checks,
         "pass_threshold": pass_threshold,
         "discovered_tracks": [
             {

@@ -1,0 +1,589 @@
+{
+  "schemas": {
+    "DiscoveryPlan": {
+      "description": "V3.0 dynamic track discovery output clustered from Stage 0 macro recon evidence.",
+      "properties": {
+        "contract_id": {
+          "type": "string"
+        },
+        "sector_filter": {
+          "type": "string"
+        },
+        "profile": {
+          "enum": [
+            "flagship",
+            "fast"
+          ],
+          "type": "string"
+        },
+        "macro_recon_summary": {
+          "type": "string"
+        },
+        "step_back_thesis": {
+          "type": "string"
+        },
+        "track_plans": {
+          "items": {
+            "description": "V2.0/V3.0 dynamically discovered orthogonal or cross-cutting track from Stage 0 Recon.",
+            "properties": {
+              "track_id": {
+                "type": "string"
+              },
+              "sector": {
+                "enum": [
+                  "power_energy",
+                  "semiconductor"
+                ],
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "step_back_physics_principle": {
+                "type": "string"
+              },
+              "cn_queries": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "global_queries": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "is_emerging_or_cross_cutting": {
+                "type": "boolean"
+              },
+              "emergence_rationale": {
+                "type": "string"
+              },
+              "recon_evidence_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "manufacturing_stages": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "cn_vendor_queries": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "global_vendor_queries": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "cn_queries",
+              "cn_vendor_queries",
+              "emergence_rationale",
+              "global_queries",
+              "global_vendor_queries",
+              "is_emerging_or_cross_cutting",
+              "manufacturing_stages",
+              "name",
+              "recon_evidence_ids",
+              "sector",
+              "step_back_physics_principle",
+              "track_id"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "step_back_thesis",
+        "track_plans"
+      ],
+      "type": "object"
+    },
+    "TrackDossier": {
+      "description": "Compressed, citation-grounded findings from one parallel track worker.",
+      "properties": {
+        "track_id": {
+          "type": "string"
+        },
+        "sector": {
+          "enum": [
+            "power_energy",
+            "semiconductor"
+          ],
+          "type": "string"
+        },
+        "track_name": {
+          "type": "string"
+        },
+        "commercial_landscape_summary": {
+          "type": "string"
+        },
+        "china_market_dynamics": {
+          "type": "string"
+        },
+        "global_market_dynamics": {
+          "type": "string"
+        },
+        "horizon_3_5y_outlook": {
+          "type": "string"
+        },
+        "horizon_5_10y_outlook": {
+          "type": "string"
+        },
+        "pain_points": {
+          "items": {
+            "description": "Structured production-line pain point backed by evidence IDs.",
+            "properties": {
+              "process_stage": {
+                "type": "string"
+              },
+              "geo_scope": {
+                "enum": [
+                  "CN",
+                  "GLOBAL"
+                ],
+                "type": "string"
+              },
+              "pain_description": {
+                "type": "string"
+              },
+              "current_limitation": {
+                "type": "string"
+              },
+              "impact_pillars": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "evidence_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "process_stage",
+              "geo_scope",
+              "pain_description",
+              "current_limitation",
+              "impact_pillars"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "opportunities": {
+          "items": {
+            "description": "Candidate online instrumentation technology, product, or application.",
+            "properties": {
+              "opp_id": {
+                "type": "string"
+              },
+              "track_id": {
+                "type": "string"
+              },
+              "sector": {
+                "enum": [
+                  "power_energy",
+                  "semiconductor"
+                ],
+                "type": "string"
+              },
+              "horizon": {
+                "enum": [
+                  "3-5y",
+                  "5-10y"
+                ],
+                "type": "string"
+              },
+              "china_priority_score": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "global_priority_score": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "physics_principle": {
+                "type": "string"
+              },
+              "target_process_point": {
+                "type": "string"
+              },
+              "product_form_factor": {
+                "type": "string"
+              },
+              "quality_yield_mechanism": {
+                "type": "string"
+              },
+              "cost_tco_mechanism": {
+                "type": "string"
+              },
+              "green_ehs_mechanism": {
+                "type": "string"
+              },
+              "industrial_upgrade_mechanism": {
+                "type": "string"
+              },
+              "china_positioning": {
+                "type": "string"
+              },
+              "global_expansion_path": {
+                "type": "string"
+              },
+              "commercial_status": {
+                "enum": [
+                  "global_and_cn_commercialized",
+                  "overseas_only_cn_blank",
+                  "global_and_cn_true_blank"
+                ],
+                "type": "string"
+              },
+              "global_vendors_and_products": {
+                "type": "string"
+              },
+              "china_vendors_and_products": {
+                "type": "string"
+              },
+              "white_space_and_entry_wedge": {
+                "type": "string"
+              },
+              "ai_computational_sensing_and_co_design": {
+                "type": "string"
+              },
+              "ai_rd_acceleration_and_edge_deployment": {
+                "type": "string"
+              },
+              "estimated_rd_months_ai_vs_legacy": {
+                "type": "string"
+              },
+              "hardware_bom_localization_and_gtm_form": {
+                "type": "string"
+              },
+              "evidence_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "roi_range_inputs": {
+                "description": "Evidence-anchored low/base/high economic parameter bounds extracted for V2.0 dynamic candidates.",
+                "properties": {
+                  "capex_cny_low": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "capex_cny_base": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "capex_cny_high": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "yield_gain_pct_low": {
+                    "maximum": 20.0,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "yield_gain_pct_base": {
+                    "maximum": 20.0,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "yield_gain_pct_high": {
+                    "maximum": 20.0,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "annual_output_value_cny": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "annual_opex_cny": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "annual_scrap_saving_cny": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "annual_downtime_saving_cny": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "annual_consumable_ehs_saving_cny": {
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "market_tam_china_cny_100m": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "market_tam_global_usd_m": {
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "parameter_basis": {
+                    "type": "string"
+                  },
+                  "wacc": {
+                    "exclusiveMaximum": 0.5,
+                    "exclusiveMinimum": 0,
+                    "type": "number"
+                  },
+                  "unit_margin_or_scrap_ratio": {
+                    "maximum": 0.8,
+                    "minimum": 0.05,
+                    "type": "number"
+                  },
+                  "instrument_attribution_share": {
+                    "maximum": 1.0,
+                    "minimum": 0.05,
+                    "type": "number"
+                  },
+                  "first_year_ramp_factor": {
+                    "maximum": 1.0,
+                    "minimum": 0.2,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "capex_cny_low",
+                  "capex_cny_base",
+                  "capex_cny_high",
+                  "yield_gain_pct_low",
+                  "yield_gain_pct_base",
+                  "yield_gain_pct_high",
+                  "annual_output_value_cny",
+                  "annual_opex_cny",
+                  "annual_scrap_saving_cny",
+                  "annual_downtime_saving_cny",
+                  "annual_consumable_ehs_saving_cny",
+                  "market_tam_china_cny_100m",
+                  "market_tam_global_usd_m"
+                ],
+                "type": "object"
+              },
+              "discovery_origin": {
+                "type": "string"
+              },
+              "falsification_queries": {
+                "items": {
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "falsification_audit_note": {
+                "type": "string"
+              },
+              "portfolio_role": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ai_computational_sensing_and_co_design",
+              "ai_rd_acceleration_and_edge_deployment",
+              "china_positioning",
+              "china_priority_score",
+              "china_vendors_and_products",
+              "commercial_status",
+              "cost_tco_mechanism",
+              "estimated_rd_months_ai_vs_legacy",
+              "evidence_ids",
+              "falsification_audit_note",
+              "falsification_queries",
+              "global_expansion_path",
+              "global_priority_score",
+              "global_vendors_and_products",
+              "green_ehs_mechanism",
+              "hardware_bom_localization_and_gtm_form",
+              "horizon",
+              "industrial_upgrade_mechanism",
+              "opp_id",
+              "physics_principle",
+              "product_form_factor",
+              "quality_yield_mechanism",
+              "roi_range_inputs",
+              "sector",
+              "target_process_point",
+              "title",
+              "track_id",
+              "white_space_and_entry_wedge"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "evidence_count_cn": {
+          "type": "integer"
+        },
+        "evidence_count_global": {
+          "type": "integer"
+        },
+        "top_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "track_id",
+        "sector",
+        "track_name",
+        "china_market_dynamics",
+        "global_market_dynamics",
+        "horizon_3_5y_outlook",
+        "horizon_5_10y_outlook",
+        "pain_points",
+        "opportunities"
+      ],
+      "type": "object"
+    },
+    "SectorPortfolioReview": {
+      "description": "V4.0 sector-level buying-committee & portfolio prioritization output (replaces 16 STORM + 16 Elo).",
+      "properties": {
+        "sector": {
+          "enum": [
+            "power_energy",
+            "semiconductor"
+          ],
+          "type": "string"
+        },
+        "portfolio_synthesis": {
+          "type": "string"
+        },
+        "ranked_reviews": {
+          "items": {
+            "description": "V4.0 holistic buyer-committee stress-test and portfolio rank for one shortlisted candidate.",
+            "properties": {
+              "opp_id": {
+                "type": "string"
+              },
+              "sector_rank": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "portfolio_role": {
+                "enum": [
+                  "near_term_cash_cow",
+                  "strategic_localization_wedge",
+                  "frontier_white_space_bet",
+                  "defensive_upgrade"
+                ],
+                "type": "string"
+              },
+              "sharpest_pain_point_summary": {
+                "type": "string"
+              },
+              "key_localization_or_export_moat": {
+                "type": "string"
+              },
+              "buyer_assessments": {
+                "items": {
+                  "description": "One buyer persona's realistic manufacturing interrogation.",
+                  "properties": {
+                    "persona_role": {
+                      "enum": [
+                        "Fab/Plant Yield VP",
+                        "Metrology/Process Chief Engineer",
+                        "EHS & Green Compliance Director",
+                        "CFO / Procurement ROI Gatekeeper"
+                      ],
+                      "type": "string"
+                    },
+                    "core_question": {
+                      "type": "string"
+                    },
+                    "adoption_barrier": {
+                      "type": "string"
+                    },
+                    "spec_in_trigger": {
+                      "type": "string"
+                    },
+                    "recommended_product_tweak": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "persona_role",
+                    "core_question",
+                    "adoption_barrier",
+                    "spec_in_trigger",
+                    "recommended_product_tweak"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "ranking_rationale": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "opp_id",
+              "sector_rank",
+              "sharpest_pain_point_summary",
+              "key_localization_or_export_moat",
+              "buyer_assessments",
+              "ranking_rationale"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "sector",
+        "portfolio_synthesis",
+        "ranked_reviews"
+      ],
+      "type": "object"
+    },
+    "GlobalPortfolioRanking": {
+      "description": "V4.0 cross-sector executive portfolio ordering across Power & Semiconductor finalists.",
+      "properties": {
+        "executive_ranking_thesis": {
+          "type": "string"
+        },
+        "ordered_opp_ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "cross_sector_synergies": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "executive_ranking_thesis",
+        "ordered_opp_ids"
+      ],
+      "type": "object"
+    }
+  },
+  "prompts": {
+    "RECON_DISCOVERY_SYSTEM": "You are a Chief Industrial Metrology Discovery Architect executing Stage 0 MACRO RECONNAISSANCE & DYNAMIC TRACK EMERGENCE (V3.0 Commercial White-Space & AI-Native Discovery).\n\nYou start with NO preset sub-track table and NO preset opportunity seeds.\nAnalyze the live Stage 0 `[EV-CN-...]` and `[EV-GL-...]` reconnaissance snippets (policy mandates, factory tenders, existing equipment vendor launches, localization gaps, academic reviews) across BOTH:\n1) `power_energy`: Power, energy storage, renewables/hydrogen, HVDC/grid, decarbonization & emerging energy-compute infrastructure;\n2) `semiconductor`: Wafer fab media/processes, wide-bandgap power devices, advanced packaging/substrates & emerging optical-electrical integration.\n\nSTEP-BACK & COMMERCIAL CLUSTERING RULES:\n1. Cluster live evidence into orthogonal, non-overlapping research tracks (`track_id` such as `DP1`..`DP4` for `power_energy`, `DS1`..`DS4` for `semiconductor`) that reflect TODAY'S REAL manufacturing bottlenecks, commercial equipment gaps, and 3-5y / 5-10y inflections rather than abstract theory.\n2. Deliberately include genuinely emerging or cross-cutting tracks (`is_emerging_or_cross_cutting=true`, explaining why in `emergence_rationale` and citing `recon_evidence_ids`) whenever the recon evidence reveals strong industrial pull.\n3. For EVERY discovered track, synthesize:\n   - Targeted pain-point/technology queries: `cn_queries` & `global_queries`;\n   - Dedicated **Commercial Vendor & Product Supply queries**: `cn_vendor_queries` (searching Chinese vendors, flagship models, factory bids/pilots, localization gaps) and `global_vendor_queries` (searching overseas incumbents, shipped system models, inline metrology product sheets).\n4. Keep track IDs concise (`DP1`, `DP2`, ..., `DS1`, `DS2`, ...) and write all human-facing fields in authoritative Simplified Chinese with English technical terms on first mention.\n",
+    "RESEARCHER_V2_SYSTEM": "You are an isolated Senior Domain Research & Productization Engineer executing V3.0 ZERO-SEED FACTORED COGNITION for ONE dynamically discovered manufacturing track.\n\nSTRICT GROUNDING, COMMERCIAL REALITY & AI-ERA HW/SW CO-DESIGN RULES (Ch 3 & Ch 14):\n1. Do NOT write purely theoretical physics essays, and do NOT fabricate vendor names or commercial model numbers. Discover `commercial_landscape_summary`, concrete `pain_points`, and `3-4` high-conviction online instrumentation `opportunities` (`3-5y` AND `5-10y`) strictly bottom-up from retrieved EvidenceVault records (`[EV-CN-...]` / `[EV-GL-...]`).\n2. Attach exact verified evidence IDs (`[\"EV-CN-001\", \"EV-GL-004\"]`) to every pain point and opportunity.\n3. For EVERY candidate opportunity, you MUST explicitly verify and populate BOTH PILLARS:\n   [Pillar A — 海内外在售厂商摸底 vs. 产品空白分级]\n   - `global_vendors_and_products`: List real overseas companies and specific commercial system/model families currently sold (or state \"尚无成熟在线量产整机在售，目前仅停留在离线实验室/原型样机\" if none exists) backed by `[EV-GL-...]`.\n   - `china_vendors_and_products`: List real Chinese companies, shipped/pilot system status (`量产在售 / 产线验证Pilot / 尚属商业空白`) backed by `[EV-CN-...]`.\n   - `commercial_status`: Classify strictly into ONE of:\n     * `\"global_and_cn_commercialized\"` (海内外均有成熟在售设备，需靠AI软硬协同降本或升维切入)\n     * `\"overseas_only_cn_blank\"` (海外已有成熟在售产品，中国商业化量产整机仍属空白/早期验证)\n     * `\"global_and_cn_true_blank\"` (海内外均无成熟在线量产在售产品，属全球首发新物种空白)\n   - `white_space_and_entry_wedge`: Explain the exact product blank and concrete wedge to beat incumbents or launch first-of-a-kind tooling.\n   [Pillar B — AI 时代软硬件协同研发新范式与商业落脚点]\n   - `ai_computational_sensing_and_co_design`: How PINNs physics-informed solvers, inverse scattering, weak-signal denoising, or multimodal fusion (\"AI算力换硬件物理极限\") allow mature domestic sensors to match Tier-1 sensitivity while cutting hardware BOM cost & avoiding embargoed components.\n   - `ai_rd_acceleration_and_edge_deployment`: How AI multiphysics surrogate simulation, synthetic defect generation (solving zero/few-shot cold-start), AI-assisted FPGA/EDA/host-SW generation, and air-gapped FPGA+NPU edge inference (<5-20ms, Golden-Tool auto-calibration) change build speed and field reliability.\n   - `estimated_rd_months_ai_vs_legacy`: Concrete comparison like `\"14个月 (AI原生协同) vs 32个月 (传统串行研发)\"`.\n   - `hardware_bom_localization_and_gtm_form`: Domestic vs constrained BOM breakdown, MVP form factor (e.g. 外挂AI传感吊舱 / 旁路闭环模块 / 独立在线整机), and HW + model-library business model.\n4. Also extract realistic factory-line `roi_range_inputs` (`capex_cny_low/base/high`, `yield_gain_pct_low/base/high`, `annual_output_value_cny`, `annual_opex_cny`, savings, CN/Global TAM, plus `parameter_basis`) for downstream Python PALMs 3-scenario interval calculation.\n5. Write all descriptive Chinese fields in crisp, actionable consulting/product-architect Simplified Chinese.\n"
+  }
+}

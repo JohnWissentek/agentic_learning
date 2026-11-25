@@ -24,27 +24,32 @@ def _clamp(v: Any, lo: float, hi: float) -> float:
 
 def _coerce_commercial_status(v: Any) -> str:
     low = str(v or "").strip().lower()
-    if any(
+    if low in ("global_and_cn_true_blank", "true_blank", "global blank", "true blank") or any(
         k in low
         for k in (
-            "true_blank",
-            "global_and_cn_true_blank",
             "全球空白",
             "海内外均属产品空白",
             "海内外空白",
             "全球均无",
             "均无量产",
             "均未商业",
-            "均无",
+            "均无成熟",
             "尚无成熟",
-            "global blank",
-            "true blank",
         )
     ):
         return "global_and_cn_true_blank"
-    if any(k in low for k in ("global_and_cn_commercialized", "commercialized", "均有", "红海", "均已在售", "海内外在售")):
+    if low in ("global_and_cn_commercialized", "commercialized") or any(
+        k in low for k in ("均有", "红海", "均已在售", "海内外在售", "海内外均已")
+    ):
         return "global_and_cn_commercialized"
-    return "overseas_only_cn_blank"
+    if low in ("overseas_only_cn_blank", "cn_blank") or any(
+        k in low for k in ("海外在售", "海外已有", "海外巨头在售", "国产空白", "国内空白")
+    ):
+        return "overseas_only_cn_blank"
+    raise ValueError(
+        f"Unrecognized commercial_status={v!r}; must be one of "
+        "'global_and_cn_commercialized', 'overseas_only_cn_blank', 'global_and_cn_true_blank'"
+    )
 
 
 def _coerce_query_list(v: Any) -> list[dict[str, str]]:
@@ -186,7 +191,7 @@ class PainPointItem(BaseModel):
 
 
 class ROIInputs(BaseModel):
-    """Deterministic financial inputs fed into PALMs ROI calculator."""
+    """Deterministic financial inputs fed into calibrated PALMs ROI calculator."""
 
     capex_cny: float = Field(gt=0)
     annual_opex_cny: float = Field(ge=0)
@@ -198,6 +203,9 @@ class ROIInputs(BaseModel):
     market_tam_china_cny_100m: float = Field(gt=0)
     market_tam_global_usd_m: float = Field(gt=0)
     wacc: float = Field(default=0.10, gt=0, lt=0.5)
+    unit_margin_or_scrap_ratio: float = Field(default=0.30, ge=0.05, le=0.80)
+    instrument_attribution_share: float = Field(default=0.35, ge=0.05, le=1.0)
+    first_year_ramp_factor: float = Field(default=0.50, ge=0.20, le=1.0)
 
     @field_validator("wacc", mode="before")
     @classmethod
@@ -206,6 +214,30 @@ class ROIInputs(BaseModel):
         if val >= 1.0:
             val = val / 100.0
         return _clamp(val, 0.03, 0.35)
+
+    @field_validator("unit_margin_or_scrap_ratio", mode="before")
+    @classmethod
+    def _val_margin_ratio(cls, v: Any) -> float:
+        val = float(v)
+        if val > 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.05, 0.80)
+
+    @field_validator("instrument_attribution_share", mode="before")
+    @classmethod
+    def _val_attr_share(cls, v: Any) -> float:
+        val = float(v)
+        if val > 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.05, 1.0)
+
+    @field_validator("first_year_ramp_factor", mode="before")
+    @classmethod
+    def _val_ramp(cls, v: Any) -> float:
+        val = float(v)
+        if val > 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.20, 1.0)
 
     @field_validator("yield_gain_pct", mode="before")
     @classmethod
@@ -277,6 +309,9 @@ class ROIRangeInputs(BaseModel):
     market_tam_global_usd_m: float = Field(gt=0)
     parameter_basis: str = ""
     wacc: float = Field(default=0.10, gt=0, lt=0.5)
+    unit_margin_or_scrap_ratio: float = Field(default=0.30, ge=0.05, le=0.80)
+    instrument_attribution_share: float = Field(default=0.35, ge=0.05, le=1.0)
+    first_year_ramp_factor: float = Field(default=0.50, ge=0.20, le=1.0)
 
     @field_validator("wacc", mode="before")
     @classmethod
@@ -285,6 +320,30 @@ class ROIRangeInputs(BaseModel):
         if val >= 1.0:
             val = val / 100.0
         return _clamp(val, 0.03, 0.35)
+
+    @field_validator("unit_margin_or_scrap_ratio", mode="before")
+    @classmethod
+    def _val_range_margin(cls, v: Any) -> float:
+        val = float(v)
+        if val > 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.05, 0.80)
+
+    @field_validator("instrument_attribution_share", mode="before")
+    @classmethod
+    def _val_range_attr(cls, v: Any) -> float:
+        val = float(v)
+        if val > 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.05, 1.0)
+
+    @field_validator("first_year_ramp_factor", mode="before")
+    @classmethod
+    def _val_range_ramp(cls, v: Any) -> float:
+        val = float(v)
+        if val > 1.0:
+            val = val / 100.0
+        return _clamp(val, 0.20, 1.0)
 
     @model_validator(mode="after")
     def _normalize_triads(self) -> "ROIRangeInputs":
@@ -314,6 +373,9 @@ class ROIRangeInputs(BaseModel):
             market_tam_china_cny_100m=self.market_tam_china_cny_100m,
             market_tam_global_usd_m=self.market_tam_global_usd_m,
             wacc=self.wacc,
+            unit_margin_or_scrap_ratio=self.unit_margin_or_scrap_ratio,
+            instrument_attribution_share=self.instrument_attribution_share,
+            first_year_ramp_factor=self.first_year_ramp_factor,
         )
 
 
@@ -377,6 +439,9 @@ class TechOpportunitySeed(BaseModel):
     roi_inputs: ROIInputs | None = None
     roi_range_inputs: ROIRangeInputs | None = None
     discovery_origin: str = "dynamic_evidence_emergence"
+    falsification_queries: list[dict[str, str]] = Field(default_factory=list)
+    falsification_audit_note: str = ""
+    portfolio_role: str = ""
 
     @field_validator("commercial_status", mode="before")
     @classmethod
@@ -517,7 +582,7 @@ class EvaluatedOpportunity(BaseModel):
 
 
 class EloMatchRecord(BaseModel):
-    """Single pairwise Elo debate record (Ch 21 AI Co-Scientist)."""
+    """Single pairwise Elo debate record (Ch 21 AI Co-Scientist, legacy V1-V3 compat)."""
 
     round_idx: int
     opp_a_id: str
@@ -526,6 +591,44 @@ class EloMatchRecord(BaseModel):
     rationale: str
     elo_a_after: float
     elo_b_after: float
+
+
+class PortfolioCandidateReview(BaseModel):
+    """V4.0 holistic buyer-committee stress-test and portfolio rank for one shortlisted candidate."""
+
+    opp_id: str
+    sector_rank: int = Field(ge=1)
+    portfolio_role: Literal[
+        "near_term_cash_cow",
+        "strategic_localization_wedge",
+        "frontier_white_space_bet",
+        "defensive_upgrade",
+    ] = "strategic_localization_wedge"
+    sharpest_pain_point_summary: str
+    key_localization_or_export_moat: str
+    buyer_assessments: list[BuyerPersonaAssessment]
+    ranking_rationale: str
+
+
+class SectorPortfolioReview(BaseModel):
+    """V4.0 sector-level buying-committee & portfolio prioritization output (replaces 16 STORM + 16 Elo)."""
+
+    sector: Literal["power_energy", "semiconductor"]
+    portfolio_synthesis: str
+    ranked_reviews: list[PortfolioCandidateReview]
+
+    @field_validator("sector", mode="before")
+    @classmethod
+    def _val_portfolio_sector(cls, v: Any) -> str:
+        return _coerce_sector(v)
+
+
+class GlobalPortfolioRanking(BaseModel):
+    """V4.0 cross-sector executive portfolio ordering across Power & Semiconductor finalists."""
+
+    executive_ranking_thesis: str
+    ordered_opp_ids: list[str]
+    cross_sector_synergies: list[str] = Field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
@@ -596,14 +699,16 @@ class CritiqueVerdict(BaseModel):
     @field_validator("decision", mode="before")
     @classmethod
     def _normalize_decision(cls, v: Any) -> str:
-        s = str(v).strip().lower()
+        s = str(v or "").strip().lower()
         if s in {"pass", "needs_more_evidence", "needs_rewrite"}:
             return s
         if "evidence" in s:
             return "needs_more_evidence"
         if "rewrite" in s or "revise" in s:
             return "needs_rewrite"
-        return "pass"
+        raise ValueError(
+            f"Unrecognized critique decision={v!r}; must be 'pass', 'needs_more_evidence', or 'needs_rewrite'"
+        )
 
     @field_validator("gap_queries", mode="before")
     @classmethod
@@ -686,10 +791,12 @@ class WorkflowState(TypedDict, total=False):
     raw_candidates_count: int
     eliminated_candidates: list[dict[str, Any]]
 
-    # Stage 3: STORM & PALMs / Elo Ranking
+    # Stage 3: Unified Sector Buying-Committee & Portfolio Review (V4.0) + Legacy Compat
     storm_memos: dict[str, Any]
     evaluated_opportunities: list[dict[str, Any]]
     elo_matches: list[dict[str, Any]]
+    portfolio_reviews: dict[str, Any]
+    global_portfolio_ranking: dict[str, Any]
 
     # Stage 4: Grounded Synthesis & Heterogeneous Reflection
     draft_reports: Annotated[dict[str, str], _merge_dict]

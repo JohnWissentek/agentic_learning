@@ -166,11 +166,11 @@ class WorkflowSettings:
     critic_model: str = "deepseek-v4-pro"
     critic_fallback_model: str = "qwen3.8-max"
 
-    max_reflection_loops: int = 2
+    max_reflection_loops: int = 1
     concurrency: int = 6
     data_dir: Path = field(default_factory=lambda: Path("data"))
-    vault_db_name: str = "evidence_vault_v3.db"
-    default_output_dir: Path = field(default_factory=lambda: Path("outputs/v3_commercial_ai_grounded_2026_2036"))
+    vault_db_name: str = "evidence_vault_v4.db"
+    default_output_dir: Path = field(default_factory=lambda: Path("outputs/v4_model_first_grounded_2026_2036"))
 
     contract: dict[str, Any] = field(default_factory=dict)
     taxonomy: dict[str, Any] = field(default_factory=dict)
@@ -229,8 +229,8 @@ class WorkflowSettings:
         data_dir = Path(pick("PSO_DATA_DIR", "data"))
         if not data_dir.is_absolute():
             data_dir = root_dir / data_dir
-        vault_db_name = pick("PSO_VAULT_DB", "evidence_vault_v3.db")
-        out_dir = Path(pick("PSO_DEFAULT_OUTPUT_DIR", "outputs/v3_commercial_ai_grounded_2026_2036"))
+        vault_db_name = pick("PSO_VAULT_DB", "evidence_vault_v4.db")
+        out_dir = Path(pick("PSO_DEFAULT_OUTPUT_DIR", "outputs/v4_model_first_grounded_2026_2036"))
         if not out_dir.is_absolute():
             out_dir = root_dir / out_dir
 

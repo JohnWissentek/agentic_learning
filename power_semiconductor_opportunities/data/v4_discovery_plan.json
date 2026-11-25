@@ -1,0 +1,489 @@
+{
+  "contract_id": "PSO-CONTRACT-2026-V4",
+  "sector_filter": "all",
+  "profile": "flagship",
+  "macro_recon_summary": "基于Stage 0宏观侦察（36条[EV-CN-*]与[EV-GL-*]实证记录），2025—2026年电力能源（power_energy）与半导体（semiconductor）两大产业的量检测（Metrology & Inspection）需求正从“离线抽检与单物理量监控”全面转向“产线原位无损三维感知、物理信息AI反演及跨界多物理场协同测试”。在电力能源板块：1）固态电池进入中试线招标与整线交付期，先导智能、利元亨、纳科诺尔等推动干法电极、600MPa等静压与硫化物整线落地，但高节拍微裂纹（≤0.5μm）及内部界面接触在线无损检测仍属关键缺口（[EV-CN-001]~[EV-CN-005]、[EV-GL-018]）；2）绿氢电解槽/燃料电池物理信息AI超声原位传感与钙钛矿叠层光伏量产提速形成新兴跨界需求（[EV-GL-017]、[EV-GL-001]~[EV-GL-003]、[EV-CN-014]）；3）特高压/配网SF6替代环保气体（12kV/40.5kV样机）与CCUS全链条碳计量在线红外/多光谱合规监测加速替代（[EV-CN-006]~[EV-CN-010]）；4）AI算力爆发直接引爆800V直流微网供电（HVDC）、氢能UPS与全浸没式液冷散热在线安全及能效测试的新型商业空白（[EV-CN-011]~[EV-CN-015]）。在半导体板块：全球量检测设备市场2025年突破180亿美元（同比+15%，占WFE约14%）且向2034年295.7亿美元扩容（[EV-GL-022]、[EV-GL-024]），而中国半导体设备整体国产化率仍仅约20%~22%（[EV-CN-022]），呈现四大正交攻坚赛道：1）埃米/2nm以下前道AI计算光学量测、EUV图形化缺陷与Fab超净工艺介质（AMC/UPW/湿化学品/特气）原位污染监控（[EV-CN-031]、[EV-GL-027]~[EV-GL-031]、[EV-GL-035]）；2）SiC/GaN/氧化镓等宽禁带功率半导体衬底外延缺陷与ML自适应晶圆级动态KGD测试（[EV-CN-022]、[EV-GL-033]、[EV-GL-040]、[EV-GL-042]）；3）2.5D/3D Chiplet/HBM/Cu-Cu混合键合与玻璃基板对破坏性FIB-SEM的无损三维体层量测替代（如PXCT叠层X射线断层扫描，[EV-CN-022]、[EV-CN-033]）；4）硅光共封装光学（CPO）晶圆级光耦合与电-光-热协同高速测试成为量产首要瓶颈，引发Advantest、Teradyne与Keysight激战（[EV-GL-045]）。",
+  "step_back_thesis": "第一性原理退后一步（Step-Back）核心论断：无论是向微米/纳米界面演进的固态电池、钙钛矿叠层与800V浸没液冷算力基础设施，还是迈向埃米（Angstrom）三维晶体管、Cu-Cu混合键合及CPO光电合封的芯片制造，传统量检测范式均在遭遇同一物理瓶颈——“衍射极限/不透明遮挡/多物理场耦合/破坏性低抽检”导致的观测盲区。未来3~5年及5~10年的真正商业白地，不再是单点传感器升级，而是以物理信息AI（Physics-Informed AI）与逆散射/稀疏三维重建算法为核心算力引擎，将光学/SWIR红外/高频超声/相衬X射线（PXCT）/多光谱激光传感嵌入产线节拍，实现从“事后报废判定”向“全片/全电堆原位无损闭环控制”及“能源-算力/光-电-热跨界协同验证”的架构级跃迁。",
+  "track_plans": [
+    {
+      "track_id": "DP1",
+      "sector": "power_energy",
+      "name": "固态电池与新型储能（干法电极/等静压/硫化物）产线在线无损量检测",
+      "step_back_physics_principle": "固态电池摒弃液态电解液浸润，依赖固-固点面接触传导离子，使得聚四氟乙烯（PTFE）干法纤维化均匀性、极片面密度/孔隙率梯度、600MPa等静压应力分布及亚微米级（≤0.5μm）微裂纹直接决定界面阻抗与循环安全。传统离线拆解切片或化成后开路电压（OCV）筛选存在严重滞后且不可逆毁伤电芯，普通表面视觉无法穿透不透明壳体与多层叠片。唯有通过激光/太赫兹/β射线在线面密度测量、透射超声导波声阻抗断层扫描（对固-固空洞与微分层高敏感）及高速X射线相衬断层扫描（X-ray CT）结合AI缺陷重构，并在硫化物线集成亚ppm级硫化氢（H2S）与微水露点在线传感，才能实现闭环零缺陷制造。",
+      "cn_queries": [
+        {
+          "query": "固态电池 干法电极 PTFE纤维化 辊压面密度 在线检测 瓶颈 良率 2025 2026"
+        },
+        {
+          "query": "硫化物全固态电池 等静压 600MPa 微裂纹 界面接触 超声波 X射线 无损检测"
+        },
+        {
+          "query": "固态电池 高压化成 产线 硫化氢 露点 在线监测 钠离子 液流电池 电堆检测"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "solid state battery dry electrode PTFE fibrillation inline metrology thickness porosity 2025 2026"
+        },
+        {
+          "query": "all-solid-state battery ultrasonic acoustic inspection X-ray CT delamination microcrack inline NDT"
+        },
+        {
+          "query": "sulfide solid electrolyte pilot line H2S moisture trace monitoring high-pressure formation testing"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "2025—2026年是固态电池从实验室迈向GWh中试线的关键窗口（[EV-CN-001]、[EV-CN-004]）。中国整线及工艺主机厂（先导智能、利元亨、纳科诺尔、赢合科技、杭可科技）已实现干法辊压（±1.5μm）、600MPa等静压及硫化物整线交付（[EV-CN-002]、[EV-CN-003]、[EV-CN-005]），利元亨已切入0.5μm微裂纹AI质检（[EV-CN-005]），但针对干法膜片均匀性、等静压后内部微空洞的产线全检无损探伤与硫化物产线痕量H2S/露点在线联锁仪仍存在明显商业化缺口，契合[EV-GL-018]提出的30%~60%废品率削减工业诉求。该赛道属于电力能源核心制造主赛道（非跨界衍生赛道）。",
+      "recon_evidence_ids": [
+        "EV-CN-001",
+        "EV-CN-002",
+        "EV-CN-003",
+        "EV-CN-004",
+        "EV-CN-005",
+        "EV-GL-018"
+      ],
+      "manufacturing_stages": [
+        "干法电极纤维化与精密辊压（Dry Electrode Fibrillation & Calendering）",
+        "无隔膜/固态电解质涂覆与高精度叠片（Solid Electrolyte Coating & Stacking）",
+        "超高压等静压致密化（600MPa Isostatic Pressing）",
+        "高压高温化成分容与界面激活（High-Pressure/High-Temp Formation & Aging）",
+        "钠电及液流储能电堆气液密封一致性出厂测试（Na-Ion & Flow Battery Stack QA）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "大成精密 曼恩斯特 纳科诺尔 固态电池 干法膜厚 面密度 在线测量 型号 中标"
+        },
+        {
+          "query": "利元亨 先导智能 荣旗科技 固态电池 AI质检 微裂纹 超声 X射线 产线 供应商"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Thermo Fisher NDC Technologies Mahlo dry battery electrode inline thickness areal weight gauge"
+        },
+        {
+          "query": "Limab Keyence Cognex inline laser thickness defect inspection solid-state battery stacking"
+        }
+      ]
+    },
+    {
+      "track_id": "DP2",
+      "sector": "power_energy",
+      "name": "绿氢电解槽/燃料电池与钙钛矿叠层光伏物理信息AI原位传感及缺陷量测",
+      "step_back_physics_principle": "质子交换膜电解槽/燃料电池膜电极（MEA）与钙钛矿叠层电池均依赖纳米至微米级多层功能薄膜界面，微小针孔、催化剂负载不均、流道两相流气液阻塞或激光死区裂纹，会立即引发氢氧交叉渗透（H2 Crossover）爆燃风险或钙钛矿局域热斑快速衰减。常规离线电化学阻抗谱（EIS）或纯数据驱动黑盒视觉无法穿透封闭电堆内部反应态，亦难以在卷对卷（R2R）高速线体下解耦多物理场扰动。通过将质量守恒、声波多相流传播及载流子复合方程嵌入物理信息AI（Physics-Informed AI）反演模型，耦合高频超声传感（[EV-GL-017]）、高光谱/光致发光（PL）/电致发光（EL）及光学相干测量，可在不停机工况下实时反演催化剂分布、流道浓度与薄膜结晶缺陷密度。",
+      "cn_queries": [
+        {
+          "query": "PEM电解槽 膜电极 MEA 催化剂涂布 针孔 膜厚 在线光学 瑕疵检测 2025 2026"
+        },
+        {
+          "query": "绿氢 电解槽 电堆 出厂测试 氢氧互穿 气密性 压降一致性 产线测试台 痛点"
+        },
+        {
+          "query": "钙钛矿叠层光伏 大面积涂布 结晶均匀性 P1 P2 P3 激光刻蚀 PL EL 在线检测"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "PEM electrolyzer MEA catalyst coating pinhole thickness inline optical metrology roll-to-roll 2025 2026"
+        },
+        {
+          "query": "physics-informed machine learning ultrasonic sensing fuel cell electrolyzer inline diagnostics"
+        },
+        {
+          "query": "perovskite tandem solar module inline photoluminescence hyperspectral defect inspection GW scale"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "本赛道是典型的新兴交叉赛道（is_emerging_or_cross_cutting=true）：一方面，[EV-GL-017]（2025年T1实证）揭示了“物理信息机器学习（Physics-Informed ML）+ 超声传感”正成为直接燃料电池及绿氢/高附加值化学品电解槽在线实时监测的前沿范式，配合[EV-GL-001]~[EV-GL-003]显示的2026—2033年绿氢生产与智能管理7.3%复合增长需求；另一方面，[EV-CN-014]指出2026年钙钛矿叠层光伏组件转换效率再创新高且大规模量产时间大幅提前。电化学反应动力学、超薄涂布光学/声学物理与Physics-Informed AI的交叉融合，正催生远未定型的GW级产线专用在线量检测设备白地（[EV-GL-018]）。",
+      "recon_evidence_ids": [
+        "EV-GL-017",
+        "EV-GL-001",
+        "EV-GL-002",
+        "EV-GL-003",
+        "EV-CN-014",
+        "EV-GL-018"
+      ],
+      "manufacturing_stages": [
+        "质子交换膜电解槽/燃料电池膜电极涂布（PEM/AEM/FC CCM & MEA Coating）",
+        "钙钛矿及叠层光伏大面积涂布与P1-P3激光刻蚀（Perovskite Tandem Coating & Laser Scribing）",
+        "电堆压装流场气液分布与极板密封测试（Stack Compression & Flow-Field Metrology）",
+        "绿氢制取高压电堆出厂验收与氢氧互穿监测（Electrolyzer EOL Test & H2 Crossover Monitoring）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "奥特维 迈为股份 捷佳伟创 钙钛矿 光伏 PL EL 在线检测 分选设备 型号 中标"
+        },
+        {
+          "query": "科威尔 锐格新能源 氢能 燃料电池 电解槽 测试台架 产线自动化 供应商 型号"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Solaris Laser Isra Vision Dr. Schenk fuel cell MEA membrane inline defect inspection system"
+        },
+        {
+          "query": "Greenlight Innovation Horiba FuelCon electrolyzer stack test station commercial models"
+        }
+      ]
+    },
+    {
+      "track_id": "DP3",
+      "sector": "power_energy",
+      "name": "特高压/配电网SF6替代环保绝缘气体与CCUS全链条碳计量在线多光谱监测",
+      "step_back_physics_principle": "电力设备向特高压与“去SF6（GWP为CO2的23500倍）”环保混合气体（如C4F7N/CO2、干燥空气）转型，且CCUS要求在高温高湿高腐蚀烟气及超临界CO2管输中实现法定碳计量合规。传统单一非分散红外（NDIR）或电化学传感器在高背景气体变化下存在严重的谱线重叠交叉干扰与温湿零点漂移，难以分辨ppm级局部放电特征分解产物（HF、SO2、CF4、CO）及痕量微水露点，也易在风电/光伏升压站强电磁、宽温凝露与振动工况下失效。必须依靠可调谐半导体激光吸收光谱（TDLAS）/光声光谱（PAS）/声表面波（SAW）多物理融合与无线无源能量采集架构，从光学吸收截面与声速传播双维度解耦复杂多组分浓度与绝缘劣化状态。",
+      "cn_queries": [
+        {
+          "query": "SF6替代气体 C4F7N 环保气体 GIS 在线监测 分解产物 微水 交叉干扰 技术瓶颈 2025 2026"
+        },
+        {
+          "query": "特高压 变电站 新能源升压站 无线无源 气体密度 微水 在线监测 防凝露 抗振动 招标要求"
+        },
+        {
+          "query": "CCUS 碳捕集 超临界CO2纯度 烟气浓度 封存泄漏 红外激光 在线碳计量 合规 痛点"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "SF6 alternative gas C4F7N Novec 4710 GIS online decomposition moisture monitoring sensor drift"
+        },
+        {
+          "query": "TDLAS photoacoustic gas analyzer power transformer GIS partial discharge fault gas online monitoring"
+        },
+        {
+          "query": "CCUS carbon capture custody transfer CO2 purity trace impurity inline analyzer ISO metrology 2025 2026"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "在“双碳”及“十五五”能源装备合规驱动下，电网与工业碳捕集在线气体监测已形成刚性规模市场：国内已有常州鼎诺等厂商部署超3万台SF6在线监测终端（融合NDIR与SAW技术，覆盖特高压至配网，[EV-CN-006]、[EV-CN-007]），并与ABB、西门子能源、MR、施耐德等外资同台竞技；同时汇能智电等正推进12kV/40.5kV SF6替代环保气体在线监测数字样机验证（[EV-CN-008]），华云仪器等深度切入CCUS捕集烟气、管输纯度及封存泄漏在线计量赛道（[EV-CN-010]）。该赛道属能源电力与低碳合规的核心主干产业跟踪方向（非新兴交叉白地）。",
+      "recon_evidence_ids": [
+        "EV-CN-006",
+        "EV-CN-007",
+        "EV-CN-008",
+        "EV-CN-009",
+        "EV-CN-010"
+      ],
+      "manufacturing_stages": [
+        "高压/特高压GIS与环保气体开关出厂密封及微水验证（HV GIS & Eco-Gas Switchgear Factory QA）",
+        "变电站及风光新能源升压站无线无源绝缘状态在线监测（Substation & Step-Up Online Dielectric Monitoring）",
+        "CCUS碳捕集烟气浓度与管输超临界CO2纯度在线贸易计量（CCUS Capture & Supercritical CO2 Purity Metrology）",
+        "地质封存泄漏预警与BECCS生物发酵尾气连续监测（CO2 Storage Leak & BECCS Exhaust Monitoring）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "常州鼎诺 DNGM 汇能智电 南京世都 SD8000 SF6 环保气体 在线监测 中标 国网 南网"
+        },
+        {
+          "query": "华云仪器 聚光科技 雪迪龙 先河环保 CCUS CO2在线分析仪 红外光谱 型号 落地案例"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "WIKA Trafag Vaisala DILO SF6 alternative C4F7N gas density moisture online monitor model"
+        },
+        {
+          "query": "ABB Siemens Energy Maschinenfabrik Reinhausen MR MSense transformer GIS gas monitoring datasheet"
+        }
+      ]
+    },
+    {
+      "track_id": "DP4",
+      "sector": "power_energy",
+      "name": "AI智算中心800V直流微网/氢能UPS与浸没式液冷在线安全及能效计量测试",
+      "step_back_physics_principle": "单机柜功率跃升至100kW~600kW+，推动智算中心电源向800V高压直流（HVDC）及氢能-UPS混供重构、散热向全浸没式/液冷迁移。从物理本质看：1）800V直流母线无自然过零点，故障电弧一旦燃起即持续高能碳化，对亚毫秒级直流电弧特征（AFCI）、极间绝缘阻抗与SiC固态断路器（SSCB）瞬态分断测试提出全新要求（[EV-CN-012]）；2）浸没冷却液（氟化液/合成烃）吸湿、氧化分解或悬浮微粒会急剧拉低击穿场强并恶化沸腾/对流换热系数，而传统离线取样化验与常规交流电能表无法实现高压直流瞬态故障波形与在线介电谱、超声波微泡/微漏及可溯源热量计的同步闭环计量。",
+      "cn_queries": [
+        {
+          "query": "智算中心 800V 直流供电 直流拉弧 AFCI 绝缘在线监测 固态断路器 测试瓶颈 2025 2026"
+        },
+        {
+          "query": "浸没式液冷 数据中心 氟化液 介电强度 微水颗粒度 热阻 微漏 在线监测 痛点"
+        },
+        {
+          "query": "氢能UPS AI数据中心 800V HVDC 电能质量 暂态谐波 PUE 实时计量 测试标准 空白"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "AI data center 800V HVDC power rack DC arc fault detection solid state breaker test instrumentation 2025 2026"
+        },
+        {
+          "query": "immersion liquid cooling dielectric fluid degradation moisture breakdown voltage inline sensor monitoring"
+        },
+        {
+          "query": "data center liquid cooling CDU thermal resistance micro-leak flow metrology OCP ASHRAE PUE testing"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "本赛道是极具工业拉动力的跨界新兴赛道（is_emerging_or_cross_cutting=true）：[EV-CN-012]揭示北美100MW以上大型变压器交期长达2.5~3.5年且PJM并网排队超7年，正倒逼智算中心向800V直流配电革新（远景800V直流商业化运行）；[EV-CN-015]记录中国通信学会联合中恒电气召开800V直流供电专题攻关；[EV-CN-011]（5.2亿元浸没液冷智算中心项目）、[EV-CN-013]（施耐德氢能-UPS混合供电、液冷CNAS认证故障率<0.5‰）及[EV-CN-014]（新建智算中心全面配套浸没式液冷）共同印证了“电力电子×流体热管理×AI算力基建”的爆发式交汇。然而当前针对800V直流电弧、氢能UPS暂态冲击及冷却液介电退化的产线与运维专用测试仪器仍处商业空白期。",
+      "recon_evidence_ids": [
+        "EV-CN-011",
+        "EV-CN-012",
+        "EV-CN-013",
+        "EV-CN-014",
+        "EV-CN-015"
+      ],
+      "manufacturing_stages": [
+        "800V高压直流电源柜与固态断路器产线老化及电弧故障测试（800V HVDC & SSCB Arc Fault Test）",
+        "氢能-UPS及风光储微网并离网暂态电能质量测试（H2-UPS & Microgrid Power Quality Test）",
+        "浸没式/冷板液冷CDU流阻热阻、微漏与介电液在线降解监控（Liquid Cooling Thermal & Dielectric Inline Metrology）",
+        "百kW级智算整机柜出厂与CNAS级实时PUE能效核验（AI Rack Integration & Traceable PUE Audit）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "中恒电气 科华数据 远景能源 智算中心 800V直流 巴拿马电源 测试设备 供应商 招标"
+        },
+        {
+          "query": "艾德克斯 ITECH 致茂电子 Chroma 科威尔 800V 直流电源 回馈式负载 型号 智算测试"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Chroma Keysight EA Elektro-Automatik 800V DC power shelf ATE regenerative load data center"
+        },
+        {
+          "query": "Schneider Electric Vertiv Delta 800V DC hydrogen UPS immersion cooling monitoring instrumentation"
+        }
+      ]
+    },
+    {
+      "track_id": "DS1",
+      "sector": "semiconductor",
+      "name": "前道埃米制程AI计算光学量测、缺陷检测与Fab超净工艺介质原位污染监测",
+      "step_back_physics_principle": "进入<2nm埃米（Angstrom）GAA与300层+ 3D NAND时代，特征尺寸远低于光学衍射极限（λ/2NA），且三维垂直结构深宽比急剧增大，使直接光学成像失效；而电子束（E-Beam）量测受限于吞吐量只能抽检极少数晶圆（[EV-GL-035]）。与此同时，EUV光刻胶逸气、气态分子污染物（AMC）、超纯水（UPW）及湿化学品配比哪怕ppt/ppb级漂移，都会引发桥接、剥落或膜厚异常（[EV-GL-029]）。唯有构建“AI计算光学逆散射（Inverse Scatterometry）+ 晶圆虚拟量测（Virtual Metrology）”与“原位光谱/质谱介质监控”耦合体系，在麦克斯韦方程与统计良率模型（[EV-CN-031]、[EV-GL-037]、[EV-GL-040]）约束下实时重建亚纳米3D轮廓并锁定工艺介质污染源，方能突破精度-速度-无损三角悖论。",
+      "cn_queries": [
+        {
+          "query": "前道晶圆制造 明暗场缺陷检测 套刻误差 OCD 埃米制程 AI计算光学 逆散射 国产替代难点 2025 2026"
+        },
+        {
+          "query": "GAA 3D NAND 薄膜厚度 刻蚀深宽比 虚拟量测 Virtual Metrology 抽检率 瓶颈"
+        },
+        {
+          "query": "晶圆厂 Fab AMC 气态分子污染物 UPW 超纯水 湿化学品浓度 电子特气 ppt 在线监测 痛点"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "angstrom node GAA 3D NAND computational optical metrology inverse scatterometry AI virtual metrology 2025 2026"
+        },
+        {
+          "query": "EUV photoresist patterning defect inspection brightfield e-beam metrology throughput bottleneck"
+        },
+        {
+          "query": "semiconductor fab AMC airborne molecular contamination UPW wet chemical concentration inline ppt analyzer"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "前道量检测设备占晶圆厂设备支出约14%（2025年全球市场超180亿美元，预计2034年达295.7亿美元，[EV-GL-022]、[EV-GL-024]），由KLA、Applied Materials、Bruker、Horiba及Inficon等主导（[EV-GL-027]~[EV-GL-029]）。中国大陆整体半导体设备国产化率仅20%~22%（[EV-CN-022]），在AI驱动先进逻辑/存储扩产背景下，面对<2nm节点传统量测低抽检率与昂贵成本（[EV-GL-035]）、复杂三维光学逆散射算力瓶颈（[EV-CN-031]）及Fab超净介质国产配套短板，国内中科飞测、精测电子等正向高端明场及AI计算量测突围。本赛道为半导体前道核心主干赛道（is_emerging_or_cross_cutting=false）。",
+      "recon_evidence_ids": [
+        "EV-CN-022",
+        "EV-CN-031",
+        "EV-GL-022",
+        "EV-GL-023",
+        "EV-GL-024",
+        "EV-GL-027",
+        "EV-GL-028",
+        "EV-GL-029",
+        "EV-GL-031",
+        "EV-GL-035",
+        "EV-GL-037",
+        "EV-GL-040"
+      ],
+      "manufacturing_stages": [
+        "EUV/DUV光刻套刻（Overlay）与光刻胶显影图形量测（Litho Overlay & EUV Photoresist Patterning）",
+        "GAA/3D NAND刻蚀深孔与薄膜沉积光学关键尺寸量测（Etch/ALD/CVD 3D OCD & Film Metrology）",
+        "CMP抛光表面与亚20nm晶圆明暗场缺陷高速扫描（CMP & Patterned Wafer Defect Inspection）",
+        "Fab超净工艺介质（AMC/UPW/湿化学品/电子特气）原位ppt级监控（Fab Process Media Inline Monitoring）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "中科飞测 精测电子 睿励科学仪器 东方晶源 前道量检测 明场 膜厚 OCD 型号 中标 国产化率"
+        },
+        {
+          "query": "天准科技 赛腾股份 精智达 晶圆缺陷检测 光学量测 设备 产线验证 进展"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "KLA Archer SpectraShape broadband plasma inspection Applied Materials eBeam metrology product launch 2025 2026"
+        },
+        {
+          "query": "Bruker imec EUV metrology Onto Innovation Nova PRISM scatterometry inline product datasheet"
+        }
+      ]
+    },
+    {
+      "track_id": "DS2",
+      "sector": "semiconductor",
+      "name": "第三代/超宽禁带功率半导体（SiC/GaN/氧化镓）衬底外延与晶圆级动态可靠性及自适应KGD测试",
+      "step_back_physics_principle": "SiC、GaN及氧化镓（Ga2O3）工作于1.2kV~10kV+高压与>100V/ns高速开关瞬态，衬底与外延中的基平面位错（BPD）、堆垛层错及栅氧界面陷阱在常规直流静态测试下完全潜伏，唯有在高压动态双脉冲/雪崩/HTGB应力下才诱发导通电阻（RDS(on)）退化与阈值电压（Vth）漂移。物理检测面临两大难关：其一，宽禁带高折射率双折射晶体需深紫外光致发光（UV-PL）与共聚焦拉曼实现微米级无损深层位错分辨；其二，千伏级晶圆探测（Wafer Probing）极易在空气隙产生高压电弧击穿且探针寄生电感（Lstray）掩盖纳秒开关瞬态，需结合超低感同轴防电弧探针卡盘与ML自适应测试算法（[EV-GL-033]）缩短测试时长并严守KGD（Known Good Die）良率门限。",
+      "cn_queries": [
+        {
+          "query": "8英寸碳化硅 SiC 衬底 外延 基平面位错 BPD 堆垛层错 UV-PL 拉曼 在线检测 痛点 2025 2026"
+        },
+        {
+          "query": "SiC GaN 氧化镓 功率芯片 晶圆级 高压动态测试 KGD 探针台 电弧防护 低寄生电感 瓶颈"
+        },
+        {
+          "query": "第三代半导体 Wafer Sort 动态栅偏 HTGB 雪崩测试 自适应测试 AI 良率筛选"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "200mm SiC substrate epitaxy basal plane dislocation stacking fault UV photoluminescence metrology 2025 2026"
+        },
+        {
+          "query": "GaN SiC Ga2O3 wafer level dynamic reliability HTGB high voltage probe station arcing KGD test"
+        },
+        {
+          "query": "adaptive wafer sort testing machine learning outlier detection power semiconductor KGD yield learning"
+        }
+      ],
+      "is_emerging_or_cross_cutting": false,
+      "emergence_rationale": "[EV-CN-022]明确点出碳化硅（SiC）与测试设备龙头（华峰测控、长川科技）在国产替代与新能源/AI电源放量下的持续高增；同时[EV-GL-033]与[EV-GL-040]（2026年综述）指出，将机器学习自适应测试（Adaptive Testing）与动态限值控制引入晶圆测试（Wafer Sort）可在不损失诊断覆盖率的前提下压缩测试成本、精准锁定异常芯片（KGD）。面对海外Lasertec、KLA Candela、FormFactor、Keysight在8英寸SiC缺陷检测与高压动态测试的高壁垒（[EV-GL-042]），国产高端KGD动态探针与外延晶格缺陷量测具有明确产业替代逻辑，属半导体功率器件核心主赛道（is_emerging_or_cross_cutting=false）。",
+      "recon_evidence_ids": [
+        "EV-CN-022",
+        "EV-GL-033",
+        "EV-GL-040",
+        "EV-GL-042"
+      ],
+      "manufacturing_stages": [
+        "SiC及氧化镓衬底微管、基平面位错与晶格应力无损表征（Substrate Micropipe, BPD & Stress Metrology）",
+        "外延层掺杂浓度、厚度均匀性与堆垛层错全片在线检测（Epi Doping/Thickness & Stacking Fault Inspection）",
+        "晶圆级高压大电流动态开关、雪崩与HTGB/H3TRB老化测试（Wafer-Level Dynamic Switching & Reliability Burn-In）",
+        "ML自适应晶圆分选与已知合格裸片KGD筛选（AI Adaptive Wafer Sort & KGD Screening）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "天准科技 悦芯科技 华峰测控 长川科技 功率半导体 SiC 测试机 KGD 探针台 型号 中标"
+        },
+        {
+          "query": "卓立汉光 中科飞测 昂坤视觉 碳化硅 SiC 衬底 外延 光学缺陷 拉曼 PL 量测 厂商 型号"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Lasertec SICA88 KLA Candela 8520 Semilab SiC epitaxy substrate defect metrology datasheet"
+        },
+        {
+          "query": "FormFactor MPI Cascade 3kV 10kV high voltage SiC GaN wafer probe station dynamic test"
+        }
+      ]
+    },
+    {
+      "track_id": "DS3",
+      "sector": "semiconductor",
+      "name": "2.5D/3D Chiplet/HBM/Cu-Cu混合键合与玻璃基板跨尺度无损三维体层量检测",
+      "step_back_physics_principle": "2.5D/3D Chiplet、HBM高带宽内存及玻璃芯基板（Glass Core）将互连界面深埋于硅片、铜柱、二氧化硅介质及透明高脆性玻璃等多密度异构堆叠层内部，且Cu-Cu混合键合对准容差收窄至<100nm、铜凹陷（Dishing）控制<5nm。常规可见光无法穿透硅与铜层；破坏性FIB-SEM在密度悬殊的多层结构处会产生离子束非均匀铣削效应，严重劣化垂直分辨率并损毁高价值AI芯粒（[EV-CN-033]）；传统微焦点X射线与声学扫描（SAM）则分别受限于亚百纳米分辨率不足与超薄键合层声学反射混叠。唯有引入叠层衍射X射线CT（PXCT）/相衬X射线成像（[EV-CN-033]）、短波红外（SWIR）透硅干涉、GHz皮秒超声及AI稀疏视角三维重建算法，方能打破穿透深度、空间分辨率与产线吞吐量的物理制约。",
+      "cn_queries": [
+        {
+          "query": "2.5D 3D先进封装 Cu-Cu混合键合 对准精度 铜碟形凹陷 界面空洞 无损检测 瓶颈 2025 2026"
+        },
+        {
+          "query": "玻璃基板 TGV 通孔 侧壁微裂纹 深宽比 大面板翘曲 量检测 设备 痛点"
+        },
+        {
+          "query": "HBM Chiplet 内部微凸点 隐蔽缺陷 X射线三维CT PXCT 超声扫描 替代FIB-SEM 速度瓶颈"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "Cu-Cu hybrid bonding sub-100nm overlay dishing void non-destructive inline metrology HBM 2025 2026"
+        },
+        {
+          "query": "glass core substrate TGV through glass via crack geometry warpage inline inspection metrology"
+        },
+        {
+          "query": "ptychographic X-ray tomography SWIR interferometry GHz acoustic microscopy 3D IC buried defect NDT"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "本赛道兼具强产业爆发力与跨尺度物理技术跃迁（is_emerging_or_cross_cutting=true）：[EV-CN-022]明确指出AI算力芯片驱动先进封装与“混合键合”需求井喷，并列入中科飞测、精测电子、迈为股份、芯源微等国产核心标的；同时[EV-CN-033]深度论证了传统FIB-SEM因材料密度差异造成非均匀铣削及破坏样品的固有缺陷，指出叠层衍射X射线断层扫描（PXCT）是实现三维芯片内部无损成像的新一代突破方向；叠加[EV-GL-022]与[EV-GL-031]反映的先进封装ML视觉检测扩容及玻璃基板TGV导入，跨光学、X射线相衬衍射与超高速稀疏三维重建的新兴无损量测体系正在快速成型。",
+      "recon_evidence_ids": [
+        "EV-CN-022",
+        "EV-CN-033",
+        "EV-GL-022",
+        "EV-GL-031",
+        "EV-GL-042"
+      ],
+      "manufacturing_stages": [
+        "硅通孔（TSV）与玻璃通孔（TGV）深宽比、形貌及微裂纹量测（TSV/TGV Geometry & Crack Metrology）",
+        "W2W/D2W Cu-Cu混合键合亚百纳米对准与铜碟形凹陷量测（Hybrid Bonding Overlay & Cu Dish Metrology）",
+        "HBM/CoWoS堆叠内部微凸点空洞与界面分层三维无损断层成像（Subsurface 3D Interconnect NDT）",
+        "大尺寸玻璃基板/重构晶圆翘曲与热机械应力全幅面高速扫描（Panel/Wafer Warpage & Stress Metrology）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "中科飞测 精测电子 赛腾股份 迈为股份 先进封装 HBM 混合键合 量检测设备 型号 中标"
+        },
+        {
+          "query": "日联科技 华兴源创 凌云光 2.5D 3D封装 X-ray CT TGV 玻璃基板 检测设备 供应商"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Camtek Eagle Onto Innovation Dragonfly KLA Kronos advanced packaging hybrid bonding inspection datasheet"
+        },
+        {
+          "query": "Zeiss Xradia Bruker SkyScan Nordson Dage 3D X-ray CT acoustic SAM HBM TSV void inspection"
+        }
+      ]
+    },
+    {
+      "track_id": "DS4",
+      "sector": "semiconductor",
+      "name": "硅光共封装光学（CPO）晶圆级光耦合与电-光-热协同高速测试",
+      "step_back_physics_principle": "共封装光学（CPO）将硅光集成芯片（PIC）直接紧邻51.2T/102.4T AI交换ASIC封装，在晶圆测试（Wafer Sort）与裸片耦合阶段叠加了三重物理强耦合极限：1）多通道光纤阵列与光栅/端面耦合器存在六自由度（6-DOF）亚微米级（<100~300nm）空间对准容差，传统爬山搜峰耗时数十秒/颗，严重制约ATE量产节拍；2）需在探针台同期注入112G/224G PAM4毫米波电激励并高速采集扫频光信号；3）邻近高功耗算力裸片（>500W）引发剧烈热串扰，直接导致硅光微环谐振器波长漂移（~0.1 nm/°C）与激光器阈值波动。唯有融合双面光电探针卡、快速压电/视觉引导光耦合、高密度闭环温控及光-电同步ATE校准，方能攻克CPO量产KGD测试吞吐量瓶颈。",
+      "cn_queries": [
+        {
+          "query": "硅光芯片 CPO 共封装光学 晶圆级测试 光耦合对准 速度瓶颈 KGD 良率 2025 2026"
+        },
+        {
+          "query": "硅光调制器 224G 高速光电协同测试 微环谐振器 温漂 热串扰 探针台 难点"
+        },
+        {
+          "query": "光引擎 CPO 封装产线 多通道光纤阵列 主动对准 激光器耦合 在线测试 国产化 空白"
+        }
+      ],
+      "global_queries": [
+        {
+          "query": "co-packaged optics CPO silicon photonics mass production testing bottleneck wafer level KGD 2025 2026"
+        },
+        {
+          "query": "silicon photonics wafer probing automated 6-DOF optical fiber array alignment thermal crosstalk test"
+        },
+        {
+          "query": "224G PAM4 electro-optical ATE wafer sort photonic integrated circuit PIC calibration throughput"
+        }
+      ],
+      "is_emerging_or_cross_cutting": true,
+      "emergence_rationale": "本赛道是Stage 0侦察识别出的最尖锐跨界新兴瓶颈（is_emerging_or_cross_cutting=true）：2026年4月TrendForce实证报告（[EV-GL-045]）直接定性“CPO大规模量产的关键瓶颈在于测试（The Critical Bottleneck in CPO Mass Production? It's Testing）”，并揭示Advantest、Teradyne、Keysight三大国际ATE巨头正围绕CPO多阶段测试展开激烈卡位，与[EV-GL-042]（CPO晶圆级测试装备探针）及[EV-CN-022]（AI算力基础设施资本开支驱动）高度共振。结合[EV-GL-033]的自适应晶圆测试算法逻辑，硅光子学×高速射频ATE×亚微米多自由度精密耦合的跨界融合，使国内成套CPO晶圆级光电热协同测试设备存在巨大代差与商业白地。",
+      "recon_evidence_ids": [
+        "EV-GL-045",
+        "EV-GL-042",
+        "EV-CN-022",
+        "EV-GL-033"
+      ],
+      "manufacturing_stages": [
+        "硅光晶圆光栅/端面耦合无源插损与波导偏振测试（PIC Wafer Passive Optical Loss & Polarization Test）",
+        "有源调制器/探测器晶圆级112G/224G电-光协同测试（Wafer-Level High-Speed RF-Optical Test）",
+        "多通道光纤阵列与激光器亚微米主动对准耦合测试（Multi-Channel Active Fiber/Laser Alignment Test）",
+        "CPO交换芯片共封装热串扰、微环温漂与电-光-热老化验证（CPO Electro-Optical-Thermal Co-Test & Burn-In）"
+      ],
+      "cn_vendor_queries": [
+        {
+          "query": "联特科技 华工正源 中际旭创 光模块 CPO 硅光 晶圆测试 耦合设备 采购 供应商"
+        },
+        {
+          "query": "猎奇智能 芯耘光电 普源精电 鼎阳科技 硅光 晶圆耦合 光电测试仪器 型号 突破"
+        }
+      ],
+      "global_vendor_queries": [
+        {
+          "query": "Advantest Teradyne Keysight silicon photonics CPO wafer level optical electrical ATE system model"
+        },
+        {
+          "query": "FormFactor Cascade Sumitro MPI ficonTEC silicon photonics double-sided optical wafer prober"
+        }
+      ]
+    }
+  ]
+}

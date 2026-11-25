@@ -19,12 +19,15 @@ from pso_workflow.schemas import (
     CritiqueVerdict,
     DiscoveredTrack,
     DiscoveryPlan,
+    GlobalPortfolioRanking,
     JudgeRubricScores,
     OpportunityStormMemo,
     PainPointItem,
+    PortfolioCandidateReview,
     ResearchPlan,
     ROIRangeInputs,
     SearchHit,
+    SectorPortfolioReview,
     TechOpportunitySeed,
     TrackDossier,
     TrackQueryPlan,
@@ -180,9 +183,11 @@ class MockLLMClient:
             )  # type: ignore[return-value]
 
         if schema is TrackDossier:
-            tid = node.replace("researcher_", "")
+            import re
+            tid = node.replace("researcher_", "").replace("falsify_", "")
             sec = "semiconductor" if tid.startswith(("DS", "S")) else "power_energy"
             capex_mult = 1.4 if sec == "semiconductor" else 1.0
+            prompt_ev_ids = sorted(set(re.findall(r"\bEV-(?:CN|GL)-\d{3,4}\b", user_prompt)))[:2]
             cands = []
             for c_idx in range(1, 4):
                 horizon = "5-10y" if c_idx == 2 else "3-5y"
@@ -191,9 +196,9 @@ class MockLLMClient:
                     "global_and_cn_true_blank",
                     "global_and_cn_commercialized",
                 )[c_idx - 1]
-                # Make O3 slower payback (~34m) so deterministic Stage 2 capacity funnel prioritizes O1/O2 cleanly
+                # Make O3 slower payback so deterministic Stage 2 capacity funnel prioritizes O1/O2 cleanly
                 capex_base = (900_000.0 if c_idx < 3 else 4_800_000.0) * capex_mult
-                yield_base = 0.55 if c_idx < 3 else 0.35
+                yield_base = 1.15 if c_idx < 3 else 0.35
                 cands.append(
                     TechOpportunitySeed(
                         opp_id=f"{tid}-O{c_idx}",
@@ -228,7 +233,7 @@ class MockLLMClient:
                         ai_rd_acceleration_and_edge_deployment="合成缺陷样本冷启动 + AI辅助FPGA/EDA开发 + 断网产线NPU边缘推理与Golden-Tool自校准。",
                         estimated_rd_months_ai_vs_legacy="AI协同研发 12-16个月 vs 传统模式 36-42个月",
                         hardware_bom_localization_and_gtm_form="国产FPGA/ADC/激光模组替代；先OEM旁路模块切入后升级整机ATE。",
-                        evidence_ids=[],
+                        evidence_ids=prompt_ev_ids,
                         roi_range_inputs=ROIRangeInputs(
                             capex_cny_low=capex_base * 0.85,
                             capex_cny_base=capex_base,
@@ -236,11 +241,11 @@ class MockLLMClient:
                             yield_gain_pct_low=yield_base * 0.80,
                             yield_gain_pct_base=yield_base,
                             yield_gain_pct_high=yield_base * 1.25,
-                            annual_output_value_cny=360_000_000.0 if sec == "semiconductor" else 280_000_000.0,
+                            annual_output_value_cny=1_100_000_000.0 if sec == "semiconductor" else 900_000_000.0,
                             annual_opex_cny=capex_base * 0.08,
-                            annual_scrap_saving_cny=320_000.0,
-                            annual_downtime_saving_cny=180_000.0,
-                            annual_consumable_ehs_saving_cny=90_000.0,
+                            annual_scrap_saving_cny=500_000.0,
+                            annual_downtime_saving_cny=280_000.0,
+                            annual_consumable_ehs_saving_cny=120_000.0,
                             market_tam_china_cny_100m=24.0,
                             market_tam_global_usd_m=620.0,
                             parameter_basis=f"Mock range anchored to {tid} inline metrology benchmark",
@@ -270,6 +275,51 @@ class MockLLMClient:
                 evidence_count_cn=2,
                 evidence_count_global=2,
                 top_evidence_ids=[],
+            )  # type: ignore[return-value]
+
+        if schema is SectorPortfolioReview:
+            import re
+            sec = "semiconductor" if "semiconductor" in node else "power_energy"
+            opp_ids = re.findall(r"### Candidate `([^`]+)`", user_prompt)
+            roles = [
+                "Fab/Plant Yield VP",
+                "Metrology/Process Chief Engineer",
+                "EHS & Green Compliance Director",
+                "CFO / Procurement ROI Gatekeeper",
+            ]
+            return SectorPortfolioReview(
+                sector=sec,  # type: ignore[arg-type]
+                portfolio_synthesis=f"{sec} 行业级买方委员会统筹评审完成。",
+                ranked_reviews=[
+                    PortfolioCandidateReview(
+                        opp_id=oid,
+                        sector_rank=idx,
+                        portfolio_role="strategic_localization_wedge",
+                        sharpest_pain_point_summary="离线抽检无法拦截连续工艺漂移。",
+                        key_localization_or_export_moat="核心传感器自主可控叠加本地化维保。",
+                        buyer_assessments=[
+                            BuyerPersonaAssessment(
+                                persona_role=r,  # type: ignore[arg-type]
+                                core_question=f"{r} 关注在线实时性与误报率",
+                                adoption_barrier="需兼容现有产线节拍与协议",
+                                spec_in_trigger="提供对比测试与良率验证",
+                                recommended_product_tweak="增加自动校准旁路模块",
+                            )
+                            for r in roles
+                        ],
+                        ranking_rationale=f"{oid} 综合回收期与商业空白表现突出 [ROI-CALC]。",
+                    )
+                    for idx, oid in enumerate(opp_ids, start=1)
+                ],
+            )  # type: ignore[return-value]
+
+        if schema is GlobalPortfolioRanking:
+            import re
+            opp_ids = re.findall(r"- `([^`]+)`", user_prompt)
+            return GlobalPortfolioRanking(
+                executive_ranking_thesis="结合校准三情景 ROI 与商业空白完成跨行业全局排位。",
+                ordered_opp_ids=opp_ids,
+                cross_sector_synergies=["AI计算传感与断网边缘推理平台可跨电力与半导体复用"],
             )  # type: ignore[return-value]
 
         if schema is OpportunityStormMemo:
@@ -432,7 +482,7 @@ async def test_full_graph_trajectory_with_corrective_rag_loop(tmp_path: Path) ->
             assert (out_dir / fname).exists(), f"Missing {fname}"
 
         scorecard = json.loads((out_dir / "06_EVALUATION_SCORECARD_AND_COST_TELEMETRY.json").read_text())
-        assert scorecard["workflow_version"] == "V3.0_COMMERCIAL_WHITESPACE_AND_AI_CO_DESIGN"
+        assert str(scorecard["workflow_version"]).startswith("V4.0")
         assert scorecard["deterministic_contract_checks"]["commercial_whitespace_grounded"] is True
         assert scorecard["deterministic_contract_checks"]["ai_native_paradigm_present"] is True
         assert "commercial_whitespace_breakdown" in scorecard
@@ -779,11 +829,11 @@ async def test_v2_cli_funnel_roundtrip(
                         "yield_gain_pct_low": ygain * 0.80,
                         "yield_gain_pct_base": ygain,
                         "yield_gain_pct_high": ygain * 1.25,
-                        "annual_output_value_cny": 350_000_000.0,
+                        "annual_output_value_cny": 800_000_000.0,
                         "annual_opex_cny": capex * 0.08,
-                        "annual_scrap_saving_cny": 260_000.0,
-                        "annual_downtime_saving_cny": 140_000.0,
-                        "annual_consumable_ehs_saving_cny": 70_000.0,
+                        "annual_scrap_saving_cny": 450_000.0,
+                        "annual_downtime_saving_cny": 250_000.0,
+                        "annual_consumable_ehs_saving_cny": 120_000.0,
                         "market_tam_china_cny_100m": 20.0,
                         "market_tam_global_usd_m": 500.0,
                         "parameter_basis": "roundtrip test range",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import logging
 from datetime import datetime, timezone
 from typing import Any, Literal
 
@@ -17,6 +18,9 @@ from pso_workflow.schemas import (
     EvidenceRecord,
     WorkflowState,
 )
+from pso_workflow.tools.audit_guard import wrap_untrusted_evidence
+
+logger = logging.getLogger(__name__)
 
 
 def _active_sectors(sector_filter: str) -> list[str]:
@@ -76,10 +80,13 @@ async def run_macro_recon(
             deps.vault.upsert_hit(track_id="RECON", hit=hit)
 
     if query_items:
-        await asyncio.gather(
+        results = await asyncio.gather(
             *[_run_one(geo, item) for geo, item in query_items],
             return_exceptions=True,
         )
+        for res in results:
+            if isinstance(res, BaseException):
+                logger.warning("Stage 0 macro recon task failed: %s", res)
 
     return deps.vault.list_by_track("RECON"), query_hashes
 
@@ -94,7 +101,8 @@ def _format_recon_context(records: list[EvidenceRecord], max_items: int = 24) ->
             f"- [{r.ev_id}] ({r.geo_scope} | {r.authority_tier} | {r.published_date or 'n/a'}) "
             f"{r.title} | Query: {r.query}\n  URL: {r.url}\n  Snippet: {snippet}"
         )
-    return "\n".join(lines) if lines else "(No Stage 0 recon snippets returned.)"
+    raw = "\n".join(lines) if lines else "(No Stage 0 recon snippets returned.)"
+    return wrap_untrusted_evidence(raw, label="STAGE0_MACRO_RECON")
 
 
 def _normalize_discovered_tracks(
