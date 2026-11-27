@@ -1,9 +1,10 @@
 # 04｜智能体工作流规范对标审计、UML 2.5 架构蓝图与周度 PDF 报告模板方案
 
 > **文档定位**：本文件围绕您最新拍板的交付定位——**「不集成到微信助理 Dashboard，改为独立周期运行（如每周一次），生成高管级 PDF 报告作为附件通过 Cyber Griffin 邮箱发送」**——系统交付三件事的前两项评审稿及第三项落地蓝图，待您审阅拍板后立即进入编码与实盘执行：
-> 1. **第一件事**：逐项对照 `07` / `08` / `09` / `Agentic_Design_Patterns` 四份规范，完成对现有 `wecom_report_agentic_analysis` 代码的全面合规审计，并配套输出 **OMG UML 2.5 标准 Draw.io 状态机架构图**（见同目录 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio](./04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio) 及高清图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](./04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png)）；
-> 2. **第二件事**：确定《维恩科仪周度经营战略对齐与 AI 提效诊断报告（PDF 版）》的**完整标准模板**（章节、核心指标、周环比追踪、图表与排版规范）；
-> 3. **第三件事**：明确 **LangGraph Studio 图形界面执行 + 全链路 LLM 上下文监控大盘** 的零冗余复用落地方案。
+> 1. **第一件事**：逐项对照 `07` / `08` / `09` / `Agentic_Design_Patterns` 四份规范，完成对现有 `wecom_report_agentic_analysis` 代码的全面合规审计，并配套输出 **OMG UML 2.5 标准 Draw.io 状态机架构图**（见 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio) 及高清图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png)）；
+> 2. **第二件事**：确定《维恩科仪周度经营战略对齐与 AI 提效诊断报告（PDF 版）》的**完整标准模板**（章节、核心指标、周环比与四时间窗动态追踪、图表与排版规范）；
+> 3. **第三件事**：明确 **LangGraph Studio 图形界面执行 + 全链路 LLM 上下文监控大盘** 的零冗余复用落地方案；
+> 4. **四层目标与全量/增量滚动演进扩展**：详见专题文档 [05_FOUR_TIER_GOALS_AND_ROLLING_HORIZON_DESIGN.md](./05_FOUR_TIER_GOALS_AND_ROLLING_HORIZON_DESIGN.md) 与可编辑配置文件 [strategic_goals.json](../config/strategic_goals.json)。
 
 ---
 
@@ -27,7 +28,7 @@
 
 ### 1.2 目标 V2.0 工作流架构说明（配合 Draw.io 图纸审核）
 
-> 请打开同目录 Draw.io 原图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio](./04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio) 或高清导出图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](./04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png) 逐一核对。
+> 请打开 Draw.io 原图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio) 或高清导出图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png) 逐一核对。
 
 #### 主状态机 6 个 LangGraph 节点与职责边界对照
 
@@ -48,7 +49,7 @@
 
 ## 第二部分：周度 PDF 经营诊断报告标准模板（请您审阅定稿）
 
-基于此前 30 天真实基线试跑报告（[03_BASELINE_30D_ALIGNMENT_DIAGNOSIS_2026_11.md](./03_BASELINE_30D_ALIGNMENT_DIAGNOSIS_2026_11.md)）的实战反馈，我们在周度 PDF 版本中做了 4 项面向高管阅读体验的升级：
+基于此前 30 天真实基线试跑报告（[03_BASELINE_30D_ALIGNMENT_DIAGNOSIS_2026_11.md](../reports/03_BASELINE_30D_ALIGNMENT_DIAGNOSIS_2026_11.md)）的实战反馈，我们在周度 PDF 版本中做了 4 项面向高管阅读体验的升级：
 - **① 封面 + 一页纸执行摘要（1 分钟抓住重点）**：首页顶部放 4 张核心 KPI 卡片 + 本周红黄绿灯 + 董事长下周必须拍板的 3 件头等大事；
 - **② 新增「上周整改建议闭环追踪」**：借助只读历史工具，专门核查上周指出的问题（如李文颖精力稀释、杨震零汇报、CCS 停滞）本周到底有没有真实改善；
 - **③ 图表可视化（纯 Python 确定性生成高清 SVG/PNG 嵌入 PDF）**：战略目标预期 vs 实际投入对比条形图、产品线×职能投入热力图、高成本研发精力切分饼图/条图；
@@ -90,7 +91,7 @@
    - 点击 **Submit / Run** 实时看着节点依次亮起，并可随时展开任意节点查看共享白板 `State` 快照，支持修改参数后**从检查点重放（Time-Travel Replay）**。
 
 ### 3.2 全过程 LLM 对话上下文监控大盘（直接复用本仓库 `agentic_observability_hub`）
-无需从零手搓前端大盘！工作区已建好完整的开源双栈可观测中心 [agentic_observability_hub](../../agentic_observability_hub/README.md)，我们只需为 `wecom_report_agentic_analysis` 接入标准 OTel + SSE 埋点（带自动密钥脱敏 `SecretRedactor`），一次运行即可在浏览器同时透视：
+无需从零手搓前端大盘！工作区已建好完整的开源双栈可观测中心 [agentic_observability_hub](../../../agentic_observability_hub/README.md)，我们只需为 `wecom_report_agentic_analysis` 接入标准 OTel + SSE 埋点（带自动密钥脱敏 `SecretRedactor`），一次运行即可在浏览器同时透视：
 1. **大屏 1 — 实时拓扑与上下文显微镜 (`http://localhost:8765`)**：
    - 左侧：动态展示本工作流 6 个节点、工具查证回边与验钞纠偏回边的实时流光状态；
    - 右侧：**100% 未截断展示**发给大模型的每一字 `System Prompt`、装配好的完整桌面上下文（15 人花名册 + G1–G5 + 硬统计 + 围栏内汇报原文）、大模型深度思考链（`Thinking`）、每轮工具调用入参/出参、验钞报错与重试前后对比！
@@ -103,7 +104,7 @@
 
 ## 第四部分：请董事长审阅拍板的 4 个确认项
 
-请您先审阅配套的 Draw.io 架构图（[04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](./04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png)）以及上述 PDF 报告模板，确认以下 4 点后我立即按垂直薄切片开工落地：
+请您先审阅配套的 Draw.io 架构图（[04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png)）以及上述 PDF 报告模板，确认以下 4 点后我立即按垂直薄切片开工落地：
 
 1. **工作流架构审核**：Draw.io 图中的 4 阶段 6 节点 + 「4 个只读查证工具（上限 6 步）」+「确定性客观验钞（纠偏上限 2 轮）」+「PDF + Cyber Griffin 发信」整体流程是否符合您的预期？有没有需要增减的环节？
 2. **PDF 报告模板确认**：上述 9 页模板结构（一页纸执行摘要 + 上周整改闭环追踪 + 15 人硬统计 + 五大战略对比图 + 李文颖专项穿透 + 7×6 业务矩阵与任务还原 + 董事长盲区/空转雷达 + 人员调优 + AI 提效替代清单 + 溯源附录）是否需要增删字段或调整侧重点？

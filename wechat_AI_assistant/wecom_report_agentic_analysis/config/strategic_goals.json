@@ -1,0 +1,436 @@
+{
+  "schema_version": "2.0",
+  "document_purpose": "维恩科仪四层战略目标体系（长期 / 年度 / 季度 / 月度）唯一权威配置文件。董事长可直接在本文件中增删改各阶段目标、补充量化财务/客户/研发指标；系统每次运行分析时将自动读取本文件，按【近1个月 / 近1季度 / 近1年 / 全量长期】四层滚动窗口动态评估公司是否持续向好发展。",
+  "company": {
+    "name": "维恩科仪",
+    "maintainer": "徐宏玮（董事长）",
+    "last_updated": "2026-11-27",
+    "active_fiscal_year": "2026-2027",
+    "active_quarter": "2026-Q4",
+    "active_month": "2026-12",
+    "notes": "后续可随时在本 JSON 中补充：具体营收/订单额目标、毛利率红线、重点标杆客户清单、关键样机节点与具体人员 KPI。"
+  },
+  "sync_and_analysis_policy": {
+    "data_ingestion": {
+      "strategy": "full_backfill_once_then_incremental",
+      "initial_backfill_start_date": "2023-01-01",
+      "api_window_slice_days": 25,
+      "incremental_overlap_lookback_days": 7,
+      "overlap_reason": "每次增量同步自动从上次水位回看 7 天，专门兜底【现场技术支持工作日报（后补）】的跨日延迟补交；数据库按唯一汇报编号幂等去重，绝不重复入库。"
+    },
+    "rolling_comparison_horizons": [
+      {
+        "horizon_id": "rolling_1m",
+        "label": "近 1 个月滚动窗口（30 天）",
+        "lookback_days": 30,
+        "trend_slice_granularity": "weekly",
+        "aligns_to_goal_tier": "monthly",
+        "context_supply_mode": "full_fenced_reports_plus_hard_metrics",
+        "evaluation_focus": "一线近期真实执行颗粒度、当月硬交付物推进、零汇报与售后救火占比、与董事长在途任务的即时双向对齐。"
+      },
+      {
+        "horizon_id": "rolling_1q",
+        "label": "近 1 个季度滚动窗口（90 天）",
+        "lookback_days": 90,
+        "trend_slice_granularity": "monthly",
+        "aligns_to_goal_tier": "quarterly",
+        "context_supply_mode": "deterministic_trend_matrix_plus_archived_rollups_plus_react_drilldown",
+        "evaluation_focus": "按月对比过去 3 个月的变化方向：高成本研发稀释是否在收敛、标杆项目交付与报价话术是否在起色、历史整改指令是否真正落地。"
+      },
+      {
+        "horizon_id": "rolling_1y",
+        "label": "近 1 年滚动窗口（365 天）",
+        "lookback_days": 365,
+        "trend_slice_granularity": "quarterly",
+        "aligns_to_goal_tier": "annual",
+        "context_supply_mode": "deterministic_trend_matrix_plus_archived_rollups_plus_react_drilldown",
+        "evaluation_focus": "按季度审视过去 4 个季度的战略精力结构演化、各产品线真实投入配比与年度核心里程碑兑现率。"
+      },
+      {
+        "horizon_id": "long_term_all",
+        "label": "长期全量演化视野（自最早数据起至今日）",
+        "lookback_days": null,
+        "trend_slice_granularity": "half_year",
+        "aligns_to_goal_tier": "long_term",
+        "context_supply_mode": "deterministic_all_time_trajectory_plus_annual_milestones_plus_react_drilldown",
+        "evaluation_focus": "拉长至跨年视角评估公司核心护城河构建、国产化替代进程、高成本研发 ROI 演进与 AI 驱动精干组织转型是否持续向好。"
+      }
+    ]
+  },
+  "trajectory_evaluation_rubric": {
+    "improving": "持续向好 ↗：目标方向聚焦度、硬交付进度或研发专注度较前期明显提升，历史指出的问题正在实质性收敛。",
+    "steady": "稳步推进 →：按计划推进且精力配比基本符合预期，无显著方向偏差，需维持节奏。",
+    "oscillating": "波动反复 ↔：阶段性有亮点但反复被旧有救火/杂务拉回，整改未能固化为长效机制。",
+    "deteriorating": "偏离恶化 ↘：连续多个切片精力被低价值事务吞噬、关键目标长期零实质推进，必须由董事长强干预纠偏。",
+    "baseline_only": "基线初建 ○：历史数据跨度尚不足以覆盖完整对比周期（如早期数据缺失），本次先锁定基线待下周期起追踪趋势。"
+  },
+  "goals": {
+    "long_term": [
+      {
+        "goal_code": "LT-1-SONIC-SYSTEM-LEADER",
+        "horizon_label": "2026–2030（3–5年长期）",
+        "product_lines": ["声波测温"],
+        "priority": "P0",
+        "title": "确立燃煤火电燃烧优化与垃圾焚烧高效 SNCR 领域的系统级方案领先地位",
+        "vision_and_end_state": "从单纯卖测温硬件彻底升级为“声波测温 + 燃烧/SNCR 工艺优化价值方案”供应商，建立高壁垒技术定价权，摆脱纯硬件低价内卷。",
+        "strategic_kpi_placeholders": {
+          "target_market_position": "【待董事长补充：如火电/垃圾焚烧细分市占率或标杆集团覆盖目标】",
+          "target_gross_margin_pct": "【待董事长补充：目标综合毛利率 %】",
+          "software_and_optimization_revenue_share": "【待董事长补充：系统优化/高附加值方案营收占比目标】"
+        },
+        "evaluation_redlines": [
+          "是否持续沉淀可量化的客户节能/降氮 ROI 案例库，而非长期依赖低价拼标",
+          "现场交付是否从“工程师充当施工监理反复救火”升级为标准化出厂联调与高复用交付"
+        ],
+        "status": "active"
+      },
+      {
+        "goal_code": "LT-2-HIGHEND-MS-PORTFOLIO",
+        "horizon_label": "2026–2030（3–5年长期）",
+        "product_lines": ["进口V&F质谱仪", "国产质谱仪"],
+        "priority": "P0",
+        "title": "建成“进口高端卡位 + 国产差异化放量”双轮质谱仪业务矩阵",
+        "vision_and_end_state": "进口 V&F 质谱仪牢牢占据半导体、CCS/CCUS 等高毛利前沿场景；国产质谱仪在氢燃料电池、科研实验室与工业在线监测形成自主可控的核心增长曲线。",
+        "strategic_kpi_placeholders": {
+          "highend_vf_revenue_target": "【待董事长补充：半导体/CCS 等高端场景长期营收目标】",
+          "domestic_ms_scale_target": "【待董事长补充：国产质谱仪长期年出货台套数与稳定性目标】"
+        },
+        "evaluation_redlines": [
+          "进口 V&F 业务是否真正向半导体与 CCS/CCUS 迁移，而非被老旧传统车企维保锁死",
+          "国产质谱仪是否持续攻克真空度/稳定性底盘短板并跑通商业化复制"
+        ],
+        "status": "active"
+      },
+      {
+        "goal_code": "LT-3-FID-DOMESTIC-ONLINE",
+        "horizon_label": "2026–2030（3–5年长期）",
+        "product_lines": ["进口FID", "国产FID"],
+        "priority": "P1",
+        "title": "完成 FID 从“进口汽车 VOC 守盘”向“国产化工业在线检测扩张”的代际跨越",
+        "vision_and_end_state": "以进口 FID 现金流稳住汽车 VOC 存量客户口碑，完成国产 FID 自主整机突破后大举切入工业在线 VOC/废气监测增量市场。",
+        "strategic_kpi_placeholders": {
+          "domestic_fid_launch_year": "【待董事长补充：国产 FID 商业化量产年份】",
+          "online_monitoring_revenue_target": "【待董事长补充：工业在线检测长期营收目标】"
+        },
+        "evaluation_redlines": [
+          "国产 FID 预研与整机落地窗口是否被无休止的老旧设备维修拖延"
+        ],
+        "status": "active"
+      },
+      {
+        "goal_code": "LT-4-CORE-RD-AND-AI-LEAN-ORG",
+        "horizon_label": "2026–2030（3–5年长期）",
+        "product_lines": ["跨产品/公司通用"],
+        "priority": "P0",
+        "title": "打造“高聚焦核心硬件研发 + AI 工作流驱动的高人效精干组织”",
+        "vision_and_end_state": "核心高成本研发算力长期聚焦公司国产化与关键硬件壁垒（专注度 ≥75%）；财务、文书、常规排期、初级售后排障与售前方案全面由 AI 工作流与 RAG 知识库接管，实现人均产值倍增与低效事务岗位结构性优化。",
+        "strategic_kpi_placeholders": {
+          "rd_strategic_focus_floor_pct": 75.0,
+          "revenue_per_employee_target": "【待董事长补充：长期人均产值目标】",
+          "ai_automation_coverage_target": "【待董事长补充：重复行政/财务/初级售后 AI 自动化替代率目标】"
+        },
+        "evaluation_redlines": [
+          "高成本专职研发是否长期被售后返厂维修和低门槛杂务稀释",
+          "已识别的 AI 提效与岗位优化靶点是否在跨季度持续落地，而非只停留在报告纸面"
+        ],
+        "status": "active"
+      }
+    ],
+    "annual": [
+      {
+        "goal_code": "AN-1-SONIC-BREAKTHROUGH",
+        "legacy_code": "G1-SONIC-BREAKTHROUGH",
+        "parent_goal_code": "LT-1-SONIC-SYSTEM-LEADER",
+        "period": "2026-Q4~2027",
+        "category": "市场拓展",
+        "product_lines": ["声波测温"],
+        "priority": "P0",
+        "target_effort_share_pct": 30.0,
+        "owners": ["杨丽丽", "吕旭东", "刘家明"],
+        "title": "声波测温在燃煤火电（燃烧优化）与垃圾焚烧（高效 SNCR 控制）双场景年度突破",
+        "target_outcomes": "围绕燃烧优化与高效 SNCR 控制建立系统级价值卖点与 ROI 报价应答体系，有效平衡技术优势与价格竞争，交付标杆项目并形成复制。",
+        "key_milestones": [
+          "燃煤电厂结合燃烧优化形成标杆案例与量化 ROI 价值话术",
+          "垃圾焚烧结合高效 SNCR 优化控制突破核心标杆客户",
+          "建立技术优势对冲价格竞争的标准化报价与技术应答体系",
+          "声波测温国产前置放大器 v2.0 与核心板卡降本替代落地"
+        ],
+        "quant_targets": {
+          "target_orders_or_revenue": "【待补充：年度签约台套数/合同额】",
+          "target_benchmark_projects": "【待补充：燃煤电厂与垃圾焚烧标杆项目清单】",
+          "field_rework_reduction": "【待补充：现场返工/接线排错工时压降目标】"
+        },
+        "status": "active"
+      },
+      {
+        "goal_code": "AN-2-VF-MS-HIGHEND",
+        "legacy_code": "G2-VF-MS-HIGHEND",
+        "parent_goal_code": "LT-2-HIGHEND-MS-PORTFOLIO",
+        "period": "2026-Q4~2027",
+        "category": "市场拓展",
+        "product_lines": ["进口V&F质谱仪"],
+        "priority": "P0",
+        "target_effort_share_pct": 20.0,
+        "owners": ["杨丽丽", "吕旭东", "刘家明"],
+        "title": "进口 V&F 质谱仪年度突破半导体与 CCS/CCUS 等高端高毛利市场",
+        "target_outcomes": "扭转高端市场零推进局面，在半导体工艺监测与 CCS/CCUS 前沿场景建立实质客户拜访、技术验证、示范商机与方案沉淀。",
+        "key_milestones": [
+          "完成 CCS/CCUS 与半导体目标客户地图与应用场景专项研究归档",
+          "推进头部半导体与 CCS/CCUS 客户实质技术交流与试测验证",
+          "落地高端场景示范项目/首批高毛利订单"
+        ],
+        "quant_targets": {
+          "target_new_highend_leads": "【待补充：年度高端有效商机/拜访客户数】",
+          "target_orders_or_revenue": "【待补充：年度高端 V&F 目标合同额】"
+        },
+        "status": "active"
+      },
+      {
+        "goal_code": "AN-3-CN-MS-NICHE",
+        "legacy_code": "G3-CN-MS-NICHE",
+        "parent_goal_code": "LT-2-HIGHEND-MS-PORTFOLIO",
+        "period": "2026-Q4~2027",
+        "category": "核心产品研发",
+        "product_lines": ["国产质谱仪"],
+        "priority": "P1",
+        "target_effort_share_pct": 15.0,
+        "owners": ["李文颖", "杨震", "刘家明"],
+        "title": "国产质谱仪年度卡位氢燃料电池与科研实验室细分场景",
+        "target_outcomes": "攻克国产质谱仪真空度与长期运行稳定性短板，完成样机定型并在氢燃料电池（如联合燃料电池、丰田氢能验证）及科研院所形成可复制试点与销售。",
+        "key_milestones": [
+          "解决国产小质谱仪真空度与气路稳定性问题并形成标准检验规程",
+          "氢燃料电池客户租赁/试单转为正式采购闭环",
+          "高校与科研实验室形成首批标杆样机交付"
+        ],
+        "quant_targets": {
+          "target_units_delivered": "【待补充：年度国产质谱仪试点/销售台数】",
+          "reliability_metric": "【待补充：连续无故障运行时长/真空度达标指标】"
+        },
+        "status": "active"
+      },
+      {
+        "goal_code": "AN-4-FID-EVOLUTION",
+        "legacy_code": "G4-FID-EVOLUTION",
+        "parent_goal_code": "LT-3-FID-DOMESTIC-ONLINE",
+        "period": "2026-Q4~2027",
+        "category": "核心产品研发",
+        "product_lines": ["进口FID", "国产FID"],
+        "priority": "P1",
+        "target_effort_share_pct": 15.0,
+        "owners": ["杨丽丽", "吕旭东", "李文颖", "赵勇成"],
+        "title": "FID 年度两步走：守稳汽车 VOC 基本盘，启动国产 FID 向工业在线检测演进",
+        "target_outcomes": "标准化进口 FID 维保以释放高成本研发人力，稳住汽车 VOC 存量客户；同时明确国产 FID 技术路线、核心部件供应链与样机计划。",
+        "key_milestones": [
+          "建立进口 FID 常规维修与年度维护标准 SOP（完全由技术支持闭环，不占用核心研发）",
+          "稳固汽车 VOC 存量客户年度维保续约与新增商机",
+          "完成国产 FID 关键技术路线论证、核心物料摸底与样机立项"
+        ],
+        "quant_targets": {
+          "voc_retention_target": "【待补充：汽车 VOC 存量客户续约/营收目标】",
+          "domestic_fid_milestone_date": "【待补充：国产 FID 样机关键节点日期】"
+        },
+        "status": "active"
+      },
+      {
+        "goal_code": "AN-5-RD-FOCUS-AND-AI-OPS",
+        "legacy_code": "G5-RD-COST-ALIGNMENT",
+        "parent_goal_code": "LT-4-CORE-RD-AND-AI-LEAN-ORG",
+        "period": "2026-Q4~2027",
+        "category": "组织能力",
+        "product_lines": ["跨产品/公司通用", "声波测温", "国产质谱仪"],
+        "priority": "P0",
+        "target_effort_share_pct": 20.0,
+        "owners": ["李文颖", "孔紫初", "杨震"],
+        "title": "高成本核心研发（李文颖）战略聚焦 ≥75% + 生产/财务/售后 AI 提效落地",
+        "target_outcomes": "彻底切断高成本电路板研发被常规售后与备件杂务稀释的通道；补齐生产制造透明化与出厂联调质检；推动财务自动化、一线维修 RAG 知识库与售前 ROI 武器库分批上线。",
+        "key_milestones": [
+          "李文颖战略核心研发工时占比从基线 ~35% 提升并稳定在 ≥75%",
+          "建立杨震生产组装与出厂通电联调质检日清台账（杜绝零汇报与杂务拖累备货）",
+          "落地质谱仪/FID 故障排查 AI 知识库，拦截 80% 流向研发的初级售后咨询",
+          "推进财务凭证/发票/网银流程自动化与跨岗事务性工作提效评估"
+        ],
+        "quant_targets": {
+          "liwenying_rd_share_target_pct": 75.0,
+          "ai_workflows_deployed_count": "【待补充：年度计划上线 AI 提效工作流数量】",
+          "headcount_efficiency_goal": "【待补充：组织提效或岗位优化目标】"
+        },
+        "status": "active"
+      }
+    ],
+    "quarterly": [
+      {
+        "goal_code": "Q-2026Q4-1-SONIC-DELIVERY-AND-ROI",
+        "parent_goal_code": "AN-1-SONIC-BREAKTHROUGH",
+        "quarter": "2026-Q4",
+        "date_range": ["2026-10-01", "2026-12-31"],
+        "product_lines": ["声波测温"],
+        "priority": "P0",
+        "owners": ["王楠", "王旭", "石志同", "杨丽丽", "吕旭东"],
+        "title": "打通博州火电与香港垃圾焚烧声波测温标杆交付，并沉淀首版燃烧优化/SNCR 价值应答包",
+        "deliverables": [
+          "国能博州电厂 1/2 号炉声波测温与燃烧优化 DCS 联调验收闭环",
+          "香港 I-Park 垃圾焚烧 SNCR 现场安装调试与数据采集闭环",
+          "宁夏临河电厂国产声波测温软硬件交付按期受控",
+          "输出首版《声波测温燃烧优化与 SNCR 技术价值对冲价格战 ROI 话术/报价包》"
+        ],
+        "success_criteria": "标杆现场不再因低级接线/出厂未联调反复拖期；销售汇报中出现实质性的燃烧优化/SNCR 价值方案推进而非纯价格博弈。",
+        "editable_details": "【待董事长补充：本季度末重点冲刺签约客户名单与回款目标】",
+        "status": "active"
+      },
+      {
+        "goal_code": "Q-2026Q4-2-VF-HIGHEND-IGNITION",
+        "parent_goal_code": "AN-2-VF-MS-HIGHEND",
+        "quarter": "2026-Q4",
+        "date_range": ["2026-10-01", "2026-12-31"],
+        "product_lines": ["进口V&F质谱仪"],
+        "priority": "P0",
+        "owners": ["杨丽丽", "吕旭东", "刘家明"],
+        "title": "破冰 CCS/CCUS 与半导体高端市场（打破零汇报僵局）",
+        "deliverables": [
+          "补齐并归档董事长挂单任务 #13《CCS/CCUS 应用与市场专项研究报告》",
+          "梳理半导体与 CCS/CCUS 首批 Top 15 目标客户名单并启动拜访/技术交流"
+        ],
+        "success_criteria": "终结连续 30 天零提及状态，销售日报中出现实质性高端客户推进与技术澄清记录。",
+        "editable_details": "【待董事长补充：重点目标半导体/CCS 客户或设计院名称】",
+        "status": "active"
+      },
+      {
+        "goal_code": "Q-2026Q4-3-CN-MS-HYDROGEN-CLOSE",
+        "parent_goal_code": "AN-3-CN-MS-NICHE",
+        "quarter": "2026-Q4",
+        "date_range": ["2026-10-01", "2026-12-31"],
+        "product_lines": ["国产质谱仪"],
+        "priority": "P1",
+        "owners": ["李文颖", "刘家明"],
+        "title": "闭环国产小质谱仪真空度根因整改与氢燃料电池客户租赁/验证",
+        "deliverables": [
+          "彻底根治物理所/丰田氢能小质谱仪真空度故障并输出标准排查文档",
+          "联合燃料电池 HydrogenMatrix Q7 租赁合同盖章回款及运行跟踪"
+        ],
+        "success_criteria": "不再出现单台设备反复拉回修 25 天无根因闭环的情况。",
+        "editable_details": "【待董事长补充：其他氢能或高校重点试点项目】",
+        "status": "active"
+      },
+      {
+        "goal_code": "Q-2026Q4-4-FID-SUPPORT-ISOLATION",
+        "parent_goal_code": "AN-4-FID-EVOLUTION",
+        "quarter": "2026-Q4",
+        "date_range": ["2026-10-01", "2026-12-31"],
+        "product_lines": ["进口FID", "国产FID"],
+        "priority": "P1",
+        "owners": ["赵勇成", "李文颖"],
+        "title": "实现进口 FID 常规维保独立闭环，明确国产 FID 预研输入",
+        "deliverables": [
+          "赵勇成建立常规 FID 维修独立闭环机制（严禁将非底层电路改版问题转甩给李文颖）",
+          "输出国产 FID 关键难点与在线检测目标场景初步论证清单"
+        ],
+        "success_criteria": "进口 FID 维保对李文颖研发时间的占用降至接近 0%。",
+        "editable_details": "【待董事长补充：国产 FID 立项时间窗与预算要求】",
+        "status": "active"
+      },
+      {
+        "goal_code": "Q-2026Q4-5-RD-PCB-AND-OPS-DISCIPLINE",
+        "parent_goal_code": "AN-5-RD-FOCUS-AND-AI-OPS",
+        "quarter": "2026-Q4",
+        "date_range": ["2026-10-01", "2026-12-31"],
+        "product_lines": ["声波测温", "跨产品/公司通用"],
+        "priority": "P0",
+        "owners": ["李文颖", "孔紫初", "杨震"],
+        "title": "完成前置放大器 v2.0 投板测试、锁定李文颖研发专注度并整改制造零汇报",
+        "deliverables": [
+          "前置放大器改版 v2.0 PCB 定稿、嘉立创打样回板与核心指标测试报告",
+          "李文颖每周至少 3 个整天锁定核心研发（ strategic_rd_share_pct 从 35% 拉升至 ≥65%）",
+          "杨震恢复每日工作汇报，剥离非生产杂务，建立出厂前通电联调质检清单",
+          "完成李文颖历史检修经验文档收口，为一线故障排查 RAG 知识库准备语料"
+        ],
+        "success_criteria": "下月及季末审计中，李文颖精力占比出现明确向上拐点，杨震零汇报彻底清零。",
+        "editable_details": "【待董事长补充：本季度拟启动的第一个财务/行政 AI 提效试点】",
+        "status": "active"
+      }
+    ],
+    "monthly": [
+      {
+        "goal_code": "M-202612-1-PREAMP-V2-TAPE-OUT",
+        "parent_goal_code": "Q-2026Q4-5-RD-PCB-AND-OPS-DISCIPLINE",
+        "month": "2026-12",
+        "date_range": ["2026-12-01", "2026-12-31"],
+        "product_lines": ["声波测温"],
+        "priority": "P0",
+        "owners": ["李文颖", "孔紫初"],
+        "title": "本月完成前置放大器 v2.0 PCB 打样回板实测，并严格隔离李文颖常规售后杂务",
+        "key_deliverables": [
+          "前置放大器 v2.0 原理图/PCB/BOM 锁定并完成嘉立创投板与首轮实测",
+          "本月李文颖汇报中战略核心研发占比明显高于上月基线（目标 ≥65%）",
+          "切断 FID 常规维修与备件代查流向李文颖"
+        ],
+        "editable_details": "【待董事长补充：具体打样截止日与验收性能指标】",
+        "status": "active"
+      },
+      {
+        "goal_code": "M-202612-2-BOZHOU-WUCW-HK-SONIC",
+        "parent_goal_code": "Q-2026Q4-1-SONIC-DELIVERY-AND-ROI",
+        "month": "2026-12",
+        "date_range": ["2026-12-01", "2026-12-31"],
+        "product_lines": ["声波测温"],
+        "priority": "P0",
+        "owners": ["王楠", "王旭", "杨丽丽", "孔紫初"],
+        "title": "本月推动博州 DCS 通讯收口、五彩湾 DCS 文件拿回与香港 SNCR 数据闭环",
+        "key_deliverables": [
+          "博州电厂 1/2 号炉 DCS 模拟量通讯异常彻底排除并推进验收",
+          "解决停滞 25 天的董事长任务 #1：拿回五彩湾电厂 DCS 文件用于燃烧优化更新",
+          "香港 I-Park 垃圾焚烧 SNCR 现场运行数据回传分析"
+        ],
+        "editable_details": "【待董事长补充：宁夏临河电厂本月具体交付节点】",
+        "status": "active"
+      },
+      {
+        "goal_code": "M-202612-3-CCS-SEMICON-BREAK-ZERO",
+        "parent_goal_code": "Q-2026Q4-2-VF-HIGHEND-IGNITION",
+        "month": "2026-12",
+        "date_range": ["2026-12-01", "2026-12-31"],
+        "product_lines": ["进口V&F质谱仪"],
+        "priority": "P0",
+        "owners": ["杨丽丽", "吕旭东", "刘家明"],
+        "title": "本月打破 CCS/CCUS 与半导体高端拓展零进展状态",
+        "key_deliverables": [
+          "提交任务 #13《CCS/CCUS 应用与市场专项研究》初稿并归档",
+          "销售团队本月至少开展 3 家半导体或 CCS/CCUS 目标客户实质对接并在日报留痕"
+        ],
+        "editable_details": "【待董事长补充：指定对接的重点客户或行业会议】",
+        "status": "active"
+      },
+      {
+        "goal_code": "M-202612-4-CN-MS-AND-MANUFACTURING-FIX",
+        "parent_goal_code": "Q-2026Q4-3-CN-MS-HYDROGEN-CLOSE",
+        "month": "2026-12",
+        "date_range": ["2026-12-01", "2026-12-31"],
+        "product_lines": ["国产质谱仪", "跨产品/公司通用"],
+        "priority": "P1",
+        "owners": ["刘家明", "杨震", "孔紫初"],
+        "title": "本月完成联合燃料电池合同用印落地，并彻底整改杨震零汇报与备货透明化",
+        "key_deliverables": [
+          "联合燃料电池 HydrogenMatrix Q7 租赁合同完成用印与交付跟踪",
+          "杨震实现工作日全勤汇报，贵州大方等重点项目备货进度纳入晨会日清"
+        ],
+        "editable_details": "【待董事长补充：本月生产组装批次与出厂联检具体设备清单】",
+        "status": "active"
+      },
+      {
+        "goal_code": "M-202612-5-AI-EFFICIENCY-PILOT",
+        "parent_goal_code": "Q-2026Q4-5-RD-PCB-AND-OPS-DISCIPLINE",
+        "month": "2026-12",
+        "date_range": ["2026-12-01", "2026-12-31"],
+        "product_lines": ["跨产品/公司通用"],
+        "priority": "P1",
+        "owners": ["孔紫初", "徐梦嘉", "薛蕾", "王晓"],
+        "title": "本月启动首轮 AI 提效切口摸底（财务重复流程与维修知识库语料沉淀）",
+        "key_deliverables": [
+          "梳理财务（金蝶/网银/发票）高频重复动作清单，评估 RPA/AI 自动化替代边界",
+          "汇总李文颖检修文档与典型现场故障案例，启动一线售后 AI 知识库底座筹备"
+        ],
+        "editable_details": "【待董事长补充：本月最希望优先落地的 AI 提效或岗位优化动作】",
+        "status": "active"
+      }
+    ]
+  }
+}
