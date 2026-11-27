@@ -1442,22 +1442,32 @@ class ChiefOfStaffEngine:
                     redact_secrets(f"{type(exc).__name__}: {exc}", self.settings),
                 )
 
-        board_url = ""
+        onedrive_synced = False
         if self.onedrive is not None:
-            od_ok, board_url = self._safe_sync_onedrive()
-            if not od_ok:
+            od_ok, _ = self._safe_sync_onedrive()
+            if od_ok:
+                onedrive_synced = True
+            else:
                 onedrive_failed = True
 
+        cockpit_url = (self.magic_link_factory() or "").strip() if self.magic_link_factory else ""
         inserted_ids = commit_res.get("inserted_item_ids") or []
         updated_ids = commit_res.get("updated_item_ids") or []
         ids_str = ", ".join(f"#{i}" for i in inserted_ids)
         upd_str = ", ".join(f"#{i}" for i in updated_ids)
-        if board_url:
-            tail = f"\n☁️ 云端看板已刷新：{board_url}"
-        elif onedrive_failed:
-            tail = "\n⚠️ 本地数据库已安全落盘（云端 OneDrive 同步暂遇网络波动，恢复后将自动刷新）。"
-        else:
-            tail = ""
+        tail_lines: list[str] = []
+        if onedrive_failed:
+            tail_lines.append("⚠️ 本地数据库已安全落盘（云端 OneDrive 同步暂遇网络波动，恢复后将自动刷新）。")
+            if cockpit_url:
+                tail_lines.append(f"📊 云端看板：{cockpit_url}")
+        elif onedrive_synced:
+            if cockpit_url:
+                tail_lines.append(f"☁️ 云端清单已同步 ｜ 📊 云端看板：{cockpit_url}")
+            else:
+                tail_lines.append("☁️ 云端清单已同步。")
+        elif cockpit_url:
+            tail_lines.append(f"📊 云端看板：{cockpit_url}")
+        tail = ("\n" + "\n".join(tail_lines)) if tail_lines else ""
 
         summary_parts: list[str] = []
         if ids_str:
