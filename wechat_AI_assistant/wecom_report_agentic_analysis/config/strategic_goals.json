@@ -1,22 +1,44 @@
 {
-  "schema_version": "2.0",
+  "schema_version": "2.1",
   "document_purpose": "维恩科仪四层战略目标体系（长期 / 年度 / 季度 / 月度）唯一权威配置文件。董事长可直接在本文件中增删改各阶段目标、补充量化财务/客户/研发指标；系统每次运行分析时将自动读取本文件，按【近1个月 / 近1季度 / 近1年 / 全量长期】四层滚动窗口动态评估公司是否持续向好发展。",
   "company": {
     "name": "维恩科仪",
     "maintainer": "徐宏玮（董事长）",
     "last_updated": "2026-11-27",
+    "long_term_horizon_definition": "核心长期攻坚周期为未来 3 年（2026–2029），同时服务于董事长退休前约 10 年的公司终局定型。",
     "active_fiscal_year": "2026-2027",
     "active_quarter": "2026-Q4",
     "active_month": "2026-12",
-    "notes": "后续可随时在本 JSON 中补充：具体营收/订单额目标、毛利率红线、重点标杆客户清单、关键样机节点与具体人员 KPI。"
+    "headcount_cap": 20,
+    "strategic_positioning": "成为具备独立自主研发能力、拥有独立自主可控完整产品与系统解决方案的细分领域专业技术厂商；深耕高知识/高经验/高质量壁垒的特定应用场景，坚决避免陷入单纯价格竞争。",
+    "partner_and_localization_principle": "坚持“稳定合作 + 关键国产替代”的竞合平衡策略（不盲目全面撕裂现有海外伙伴演变为恶性竞争）：与德国 B&D 转向中国本土生产+极低成本核心算法/硬件新合作模式；稳住 V&F IMR-MS 销售的同时国产化 PEMSense/HSense/GasOxidizer 并探索自主 IMR-MS 与离子源增强；FID 长期自主生产并在特定领域保持与 Tera 合作；FTIR 倾向彻底自主开发、完全脱离 ABB。",
+    "operating_model_principles": [
+      "组织规模红线：公司长期维持在 20 人以内，以研发、核心工艺装配与专业技术支持为主，并由 AI 工作流自动化承接重复事务。",
+      "轻资产制造原则：常规制造尽可能外包，内部仅保留核心装配与关键质检环节，牢牢守住自身工艺与设计的 Know-How。",
+      "渠道赋能转型：打造高水平专业技术支持团队，重点拓展与赋能代理商/分销商渠道；终端客户的销售、安装调试与售后服务逐步交由分销商渠道承接。",
+      "双市场版图：在深耕中国市场的同时，逐步拓展海外市场。"
+    ],
+    "notes": "长期目标（LT-1 ~ LT-6）已按 2026-11-27 董事长口述战略定稿；后续可继续逐层细化年度、季度、月度目标的具体时间节点、营收/台套数与客户清单。"
   },
   "sync_and_analysis_policy": {
+    "agent_loop_limits": {
+      "max_investigation_steps": 18,
+      "redteam_critic_enabled": true,
+      "max_verification_retries": 2,
+      "degrade_on_minor_unverified_items": true,
+      "alert_severity_levels": [
+        "🔴 高危漏洞告警（需董事长立即拍板纠偏）",
+        "🟡 风险偏离提醒（持续跟踪防恶化）",
+        "🔵 效率与 AI 替代提示（提效降本/渠道化机会）"
+      ],
+      "notes": "方案 B：主脑翻查上限默认 18 轮（单轮支持并发查多项，达上限后自动进入诊断初稿收口）；阶段三启用独立红队漏洞挑刺复核官（100% 共享原始证据），专揪业务漏洞并输出分级 Alert 与硬建议；证据核验纠偏上限 2 轮，次要存疑仅标灰剔除不阻断整份预警 PDF 投递。"
+    },
     "data_ingestion": {
       "strategy": "full_backfill_once_then_incremental",
       "initial_backfill_start_date": "2023-01-01",
       "api_window_slice_days": 25,
       "incremental_overlap_lookback_days": 7,
-      "overlap_reason": "每次增量同步自动从上次水位回看 7 天，专门兜底【现场技术支持工作日报（后补）】的跨日延迟补交；数据库按唯一汇报编号幂等去重，绝不重复入库。"
+      "overlap_reason": "首次运行执行全量历史拉取并打标；此后每次仅执行增量拉取（兼容近期迟交补报，数据库按唯一汇报编号幂等去重，绝不重复拉取全量历史）。"
     },
     "rolling_comparison_horizons": [
       {
@@ -35,7 +57,7 @@
         "trend_slice_granularity": "monthly",
         "aligns_to_goal_tier": "quarterly",
         "context_supply_mode": "deterministic_trend_matrix_plus_archived_rollups_plus_react_drilldown",
-        "evaluation_focus": "按月对比过去 3 个月的变化方向：高成本研发稀释是否在收敛、标杆项目交付与报价话术是否在起色、历史整改指令是否真正落地。"
+        "evaluation_focus": "按月对比过去 3 个月的变化方向：高成本研发稀释是否在收敛、国产化/渠道化转型与重点项目推进是否在起色、历史整改指令是否真正落地。"
       },
       {
         "horizon_id": "rolling_1y",
@@ -44,7 +66,7 @@
         "trend_slice_granularity": "quarterly",
         "aligns_to_goal_tier": "annual",
         "context_supply_mode": "deterministic_trend_matrix_plus_archived_rollups_plus_react_drilldown",
-        "evaluation_focus": "按季度审视过去 4 个季度的战略精力结构演化、各产品线真实投入配比与年度核心里程碑兑现率。"
+        "evaluation_focus": "按季度审视过去 4 个季度的战略精力结构演化、各产品线国产化/自主化真实投入配比与年度核心里程碑兑现率。"
       },
       {
         "horizon_id": "long_term_all",
@@ -53,85 +75,148 @@
         "trend_slice_granularity": "half_year",
         "aligns_to_goal_tier": "long_term",
         "context_supply_mode": "deterministic_all_time_trajectory_plus_annual_milestones_plus_react_drilldown",
-        "evaluation_focus": "拉长至跨年视角评估公司核心护城河构建、国产化替代进程、高成本研发 ROI 演进与 AI 驱动精干组织转型是否持续向好。"
+        "evaluation_focus": "拉长至跨年（3 年核心长期）视角评估公司是否真正迈向“自主可控完整产品与解决方案 + ≤20人精干组织 + 外包制造保 Know-How + 分销渠道赋能 + 出海”的终局形态。"
       }
     ]
   },
   "trajectory_evaluation_rubric": {
-    "improving": "持续向好 ↗：目标方向聚焦度、硬交付进度或研发专注度较前期明显提升，历史指出的问题正在实质性收敛。",
+    "improving": "持续向好 ↗：目标方向聚焦度、自主研发/国产化进展、渠道赋能或研发专注度较前期明显提升，历史指出的问题正在实质性收敛。",
     "steady": "稳步推进 →：按计划推进且精力配比基本符合预期，无显著方向偏差，需维持节奏。",
-    "oscillating": "波动反复 ↔：阶段性有亮点但反复被旧有救火/杂务拉回，整改未能固化为长效机制。",
-    "deteriorating": "偏离恶化 ↘：连续多个切片精力被低价值事务吞噬、关键目标长期零实质推进，必须由董事长强干预纠偏。",
+    "oscillating": "波动反复 ↔：阶段性有亮点但反复被旧有终端救火/低门槛杂务拉回，整改未能固化为长效机制。",
+    "deteriorating": "偏离恶化 ↘：连续多个切片精力被低价值事务吞噬、自主研发/渠道化/高端突破长期停滞，必须由董事长强干预纠偏。",
     "baseline_only": "基线初建 ○：历史数据跨度尚不足以覆盖完整对比周期（如早期数据缺失），本次先锁定基线待下周期起追踪趋势。"
   },
   "goals": {
     "long_term": [
       {
-        "goal_code": "LT-1-SONIC-SYSTEM-LEADER",
-        "horizon_label": "2026–2030（3–5年长期）",
+        "goal_code": "LT-1-SONIC-BD-LOCALIZATION",
+        "horizon_label": "未来 3 年核心长期（2026–2029｜退休前终局定型）",
         "product_lines": ["声波测温"],
+        "partners": ["德国 B&D (budi.de)"],
         "priority": "P0",
-        "title": "确立燃煤火电燃烧优化与垃圾焚烧高效 SNCR 领域的系统级方案领先地位",
-        "vision_and_end_state": "从单纯卖测温硬件彻底升级为“声波测温 + 燃烧/SNCR 工艺优化价值方案”供应商，建立高壁垒技术定价权，摆脱纯硬件低价内卷。",
+        "title": "声波测温：与德国 B&D 建立“中国本土制造 + 核心低成本供给”新合作模式，对外交付自主中文系统与工艺优化方案",
+        "vision_and_end_state": "保持与德国 B&D 稳定共赢合作而非恶性竞争：推动大部分硬件与整机在中国本土生产，德国 B&D 仅以极低成本提供最核心的部分算法与关键硬件；维恩科仪对外提供自主可控的完整中文系统、自研软件及燃煤火电燃烧优化 / 垃圾焚烧高效 SNCR 解决方案，以高质量与深厚行业经验建立高壁垒，坚决避免单纯价格战。",
         "strategic_kpi_placeholders": {
-          "target_market_position": "【待董事长补充：如火电/垃圾焚烧细分市占率或标杆集团覆盖目标】",
-          "target_gross_margin_pct": "【待董事长补充：目标综合毛利率 %】",
-          "software_and_optimization_revenue_share": "【待董事长补充：系统优化/高附加值方案营收占比目标】"
+          "china_localization_bom_share_pct": "【待董事长补充：声波测温中国本土生产/国产化物料成本占比目标 %】",
+          "bd_new_cooperation_agreement_target": "【待董事长补充：与德国 B&D 签署新合作分工模式的时间节点】",
+          "target_gross_margin_pct": "【待董事长补充：系统+优化方案综合毛利率目标 %】"
         },
         "evaluation_redlines": [
-          "是否持续沉淀可量化的客户节能/降氮 ROI 案例库，而非长期依赖低价拼标",
-          "现场交付是否从“工程师充当施工监理反复救火”升级为标准化出厂联调与高复用交付"
+          "长期停留在纯代理倒卖进口硬件、陷入低价拼标而无中文软件与燃烧/SNCR 优化价值壁垒",
+          "核心板卡（如前置放大器）国产化与本土降本推进迟缓，成本结构缺乏竞争力"
+        ],
+        "positive_trend_signals": [
+          "核心板卡国产化替代持续落地、中文系统与燃烧优化/SNCR 软件进入标杆现场闭环",
+          "与德国 B&D 商务/技术谈判向中国本土制造分工模式实质推进"
         ],
         "status": "active"
       },
       {
-        "goal_code": "LT-2-HIGHEND-MS-PORTFOLIO",
-        "horizon_label": "2026–2030（3–5年长期）",
+        "goal_code": "LT-2-MS-VF-LOCALIZE-AND-IMRMS",
+        "horizon_label": "未来 3 年核心长期（2026–2029｜退休前终局定型）",
         "product_lines": ["进口V&F质谱仪", "国产质谱仪"],
+        "partners": ["V&F (vandf.com)"],
         "priority": "P0",
-        "title": "建成“进口高端卡位 + 国产差异化放量”双轮质谱仪业务矩阵",
-        "vision_and_end_state": "进口 V&F 质谱仪牢牢占据半导体、CCS/CCUS 等高毛利前沿场景；国产质谱仪在氢燃料电池、科研实验室与工业在线监测形成自主可控的核心增长曲线。",
+        "title": "质谱仪矩阵：稳住 V&F IMR-MS 高端销售，推进 PEMSense/HSense/GasOxidizer 国产化并探索自主 IMR-MS 与离子源性能增强",
+        "vision_and_end_state": "在保持与 V&F 合作及现有 IMR-MS 高端（半导体、CCS/CCUS 等）销售基本盘的前提下，分步实现 PEMSense、HSense 及 GasOxidizer（气体氧化器）等核心产品/模块的国产化替代；中长期探索独立自主生产 IMR-MS，并在其基础上对离子源进行改进升级以增强检测性能，同时推动国产质谱仪在氢燃料电池与科研实验室放量。",
         "strategic_kpi_placeholders": {
-          "highend_vf_revenue_target": "【待董事长补充：半导体/CCS 等高端场景长期营收目标】",
-          "domestic_ms_scale_target": "【待董事长补充：国产质谱仪长期年出货台套数与稳定性目标】"
+          "localized_vf_modules_roadmap": "【待董事长补充：PEMSense / HSense / GasOxidizer 国产化先后顺序与样机节点】",
+          "self_imr_ms_ion_source_milestone": "【待董事长补充：自主 IMR-MS 及离子源改进预研启动条件与性能指标】",
+          "highend_and_domestic_ms_revenue_target": "【待董事长补充：3 年后质谱仪整体营收及国产占比目标】"
         },
         "evaluation_redlines": [
-          "进口 V&F 业务是否真正向半导体与 CCS/CCUS 迁移，而非被老旧传统车企维保锁死",
-          "国产质谱仪是否持续攻克真空度/稳定性底盘短板并跑通商业化复制"
+          "进口 V&F 精力被传统老旧设备售后维修吞噬，半导体与 CCS/CCUS 高端突破长期停滞",
+          "国产质谱仪及配套模块（PEMSense/HSense/GasOxidizer）缺乏持续工程研发与稳定性根治闭环"
+        ],
+        "positive_trend_signals": [
+          "半导体/CCS 高端商机实质落地；国产小质谱仪稳定性达标放量；PEMSense/HSense/GasOxidizer 国产化及离子源改进进入实质研发节奏"
         ],
         "status": "active"
       },
       {
-        "goal_code": "LT-3-FID-DOMESTIC-ONLINE",
-        "horizon_label": "2026–2030（3–5年长期）",
+        "goal_code": "LT-3-FID-SELF-PROD-AND-TERA",
+        "horizon_label": "未来 3 年核心长期（2026–2029｜退休前终局定型）",
         "product_lines": ["进口FID", "国产FID"],
+        "partners": ["Tera (tera-instruments.com)"],
         "priority": "P1",
-        "title": "完成 FID 从“进口汽车 VOC 守盘”向“国产化工业在线检测扩张”的代际跨越",
-        "vision_and_end_state": "以进口 FID 现金流稳住汽车 VOC 存量客户口碑，完成国产 FID 自主整机突破后大举切入工业在线 VOC/废气监测增量市场。",
+        "title": "FID：坚定走向自主生产与工业在线检测升级，同时在特定细分领域保持与 Tera 合作",
+        "vision_and_end_state": "长期目标明确为自主研发与自主生产 FID 整机（完成从现阶段汽车 VOC 守盘向工业在线检测市场拓展）；同时采取务实竞合策略，在特定优势应用领域继续与 Tera 保持稳定合作，避免盲目断链。",
         "strategic_kpi_placeholders": {
-          "domestic_fid_launch_year": "【待董事长补充：国产 FID 商业化量产年份】",
-          "online_monitoring_revenue_target": "【待董事长补充：工业在线检测长期营收目标】"
+          "self_produced_fid_launch_target": "【待董事长补充：自主生产 FID 样机定型与量产年份】",
+          "tera_retained_application_scope": "【待董事长补充：计划继续与 Tera 保持合作的特定细分应用领域】",
+          "online_monitoring_revenue_target": "【待董事长补充：国产 FID 切入工业在线检测的 3 年营收目标】"
         },
         "evaluation_redlines": [
-          "国产 FID 预研与整机落地窗口是否被无休止的老旧设备维修拖延"
+          "陷入存量老旧进口 FID 反复维修且频繁占用核心研发人员，同时自主生产 FID 长期停留在口号"
+        ],
+        "positive_trend_signals": [
+          "存量 FID 维保标准化下放，自主 FID 关键部件选型、样机研发与工业在线检测客户验证稳步推进"
         ],
         "status": "active"
       },
       {
-        "goal_code": "LT-4-CORE-RD-AND-AI-LEAN-ORG",
-        "horizon_label": "2026–2030（3–5年长期）",
-        "product_lines": ["跨产品/公司通用"],
-        "priority": "P0",
-        "title": "打造“高聚焦核心硬件研发 + AI 工作流驱动的高人效精干组织”",
-        "vision_and_end_state": "核心高成本研发算力长期聚焦公司国产化与关键硬件壁垒（专注度 ≥75%）；财务、文书、常规排期、初级售后排障与售前方案全面由 AI 工作流与 RAG 知识库接管，实现人均产值倍增与低效事务岗位结构性优化。",
+        "goal_code": "LT-4-FTIR-INDEPENDENT-RD",
+        "horizon_label": "未来 3 年核心长期（2026–2029｜退休前终局定型）",
+        "product_lines": ["FTIR"],
+        "partners": ["ABB（长期战略目标：完全脱离）"],
+        "priority": "P1",
+        "title": "FTIR：独立自主开发完整产品与解决方案，长期完全脱离 ABB",
+        "vision_and_end_state": "相比声波测温/V&F/FID 的“竞合平衡”，FTIR 长期战略明确倾向于彻底自主开发，完全脱离 ABB 体系，打造自主可控的高质量 FTIR 产品及配套气体预处理/吹扫气等完整方案，掌握完整定价权与核心技术栈。",
         "strategic_kpi_placeholders": {
-          "rd_strategic_focus_floor_pct": 75.0,
-          "revenue_per_employee_target": "【待董事长补充：长期人均产值目标】",
-          "ai_automation_coverage_target": "【待董事长补充：重复行政/财务/初级售后 AI 自动化替代率目标】"
+          "independent_ftir_kickoff_date": "【待董事长补充：自主 FTIR 正式立项/核心光学或干涉仪供应链锁定时间】",
+          "abb_decoupling_target_year": "【待董事长补充：完成脱离 ABB 实现自主 FTIR 商业替代的目标年份】"
         },
         "evaluation_redlines": [
-          "高成本专职研发是否长期被售后返厂维修和低门槛杂务稀释",
-          "已识别的 AI 提效与岗位优化靶点是否在跨季度持续落地，而非只停留在报告纸面"
+          "在 FTIR 自主替代核心技术路线、光学模块/光谱算法储备上长期零布局，持续被动依赖 ABB"
+        ],
+        "positive_trend_signals": [
+          "FTIR 自主配套（如高纯吹扫气发生器等）及核心光学/算法自主研发进入明确技术路线与样机推进"
+        ],
+        "status": "active"
+      },
+      {
+        "goal_code": "LT-5-LEAN-20-ORG-CORE-KNOWHOW",
+        "horizon_label": "未来 3 年核心长期（2026–2029｜退休前终局定型）",
+        "product_lines": ["跨产品/公司通用"],
+        "partners": [],
+        "priority": "P0",
+        "title": "精干技术组织（≤20 人）：外包常规制造、自留核心装配保 Know-How、核心研发高聚焦与 AI 全面提效",
+        "vision_and_end_state": "公司总人数长期严格控制在 20 人以内，人员结构向「核心研发 + 核心工艺装配 + 专业技术支持」高度集中；常规加工制造尽可能外包，内部仅保留决定产品质量与可靠性的核心装配与出厂质检环节，牢牢守住工艺与设计 Know-How；核心高成本研发（李文颖等）战略专注度稳定在 ≥75%，并用 AI 工作流系统性自动化财务、文书、常规排期与初级售后排障。",
+        "strategic_kpi_placeholders": {
+          "headcount_hard_cap": 20,
+          "rd_strategic_focus_floor_pct": 75.0,
+          "outsourced_manufacturing_ratio": "【待董事长补充：常规机加工/非核心装配外包比例目标】",
+          "revenue_per_employee_target": "【待董事长补充：3 年后人均产值目标（万元/人）】"
+        },
+        "evaluation_redlines": [
+          "公司人数无序膨胀却仍靠人海堆低效事务或低级现场救火",
+          "高成本研发人员长期被返厂维修与杂务稀释超过 25%",
+          "生产制造缺乏外包协同与核心装配/出厂联调质检标准，导致工艺 Know-How 无法沉淀"
+        ],
+        "positive_trend_signals": [
+          "李文颖战略研发占比持续向 ≥75% 靠拢；常规制造逐步规范外包、内部聚焦核心装配与出厂联检；AI 自动化工作流与故障 RAG 知识库实打实释放低效人力"
+        ],
+        "status": "active"
+      },
+      {
+        "goal_code": "LT-6-CHANNEL-PARTNERS-AND-OVERSEAS",
+        "horizon_label": "未来 3 年核心长期（2026–2029｜退休前终局定型）",
+        "product_lines": ["声波测温", "进口V&F质谱仪", "国产质谱仪", "国产FID", "FTIR", "跨产品/公司通用"],
+        "partners": ["国内与海外代理商/分销商渠道"],
+        "priority": "P0",
+        "title": "商业模式升级与出海：建设专业技术支持团队赋能代理商/分销商（剥离终端安装售后），并拓展海外市场",
+        "vision_and_end_state": "彻底扭转原厂工程师亲自跑遍全国做终端安装、接线排错和基础售后的重人力模式：打造一支高水平、能培训能攻坚的专业技术支持团队，大力拓展并支持代理商/分销商渠道，将终端销售、现场安装调试与常规售后服务交给分销商体系承接；同时依托自主可控、质量过硬的细分专业产品，在中国市场之外逐步打开海外市场。",
+        "strategic_kpi_placeholders": {
+          "channel_sales_share_target_pct": "【待董事长补充：3 年后经由代理商/分销商成交与交付的业务占比目标 %】",
+          "target_core_distributors_count": "【待董事长补充：国内重点签约并具备独立交付/售后能力的核心代理商数量】",
+          "overseas_target_regions_and_revenue": "【待董事长补充：首批拓展的海外目标区域（如东南亚/中东/欧洲等）及 3 年海外营收目标】"
+        },
+        "evaluation_redlines": [
+          "技术支持团队长期 80%+ 时间耗在终端现场帮施工方纠错与常规维保，毫无代理商赋能、标准化培训或交付手册沉淀",
+          "销售长期 100% 依赖纯直销，渠道拓展与海外市场探索持续零动作"
+        ],
+        "positive_trend_signals": [
+          "沉淀标准化安装调试手册/维修知识库以赋能代理商；出现实质代理商招募、培训与分销项目交付；海外渠道/英文资料/首批海外商机破零推进"
         ],
         "status": "active"
       }
@@ -140,20 +225,20 @@
       {
         "goal_code": "AN-1-SONIC-BREAKTHROUGH",
         "legacy_code": "G1-SONIC-BREAKTHROUGH",
-        "parent_goal_code": "LT-1-SONIC-SYSTEM-LEADER",
+        "parent_goal_code": "LT-1-SONIC-BD-LOCALIZATION",
         "period": "2026-Q4~2027",
         "category": "市场拓展",
         "product_lines": ["声波测温"],
         "priority": "P0",
         "target_effort_share_pct": 30.0,
         "owners": ["杨丽丽", "吕旭东", "刘家明"],
-        "title": "声波测温在燃煤火电（燃烧优化）与垃圾焚烧（高效 SNCR 控制）双场景年度突破",
-        "target_outcomes": "围绕燃烧优化与高效 SNCR 控制建立系统级价值卖点与 ROI 报价应答体系，有效平衡技术优势与价格竞争，交付标杆项目并形成复制。",
+        "title": "声波测温在燃煤火电（燃烧优化）与垃圾焚烧（高效 SNCR 控制）双场景年度突破及本土化降本",
+        "target_outcomes": "围绕燃烧优化与高效 SNCR 控制建立系统级价值卖点与 ROI 报价应答体系，有效平衡技术优势与价格竞争，交付标杆项目并推进国产核心板卡与中文系统/软件能力建设。",
         "key_milestones": [
           "燃煤电厂结合燃烧优化形成标杆案例与量化 ROI 价值话术",
           "垃圾焚烧结合高效 SNCR 优化控制突破核心标杆客户",
           "建立技术优势对冲价格竞争的标准化报价与技术应答体系",
-          "声波测温国产前置放大器 v2.0 与核心板卡降本替代落地"
+          "声波测温国产前置放大器 v2.0 与核心板卡降本替代落地（为与德国 B&D 本土化新合作模式奠基）"
         ],
         "quant_targets": {
           "target_orders_or_revenue": "【待补充：年度签约台套数/合同额】",
@@ -165,15 +250,15 @@
       {
         "goal_code": "AN-2-VF-MS-HIGHEND",
         "legacy_code": "G2-VF-MS-HIGHEND",
-        "parent_goal_code": "LT-2-HIGHEND-MS-PORTFOLIO",
+        "parent_goal_code": "LT-2-MS-VF-LOCALIZE-AND-IMRMS",
         "period": "2026-Q4~2027",
         "category": "市场拓展",
         "product_lines": ["进口V&F质谱仪"],
         "priority": "P0",
         "target_effort_share_pct": 20.0,
         "owners": ["杨丽丽", "吕旭东", "刘家明"],
-        "title": "进口 V&F 质谱仪年度突破半导体与 CCS/CCUS 等高端高毛利市场",
-        "target_outcomes": "扭转高端市场零推进局面，在半导体工艺监测与 CCS/CCUS 前沿场景建立实质客户拜访、技术验证、示范商机与方案沉淀。",
+        "title": "进口 V&F 质谱仪年度突破半导体与 CCS/CCUS 高端市场，并启动周边核心模块国产化筹备",
+        "target_outcomes": "扭转高端市场零推进局面，在半导体工艺监测与 CCS/CCUS 前沿场景建立实质客户拜访、技术验证、示范商机与方案沉淀；同时评估 PEMSense/HSense/GasOxidizer 国产替代切入点。",
         "key_milestones": [
           "完成 CCS/CCUS 与半导体目标客户地图与应用场景专项研究归档",
           "推进头部半导体与 CCS/CCUS 客户实质技术交流与试测验证",
@@ -188,7 +273,7 @@
       {
         "goal_code": "AN-3-CN-MS-NICHE",
         "legacy_code": "G3-CN-MS-NICHE",
-        "parent_goal_code": "LT-2-HIGHEND-MS-PORTFOLIO",
+        "parent_goal_code": "LT-2-MS-VF-LOCALIZE-AND-IMRMS",
         "period": "2026-Q4~2027",
         "category": "核心产品研发",
         "product_lines": ["国产质谱仪"],
@@ -211,50 +296,91 @@
       {
         "goal_code": "AN-4-FID-EVOLUTION",
         "legacy_code": "G4-FID-EVOLUTION",
-        "parent_goal_code": "LT-3-FID-DOMESTIC-ONLINE",
+        "parent_goal_code": "LT-3-FID-SELF-PROD-AND-TERA",
         "period": "2026-Q4~2027",
         "category": "核心产品研发",
         "product_lines": ["进口FID", "国产FID"],
         "priority": "P1",
         "target_effort_share_pct": 15.0,
         "owners": ["杨丽丽", "吕旭东", "李文颖", "赵勇成"],
-        "title": "FID 年度两步走：守稳汽车 VOC 基本盘，启动国产 FID 向工业在线检测演进",
-        "target_outcomes": "标准化进口 FID 维保以释放高成本研发人力，稳住汽车 VOC 存量客户；同时明确国产 FID 技术路线、核心部件供应链与样机计划。",
+        "title": "FID 年度两步走：守稳汽车 VOC 基本盘，筹备自主生产 FID 并明确与 Tera 合作边界",
+        "target_outcomes": "标准化进口 FID 维保以释放高成本研发人力，稳住汽车 VOC 存量客户；同时明确自主生产 FID 技术路线、核心部件供应链与样机计划，厘清与 Tera 保持合作的细分应用。",
         "key_milestones": [
           "建立进口 FID 常规维修与年度维护标准 SOP（完全由技术支持闭环，不占用核心研发）",
           "稳固汽车 VOC 存量客户年度维保续约与新增商机",
-          "完成国产 FID 关键技术路线论证、核心物料摸底与样机立项"
+          "完成自主 FID 关键技术路线论证、核心物料摸底与样机立项"
         ],
         "quant_targets": {
           "voc_retention_target": "【待补充：汽车 VOC 存量客户续约/营收目标】",
-          "domestic_fid_milestone_date": "【待补充：国产 FID 样机关键节点日期】"
+          "domestic_fid_milestone_date": "【待补充：自主 FID 样机关键节点日期】"
         },
         "status": "active"
       },
       {
         "goal_code": "AN-5-RD-FOCUS-AND-AI-OPS",
         "legacy_code": "G5-RD-COST-ALIGNMENT",
-        "parent_goal_code": "LT-4-CORE-RD-AND-AI-LEAN-ORG",
+        "parent_goal_code": "LT-5-LEAN-20-ORG-CORE-KNOWHOW",
         "period": "2026-Q4~2027",
         "category": "组织能力",
         "product_lines": ["跨产品/公司通用", "声波测温", "国产质谱仪"],
         "priority": "P0",
         "target_effort_share_pct": 20.0,
         "owners": ["李文颖", "孔紫初", "杨震"],
-        "title": "高成本核心研发（李文颖）战略聚焦 ≥75% + 生产/财务/售后 AI 提效落地",
-        "target_outcomes": "彻底切断高成本电路板研发被常规售后与备件杂务稀释的通道；补齐生产制造透明化与出厂联调质检；推动财务自动化、一线维修 RAG 知识库与售前 ROI 武器库分批上线。",
+        "title": "严守 20 人精干边界：高成本核心研发（李文颖）聚焦 ≥75% + 制造外包/核心装配规范 + AI 提效落地",
+        "target_outcomes": "彻底切断高成本电路板研发被常规售后与备件杂务稀释的通道；补齐生产制造透明化、外包协同与核心装配出厂联调质检；推动财务自动化、一线维修 RAG 知识库与售前 ROI 武器库分批上线。",
         "key_milestones": [
           "李文颖战略核心研发工时占比从基线 ~35% 提升并稳定在 ≥75%",
-          "建立杨震生产组装与出厂通电联调质检日清台账（杜绝零汇报与杂务拖累备货）",
-          "落地质谱仪/FID 故障排查 AI 知识库，拦截 80% 流向研发的初级售后咨询",
+          "建立杨震核心装配、外包跟单与出厂通电联调质检日清台账（杜绝零汇报与杂务拖累备货）",
+          "落地质谱仪/FID 故障排查 AI 知识库，拦截 80% 流向研发的初级售后咨询（同时作为代理商赋能底座）",
           "推进财务凭证/发票/网银流程自动化与跨岗事务性工作提效评估"
         ],
         "quant_targets": {
           "liwenying_rd_share_target_pct": 75.0,
           "ai_workflows_deployed_count": "【待补充：年度计划上线 AI 提效工作流数量】",
-          "headcount_efficiency_goal": "【待补充：组织提效或岗位优化目标】"
+          "headcount_efficiency_goal": "【待补充：组织提效或岗位优化目标（总人数严格 <=20）】"
         },
         "status": "active"
+      },
+      {
+        "goal_code": "AN-6-FTIR-SELF-RD-PREP",
+        "legacy_code": null,
+        "parent_goal_code": "LT-4-FTIR-INDEPENDENT-RD",
+        "period": "2027（待董事长确认启动年度与权重）",
+        "category": "核心产品研发",
+        "product_lines": ["FTIR"],
+        "priority": "P1",
+        "target_effort_share_pct": 0.0,
+        "owners": ["【待董事长指定】"],
+        "title": "【草案待细化】FTIR 自主开发脱离 ABB 的年度预研与配套落地",
+        "target_outcomes": "结合董事长后续确定的年度启动节奏，推进 FTIR 自主光学/算法/吹扫气配套预研与替代方案。",
+        "key_milestones": [
+          "【待董事长补充：2027 年度 FTIR 自主开发关键节点】"
+        ],
+        "quant_targets": {
+          "target_milestone": "【待补充】"
+        },
+        "status": "draft"
+      },
+      {
+        "goal_code": "AN-7-CHANNEL-AND-OVERSEAS-LAUNCH",
+        "legacy_code": null,
+        "parent_goal_code": "LT-6-CHANNEL-PARTNERS-AND-OVERSEAS",
+        "period": "2027（待董事长确认启动年度与权重）",
+        "category": "市场拓展",
+        "product_lines": ["跨产品/公司通用", "声波测温", "国产质谱仪"],
+        "priority": "P0",
+        "target_effort_share_pct": 0.0,
+        "owners": ["【待董事长指定】"],
+        "title": "【草案待细化】代理商/分销商渠道体系搭建、专业支持手册沉淀与海外市场破冰",
+        "target_outcomes": "结合董事长后续确定的年度权重，逐步将终端安装调试与常规售后沉淀为标准化手册并向代理商转移，同时启动首批海外市场拓展。",
+        "key_milestones": [
+          "【待董事长补充：2027 年度签约核心代理商数量、渠道赋能计划与出海目标市场】"
+        ],
+        "quant_targets": {
+          "target_distributors": "【待补充】",
+          "target_overseas_leads": "【待补充】"
+        },
+        "status": "draft"
       }
     ],
     "quarterly": [
@@ -319,13 +445,13 @@
         "product_lines": ["进口FID", "国产FID"],
         "priority": "P1",
         "owners": ["赵勇成", "李文颖"],
-        "title": "实现进口 FID 常规维保独立闭环，明确国产 FID 预研输入",
+        "title": "实现进口 FID 常规维保独立闭环，明确自主生产 FID 预研输入",
         "deliverables": [
           "赵勇成建立常规 FID 维修独立闭环机制（严禁将非底层电路改版问题转甩给李文颖）",
-          "输出国产 FID 关键难点与在线检测目标场景初步论证清单"
+          "输出自主生产 FID 关键难点与在线检测目标场景初步论证清单"
         ],
         "success_criteria": "进口 FID 维保对李文颖研发时间的占用降至接近 0%。",
-        "editable_details": "【待董事长补充：国产 FID 立项时间窗与预算要求】",
+        "editable_details": "【待董事长补充：自主 FID 立项时间窗与预算要求】",
         "status": "active"
       },
       {
@@ -339,9 +465,9 @@
         "title": "完成前置放大器 v2.0 投板测试、锁定李文颖研发专注度并整改制造零汇报",
         "deliverables": [
           "前置放大器改版 v2.0 PCB 定稿、嘉立创打样回板与核心指标测试报告",
-          "李文颖每周至少 3 个整天锁定核心研发（ strategic_rd_share_pct 从 35% 拉升至 ≥65%）",
-          "杨震恢复每日工作汇报，剥离非生产杂务，建立出厂前通电联调质检清单",
-          "完成李文颖历史检修经验文档收口，为一线故障排查 RAG 知识库准备语料"
+          "李文颖每周至少 3 个整天锁定核心研发（strategic_rd_share_pct 从 35% 拉升至 ≥65%）",
+          "杨震恢复每日工作汇报，剥离非生产杂务，建立核心装配与出厂通电联调质检清单",
+          "完成李文颖历史检修经验文档收口，为一线故障排查 RAG 知识库与代理商支持手册准备语料"
         ],
         "success_criteria": "下月及季末审计中，李文颖精力占比出现明确向上拐点，杨震零汇报彻底清零。",
         "editable_details": "【待董事长补充：本季度拟启动的第一个财务/行政 AI 提效试点】",
