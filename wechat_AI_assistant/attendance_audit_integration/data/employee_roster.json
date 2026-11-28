@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "source": "花名册结构来自员工花名册.xlsx；邮箱于 2026-07-14 按帕莫瑞/维恩科仪邮箱目录截图补全",
+  "email_directory_notes": [
+    "未纳入花名册的邮箱账号（非员工考勤对象）：Cyber Griffin、Palmary Marketing、Palmary Technology Ltd、Wissentek Marketing、Anna-Shujuan.Hou、Hedy-Dezhao.Xu、Xiao Yuning",
+    "杨丽丽在帕莫瑞目录为 Steffi-Lili.Yang / steffi@palmarytech.com（已采用）；维恩科仪目录另有 steffi@wissentek.com 未用作员工主邮箱",
+    "徐宏玮工作邮箱采用 john.xu@palmarytech.com（维恩科仪侧另有 info@wissentek.com 为 John-Hongwei.Xu）"
+  ],
+  "employees": [
+    {
+      "name": "徐宏玮",
+      "email": "john.xu@palmarytech.com",
+      "wecom_userid": "XuHongWei",
+      "role": "总经理室",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2009-03-09",
+      "status": "active"
+    },
+    {
+      "name": "吕旭东",
+      "email": "lvxudong@palmarytech.com",
+      "wecom_userid": "LvXuDong",
+      "role": "销售经理",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2009-02-16",
+      "status": "active"
+    },
+    {
+      "name": "王楠",
+      "email": "wangnan@palmarytech.com",
+      "wecom_userid": "WangNan",
+      "role": "项目经理",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2016-04-05",
+      "status": "active"
+    },
+    {
+      "name": "刘页",
+      "email": "liuye@palmarytech.com",
+      "wecom_userid": "LiuYe",
+      "role": "技术工程师",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2016-08-30",
+      "status": "active"
+    },
+    {
+      "name": "王晓",
+      "email": "wangxiao@palmarytech.com",
+      "wecom_userid": "WangXiao",
+      "role": "会计",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2017-12-26",
+      "status": "active"
+    },
+    {
+      "name": "牛海庆",
+      "email": "niuhaiqing@palmarytech.com",
+      "wecom_userid": "NiuHaiQing",
+      "role": "技术工程师",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2018-09-25",
+      "status": "active"
+    },
+    {
+      "name": "陈晞",
+      "email": "chenxi@palmarytech.com",
+      "wecom_userid": "ChenXi",
+      "role": "采购",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2018-11-05",
+      "status": "active"
+    },
+    {
+      "name": "薛蕾",
+      "email": "xuelei@palmarytech.com",
+      "wecom_userid": "XueLei",
+      "role": "财务经理",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2024-05-04",
+      "status": "active"
+    },
+    {
+      "name": "赵勇成",
+      "email": "zhaoyongcheng@palmarytech.com",
+      "wecom_userid": "ZhaoYongCheng",
+      "role": "技术工程师",
+      "company": "北京帕莫瑞科技有限公司",
+      "hire_date": "2026-05-06",
+      "status": "active"
+    },
+    {
+      "name": "杨丽丽",
+      "email": "steffi@palmarytech.com",
+      "wecom_userid": "YangLiLi",
+      "role": "总经理室",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2009-03-09",
+      "status": "active"
+    },
+    {
+      "name": "徐梦嘉",
+      "email": "xumengjia@palmarytech.com",
+      "wecom_userid": "XuMengJia",
+      "role": "销售助理",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2015-08-03",
+      "status": "active"
+    },
+    {
+      "name": "石志同",
+      "email": "shizhitong@palmarytech.com",
+      "wecom_userid": "ShiZhiTong",
+      "role": "技术工程师",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2020-06-01",
+      "status": "active"
+    },
+    {
+      "name": "李文颖",
+      "email": "will-wenying.li@wissentek.com",
+      "wecom_userid": "LiWenYing",
+      "role": "软件工程师",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2021-08-23",
+      "status": "active"
+    },
+    {
+      "name": "于艳丽",
+      "email": "ella-yanli.yu@wissentek.com",
+      "wecom_userid": "YuYanLi",
+      "role": "软件工程师",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2021-09-22",
+      "status": "active"
+    },
+    {
+      "name": "杨震",
+      "email": "yangzhen@wissentek.com",
+      "wecom_userid": "YangZhen",
+      "role": "技术工程师",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2021-10-11",
+      "status": "active"
+    },
+    {
+      "name": "高薇",
+      "email": "vivian-wei.gao@wissentek.com",
+      "wecom_userid": "GaoWei",
+      "role": "出纳",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2021-11-08",
+      "status": "active"
+    },
+    {
+      "name": "孔紫初",
+      "email": "winni-zichu.kong@wissentek.com",
+      "wecom_userid": "KongZiChu",
+      "role": "项目经理",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2021-11-15",
+      "status": "active"
+    },
+    {
+      "name": "刘家明",
+      "email": "mikel-jiaming.liu@wissentek.com",
+      "wecom_userid": "LiuJiaMing",
+      "role": "销售经理",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2022-03-11",
+      "status": "active"
+    },
+    {
+      "name": "王旭",
+      "email": "wangxu@wissentek.com",
+      "wecom_userid": "WangXu",
+      "role": "技术工程师",
+      "company": "维恩科仪（北京）机械自动化设备有限公司",
+      "hire_date": "2025-07-15",
+      "status": "active"
+    }
+  ]
+}

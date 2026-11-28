@@ -1,0 +1,179 @@
+{
+  "nodes": [
+    {
+      "id": "g_b",
+      "type": "group",
+      "x": -80,
+      "y": -80,
+      "width": 720,
+      "height": 480,
+      "label": "子图 B：月审调用链"
+    },
+    {
+      "id": "fn_monthly",
+      "type": "text",
+      "x": 180,
+      "y": -40,
+      "width": 260,
+      "height": 55,
+      "text": "**run_monthly_audit()**",
+      "color": "2"
+    },
+    {
+      "id": "fn_cycle",
+      "type": "text",
+      "x": -40,
+      "y": 80,
+      "width": 260,
+      "height": 55,
+      "text": "**get_monthly_cycle_range()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_lock",
+      "type": "text",
+      "x": 260,
+      "y": 80,
+      "width": 260,
+      "height": 55,
+      "text": "**is_payroll_period_locked()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_comp_chk",
+      "type": "text",
+      "x": 180,
+      "y": 180,
+      "width": 300,
+      "height": 55,
+      "text": "**_run_final_compound_checks()**",
+      "color": "2"
+    },
+    {
+      "id": "fn_decide",
+      "type": "text",
+      "x": -40,
+      "y": 280,
+      "width": 280,
+      "height": 55,
+      "text": "**decide_compensatory_accrual()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_stat",
+      "type": "text",
+      "x": 280,
+      "y": 280,
+      "width": 240,
+      "height": 55,
+      "text": "**is_statutory_holiday()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_iswork",
+      "type": "text",
+      "x": 280,
+      "y": 360,
+      "width": 220,
+      "height": 55,
+      "text": "**is_workday_db()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_lockp",
+      "type": "text",
+      "x": 520,
+      "y": 180,
+      "width": 240,
+      "height": 55,
+      "text": "**lock_payroll_period()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_render_m",
+      "type": "text",
+      "x": 180,
+      "y": 400,
+      "width": 300,
+      "height": 55,
+      "text": "**render_monthly_finalized_email()**",
+      "color": "5"
+    },
+    {
+      "id": "note_b",
+      "type": "text",
+      "x": 780,
+      "y": -40,
+      "width": 280,
+      "height": 140,
+      "text": "📖 **月审链**\n\n定周期 → 查封账 → 复合校验\n（调休决策+法定假）→ 封账 → 月报。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "m1",
+      "fromNode": "fn_monthly",
+      "toNode": "fn_cycle",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "定周期"
+    },
+    {
+      "id": "m2",
+      "fromNode": "fn_monthly",
+      "toNode": "fn_lock",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "查封账"
+    },
+    {
+      "id": "m3",
+      "fromNode": "fn_monthly",
+      "toNode": "fn_comp_chk",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "复合校验"
+    },
+    {
+      "id": "m4",
+      "fromNode": "fn_comp_chk",
+      "toNode": "fn_decide",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "调休决策"
+    },
+    {
+      "id": "m5",
+      "fromNode": "fn_comp_chk",
+      "toNode": "fn_stat",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "法定假"
+    },
+    {
+      "id": "m6",
+      "fromNode": "fn_comp_chk",
+      "toNode": "fn_iswork",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "工作日"
+    },
+    {
+      "id": "m7",
+      "fromNode": "fn_monthly",
+      "toNode": "fn_lockp",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "终审封账"
+    },
+    {
+      "id": "m8",
+      "fromNode": "fn_monthly",
+      "toNode": "fn_render_m",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "月报"
+    }
+  ]
+}

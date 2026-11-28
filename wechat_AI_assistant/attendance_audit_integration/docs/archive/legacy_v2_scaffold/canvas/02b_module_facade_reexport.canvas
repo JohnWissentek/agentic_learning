@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "facade",
+      "type": "text",
+      "x": 260,
+      "y": -40,
+      "width": 220,
+      "height": 60,
+      "text": "**audit_engine.py**\n门面",
+      "color": "2"
+    },
+    {
+      "id": "geo",
+      "type": "text",
+      "x": -40,
+      "y": 100,
+      "width": 240,
+      "height": 55,
+      "text": "**geo.py**\nHaversine距离计算",
+      "color": "4"
+    },
+    {
+      "id": "holiday",
+      "type": "text",
+      "x": 220,
+      "y": 100,
+      "width": 260,
+      "height": 55,
+      "text": "**holiday.py**\n工作日/法定假判定",
+      "color": "4"
+    },
+    {
+      "id": "comp",
+      "type": "text",
+      "x": 500,
+      "y": 100,
+      "width": 240,
+      "height": 55,
+      "text": "**compensatory.py**\n调休入账决策",
+      "color": "4"
+    },
+    {
+      "id": "payroll",
+      "type": "text",
+      "x": 760,
+      "y": 100,
+      "width": 240,
+      "height": 55,
+      "text": "**payroll_cycle.py**\n薪资周期/封账",
+      "color": "4"
+    },
+    {
+      "id": "note_b",
+      "type": "text",
+      "x": 260,
+      "y": 190,
+      "width": 340,
+      "height": 100,
+      "text": "📖 **工具 re-export**\n\n门面把 4 个纯函数工具模块原样导出，\n向后兼容重构前的旧 import 路径。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "r1",
+      "fromNode": "facade",
+      "toNode": "geo",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "re-export"
+    },
+    {
+      "id": "r2",
+      "fromNode": "facade",
+      "toNode": "holiday",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "re-export"
+    },
+    {
+      "id": "r3",
+      "fromNode": "facade",
+      "toNode": "comp",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "re-export"
+    },
+    {
+      "id": "r4",
+      "fromNode": "facade",
+      "toNode": "payroll",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "re-export"
+    }
+  ]
+}

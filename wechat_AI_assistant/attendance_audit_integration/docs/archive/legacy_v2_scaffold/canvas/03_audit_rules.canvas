@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "d_cron",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 230,
+      "height": 55,
+      "text": "🕙 **Cron 触发**\n每天09:00,对象=昨日T-1",
+      "color": "1"
+    },
+    {
+      "id": "d_pull",
+      "type": "text",
+      "x": 220,
+      "y": -40,
+      "width": 230,
+      "height": 55,
+      "text": "📥 **拉取企微**\nT-1打卡+已通过审批",
+      "color": "2"
+    },
+    {
+      "id": "d_match",
+      "type": "text",
+      "x": 500,
+      "y": -40,
+      "width": 260,
+      "height": 75,
+      "text": "🔄 **逐人勾稽 📦**\n详见 03a 防作弊子图\n+ 请假/出差/工作日判定",
+      "color": "2"
+    },
+    {
+      "id": "d_punches",
+      "type": "text",
+      "x": 500,
+      "y": 80,
+      "width": 260,
+      "height": 60,
+      "text": "🔢 **打卡条数判定**\n0/1条=缺卡；≥2条=正常",
+      "color": "4"
+    },
+    {
+      "id": "d_persist",
+      "type": "text",
+      "x": 220,
+      "y": 80,
+      "width": 260,
+      "height": 55,
+      "text": "💾 **UPSERT daily_attendance**\n幂等键=userid+日期",
+      "color": "5"
+    },
+    {
+      "id": "d_anomaly_mail",
+      "type": "text",
+      "x": 500,
+      "y": 190,
+      "width": 260,
+      "height": 55,
+      "text": "📧 **个人异常邮件**\n截止T+2当日18:00",
+      "color": "5"
+    },
+    {
+      "id": "d_summary",
+      "type": "text",
+      "x": 220,
+      "y": 190,
+      "width": 230,
+      "height": 55,
+      "text": "📊 **公司日汇总邮件**\n→ ADMIN",
+      "color": "5"
+    },
+    {
+      "id": "note_daily",
+      "type": "text",
+      "x": -60,
+      "y": 100,
+      "width": 380,
+      "height": 200,
+      "text": "📖 **图解**\n\n每天09:00对昨天做勾稽：防作弊/请假/\n出差/工作日判定黑盒化，详见03a；\n工作日才数打卡条数，0/1条触发个人\n异常邮件，最终无论有无异常都汇总\n成公司日报。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "ed1",
+      "fromNode": "d_cron",
+      "toNode": "d_pull",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "拉取"
+    },
+    {
+      "id": "ed2",
+      "fromNode": "d_pull",
+      "toNode": "d_match",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "成功"
+    },
+    {
+      "id": "ed3",
+      "fromNode": "d_match",
+      "toNode": "d_punches",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "工作日才数打卡"
+    },
+    {
+      "id": "ed4",
+      "fromNode": "d_match",
+      "toNode": "d_persist",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "写库"
+    },
+    {
+      "id": "ed5",
+      "fromNode": "d_punches",
+      "toNode": "d_anomaly_mail",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "0或1条"
+    },
+    {
+      "id": "ed6",
+      "fromNode": "d_persist",
+      "toNode": "d_summary",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "汇总"
+    },
+    {
+      "id": "ed7",
+      "fromNode": "d_anomaly_mail",
+      "toNode": "d_summary",
+      "fromSide": "left",
+      "toSide": "right",
+      "label": "汇总"
+    }
+  ]
+}

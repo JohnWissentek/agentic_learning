@@ -1,0 +1,198 @@
+{
+  "nodes": [
+    {
+      "id": "wecom_json",
+      "type": "text",
+      "x": -400,
+      "y": -40,
+      "width": 260,
+      "height": 70,
+      "text": "📥 **企微打卡JSON**\nraw_payload\n⚠️外来数据不可信",
+      "color": "6"
+    },
+    {
+      "id": "att_logs",
+      "type": "text",
+      "x": -100,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "🗄️ **attendance_logs表**",
+      "color": "5"
+    },
+    {
+      "id": "daily_att",
+      "type": "text",
+      "x": 200,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "📊 **daily_attendance表**\n日合成",
+      "color": "2"
+    },
+    {
+      "id": "is_anom",
+      "type": "text",
+      "x": 500,
+      "y": -40,
+      "width": 220,
+      "height": 55,
+      "text": "❓ **is_anomaly?**\n日审核心判定点",
+      "color": "1"
+    },
+    {
+      "id": "anom_mail",
+      "type": "text",
+      "x": 780,
+      "y": -110,
+      "width": 220,
+      "height": 50,
+      "text": "📧 **个人异常邮件**",
+      "color": "5"
+    },
+    {
+      "id": "daily_rpt",
+      "type": "text",
+      "x": 780,
+      "y": -20,
+      "width": 220,
+      "height": 50,
+      "text": "📊 **公司日报邮件**",
+      "color": "5"
+    },
+    {
+      "id": "appr_json",
+      "type": "text",
+      "x": -100,
+      "y": 100,
+      "width": 240,
+      "height": 50,
+      "text": "📥 **企微审批JSON**",
+      "color": "6"
+    },
+    {
+      "id": "appr_tbl",
+      "type": "text",
+      "x": 200,
+      "y": 100,
+      "width": 200,
+      "height": 50,
+      "text": "🗄️ **approvals表**",
+      "color": "5"
+    },
+    {
+      "id": "overtime",
+      "type": "text",
+      "x": 500,
+      "y": 100,
+      "width": 220,
+      "height": 55,
+      "text": "⏱️ **加班审批**\n复核见4.4",
+      "color": "6"
+    },
+    {
+      "id": "comp_dtl",
+      "type": "text",
+      "x": 780,
+      "y": 100,
+      "width": 280,
+      "height": 55,
+      "text": "🗄️ **compensatory_leave_details**",
+      "color": "5"
+    },
+    {
+      "id": "vac_bal",
+      "type": "text",
+      "x": 780,
+      "y": 190,
+      "width": 260,
+      "height": 50,
+      "text": "🗄️ **vacation_balances**",
+      "color": "5"
+    },
+    {
+      "id": "note_data",
+      "type": "text",
+      "x": -400,
+      "y": 80,
+      "width": 320,
+      "height": 220,
+      "text": "📖 **图解**\n\n企微打卡JSON（外来、不可信）先入\nattendance_logs，逐人勾稽合成\ndaily_attendance；is_anomaly?是日审\n核心判定点——异常发个人邮件，正常\n汇入公司日报。企微审批JSON入\napprovals后可覆盖判定daily_\nattendance（如请假/出差覆盖缺卡\n告警）。加班审批经复核后入\ncompensatory_leave_details，累加进\nvacation_balances余额表。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "p1",
+      "fromNode": "wecom_json",
+      "toNode": "att_logs",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "入库"
+    },
+    {
+      "id": "p2",
+      "fromNode": "att_logs",
+      "toNode": "daily_att",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "逐人勾稽"
+    },
+    {
+      "id": "p3",
+      "fromNode": "daily_att",
+      "toNode": "is_anom",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "判定"
+    },
+    {
+      "id": "p4",
+      "fromNode": "is_anom",
+      "toNode": "anom_mail",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "是"
+    },
+    {
+      "id": "p5",
+      "fromNode": "daily_att",
+      "toNode": "daily_rpt",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "汇总"
+    },
+    {
+      "id": "p6",
+      "fromNode": "appr_json",
+      "toNode": "appr_tbl",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "入库"
+    },
+    {
+      "id": "p7",
+      "fromNode": "appr_tbl",
+      "toNode": "daily_att",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "label": "覆盖判定"
+    },
+    {
+      "id": "p8",
+      "fromNode": "overtime",
+      "toNode": "comp_dtl",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "复核"
+    },
+    {
+      "id": "p9",
+      "fromNode": "comp_dtl",
+      "toNode": "vac_bal",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "余额入账"
+    }
+  ]
+}

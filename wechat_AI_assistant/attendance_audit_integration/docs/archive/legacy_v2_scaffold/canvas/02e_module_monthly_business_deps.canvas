@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "monthly",
+      "type": "text",
+      "x": 220,
+      "y": -40,
+      "width": 300,
+      "height": 60,
+      "text": "**services/monthly_audit.py**\n月审业务流程",
+      "color": "2"
+    },
+    {
+      "id": "comp",
+      "type": "text",
+      "x": -60,
+      "y": 120,
+      "width": 240,
+      "height": 55,
+      "text": "**compensatory.py**\n调休入账决策",
+      "color": "4"
+    },
+    {
+      "id": "payroll",
+      "type": "text",
+      "x": 220,
+      "y": 120,
+      "width": 240,
+      "height": 60,
+      "text": "**payroll_cycle.py**\n📦infra详见02f",
+      "color": "4"
+    },
+    {
+      "id": "holiday",
+      "type": "text",
+      "x": 500,
+      "y": 120,
+      "width": 220,
+      "height": 60,
+      "text": "**holiday.py**\n📦infra详见02f",
+      "color": "4"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": 760,
+      "y": 120,
+      "width": 200,
+      "height": 55,
+      "text": "**mail_sender.py**",
+      "color": "5"
+    },
+    {
+      "id": "note_b",
+      "type": "text",
+      "x": 220,
+      "y": 220,
+      "width": 340,
+      "height": 140,
+      "text": "📖 **子图**\n\n月审的特有依赖：compensatory（调休\n入账决策）+ payroll_cycle（周期与\n封账），复用 holiday 判定法定假。\n三者自身的基础设施依赖见 02f。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "c1",
+      "fromNode": "monthly",
+      "toNode": "comp",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "调休决策"
+    },
+    {
+      "id": "c2",
+      "fromNode": "monthly",
+      "toNode": "payroll",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "周期与封账"
+    },
+    {
+      "id": "c3",
+      "fromNode": "monthly",
+      "toNode": "holiday",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "法定假判定"
+    },
+    {
+      "id": "c4",
+      "fromNode": "monthly",
+      "toNode": "mail",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "发邮件"
+    }
+  ]
+}

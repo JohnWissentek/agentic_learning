@@ -1,0 +1,158 @@
+{
+  "nodes": [
+    {
+      "id": "weekly",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 260,
+      "height": 60,
+      "text": "**services/weekly_audit.py**\n周审业务流程",
+      "color": "2"
+    },
+    {
+      "id": "expiry",
+      "type": "text",
+      "x": 340,
+      "y": -40,
+      "width": 280,
+      "height": 60,
+      "text": "**services/expiry_checker.py**\nF11调休催用",
+      "color": "2"
+    },
+    {
+      "id": "payroll",
+      "type": "text",
+      "x": -60,
+      "y": 120,
+      "width": 220,
+      "height": 55,
+      "text": "**payroll_cycle.py**",
+      "color": "4"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": 220,
+      "y": 120,
+      "width": 280,
+      "height": 55,
+      "text": "**mail_sender.py**\n催用仅TO孔紫初/王楠",
+      "color": "5"
+    },
+    {
+      "id": "db",
+      "type": "text",
+      "x": 560,
+      "y": 120,
+      "width": 150,
+      "height": 55,
+      "text": "**db.py**",
+      "color": "5"
+    },
+    {
+      "id": "config",
+      "type": "text",
+      "x": -60,
+      "y": 220,
+      "width": 160,
+      "height": 55,
+      "text": "**config.py**",
+      "color": "5"
+    },
+    {
+      "id": "logger",
+      "type": "text",
+      "x": 140,
+      "y": 220,
+      "width": 160,
+      "height": 55,
+      "text": "**logger.py**",
+      "color": "5"
+    },
+    {
+      "id": "note_c",
+      "type": "text",
+      "x": 560,
+      "y": 200,
+      "width": 340,
+      "height": 170,
+      "text": "📖 **子图**\n\n周审和调休催用是最轻的两个 service，\n各自只依赖 mail_sender+db+config+\nlogger 四件基础设施；催用收件人规则\n见 PRD §4.2 第 6 条。基础设施彼此\n的内部依赖见 02h。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "weekly",
+      "toNode": "payroll",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "周期计算"
+    },
+    {
+      "id": "e2",
+      "fromNode": "weekly",
+      "toNode": "mail",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "发邮件"
+    },
+    {
+      "id": "e3",
+      "fromNode": "weekly",
+      "toNode": "db",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "读写库"
+    },
+    {
+      "id": "e4",
+      "fromNode": "weekly",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "label": "读配置"
+    },
+    {
+      "id": "e5",
+      "fromNode": "weekly",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "label": "打日志"
+    },
+    {
+      "id": "e6",
+      "fromNode": "expiry",
+      "toNode": "mail",
+      "fromSide": "left",
+      "toSide": "right",
+      "label": "催用邮件仅TO孔紫初/王楠"
+    },
+    {
+      "id": "e7",
+      "fromNode": "expiry",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "label": "读写库"
+    },
+    {
+      "id": "e8",
+      "fromNode": "expiry",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "label": "读配置"
+    },
+    {
+      "id": "e9",
+      "fromNode": "expiry",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "label": "打日志"
+    }
+  ]
+}

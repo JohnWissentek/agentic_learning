@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "facade",
+      "type": "text",
+      "x": 260,
+      "y": -40,
+      "width": 220,
+      "height": 60,
+      "text": "**audit_engine.py**\n门面",
+      "color": "2"
+    },
+    {
+      "id": "daily",
+      "type": "text",
+      "x": -60,
+      "y": 100,
+      "width": 260,
+      "height": 60,
+      "text": "**services/daily_audit.py**\n📦详见02c/02d",
+      "color": "2"
+    },
+    {
+      "id": "weekly",
+      "type": "text",
+      "x": 220,
+      "y": 100,
+      "width": 240,
+      "height": 60,
+      "text": "**services/weekly_audit.py**\n📦详见02g",
+      "color": "2"
+    },
+    {
+      "id": "monthly",
+      "type": "text",
+      "x": 480,
+      "y": 100,
+      "width": 260,
+      "height": 60,
+      "text": "**services/monthly_audit.py**\n📦详见02e/02f",
+      "color": "2"
+    },
+    {
+      "id": "expiry",
+      "type": "text",
+      "x": 740,
+      "y": 100,
+      "width": 260,
+      "height": 60,
+      "text": "**services/expiry_checker.py**\n📦详见02g",
+      "color": "2"
+    },
+    {
+      "id": "roster_svc",
+      "type": "text",
+      "x": 1000,
+      "y": 100,
+      "width": 240,
+      "height": 60,
+      "text": "**services/roster_sync.py**\n📦详见02d",
+      "color": "2"
+    },
+    {
+      "id": "note_a",
+      "type": "text",
+      "x": 260,
+      "y": 200,
+      "width": 300,
+      "height": 130,
+      "text": "📖 **门面分发**\n\n5 类审计任务各自代理给独立\nservice 文件；Services 之间\n互不调用（无横向依赖）。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "f1",
+      "fromNode": "facade",
+      "toNode": "daily",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "代理日审"
+    },
+    {
+      "id": "f2",
+      "fromNode": "facade",
+      "toNode": "weekly",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "代理周审"
+    },
+    {
+      "id": "f3",
+      "fromNode": "facade",
+      "toNode": "monthly",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "代理月审"
+    },
+    {
+      "id": "f4",
+      "fromNode": "facade",
+      "toNode": "expiry",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "代理调休检查"
+    },
+    {
+      "id": "f5",
+      "fromNode": "facade",
+      "toNode": "roster_svc",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "代理花名册同步"
+    }
+  ]
+}

@@ -1,0 +1,246 @@
+{
+  "nodes": [
+    {
+      "id": "g_entry",
+      "type": "group",
+      "x": -420,
+      "y": -260,
+      "width": 900,
+      "height": 160,
+      "label": "入口层"
+    },
+    {
+      "id": "main",
+      "type": "text",
+      "x": -390,
+      "y": -220,
+      "width": 260,
+      "height": 60,
+      "text": "**main.py**\n入口：调度审计/收Webhook",
+      "color": "1"
+    },
+    {
+      "id": "cli",
+      "type": "text",
+      "x": -90,
+      "y": -220,
+      "width": 220,
+      "height": 60,
+      "text": "**cli.py**\n入口：命令行触发",
+      "color": "1"
+    },
+    {
+      "id": "mock",
+      "type": "text",
+      "x": 180,
+      "y": -220,
+      "width": 260,
+      "height": 60,
+      "text": "**mock_data_populator.py**\n测试数据填充:真实优先",
+      "color": "4"
+    },
+    {
+      "id": "diag",
+      "type": "text",
+      "x": 480,
+      "y": -220,
+      "width": 220,
+      "height": 60,
+      "text": "**diagnostics.py**\n诊断包导出",
+      "color": "4"
+    },
+    {
+      "id": "facade",
+      "type": "text",
+      "x": -90,
+      "y": -60,
+      "width": 420,
+      "height": 60,
+      "text": "**audit_engine.py**\n门面 📦分发详见02a/re-export详见02b",
+      "color": "2"
+    },
+    {
+      "id": "g_base",
+      "type": "group",
+      "x": -420,
+      "y": 60,
+      "width": 900,
+      "height": 160,
+      "label": "入口自身底座"
+    },
+    {
+      "id": "config",
+      "type": "text",
+      "x": -390,
+      "y": 100,
+      "width": 160,
+      "height": 55,
+      "text": "**config.py**",
+      "color": "5"
+    },
+    {
+      "id": "db",
+      "type": "text",
+      "x": -190,
+      "y": 100,
+      "width": 140,
+      "height": 55,
+      "text": "**db.py**",
+      "color": "5"
+    },
+    {
+      "id": "logger",
+      "type": "text",
+      "x": -10,
+      "y": 100,
+      "width": 140,
+      "height": 55,
+      "text": "**logger.py**",
+      "color": "5"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": 170,
+      "y": 100,
+      "width": 200,
+      "height": 55,
+      "text": "**mail_sender.py**",
+      "color": "5"
+    },
+    {
+      "id": "wxbiz",
+      "type": "text",
+      "x": 410,
+      "y": 100,
+      "width": 240,
+      "height": 55,
+      "text": "**wxbiz_msg_crypt.py**\n回调加解密",
+      "color": "4"
+    },
+    {
+      "id": "note_ov",
+      "type": "text",
+      "x": 780,
+      "y": -260,
+      "width": 300,
+      "height": 200,
+      "text": "📖 **总图**\n\n只画 main/cli/mock/diagnostics 自己\n直接碰的模块。业务分发（门面→5个\nservice）见 02a；工具 re-export 见 02b。\n各 service 内部依赖见 02c–02h。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_m2f",
+      "fromNode": "main",
+      "toNode": "facade",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "调度"
+    },
+    {
+      "id": "e_c2f",
+      "fromNode": "cli",
+      "toNode": "facade",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "命令行触发"
+    },
+    {
+      "id": "e_m2wx",
+      "fromNode": "main",
+      "toNode": "wxbiz",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "解密验签"
+    },
+    {
+      "id": "e_m2cf",
+      "fromNode": "main",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读配置"
+    },
+    {
+      "id": "e_m2db",
+      "fromNode": "main",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读写库"
+    },
+    {
+      "id": "e_m2lg",
+      "fromNode": "main",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "e_m2ml",
+      "fromNode": "main",
+      "toNode": "mail",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "发邮件"
+    },
+    {
+      "id": "e_c2cf",
+      "fromNode": "cli",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读配置"
+    },
+    {
+      "id": "e_c2db",
+      "fromNode": "cli",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "初始化库"
+    },
+    {
+      "id": "e_c2lg",
+      "fromNode": "cli",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "e_mk2db",
+      "fromNode": "mock",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "写场景缺口+溯源标记"
+    },
+    {
+      "id": "e_mk2f",
+      "fromNode": "mock",
+      "toNode": "facade",
+      "fromSide": "left",
+      "toSide": "right",
+      "label": "复用真实拉取/工作日判定"
+    },
+    {
+      "id": "e_mk2lg",
+      "fromNode": "mock",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "e_dg2lg",
+      "fromNode": "diag",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打包摘要"
+    }
+  ]
+}

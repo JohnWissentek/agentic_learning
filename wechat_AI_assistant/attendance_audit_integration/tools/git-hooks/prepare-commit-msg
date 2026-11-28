@@ -1,0 +1,70 @@
+#!/bin/sh
+# 变更分级检查（00 总纲 2.3/2.4）。
+#
+# 放在 prepare-commit-msg，而不是 commit-msg：
+# commit-msg 由 `github_push setup` 生成，每次安装都会整文件覆盖。
+# 它只检查 Conventional Commit 标题，并写入 Device: / Hardware:。
+# 级别标签和 L1/L2 文档锁放在这里，安装 github_push 时不会被冲掉。
+#
+# 标题（同时满足 github_push 与变更分级）:
+#   <类型>(L1|L2|L3|L4|init[/范围]): <中文摘要>
+# 示例: docs(L4): 接入 github_push 提交与推送规范
+# 也接受正文里的 [L1]–[L4] / [init]，但第一行仍必须是上面的标题格式。
+
+MSG_FILE="$1"
+SOURCE="${2:-}"
+
+case "$SOURCE" in
+    merge|squash) exit 0 ;;
+esac
+
+MSG=$(cat "$MSG_FILE")
+TITLE=$(printf '%s\n' "$MSG" | grep -v '^#' | sed '/^[[:space:]]*$/d' | head -n 1)
+
+[ -n "$TITLE" ] || exit 0
+
+case "$TITLE" in
+    Merge*|Revert*) exit 0 ;;
+esac
+
+if ! printf '%s\n' "$TITLE" | grep -qE '^(feat|fix|docs|refactor|perf|test|build|ci|chore|style|revert)(\([^)]+\))?!?: .+'; then
+    echo "❌ 提交标题不符合 github_push 规范：$TITLE"
+    echo "   格式：<类型>(L1|L2|L3|L4|init[/范围]): <中文摘要>"
+    echo "   类型：feat fix docs refactor perf test build ci chore style revert"
+    echo "   示例：docs(L4): 接入 github_push 提交与推送规范"
+    exit 1
+fi
+
+LEVEL=$(printf '%s\n' "$TITLE" | sed -nE 's/^[a-z]+\((L[1-4]|init)([/][^)]+)?\)!?: .+/\1/p' | head -n 1)
+
+if [ -z "$LEVEL" ]; then
+    LEVEL=$(printf '%s\n' "$MSG" | grep -oE '\[(L[1-4]|init)\]' | head -n 1 | tr -d '[]')
+fi
+
+if [ -z "$LEVEL" ]; then
+    echo "❌ 提交说明里没有变更级别。"
+    echo "   写在标题范围里：docs(L4): ……  或  feat(L1/prd): ……"
+    echo "   级别：L1 需求 / L2 设计 / L3 实现 / L4 文字 / init 初始化"
+    exit 1
+fi
+
+TAG="[$LEVEL]"
+STAGED=$(git diff --cached --name-only)
+
+if [ "$TAG" = "[L1]" ]; then
+    if ! printf '%s\n' "$STAGED" | grep -q 'docs/PRD\.md$'; then
+        echo "❌ [L1] 需求变更必须先登记 PRD:本次提交未包含 docs/PRD.md 的改动。"
+        echo "   请在 PRD 变更记录中登记本次需求变化后重新提交(00 总纲 2.3:L1 从 PRD 层进入)。"
+        exit 1
+    fi
+fi
+
+if [ "$TAG" = "[L2]" ]; then
+    if ! printf '%s\n' "$STAGED" | grep -qE 'docs/(ARCHITECTURE\.md|canvas/)'; then
+        echo "❌ [L2] 设计变更必须先改图:本次提交未包含 docs/ARCHITECTURE.md 或 docs/canvas/ 的改动。"
+        echo "   请先更新架构图后重新提交(00 总纲 2.3:L2 从图层进入)。"
+        exit 1
+    fi
+fi
+
+exit 0

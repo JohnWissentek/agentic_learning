@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "g_c",
+      "type": "group",
+      "x": -80,
+      "y": -80,
+      "width": 700,
+      "height": 360,
+      "label": "子图 C：周审 + 调休催用"
+    },
+    {
+      "id": "fn_weekly",
+      "type": "text",
+      "x": -40,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "**run_weekly_audit()**",
+      "color": "2"
+    },
+    {
+      "id": "fn_expiry",
+      "type": "text",
+      "x": 280,
+      "y": -40,
+      "width": 300,
+      "height": 55,
+      "text": "**check_compensatory_leave_expiry()**",
+      "color": "2"
+    },
+    {
+      "id": "fn_cystart",
+      "type": "text",
+      "x": -40,
+      "y": 80,
+      "width": 260,
+      "height": 55,
+      "text": "**get_payroll_cycle_start()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_render_w",
+      "type": "text",
+      "x": -40,
+      "y": 180,
+      "width": 280,
+      "height": 55,
+      "text": "**render_weekly_summary_email()**",
+      "color": "5"
+    },
+    {
+      "id": "fn_send",
+      "type": "text",
+      "x": 280,
+      "y": 140,
+      "width": 300,
+      "height": 90,
+      "text": "**send_html_email()**\n催用 TO: 孔紫初、王楠\n❌ 不发被催员工",
+      "color": "5"
+    },
+    {
+      "id": "note_c",
+      "type": "text",
+      "x": 640,
+      "y": -40,
+      "width": 280,
+      "height": 140,
+      "text": "📖 **周审+催用**\n\n周审：周期起点 → 周报 → 发信。\n催用：查库后直接发信给项目经理。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "w1",
+      "fromNode": "fn_weekly",
+      "toNode": "fn_cystart",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "周期起始"
+    },
+    {
+      "id": "w2",
+      "fromNode": "fn_weekly",
+      "toNode": "fn_render_w",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "渲染周报"
+    },
+    {
+      "id": "w3",
+      "fromNode": "fn_render_w",
+      "toNode": "fn_send",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "发送"
+    },
+    {
+      "id": "w4",
+      "fromNode": "fn_expiry",
+      "toNode": "fn_send",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "催用邮件"
+    }
+  ]
+}

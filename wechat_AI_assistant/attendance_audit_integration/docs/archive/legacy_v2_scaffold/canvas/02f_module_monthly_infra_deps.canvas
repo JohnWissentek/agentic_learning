@@ -1,0 +1,150 @@
+{
+  "nodes": [
+    {
+      "id": "monthly",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 280,
+      "height": 55,
+      "text": "**services/monthly_audit.py**",
+      "color": "2"
+    },
+    {
+      "id": "holiday",
+      "type": "text",
+      "x": 340,
+      "y": -40,
+      "width": 200,
+      "height": 55,
+      "text": "**holiday.py**",
+      "color": "4"
+    },
+    {
+      "id": "payroll",
+      "type": "text",
+      "x": 640,
+      "y": -40,
+      "width": 220,
+      "height": 55,
+      "text": "**payroll_cycle.py**",
+      "color": "4"
+    },
+    {
+      "id": "db",
+      "type": "text",
+      "x": -60,
+      "y": 120,
+      "width": 160,
+      "height": 55,
+      "text": "**db.py**",
+      "color": "5"
+    },
+    {
+      "id": "config",
+      "type": "text",
+      "x": 140,
+      "y": 120,
+      "width": 160,
+      "height": 55,
+      "text": "**config.py**",
+      "color": "5"
+    },
+    {
+      "id": "logger",
+      "type": "text",
+      "x": 340,
+      "y": 120,
+      "width": 160,
+      "height": 55,
+      "text": "**logger.py**",
+      "color": "5"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": 540,
+      "y": 120,
+      "width": 240,
+      "height": 55,
+      "text": "**mail_sender.py**\n年底维护提醒",
+      "color": "5"
+    },
+    {
+      "id": "note_bb",
+      "type": "text",
+      "x": 640,
+      "y": 60,
+      "width": 320,
+      "height": 150,
+      "text": "📖 **子图**\n\nholiday 自身也依赖 db（存节假日表）\n和 mail_sender（每年 12-31 提醒徐宏玮\n维护下一年日历）；payroll_cycle 只\n打日志，是最轻的工具模块。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "d1",
+      "fromNode": "monthly",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读写库"
+    },
+    {
+      "id": "d2",
+      "fromNode": "monthly",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读配置"
+    },
+    {
+      "id": "d3",
+      "fromNode": "monthly",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "label": "打日志"
+    },
+    {
+      "id": "d4",
+      "fromNode": "holiday",
+      "toNode": "db",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "读写库"
+    },
+    {
+      "id": "d5",
+      "fromNode": "holiday",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读配置"
+    },
+    {
+      "id": "d6",
+      "fromNode": "holiday",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "label": "打日志"
+    },
+    {
+      "id": "d7",
+      "fromNode": "holiday",
+      "toNode": "mail",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "年底提醒"
+    },
+    {
+      "id": "d8",
+      "fromNode": "payroll",
+      "toNode": "logger",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "打日志"
+    }
+  ]
+}

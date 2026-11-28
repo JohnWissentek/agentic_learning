@@ -1,0 +1,205 @@
+{
+  "nodes": [
+    {
+      "id": "g_a",
+      "type": "group",
+      "x": -100,
+      "y": -80,
+      "width": 780,
+      "height": 520,
+      "label": "子图 A：日审调用链"
+    },
+    {
+      "id": "fn_daily",
+      "type": "text",
+      "x": 200,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "**run_daily_audit()**",
+      "color": "2"
+    },
+    {
+      "id": "fn_sync",
+      "type": "text",
+      "x": -60,
+      "y": 80,
+      "width": 250,
+      "height": 55,
+      "text": "**sync_employee_roster()**",
+      "color": "2"
+    },
+    {
+      "id": "fn_fetch",
+      "type": "text",
+      "x": 240,
+      "y": 80,
+      "width": 220,
+      "height": 55,
+      "text": "**fetch_punches()**",
+      "color": "5"
+    },
+    {
+      "id": "fn_haver",
+      "type": "text",
+      "x": 500,
+      "y": 80,
+      "width": 260,
+      "height": 55,
+      "text": "**calculate_haversine_distance()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_iswork",
+      "type": "text",
+      "x": 500,
+      "y": 180,
+      "width": 220,
+      "height": 55,
+      "text": "**is_workday_db()**",
+      "color": "4"
+    },
+    {
+      "id": "fn_render",
+      "type": "text",
+      "x": 200,
+      "y": 200,
+      "width": 320,
+      "height": 65,
+      "text": "**render_individual_anomaly_email()**\n+ render_daily_summary_email()",
+      "color": "5"
+    },
+    {
+      "id": "fn_send",
+      "type": "text",
+      "x": 200,
+      "y": 320,
+      "width": 220,
+      "height": 55,
+      "text": "**send_html_email()**",
+      "color": "5"
+    },
+    {
+      "id": "fn_fuser",
+      "type": "text",
+      "x": -60,
+      "y": 200,
+      "width": 200,
+      "height": 55,
+      "text": "**fetch_users()**",
+      "color": "5"
+    },
+    {
+      "id": "fn_loadr",
+      "type": "text",
+      "x": -60,
+      "y": 300,
+      "width": 230,
+      "height": 55,
+      "text": "**load_employee_roster()**",
+      "color": "5"
+    },
+    {
+      "id": "fn_retry",
+      "type": "text",
+      "x": -60,
+      "y": 400,
+      "width": 220,
+      "height": 60,
+      "text": "**_retry_request()**\n1s→2s→4s ×3",
+      "color": "5"
+    },
+    {
+      "id": "note_a",
+      "type": "text",
+      "x": 820,
+      "y": -40,
+      "width": 280,
+      "height": 160,
+      "text": "📖 **日审链**\n\n同步花名册 → 拉打卡 →\n工作日+瞬移 → 渲染异常/日报邮件 →\n统一发送。企微 HTTP 统一走重试。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "d1",
+      "fromNode": "fn_daily",
+      "toNode": "fn_sync",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "先同步"
+    },
+    {
+      "id": "d2",
+      "fromNode": "fn_daily",
+      "toNode": "fn_fetch",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "拉打卡"
+    },
+    {
+      "id": "d3",
+      "fromNode": "fn_daily",
+      "toNode": "fn_haver",
+      "fromSide": "right",
+      "toSide": "top",
+      "label": "瞬移检测"
+    },
+    {
+      "id": "d4",
+      "fromNode": "fn_daily",
+      "toNode": "fn_iswork",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "工作日"
+    },
+    {
+      "id": "d5",
+      "fromNode": "fn_daily",
+      "toNode": "fn_render",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "渲染异常/日报邮件"
+    },
+    {
+      "id": "d6",
+      "fromNode": "fn_daily",
+      "toNode": "fn_send",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "label": "发送邮件"
+    },
+    {
+      "id": "d7",
+      "fromNode": "fn_sync",
+      "toNode": "fn_fuser",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "拉通讯录"
+    },
+    {
+      "id": "d8",
+      "fromNode": "fn_sync",
+      "toNode": "fn_loadr",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读 JSON"
+    },
+    {
+      "id": "d9",
+      "fromNode": "fn_fetch",
+      "toNode": "fn_retry",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "重试"
+    },
+    {
+      "id": "d10",
+      "fromNode": "fn_fuser",
+      "toNode": "fn_retry",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "重试"
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+#!/bin/sh
+# 溯源对账 pre-commit hook:每次 git commit 前自动运行图-代码对账,不一致则拒绝提交。
+#
+# 安装(项目里执行一次即可):
+#     git config core.hooksPath tools/git-hooks
+#
+# 紧急绕过(仅限特殊情况,事后必须补对账):
+#     git commit --no-verify
+
+ROOT="$(git rev-parse --show-toplevel)"
+if [ -d "$ROOT/attendance_audit_integration" ]; then
+    SUBROOT="$ROOT/attendance_audit_integration"
+else
+    SUBROOT="$ROOT"
+fi
+
+# 找 python
+if command -v python3 >/dev/null 2>&1; then
+    PY=python3
+elif command -v python >/dev/null 2>&1; then
+    PY=python
+else
+    echo "[hook] 找不到 python,无法执行检查" >&2
+    exit 1
+fi
+
+# --- 闸门1: 图-代码溯源对账(架构文档未建立时仅跳过本项) ---
+if [ ! -f "$SUBROOT/docs/ARCHITECTURE.md" ]; then
+    echo "[hook] docs/ARCHITECTURE.md 尚未建立,跳过溯源对账(设计阶段完成后自动生效)"
+else
+    echo "[hook] 运行图-代码溯源对账..."
+    PYTHONPATH="$SUBROOT/src" "$PY" "$SUBROOT/tools/check_traceability.py" --root "$SUBROOT"
+    STATUS=$?
+    if [ $STATUS -ne 0 ]; then
+        echo ""
+        echo "[hook] ❌ 提交被拒绝:图与代码不一致(00 总纲:最高优先级缺陷)。"
+        echo "[hook]    处理方式:先改设计文档(图),经审核后再改代码,然后重新提交。"
+        exit $STATUS
+    fi
+fi
+
+# --- 闸门: PEP8/命名规范检查(ruff,00 总纲 4.8;未安装 ruff 时跳过并提醒) ---
+if command -v ruff >/dev/null 2>&1; then
+    echo "[hook] 运行 ruff 风格与命名检查..."
+    ruff check "$SUBROOT/src" "$SUBROOT/tests" "$SUBROOT/tools"
+    LINT=$?
+    if [ $LINT -ne 0 ]; then
+        echo "[hook] ❌ 提交被拒绝:代码风格/命名不符合 PEP 8(00 总纲 4.8)。按上方提示修正后重试。"
+        exit $LINT
+    fi
+else
+    echo "[hook] ⚠ 未安装 ruff,跳过命名检查(pip install -e \".[dev]\" 可安装)"
+fi
+
+# --- 闸门2: STATUS.md 随实质改动强制更新 ---
+echo "[hook] 检查 STATUS.md 是否随实质改动更新..."
+PYTHONPATH="$SUBROOT/src" "$PY" "$SUBROOT/tools/check_process.py" --root "$SUBROOT"
+PROC=$?
+if [ $PROC -ne 0 ]; then
+    echo "[hook] ❌ 提交被拒绝:状态总账未更新(00 总纲 2.2/2.4)。"
+    exit $PROC
+fi
+
+# --- 闸门4: 阶段门与 Checklist 一致性(反虚标/反跳阶段) ---
+echo "[hook] 检查阶段门与 Checklist 一致性..."
+PYTHONPATH="$SUBROOT/src" "$PY" "$SUBROOT/tools/check_stage.py" --root "$SUBROOT"
+STAGE=$?
+if [ $STAGE -ne 0 ]; then
+    echo "[hook] ❌ 提交被拒绝:阶段门虚标或跳阶段(00 总纲:六阶段不许跳)。"
+    exit $STAGE
+fi
+
+echo "[hook] ✅ 全部检查通过,允许提交。"
+exit 0

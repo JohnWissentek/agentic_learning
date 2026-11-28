@@ -1,0 +1,162 @@
+{
+  "nodes": [
+    {
+      "id": "m_start",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 230,
+      "height": 55,
+      "text": "🚀 **月审入口**\ncli monthly [--final]",
+      "color": "1"
+    },
+    {
+      "id": "m_range",
+      "type": "text",
+      "x": 220,
+      "y": -40,
+      "width": 230,
+      "height": 55,
+      "text": "📅 **周期计算**\n上月26日→本月25日",
+      "color": "4"
+    },
+    {
+      "id": "m_locked",
+      "type": "text",
+      "x": 500,
+      "y": -40,
+      "width": 260,
+      "height": 55,
+      "text": "🔒 **封账检查**\nis_payroll_period_locked()",
+      "color": "4"
+    },
+    {
+      "id": "m_reject",
+      "type": "text",
+      "x": 500,
+      "y": 60,
+      "width": 230,
+      "height": 55,
+      "text": "❌ **拒绝重复终审**\nRuntimeError E18",
+      "color": "1"
+    },
+    {
+      "id": "m_compound",
+      "type": "text",
+      "x": 820,
+      "y": -40,
+      "width": 280,
+      "height": 75,
+      "text": "🔍 **复合校验 📦**\n加班→调休(见4.4)+出差日报\n水印(E7)+旷工折算",
+      "color": "2"
+    },
+    {
+      "id": "m_report",
+      "type": "text",
+      "x": 820,
+      "y": 80,
+      "width": 280,
+      "height": 55,
+      "text": "📊 **终审邮件+封账**\nrender→lock→发送→ADMIN",
+      "color": "5"
+    },
+    {
+      "id": "f11_release",
+      "type": "text",
+      "x": 220,
+      "y": 200,
+      "width": 280,
+      "height": 55,
+      "text": "⚖️ **调休入账**\n非法定假+客户签字→released",
+      "color": "4"
+    },
+    {
+      "id": "f11_chk",
+      "type": "text",
+      "x": 550,
+      "y": 200,
+      "width": 260,
+      "height": 55,
+      "text": "⏰ **催用时钟**\n第7/15/30天仍有剩余",
+      "color": "2"
+    },
+    {
+      "id": "f11_to",
+      "type": "text",
+      "x": 850,
+      "y": 200,
+      "width": 300,
+      "height": 55,
+      "text": "📧 **TO孔紫初、王楠**\n❌禁止发/抄送被催员工",
+      "color": "1"
+    },
+    {
+      "id": "note_monthly",
+      "type": "text",
+      "x": -60,
+      "y": 100,
+      "width": 400,
+      "height": 260,
+      "text": "📖 **图解**\n\n账期永远是「上月26号到本月25号」，\n25号草稿、26号终审；终审先查有没有\n重复上锁（有则拒绝，E18），复合校验\n（加班转调休见4.4+出差日报+旷工）\n黑盒化。调休入账后进入催用时钟：\n第7/15/30天仍有剩余才催，只发孔紫\n初、王楠，禁止发给或抄送被催员工\n本人。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "em1",
+      "fromNode": "m_start",
+      "toNode": "m_range",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "算周期"
+    },
+    {
+      "id": "em2",
+      "fromNode": "m_range",
+      "toNode": "m_locked",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "判类型"
+    },
+    {
+      "id": "em3",
+      "fromNode": "m_locked",
+      "toNode": "m_reject",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "已锁:拒绝"
+    },
+    {
+      "id": "em4",
+      "fromNode": "m_locked",
+      "toNode": "m_compound",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "未锁:放行"
+    },
+    {
+      "id": "em5",
+      "fromNode": "m_compound",
+      "toNode": "m_report",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "汇总"
+    },
+    {
+      "id": "ef1",
+      "fromNode": "f11_release",
+      "toNode": "f11_chk",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "起算accrual_date"
+    },
+    {
+      "id": "ef2",
+      "fromNode": "f11_chk",
+      "toNode": "f11_to",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "催用邮件"
+    }
+  ]
+}

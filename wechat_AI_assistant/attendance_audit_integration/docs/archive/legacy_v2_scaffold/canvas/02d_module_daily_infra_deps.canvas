@@ -1,0 +1,168 @@
+{
+  "nodes": [
+    {
+      "id": "daily",
+      "type": "text",
+      "x": -80,
+      "y": -40,
+      "width": 260,
+      "height": 55,
+      "text": "**services/daily_audit.py**",
+      "color": "2"
+    },
+    {
+      "id": "roster_svc",
+      "type": "text",
+      "x": 340,
+      "y": -40,
+      "width": 280,
+      "height": 55,
+      "text": "**services/roster_sync.py**\n花名册同步",
+      "color": "2"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": -220,
+      "y": 120,
+      "width": 200,
+      "height": 55,
+      "text": "**mail_sender.py**",
+      "color": "5"
+    },
+    {
+      "id": "db",
+      "type": "text",
+      "x": -20,
+      "y": 120,
+      "width": 140,
+      "height": 55,
+      "text": "**db.py**",
+      "color": "5"
+    },
+    {
+      "id": "logger",
+      "type": "text",
+      "x": 140,
+      "y": 120,
+      "width": 150,
+      "height": 55,
+      "text": "**logger.py**",
+      "color": "5"
+    },
+    {
+      "id": "config",
+      "type": "text",
+      "x": -140,
+      "y": 220,
+      "width": 160,
+      "height": 55,
+      "text": "**config.py**",
+      "color": "5"
+    },
+    {
+      "id": "wecom",
+      "type": "text",
+      "x": 320,
+      "y": 120,
+      "width": 200,
+      "height": 55,
+      "text": "**wecom_api.py**",
+      "color": "5"
+    },
+    {
+      "id": "roster",
+      "type": "text",
+      "x": 540,
+      "y": 120,
+      "width": 220,
+      "height": 55,
+      "text": "**roster.py**\n读JSON花名册",
+      "color": "5"
+    },
+    {
+      "id": "note_ab",
+      "type": "text",
+      "x": 600,
+      "y": -40,
+      "width": 320,
+      "height": 150,
+      "text": "📖 **子图**\n\ndaily_audit 通过基础设施四件套\n落地异常邮件与数据；roster_sync\n还依赖 wecom_api（拉通讯录）和\nroster（读本地 JSON 花名册）。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "b1",
+      "fromNode": "daily",
+      "toNode": "mail",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "发邮件"
+    },
+    {
+      "id": "b2",
+      "fromNode": "daily",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读写库"
+    },
+    {
+      "id": "b3",
+      "fromNode": "daily",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "b4",
+      "fromNode": "daily",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "label": "读配置"
+    },
+    {
+      "id": "b5",
+      "fromNode": "roster_svc",
+      "toNode": "wecom",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "拉取企微通讯录"
+    },
+    {
+      "id": "b6",
+      "fromNode": "roster_svc",
+      "toNode": "roster",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读JSON花名册"
+    },
+    {
+      "id": "b7",
+      "fromNode": "roster_svc",
+      "toNode": "db",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读写库"
+    },
+    {
+      "id": "b8",
+      "fromNode": "roster_svc",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "b9",
+      "fromNode": "roster_svc",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "label": "读配置"
+    }
+  ]
+}

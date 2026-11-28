@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "id": "trigger",
+      "type": "text",
+      "x": -400,
+      "y": -50,
+      "width": 280,
+      "height": 70,
+      "text": "⏰ **触发源 Trigger**\nCron 定时器 / 管理员手动",
+      "color": "6"
+    },
+    {
+      "id": "app",
+      "type": "text",
+      "x": -20,
+      "y": -50,
+      "width": 350,
+      "height": 80,
+      "text": "🖥️ **AttendanceAuditEngine**\n考勤审计系统（本程序）",
+      "color": "1"
+    },
+    {
+      "id": "wecom",
+      "type": "text",
+      "x": 430,
+      "y": -220,
+      "width": 280,
+      "height": 70,
+      "text": "☁️ **企业微信 OpenAPI**\n打卡/审批/成员/日报",
+      "color": "6"
+    },
+    {
+      "id": "db",
+      "type": "text",
+      "x": 430,
+      "y": -50,
+      "width": 250,
+      "height": 70,
+      "text": "🗄️ **PostgreSQL**\n业务数据持久化",
+      "color": "6"
+    },
+    {
+      "id": "smtp",
+      "type": "text",
+      "x": 430,
+      "y": 130,
+      "width": 280,
+      "height": 70,
+      "text": "📧 **企业邮箱 SMTP**\n告警邮件 & 审计报表",
+      "color": "6"
+    },
+    {
+      "id": "roster",
+      "type": "text",
+      "x": -400,
+      "y": 130,
+      "width": 280,
+      "height": 70,
+      "text": "📋 **本地花名册 JSON**\nemployee_roster.json",
+      "color": "6"
+    },
+    {
+      "id": "note_gps",
+      "type": "text",
+      "x": -400,
+      "y": 260,
+      "width": 280,
+      "height": 70,
+      "text": "📌 花名册已改本地 JSON\n代码/脚本禁止再读 xlsx",
+      "color": "3"
+    },
+    {
+      "id": "note1",
+      "type": "text",
+      "x": -20,
+      "y": 260,
+      "width": 350,
+      "height": 200,
+      "text": "📖 **图解**\n\n触发源（Cron 或管理员）启动本程序；\n程序对外只做四件事：向企微「要」数据、\n往数据库「写」业务数据、用邮件「发」\n告警与报表、从本地花名册 JSON「导入」\n姓名邮箱映射。企微 Webhook 是可选的\n反向回调，不是必须依赖。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "trigger",
+      "toNode": "app",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "触发运行"
+    },
+    {
+      "id": "e2",
+      "fromNode": "app",
+      "toNode": "wecom",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "拉取打卡与审批"
+    },
+    {
+      "id": "e3",
+      "fromNode": "app",
+      "toNode": "db",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "读写业务数据"
+    },
+    {
+      "id": "e4",
+      "fromNode": "app",
+      "toNode": "smtp",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "发送告警与报表"
+    },
+    {
+      "id": "e5",
+      "fromNode": "wecom",
+      "toNode": "app",
+      "fromSide": "left",
+      "toSide": "right",
+      "label": "可选Webhook回调"
+    },
+    {
+      "id": "e6",
+      "fromNode": "roster",
+      "toNode": "app",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "导入姓名邮箱"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+[project]
+name = "attendance_audit_integration"
+version = "0.1.0"
+description = "WeCom attendance & leave audit integration (MVP)"
+requires-python = ">=3.9"
+dependencies = [
+    "python-dotenv>=1.0.0",
+    "requests>=2.31",
+    "fastapi>=0.100.0",
+    "uvicorn>=0.22.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "psycopg2-binary>=2.9.6",
+    "httpx>=0.24.1",
+    "jinja2>=3.1.2",
+    "python-multipart>=0.0.6",
+    "pycryptodome>=3.18.0",
+    "xmltodict>=0.13.0",
+    "chinesecalendar>=1.9.0",
+    "python-dateutil>=2.8.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "responses>=0.25",
+    "freezegun>=1.4",
+    "ruff>=0.4",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "unit: 单元测试,mock全部外部依赖",
+    "integration: 集成测试,允许真实外部依赖(测试账号)",
+    "e2e: 端到端测试,按用户故事完整跑主流程",
+]
+addopts = "-v --strict-markers"
+
+[tool.coverage.run]
+source = ["src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+# E/W: PEP8 风格  F: 逻辑错误  N: pep8-naming 命名规范(00 总纲 4.8 机器闸门)
+select = ["E", "W", "F", "N"]

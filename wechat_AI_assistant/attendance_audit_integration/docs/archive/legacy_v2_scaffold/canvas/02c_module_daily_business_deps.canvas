@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "daily",
+      "type": "text",
+      "x": 200,
+      "y": -40,
+      "width": 280,
+      "height": 60,
+      "text": "**services/daily_audit.py**\n日审业务流程",
+      "color": "2"
+    },
+    {
+      "id": "wecom",
+      "type": "text",
+      "x": -80,
+      "y": 120,
+      "width": 220,
+      "height": 55,
+      "text": "**wecom_api.py**",
+      "color": "5"
+    },
+    {
+      "id": "geo",
+      "type": "text",
+      "x": 180,
+      "y": 120,
+      "width": 180,
+      "height": 55,
+      "text": "**geo.py**",
+      "color": "4"
+    },
+    {
+      "id": "holiday",
+      "type": "text",
+      "x": 400,
+      "y": 120,
+      "width": 200,
+      "height": 55,
+      "text": "**holiday.py**",
+      "color": "4"
+    },
+    {
+      "id": "roster_svc",
+      "type": "text",
+      "x": 620,
+      "y": 120,
+      "width": 260,
+      "height": 60,
+      "text": "**services/roster_sync.py**\n📦详见02d",
+      "color": "2"
+    },
+    {
+      "id": "note_a",
+      "type": "text",
+      "x": 200,
+      "y": 240,
+      "width": 320,
+      "height": 130,
+      "text": "📖 **子图**\n\n日审业务侧依赖：拉打卡、瞬移检测、\n工作日判定，并先调 roster_sync 确保\n花名册最新。基础设施依赖见 02d。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "a1",
+      "fromNode": "daily",
+      "toNode": "wecom",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "拉取企微数据"
+    },
+    {
+      "id": "a2",
+      "fromNode": "daily",
+      "toNode": "geo",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "距离计算"
+    },
+    {
+      "id": "a3",
+      "fromNode": "daily",
+      "toNode": "holiday",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "工作日判定"
+    },
+    {
+      "id": "a4",
+      "fromNode": "daily",
+      "toNode": "roster_svc",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "调用花名册同步"
+    }
+  ]
+}

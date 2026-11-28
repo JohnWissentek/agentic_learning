@@ -1,0 +1,148 @@
+{
+  "nodes": [
+    {
+      "id": "roster",
+      "type": "text",
+      "x": -280,
+      "y": -40,
+      "width": 220,
+      "height": 55,
+      "text": "**roster.py**\n读JSON花名册",
+      "color": "5"
+    },
+    {
+      "id": "wecom",
+      "type": "text",
+      "x": -20,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "**wecom_api.py**\n企微HTTP+重试",
+      "color": "5"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": 260,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "**mail_sender.py**\n模板渲染+SMTP",
+      "color": "5"
+    },
+    {
+      "id": "db",
+      "type": "text",
+      "x": 540,
+      "y": -40,
+      "width": 220,
+      "height": 55,
+      "text": "**db.py**\nPostgreSQL读写",
+      "color": "5"
+    },
+    {
+      "id": "config",
+      "type": "text",
+      "x": 100,
+      "y": 100,
+      "width": 180,
+      "height": 55,
+      "text": "**config.py**",
+      "color": "5"
+    },
+    {
+      "id": "logger",
+      "type": "text",
+      "x": 100,
+      "y": 220,
+      "width": 180,
+      "height": 55,
+      "text": "**logger.py**",
+      "color": "5"
+    },
+    {
+      "id": "note_d",
+      "type": "text",
+      "x": 540,
+      "y": 100,
+      "width": 340,
+      "height": 220,
+      "text": "📖 **子图**\n\n所有基础设施模块统一通过 config\n读配置、通过 logger 打日志；config\n自身只依赖 logger。所有依赖方向\n严格从上到下，无环——这是 02–02h\n九张图共同遵守的铁律，\ntools/check_traceability.py 会自动\n检测循环依赖。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "g1",
+      "fromNode": "roster",
+      "toNode": "config",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "读配置"
+    },
+    {
+      "id": "g2",
+      "fromNode": "roster",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "g3",
+      "fromNode": "wecom",
+      "toNode": "config",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "读配置"
+    },
+    {
+      "id": "g4",
+      "fromNode": "wecom",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "g5",
+      "fromNode": "mail",
+      "toNode": "config",
+      "fromSide": "left",
+      "toSide": "right",
+      "label": "读配置"
+    },
+    {
+      "id": "g6",
+      "fromNode": "mail",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    },
+    {
+      "id": "g7",
+      "fromNode": "db",
+      "toNode": "config",
+      "fromSide": "left",
+      "toSide": "right",
+      "label": "读配置"
+    },
+    {
+      "id": "g8",
+      "fromNode": "db",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "right",
+      "label": "打日志"
+    },
+    {
+      "id": "g9",
+      "fromNode": "config",
+      "toNode": "logger",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打日志"
+    }
+  ]
+}

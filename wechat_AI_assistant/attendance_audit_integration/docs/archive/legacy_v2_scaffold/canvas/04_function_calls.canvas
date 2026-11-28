@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "id": "cli",
+      "type": "text",
+      "x": 200,
+      "y": -280,
+      "width": 240,
+      "height": 60,
+      "text": "🚀 **cli.main()**\n命令行总入口",
+      "color": "1"
+    },
+    {
+      "id": "g_dispatch",
+      "type": "group",
+      "x": -200,
+      "y": -120,
+      "width": 1000,
+      "height": 160,
+      "label": "CLI 分发目标（各命令内部见 04a/04b/04c）"
+    },
+    {
+      "id": "fn_daily",
+      "type": "text",
+      "x": -170,
+      "y": -80,
+      "width": 220,
+      "height": 55,
+      "text": "**run_daily_audit()**\n日审 → 04a",
+      "color": "2"
+    },
+    {
+      "id": "fn_weekly",
+      "type": "text",
+      "x": 80,
+      "y": -80,
+      "width": 220,
+      "height": 55,
+      "text": "**run_weekly_audit()**\n周审 → 04c",
+      "color": "2"
+    },
+    {
+      "id": "fn_monthly",
+      "type": "text",
+      "x": 330,
+      "y": -80,
+      "width": 230,
+      "height": 55,
+      "text": "**run_monthly_audit()**\n月审 → 04b",
+      "color": "2"
+    },
+    {
+      "id": "fn_expiry",
+      "type": "text",
+      "x": 590,
+      "y": -80,
+      "width": 300,
+      "height": 55,
+      "text": "**check_compensatory_leave_expiry()**\n调休催用 → 04c",
+      "color": "2"
+    },
+    {
+      "id": "fn_sync",
+      "type": "text",
+      "x": -170,
+      "y": 20,
+      "width": 250,
+      "height": 55,
+      "text": "**sync_employee_roster()**\nsync-roster",
+      "color": "2"
+    },
+    {
+      "id": "fn_initdb",
+      "type": "text",
+      "x": 330,
+      "y": 20,
+      "width": 180,
+      "height": 55,
+      "text": "**db.init_db()**\ninit-db",
+      "color": "5"
+    },
+    {
+      "id": "note_ov",
+      "type": "text",
+      "x": 820,
+      "y": -280,
+      "width": 300,
+      "height": 180,
+      "text": "📖 **总图**\n\ncli.main() 按子命令分发，\n各命令互不交叉调用。\n详情：04a 日审 / 04b 月审 / 04c 周审+催用",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "ec1",
+      "fromNode": "cli",
+      "toNode": "fn_daily",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "daily"
+    },
+    {
+      "id": "ec2",
+      "fromNode": "cli",
+      "toNode": "fn_weekly",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "weekly"
+    },
+    {
+      "id": "ec3",
+      "fromNode": "cli",
+      "toNode": "fn_monthly",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "monthly"
+    },
+    {
+      "id": "ec4",
+      "fromNode": "cli",
+      "toNode": "fn_expiry",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "check-expiry"
+    },
+    {
+      "id": "ec5",
+      "fromNode": "cli",
+      "toNode": "fn_sync",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "sync-roster"
+    },
+    {
+      "id": "ec6",
+      "fromNode": "cli",
+      "toNode": "fn_initdb",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "init-db"
+    }
+  ]
+}

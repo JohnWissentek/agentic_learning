@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "id": "need",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 260,
+      "height": 70,
+      "text": "📍 **外勤/出差打卡**\n须有审批锁定目的地\n坐标系GCJ-02",
+      "color": "1"
+    },
+    {
+      "id": "punch",
+      "type": "text",
+      "x": 260,
+      "y": -40,
+      "width": 240,
+      "height": 60,
+      "text": "📌 **打卡点lat/lng**\n企微微度须÷1e6",
+      "color": "4"
+    },
+    {
+      "id": "dest",
+      "type": "text",
+      "x": 560,
+      "y": -40,
+      "width": 260,
+      "height": 60,
+      "text": "🎯 **审批单目的地lat/lng**\n腾讯地图POI锁定",
+      "color": "4"
+    },
+    {
+      "id": "dist",
+      "type": "text",
+      "x": 860,
+      "y": -40,
+      "width": 260,
+      "height": 60,
+      "text": "📏 **Haversine大圆距离**\n单位:米,地球半径6371km",
+      "color": "4"
+    },
+    {
+      "id": "gate",
+      "type": "text",
+      "x": 860,
+      "y": 80,
+      "width": 240,
+      "height": 55,
+      "text": "❓ **distance_m ≤ 200?**",
+      "color": "2"
+    },
+    {
+      "id": "valid",
+      "type": "text",
+      "x": 660,
+      "y": 180,
+      "width": 220,
+      "height": 55,
+      "text": "✅ **判定:有效valid**\n计入出勤勾稽",
+      "color": "5"
+    },
+    {
+      "id": "invalid",
+      "type": "text",
+      "x": 1000,
+      "y": 180,
+      "width": 280,
+      "height": 55,
+      "text": "❌ **判定:无效invalid E14**\n无100~500m人工审中间带",
+      "color": "1"
+    },
+    {
+      "id": "note_43",
+      "type": "text",
+      "x": -60,
+      "y": 100,
+      "width": 380,
+      "height": 220,
+      "text": "📖 **图解**\n\n只认200米以内的外勤打卡；超过半寸\n都不行，没有「再远一点找主管」的\n缓冲带。计算方法：打卡坐标(企微原始\n微度需÷1e6换算) vs 审批单锁定的\n目的地坐标，用Haversine大圆距离\n公式算出米数，200米是唯一硬阈值。\n\n⚠ 本图对应PRD F13，属二期功能，\n一期不做强校验，仅记录距离供人工\n参考。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "g1",
+      "fromNode": "need",
+      "toNode": "punch",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "打卡"
+    },
+    {
+      "id": "g2",
+      "fromNode": "punch",
+      "toNode": "dest",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "对照"
+    },
+    {
+      "id": "g3",
+      "fromNode": "dest",
+      "toNode": "dist",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "计算距离"
+    },
+    {
+      "id": "g4",
+      "fromNode": "dist",
+      "toNode": "gate",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "判定"
+    },
+    {
+      "id": "g5",
+      "fromNode": "gate",
+      "toNode": "valid",
+      "fromSide": "left",
+      "toSide": "top",
+      "label": "是≤200m"
+    },
+    {
+      "id": "g6",
+      "fromNode": "gate",
+      "toNode": "invalid",
+      "fromSide": "right",
+      "toSide": "top",
+      "label": "否>200m"
+    }
+  ]
+}

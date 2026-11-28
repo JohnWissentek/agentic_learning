@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "env",
+      "type": "text",
+      "x": -360,
+      "y": -40,
+      "width": 260,
+      "height": 60,
+      "text": "📄 **.env 文件**\n敏感凭证",
+      "color": "6"
+    },
+    {
+      "id": "settings",
+      "type": "text",
+      "x": -20,
+      "y": -40,
+      "width": 260,
+      "height": 60,
+      "text": "⚙️ **config.Settings**\nPydantic校验",
+      "color": "5"
+    },
+    {
+      "id": "targets",
+      "type": "text",
+      "x": 340,
+      "y": -40,
+      "width": 340,
+      "height": 70,
+      "text": "🎯 **WeComAPIClient/mail_sender/\ndb/services层/roster_sync**\n📦按前缀分发,见下表",
+      "color": "2"
+    },
+    {
+      "id": "cli_args",
+      "type": "text",
+      "x": -360,
+      "y": 100,
+      "width": 260,
+      "height": 55,
+      "text": "💻 **CLI参数**\n--date/--final",
+      "color": "1"
+    },
+    {
+      "id": "cli",
+      "type": "text",
+      "x": -20,
+      "y": 100,
+      "width": 220,
+      "height": 55,
+      "text": "🚀 **cli.main()**",
+      "color": "1"
+    },
+    {
+      "id": "note_cfg",
+      "type": "text",
+      "x": 340,
+      "y": 80,
+      "width": 340,
+      "height": 260,
+      "text": "📖 **图解**\n\n敏感凭证（企微密钥、SMTP密码）只在\n.env出现，代码零硬编码；Settings统一\n校验后按字段前缀分发给各模块：\nWECOM_*→WeComAPIClient，SMTP_*→\nmail_sender，DATABASE_URL→db，\nADMIN_EMAILS/EXCLUDED_NAMES→\nservices层，DEFAULT_COMPANY_A/B→\nroster_sync。CLI的--date/--final走\n另一条路径，传入service层控制审计\n目标日和月审类型。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "env",
+      "toNode": "settings",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "加载"
+    },
+    {
+      "id": "e2",
+      "fromNode": "settings",
+      "toNode": "targets",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "按前缀分发"
+    },
+    {
+      "id": "e3",
+      "fromNode": "cli_args",
+      "toNode": "cli",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "解析"
+    },
+    {
+      "id": "e4",
+      "fromNode": "cli",
+      "toNode": "targets",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "target_date/is_final传入"
+    }
+  ]
+}

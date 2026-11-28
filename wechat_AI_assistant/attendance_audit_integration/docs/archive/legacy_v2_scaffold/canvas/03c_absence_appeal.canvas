@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "miss",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 280,
+      "height": 60,
+      "text": "🔍 **日审检出absent/late**\n审计日=T-1,邮件日≈T09:00后",
+      "color": "1"
+    },
+    {
+      "id": "mail",
+      "type": "text",
+      "x": 280,
+      "y": -40,
+      "width": 260,
+      "height": 55,
+      "text": "📧 **个人催告邮件**\n截止:T+2当日18:00",
+      "color": "5"
+    },
+    {
+      "id": "win",
+      "type": "text",
+      "x": 640,
+      "y": -40,
+      "width": 240,
+      "height": 55,
+      "text": "❓ **截止前是否办妥?**",
+      "color": "2"
+    },
+    {
+      "id": "leave_ok",
+      "type": "text",
+      "x": 940,
+      "y": -140,
+      "width": 240,
+      "height": 55,
+      "text": "✅ **转请假抵扣 E15**\n不再按旷工",
+      "color": "5"
+    },
+    {
+      "id": "unpaid",
+      "type": "text",
+      "x": 940,
+      "y": -40,
+      "width": 260,
+      "height": 55,
+      "text": "💰 **事假扣薪参考 E16**\n月薪÷21.75×缺勤天数",
+      "color": "5"
+    },
+    {
+      "id": "absent_mark",
+      "type": "text",
+      "x": 940,
+      "y": 60,
+      "width": 280,
+      "height": 55,
+      "text": "❌ **确认旷工记录 E17**\nlate=0.5天,absent=1.0天",
+      "color": "1"
+    },
+    {
+      "id": "note_46",
+      "type": "text",
+      "x": -60,
+      "y": 140,
+      "width": 380,
+      "height": 200,
+      "text": "📖 **图解**\n\n系统9点左右报昨天的缺卡，给到后天\n傍晚6点补手续。三条出口：年假/调休\n审批通过→转请假抵扣，不算旷工；\n事假审批→扣薪不罚款（月薪÷21.75×\n缺勤天数，禁止多倍扣款）；逾期什么\n审批都没有→确认旷工，单侧缺卡记\n0.5天、全日无卡记1.0天。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "h1",
+      "fromNode": "miss",
+      "toNode": "mail",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "催告"
+    },
+    {
+      "id": "h2",
+      "fromNode": "mail",
+      "toNode": "win",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "等待"
+    },
+    {
+      "id": "h3",
+      "fromNode": "win",
+      "toNode": "leave_ok",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "年假/调休审批通过"
+    },
+    {
+      "id": "h4",
+      "fromNode": "win",
+      "toNode": "unpaid",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "事假审批"
+    },
+    {
+      "id": "h5",
+      "fromNode": "win",
+      "toNode": "absent_mark",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "逾期无审批"
+    }
+  ]
+}

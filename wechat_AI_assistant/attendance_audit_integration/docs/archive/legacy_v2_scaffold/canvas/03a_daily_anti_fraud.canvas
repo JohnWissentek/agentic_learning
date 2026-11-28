@@ -1,0 +1,176 @@
+{
+  "nodes": [
+    {
+      "id": "in",
+      "type": "text",
+      "x": -60,
+      "y": -40,
+      "width": 280,
+      "height": 55,
+      "text": "⬅️ **入口：来自4.2📦**\n输入：员工T-1打卡记录",
+      "color": "1"
+    },
+    {
+      "id": "chk_dev",
+      "type": "text",
+      "x": 300,
+      "y": -40,
+      "width": 260,
+      "height": 60,
+      "text": "❓ **设备异常?**\nexception_type非空且非未打卡",
+      "color": "4"
+    },
+    {
+      "id": "dev",
+      "type": "text",
+      "x": 620,
+      "y": -40,
+      "width": 240,
+      "height": 50,
+      "text": "⚠️ **device_anomaly E11**",
+      "color": "2"
+    },
+    {
+      "id": "chk_loc",
+      "type": "text",
+      "x": 300,
+      "y": 80,
+      "width": 260,
+      "height": 60,
+      "text": "❓ **位置异常?**\n相邻打卡时速>350km/h",
+      "color": "4"
+    },
+    {
+      "id": "loc",
+      "type": "text",
+      "x": 620,
+      "y": 80,
+      "width": 240,
+      "height": 50,
+      "text": "⚠️ **location_anomaly E12**",
+      "color": "2"
+    },
+    {
+      "id": "chk_ip",
+      "type": "text",
+      "x": 300,
+      "y": 200,
+      "width": 260,
+      "height": 60,
+      "text": "❓ **可疑IP?**\n外勤IP与申报地不符",
+      "color": "4"
+    },
+    {
+      "id": "ip",
+      "type": "text",
+      "x": 620,
+      "y": 200,
+      "width": 240,
+      "height": 50,
+      "text": "⚠️ **E13 可疑日志**\n不单独否决日状态",
+      "color": "2"
+    },
+    {
+      "id": "out",
+      "type": "text",
+      "x": 940,
+      "y": 80,
+      "width": 280,
+      "height": 55,
+      "text": "➡️ **出口：返回4.2**\n输出：打标记后的打卡记录",
+      "color": "1"
+    },
+    {
+      "id": "note_2a",
+      "type": "text",
+      "x": 300,
+      "y": 300,
+      "width": 400,
+      "height": 220,
+      "text": "📖 **图解**\n\n三道独立检查依次走：设备异常（企微\n上报的exception_type）、位置异常\n（相邻打卡时速超350km/h=瞬移）、\n可疑IP（外勤IP与申报地不符）。三道\n检查互不阻断——查到异常只打标记\n继续走，不会让流程中断，最终交回\n4.2总图主线继续判定请假/出差/工作日。\n\n审核要点：E13明确标注「不单独否决\n日状态」，避免误伤正常外勤。",
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "i1",
+      "fromNode": "in",
+      "toNode": "chk_dev",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "先查设备"
+    },
+    {
+      "id": "i2",
+      "fromNode": "chk_dev",
+      "toNode": "dev",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "是:打标记"
+    },
+    {
+      "id": "i3",
+      "fromNode": "chk_dev",
+      "toNode": "chk_loc",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "否/标记后"
+    },
+    {
+      "id": "i4",
+      "fromNode": "dev",
+      "toNode": "chk_loc",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "标记后继续"
+    },
+    {
+      "id": "i5",
+      "fromNode": "chk_loc",
+      "toNode": "loc",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "是:打标记"
+    },
+    {
+      "id": "i6",
+      "fromNode": "chk_loc",
+      "toNode": "chk_ip",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "否/标记后"
+    },
+    {
+      "id": "i7",
+      "fromNode": "loc",
+      "toNode": "chk_ip",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "标记后继续"
+    },
+    {
+      "id": "i8",
+      "fromNode": "chk_ip",
+      "toNode": "ip",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "label": "是:记可疑日志"
+    },
+    {
+      "id": "i9",
+      "fromNode": "chk_ip",
+      "toNode": "out",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "否/记录后"
+    },
+    {
+      "id": "i10",
+      "fromNode": "ip",
+      "toNode": "out",
+      "fromSide": "right",
+      "toSide": "left",
+      "label": "记录后继续"
+    }
+  ]
+}

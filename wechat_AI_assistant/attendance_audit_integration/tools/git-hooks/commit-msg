@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# github_push commit-msg hook v2
+# 由 github_push setup 生成，不要手改。每次提交时检查标题格式，并在末尾写上 Device: 与 Hardware:。
+TITLE_TYPES='feat fix docs refactor perf test build ci chore style revert'
+f="${GITHUB_PUSH_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/github_push}/device"
+fail() { printf '[github_push] 错误: %s\n' "$*" >&2; exit 1; }
+
+# 1. 标题：第一行非空、非注释的内容。空说明交给 git 自己拒绝。
+title="$(grep -v '^#' "$1" | sed '/^[[:space:]]*$/d' | head -n1)"
+[ -n "$title" ] || exit 0
+regex="^($(printf '%s' "$TITLE_TYPES" | tr ' ' '|'))(\([^)]+\))?!?: .+"
+if ! printf '%s\n' "$title" | grep -qE "$regex"; then
+    printf '[github_push] 错误: 提交标题不符合规范：%s\n' "$title" >&2
+    printf '[github_push] 格式：<类型>[(范围)][!]: <摘要>，类型为 %s\n' "$TITLE_TYPES" >&2
+    fail '例如：fix(CO2 通道): 修正温度补偿系数，高温段读数偏高 3%'
+fi
+
+# 2. 设备标注：已有的同名行会被替换成本机信息
+[ -f "$f" ] || fail '本机还没有设置设备信息，请先运行 github_push setup。'
+name="$(sed -n 's/^name=//p' "$f" | head -n1)"
+desc="$(sed -n 's/^desc=//p' "$f" | head -n1)"
+hw="$(sed -n 's/^hardware=//p' "$f" | head -n1)"
+[ -n "$name" ] || fail '本机设备信息不完整，请重新运行 github_push setup。'
+dev="$name"
+[ -n "$desc" ] && dev="$name - $desc"
+set -- "$1" --trailer "Device: $dev"
+[ -n "$hw" ] && set -- "$@" --trailer "Hardware: $hw"
+git interpret-trailers --in-place --if-exists replace "${@:2}" "$1"
