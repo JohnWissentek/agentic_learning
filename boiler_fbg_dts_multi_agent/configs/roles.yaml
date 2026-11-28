@@ -1,0 +1,114 @@
+# Multi-Agent Team Role Definitions
+
+roles:
+  pm:
+    name: 项目经理 (Project Manager)
+    responsibilities:
+      - 研发阶段编排与里程碑追踪
+      - 资源协调与风险管理
+      - 跨职能协作促进
+    inputs:
+      - 用户需求
+      - 团队状态反馈
+    outputs:
+      - 研发计划
+      - 状态报告
+      - 风险登记簿
+
+  mkt:
+    name: 市场研究 (Market Research)
+    responsibilities:
+      - 市场规模分析
+      - 客户痛点识别
+      - 竞品分析
+    evidence_requirements:
+      - 所有数据需标注来源
+      - 计算需使用 [MKT-CALC] 标签
+      - 估计值需标记 [ESTIMATE]
+
+  opt:
+    name: 光学测温/热工 (Optical/Thermal Engineer)
+    responsibilities:
+      - FBG/DTS 技术路线评估
+      - 传感器规格定义
+      - 热工建模与布局设计
+    pending_verifications:
+      - 高温 FBG 工作温度上限
+      - 长期漂移规格
+      - 应变-温度解耦方案
+
+  hw:
+    name: 硬件集成 (Hardware Integrator)
+    responsibilities:
+      - 解调仪选型
+      - 系统架构设计
+      - 接口定义
+    evidence_requirements:
+      - 所有选型需 [EV-DS] 数据表支撑
+      - 待确认项标记 [PENDING]
+
+  sw:
+    name: 软件与AI (Software & AI)
+    responsibilities:
+      - 数据采集架构
+      - 算法开发
+      - 可视化界面
+    safety_constraints:
+      - 仅提供监测/预警/建议
+      - 不发送控制指令到 DCS/SIS
+      - 所有建议需人工确认
+
+  scm:
+    name: 供应链 (Supply Chain)
+    responsibilities:
+      - 供应商筛选与评估
+      - 询价与交期管理
+      - BOM 成本优化
+    evidence_requirements:
+      - 价格需来自实际报价
+      - 无报价项标记 [PENDING_QUOTE]
+
+  qa:
+    name: 独立质量评审 (Quality Reviewer)
+    responsibilities:
+      - 独立审查所有阶段产物
+      - 证据完整性验证
+      - 门禁决策 (PASS/HOLD/BLOCKED)
+    independence: 独立于所有其他角色
+
+  mfg:
+    name: 制造导入 (Manufacturing)
+    responsibilities:
+      - 可制造性评审 (DFM)
+      - 生产工艺开发
+      - 试产计划
+
+  trn:
+    name: 工程培训 (Training)
+    responsibilities:
+      - 安装调试指南
+      - 操作维护手册
+      - 客户培训材料
+
+  fin:
+    name: 财务 (Finance)
+    responsibilities:
+      - 成本核算
+      - 预算管理
+      - ROI 分析
+    evidence_requirements:
+      - 计算需使用 [COST-CALC] 标签
+
+  sls:
+    name: 销售培训 (Sales Training)
+    responsibilities:
+      - 销售手册与话术
+      - 演示方案
+      - 竞品对比卡
+
+  str:
+    name: 营销策略 (Marketing Strategy)
+    responsibilities:
+      - 产品定位
+      - GTM 策略
+      - 渠道规划

@@ -1,0 +1,11 @@
+﻿test_id,stage,step,criterion,status,system_SN,sensor_SN,instrument_SN,reference_certificate,config_hash,raw_data_path,measured_bias_C,standard_uc_C,expanded_U_C,coverage_k,result,operator,reviewer,date_CST,NCR
+L00,开工,证书/型号/图纸/温区/安全检查,关键HOLD=0；否则仅获准室温工作,NOT_RUN,,,,,,,,,,,,,,,
+L01,真机连接,四口单点/端面/原始帧/周期/单位,4/4独立映射；无跨通道误认,NOT_RUN,,,,,,,,,,,,,,,
+L02,故障,拔P02/拔网线/重连,P02 BAD；全部失联>3s STALE；SN不换,NOT_RUN,,,,,,,,,,,,,,,
+L03,均温适配,测绘参考和P位置/插深/稳定,稳态10min峰峰≤0.3℃、斜率≤0.05℃/min；梯度入预算,NOT_RUN,,,,,,,,,,,,,,,
+L04,温标,25/100/200/300/400/500/600升降3循环,2拟合1盲验；各点记录e/U/k；保护带|e|+U≤3,NOT_RUN,,,,,,,,,,,,,,,
+L05,应变隔离,25/300/600批准载荷加载卸载,实际批准机械范围内折算干扰≤1℃目标,NOT_RUN,,,,,,,,,,,,,,,
+L06,热接触,M02工装/3次装拆/参考位置,修正与U单独；保护带|e|+U≤5目标,NOT_RUN,,,,,,,,,,,,,,,
+L07,漂移初筛,获批最高温168h,等效漂移≤2℃目标；不代表数年,NOT_RUN,,,,,,,,,,,,,,,
+L08,扩展DVT,另获批1000h与50循环,等效漂移≤3℃目标；缺失则NOT_RUN,NOT_RUN,,,,,,,,,,,,,,,
+L09,审查,原始日志/温标/证书/hash/NCR,QA签核且用途限定4支/工装/温区,NOT_RUN,,,,,,,,,,,,,,,

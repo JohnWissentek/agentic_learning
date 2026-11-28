@@ -1,0 +1,2 @@
+﻿record_id,sensor_id,serial,calibration_id,reference_id,reference_certificate,setpoint_C,direction,cycle,stable_start_CST,stable_end_CST,reference_mean_C,lambda_mean_nm,T_indicated_C,error_C,expanded_uncertainty_C,coverage_factor,decision_rule,decision,raw_data_path,operator,reviewer,status
+TEMPLATE,,,,,,,,,,,,,,,,,,,,,,NOT_RUN

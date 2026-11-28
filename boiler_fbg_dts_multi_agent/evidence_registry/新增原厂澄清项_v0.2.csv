@@ -1,0 +1,9 @@
+﻿id,party,question,status,required_evidence,blocking
+R2-01,FiSens,1550 STD+AC完整600℃实验成品的全部订货配置/引纤/过渡/应变自由度/热限,OPEN_NOT_SENT,原厂受控图+料号/分段温区/应变验证,YES
+R2-02,FiSens,Rev7页脚版次、1480vs1460下限、CWL50pmvs150pm、R累积损耗定义和容差,OPEN_NOT_SENT,现行受控规格+逐支/逐串完整出厂谱,YES
+R2-03,FiSens,STD600–900℃具体材料处理与AC成品600℃漂移/寿命；不得移植UHS低IL,OPEN_NOT_SENT,指定型号试验数据/允许温程/校准报告,YES
+R2-04,CALSENS,完整保护图/1200℃可用保护/官网polymer表述/尺寸和封装解耦,OPEN_NOT_SENT,型号与材料热限/结构/漂移/校准,YES
+R2-05,Luna/HBK,保证Ptx最小/检测与饱和门限/谱形条件；现在是否供货或EOL,OPEN_NOT_SENT,现行规格与原厂链路计算/全谱测试,YES
+R2-06,Luna/HBK/OSENSA,SDK实际获取/版本/操作系统/离线/内嵌与商业分发许可,OPEN_NOT_SENT,正式许可/协议/发行条件与费用,YES
+R2-07,OSENSA,PRB1000HT与FTX200LUXHT两台四点配套码/4根≤5m专线/低温精度,OPEN_NOT_SENT,当前供货/校准/接口/报价；非FBG独立系统,YES
+R2-08,现场方,实际最低温/材料许可温度/热点/安装压力边界与检修窗口,OPEN_NOT_SENT,原OEM图纸/历史数据/审批主体与网安设计,YES

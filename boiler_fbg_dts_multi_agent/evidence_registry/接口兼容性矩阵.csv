@@ -1,0 +1,14 @@
+﻿interface_id,from,to,evidence_status,verified_fact,unverified_condition,test,release_status
+IF01,FiSens1550 STD+AC complete probe,HBK FS22SI4CH FC/APC,PARTIAL_PRIMARY_FACTS,1550 productPDF1480–1620 supportsFC/APC; HBK1500–1600 FC/APC,完整600℃热过渡/全温峰形/反射/绝对标定/应变未知；同连接器不等于已兼容,每口一支1550真机温标/全温谱/掉峰与映射,HOLD
+IF02,未选定8点高温阵列,Luna si255EV8CH LC/APC,NOT_SELECTED,Luna1460–1620/10Hz/LC/APC原厂PDF已读,现场完整封装厂家/型号/长度/连接器/寿命未定；不能用T89040点摘要,全串冷热错位/最弱返回/饱和/ID,NOT_PROCUREMENT_READY
+IF03,HBK FS22SI,PC采集驱动,DOCUMENTED_PROTOCOL_NOT_HARDWARE_TESTED,TCP3500命令/3365连续；ASCII SCPI；1Hz,固件/终止符顺序/字段/异常帧/授权需确认；无真机测试,连接单帧→连续→拔纤/断网/重连,HOLD
+IF04,Luna si255,PC应用API,DOCUMENTED_API_FAMILY_ONLY,原厂PDF列Python/C++/Matlab/C#/LabVIEW,具体协议/端口/SDK版本/离线/商业分发/当前EOL未知,获许可SDK后真实硬件集成,HOLD
+IF05,FC/APC实验探头,LC/APC试点解调,CONNECTOR_MISMATCH_MANAGEABLE_NOT_RELEASED,接口机械类型不同，不能硬插,须批准单模FC/APC–LC/APC跳线/接续IL/NA/MFD及全链验证,端面/IL/谱/温标联测,HOLD
+IF06,FiSens850nm产品,HBK1500–1600或Luna1460–1620,INCOMPATIBLE_BAND,808–880nm与1550仪器不相交,不能通过换连接器解决,禁止采购为该组合,REJECT
+IF07,CALSENS完整保护高温FBG,Luna或HBK,RFI_ONLY,1460–1620±0.5nm FC/APC；FWHM0.1–2nm,全温峰宽可能超Luna0.25nm测试条件；无结构/寿命/解耦证明,窄峰定制/新λ预算/功率与校准,HOLD
+IF08,OSENSA PRB1000HT,FTX100/200/300LUXHT,MANUFACTURER_FAMILY_MATCH,原厂专用系统/1–3通道；ST延长≤5m,探头/FTX准确订货码和校准/SDK许可/交期需确认,USB/RS485ModbusRTU/遮光/30s常数,HOLD
+IF09,OSENSA PRB1000HT,Luna/HBK FBG光口,INCOMPATIBLE_TECHNOLOGY,非FBG专用光纤探头，不能按1550FBG读出,ST改FC跳线不会改变感测原理,禁止该组合,REJECT
+IF10,I01标准HBK供电,原厂认可PSU,PARTIAL_PRIMARY_FACTS,FS22SI标准型11–36VDC；机架型AC另行规定,插头/针脚/认证PSU未确认，不给通用24V裸接线,按实物铭牌/手册电检,HOLD
+IF11,24V柜电源/UPS,Luna+IPC+网络,DESIGN_REQUIREMENT,Luna9–36Vmax40W;IPC10–36Vmax85W,浪涌/电流/余量/UPS实际容量/柜温认证待选,负载/掉电/恢复试验,HOLD
+IF12,只读应用,电厂SIS/DCS显示,SITE_SPECIFIC_NOT_APPROVED,软件无写控功能；国能某招标有SISIII需求但非通用,本站分区/单向装置/协议许可/资产白名单未知,正式网安审批+端到端只读验收,HOLD
+IF13,模拟管接触座/AC探头,实际受压水冷壁,NOT_INTERCHANGEABLE_VALIDATION,模拟管不承压；AC材料温限不等于施工许可,曲率/夹紧/热场/振动/压力完整性/改造分类未定,机械图/OEM许可/现场热工与SAT,HOLD

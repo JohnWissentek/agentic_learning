@@ -1,0 +1,2 @@
+﻿record_id,project_id,test_id,equipment_serials,software_hash,config_hash,date_CST,procedure_revision,expected_result,observed_result,raw_evidence_path,deviation_NCR,operator,independent_reviewer,release_decision,status
+TEMPLATE,,,,,,,,,,,,,,HOLD,NOT_RUN

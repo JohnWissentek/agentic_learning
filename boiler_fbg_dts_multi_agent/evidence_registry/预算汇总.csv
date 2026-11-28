@@ -1,0 +1,3 @@
+﻿tier,subtotal_low_CNY,subtotal_high_CNY,contingency_fraction,planning_total_low_CNY,planning_total_high_CNY,meaning
+LAB,75000,218000,0.25,93750.0,272500.0,未询价预算情景；不含税费停机重大改造
+PILOT,553400,1590000,0.3,719420.0,2067000.0,未询价预算情景；不含税费停机重大改造

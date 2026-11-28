@@ -1,0 +1,2 @@
+﻿NCR_id,severity,found_CST,system_SN,affected_sensor_SN_batch,software_config_version,symptom_fact,raw_data_hash_path,containment_owner,containment_action,containment_due,root_cause_hypothesis,root_cause_test_evidence,corrective_ECN_release,verification_plan,verification_raw_evidence,effectiveness_window,customer_notification_approval,QA_release,closure_CST,status
+,,,,,,,,,,,,,,,,,,,,BLANK_NOT_EXECUTED
