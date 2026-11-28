@@ -1,11 +1,59 @@
 {
-    "venvPath": ".",
+    "venvPath": "wechat_AI_assistant",
     "venv": ".venv",
     "include": [
         "."
     ],
+    "exclude": [
+        "**/.venv",
+        "**/venv",
+        "**/__pycache__",
+        "**/node_modules",
+        "**/.pytest_cache",
+        "**/.ruff_cache"
+    ],
     "extraPaths": [
-        "."
+        ".",
+        "wechat_AI_assistant",
+        "wechat_AI_assistant/src"
+    ],
+    "executionEnvironments": [
+        {
+            "root": "wechat_AI_assistant",
+            "pythonVersion": "3.13",
+            "extraPaths": [
+                "wechat_AI_assistant",
+                "wechat_AI_assistant/src",
+                "wechat_AI_assistant/.venv/lib/python3.13/site-packages"
+            ]
+        },
+        {
+            "root": "agentic_observability_hub",
+            "pythonVersion": "3.12",
+            "extraPaths": [
+                "agentic_observability_hub",
+                "agentic_observability_hub/src",
+                "agentic_observability_hub/.venv/lib/python3.12/site-packages"
+            ]
+        },
+        {
+            "root": "power_semiconductor_opportunities",
+            "pythonVersion": "3.12",
+            "extraPaths": [
+                "power_semiconductor_opportunities",
+                "power_semiconductor_opportunities/src",
+                "power_semiconductor_opportunities/.venv/lib/python3.12/site-packages"
+            ]
+        },
+        {
+            "root": "Boiler_FBG_Product_RD_Workflow/agentic_workflow",
+            "pythonVersion": "3.12",
+            "extraPaths": [
+                "Boiler_FBG_Product_RD_Workflow/agentic_workflow",
+                "Boiler_FBG_Product_RD_Workflow/agentic_workflow/src",
+                "Boiler_FBG_Product_RD_Workflow/agentic_workflow/.venv/lib/python3.12/site-packages"
+            ]
+        }
     ],
     "reportMissingImports": true,
     "typeCheckingMode": "basic"

@@ -1,14 +1,32 @@
 {
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder}/wechat_AI_assistant/.venv/bin/python",
     "python.venvFolders": [
-        ".venv"
+        ".venv",
+        "wechat_AI_assistant/.venv",
+        "agentic_observability_hub/.venv",
+        "power_semiconductor_opportunities/.venv",
+        "Boiler_FBG_Product_RD_Workflow/agentic_workflow/.venv"
     ],
     "python.venvPath": "${workspaceFolder}",
     "python.terminal.activateEnvironment": true,
     "python.terminal.activateEnvInCurrentTerminal": true,
     "python.analysis.extraPaths": [
-        "${workspaceFolder}"
+        "${workspaceFolder}",
+        "${workspaceFolder}/wechat_AI_assistant",
+        "${workspaceFolder}/wechat_AI_assistant/src",
+        "${workspaceFolder}/agentic_observability_hub/src",
+        "${workspaceFolder}/power_semiconductor_opportunities/src",
+        "${workspaceFolder}/Boiler_FBG_Product_RD_Workflow/agentic_workflow/src"
+    ],
+    "python.analysis.exclude": [
+        "**/.venv",
+        "**/venv",
+        "**/__pycache__",
+        "**/node_modules",
+        "**/.pytest_cache",
+        "**/.ruff_cache"
     ],
     "python.analysis.autoSearchPaths": true,
-    "python.analysis.diagnosticMode": "workspace"
+    "python.analysis.diagnosticMode": "openFilesOnly",
+    "python.testing.pytestEnabled": true
 }
