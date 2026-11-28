@@ -78,3 +78,10 @@ yarn-error.log*
 
 # 含真实客户信息的大体积本地服务报告样本（不上传）
 wechat_AI_assistant/wecom_report_agentic_analysis/docs/LubeSense-*.docx
+
+# 企微历史汇报冷备归档与本地 SQLite 数据库快照（含内部经营/财务保密数据，严禁入库）
+wechat_AI_assistant/wecom_report_agentic_analysis/reports/archive/
+*.jsonl.gz
+*.db
+*.db-wal
+*.db-shm

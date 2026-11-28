@@ -100,8 +100,9 @@ flowchart TB
 为支撑“往前推 1 个月、1 个季度、1 年乃至长期”的真实纵向对比，采集底盘从“只拉近 30 天”升级为**「首次全量回溯 + 后续永久增量」**的双模状态机：
 
 ### 3.1 新增确定性同步水位表（`ops_sync_watermarks`）
-在 SQLite 中为 5 个企业微信汇报模板分别维护独立水位记录：
+在 SQLite 中为全部 7 个企业微信汇报模板（6 个在用 + 1 个已停用历史只读模板）分别维护独立水位记录：
 - `template_id`（主键）
+- `template_status`（`active` = 参与后续增量拉取；`disabled_frozen` = 已停用模板，首次全量拉完后冻结跳过，历史数据永久保留参与回溯分析）
 - `full_backfill_completed`（`0` = 尚未完成首次全量回溯；`1` = 已完成全量，自动切入永久增量模式）
 - `backfill_cursor_date`（断点续传水位：全量拉取每完成一个 25 天切片即实时落盘，中途断网重启可从断点无缝续跑）
 - `earliest_report_date`（本模板在企微中实际拉到的最早汇报日期，供大模型准确知晓数据跨度边界）
@@ -109,12 +110,12 @@ flowchart TB
 
 ### 3.2 两种运行模式严格确定性执行（0% 大模型）
 1. **模式 A · 首次全量历史拉取（`full_backfill_completed == 0`）**：
-   - 从 `config/strategic_goals.json` 中 `initial_backfill_start_date`（默认 `2023-01-01`，可按公司启用企微汇报的实际年份微调）开始，按企微 API 硬限制自动切分为连续 **≤25 天时间窗**，逐片分页拉取全部 5 类模板的历史汇报；
-   - 空时间窗仅需 1 次 `get_record_list` 即可秒过；遇到新 `journal_uuid` 再调用 `get_record_detail` 解析控件并幂等入库（`INSERT OR IGNORE`）；
-   - 加入企微限频节流（远低于 600 次/分钟红线）与显式超时/退避重试；全部切片跑完后将 `full_backfill_completed` 置为 `1`。
+   - 从 `config/strategic_goals.json` 中 `initial_backfill_start_date` 开始，按企微 API 硬限制自动切分为连续 **≤25 天时间窗**，逐片分页拉取全部 7 类模板的历史汇报（含已停用的模板 3《现场技术支持工作报告（后补）》历史原件）；
+   - 空时间窗仅需 1 次 `get_record_list` 即可秒过；遇到新 `journal_uuid` 再调用 `get_record_detail` 解析全部控件（含嵌套图文表格题与手机手写签名题）并幂等入库（`INSERT OR IGNORE`），同时保留 `raw_payload_json` 以便随时离线重解析；
+   - 加入企微限频节流（远低于 600 次/分钟红线）与显式超时/退避重试；全部切片跑完后将 `full_backfill_completed` 置为 `1`，停用模板自动标为 `disabled_frozen`，并支持导出 `.jsonl.gz` 离线冷备份快照。
 2. **模式 B · 后续永久增量拉取（`full_backfill_completed == 1`）**：
-   - 每次定时或手动触发时，自动计算增量起止窗：`start = last_synced_at - 7 天`，`end = now`；
-   - **为什么回看 7 天？** 维恩科仪存在专门的「现场技术支持工作日报（后补）」模板，工程师出差归来常延迟 2–5 天补交上周日报。7 天安全重叠窗可 100% 捕获所有迟交补报；
+   - 仅遍历 `active` 状态的 6 个在用模板（自动跳过已冻结停用模板），自动计算增量起止窗：`start = last_synced_at - 7 天`，`end = now`；
+   - **为什么回看 7 天？** 现场结项报告允许跨日/按月提交，常规日报允许次日上午 12:00 前补交，7 天安全重叠窗可 100% 捕获所有迟交补报；
    - 拉取 UUID 列表后，先与本地 `ops_wecom_reports` 已有主键集合做差集——**已入库的汇报直接跳过，零重复调用 `get_record_detail`，常规周度增量仅需 2–5 秒即可跑完**！
 
 ---

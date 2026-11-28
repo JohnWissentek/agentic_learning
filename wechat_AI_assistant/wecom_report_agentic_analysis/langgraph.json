@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "wecom_ops_dual_track": "./graph.py:build_wecom_ops_graph"
+  },
+  "env": "../.env"
+}
