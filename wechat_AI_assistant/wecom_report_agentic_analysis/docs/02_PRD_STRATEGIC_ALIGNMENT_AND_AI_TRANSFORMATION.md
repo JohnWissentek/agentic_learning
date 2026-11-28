@@ -1,6 +1,6 @@
 # 02｜需求规格说明书（PRD）：全员汇报多维归类、战略目标对齐与 AI 提效替代分析系统
 
-> **文档编号**：`WECOM-OPS-PRD-2026-V1`  
+> **文档编号**：`WECOM-OPS-PRD-2026-V1`（**历史初版归档**；最新统一分析框架、8×7×5 分类、精确考勤口径、红队 8 大漏洞清单与 V2.4 预警 PDF 模板已全部收口至唯一真理源：[06_ANALYSIS_FRAMEWORK_AND_REPORT_TEMPLATE_SPEC.md](./06_ANALYSIS_FRAMEWORK_AND_REPORT_TEMPLATE_SPEC.md)）  
 > **文档状态**：需求结构化定稿（待董事长审阅微调后进入 Slice 1 开发与首份 30 天真实数据基线试跑）  
 > **创建日期**：2026-11-27  
 > **关联文档**：[01_FEASIBILITY_AND_ARCHITECTURE_BLUEPRINT.md](./01_FEASIBILITY_AND_ARCHITECTURE_BLUEPRINT.md)（已完成 Slice 0，线上已入库近 30 天 181 份真实汇报）  

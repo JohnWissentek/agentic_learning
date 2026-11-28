@@ -1,6 +1,6 @@
 # 04｜智能体工作流规范对标审计、UML 2.5 架构蓝图与周度 PDF 报告模板方案
 
-> **文档定位**：本文件围绕您最新拍板的交付定位——**「不集成到微信助理 Dashboard，改为独立周期运行（如每周一次），生成高管级 PDF 报告作为附件通过 Cyber Griffin 邮箱发送」**——系统交付三件事的前两项评审稿及第三项落地蓝图，待您审阅拍板后立即进入编码与实盘执行：
+> **文档定位**：本文件保留对 Slice 0/1 现有代码对照 `07/08/09/ADP` 的架构合规审计结论与 LangGraph Studio + 双栈监控大盘方案；**最新 V2.4 方案 B（独立红队挑刺 + Alert 分级预警）分析框架、精确考勤口径、稀疏四层目标对比规则与最终 PDF/邮件标准模板，已统一收口至唯一真理源 [06_ANALYSIS_FRAMEWORK_AND_REPORT_TEMPLATE_SPEC.md](./06_ANALYSIS_FRAMEWORK_AND_REPORT_TEMPLATE_SPEC.md)**。
 > 1. **第一件事**：逐项对照 `07` / `08` / `09` / `Agentic_Design_Patterns` 四份规范，完成对现有 `wecom_report_agentic_analysis` 代码的全面合规审计，并配套输出 **OMG UML 2.5 标准 Draw.io 状态机架构图**（见 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.drawio) 及高清图 [04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png](../diagrams/04_WORKFLOW_AUDIT_AND_UML25_ARCHITECTURE.png)）；
 > 2. **第二件事**：确定《维恩科仪周度经营战略对齐与 AI 提效诊断报告（PDF 版）》的**完整标准模板**（章节、核心指标、周环比与四时间窗动态追踪、图表与排版规范）；
 > 3. **第三件事**：明确 **LangGraph Studio 图形界面执行 + 全链路 LLM 上下文监控大盘** 的零冗余复用落地方案；
